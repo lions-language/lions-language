@@ -1,22 +1,56 @@
-use libcommon::token;
+use libcommon::token::{self, TokenContext, TokenType};
 
 /// store Vec<u8> struct
-pub struct VecU8(Vec<u8>);
+#[derive(Debug)]
+pub struct VecU8{
+    v: Vec<u8>
+}
+
 impl VecU8 {
-    fn lookup_next_n(&mut self, n: usize) -> Option<char> {
-        None
+    fn skip_next_n(&mut self, n: usize) {
+        // 跳过n个字符
+        if n > self.v.len() {
+            panic!("skip next must be called after lookup");
+        }
+        for _ in 0..n {
+            self.v.remove(0);
+        }
+    }
+
+    fn skip_next_one(&mut self) {
+        self.skip_next_n(1);
+    }
+
+    fn lookup_next_n(&self, n: usize) -> Option<char> {
+        if n == 0 {
+            panic!("n > 0");
+        }
+        let index = n - 1;
+        if (self.v.len() > 0) && (index > self.v.len() - 1) {
+            // 没有可以获取的值了
+            return None;
+        } else {
+            if self.v.len() == 0 {
+                return None;
+            }
+            return Some(self.v[index] as char)
+        }
     }
     
-    fn lookup_next_one(&mut self) -> Option<char> {
-        None
+    fn lookup_next_one(&self) -> Option<char> {
+        return self.lookup_next_n(1);
     }
 
     fn from_vec_u8(v: Vec<u8>) -> Self {
-        Self(v)
+        Self{
+            v: v
+        }
     }
 
     fn new() -> Self {
-        Self(Vec::new())
+        Self{
+            v: Vec::new()
+        }
     }
 }
 
@@ -36,17 +70,15 @@ pub enum CallbackReturnStatus {
 pub type TokenVecItem = Box<dyn token::Token>;
 
 pub struct LexicalParser<T: FnMut() -> CallbackReturnStatus> {
-    // content: std::str::Chars<'a>,
-    // cb: Callback<'a>
+    file: String,
+    line: u64,
+    col: u64,
     content: VecU8,
     cb: T,
     tokens_buffer: Vec<TokenVecItem>
 }
 
 impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
-    fn parser(&self) {
-    }
-
     /*
     // 为什么下面的是错误的呢 ?
     // 因为 返回值是 self.tokens_buffer的引用
@@ -106,6 +138,22 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
         }
     }
     */
+
+    fn skip_next_n(&mut self, n: usize) {
+        // 在 lookup 之后调用
+        // 也就是说, 此时缓存中一定存在足够skip n个token的长度
+        if self.tokens_buffer.len() < n {
+            // 缓存中不存在足够的token => 调用顺序有误 => 拋异常
+            panic!("skip next n must be called after lookup");
+        }
+        for _ in 0..n {
+            self.tokens_buffer.remove(0);
+        }
+    }
+
+    fn skip_next_one(&mut self) {
+        self.skip_next_n(1);
+    }
 
     fn lookup_next_n(&mut self, n: usize) -> Option<&TokenVecItem> {
         match self.lookup_next_n_index(n) {
@@ -180,16 +228,43 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
     }
 
     fn select(&mut self, c: char) {
+        // 此时的 content 位置是 c (没有提取出来)
         match c {
-            '+' => self.start_with_plus(),
+            '+' => self.plus(),
+            '\r' => self.backslash_r(),
+            '\n' => self.backslash_n(),
             _ => {}
         }
     }
+
+    fn build_token_context(&self, token_type: TokenType) -> TokenContext {
+        TokenContext {
+            line: self.line,
+            col: self.col,
+            token_type: token_type
+        }
+    }
+
+    fn add_one_line(&mut self) {
+        self.line += 1;
+    }
+
+    fn panic(&self, msg: &str) {
+        panic!("{}: {} => {}", &self.file, self.line, msg);
+    }
+
 }
 
 impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
-    pub fn new(cb: T) -> LexicalParser<T> {
+    pub fn get_file(&self) -> &String {
+        &self.file
+    }
+
+    pub fn new(file: String, cb: T) -> LexicalParser<T> {
         let parser = LexicalParser{
+            file: file,
+            line: 0,
+            col: 0,
             content: VecU8::new(),
             cb: cb,
             tokens_buffer: Vec::new()
@@ -199,20 +274,51 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
 }
 
 mod plus;
+mod backslash_r;
+mod backslash_n;
 
 mod test {
     use super::*;
 
+    use std::fs;
+    use std::io::Read;
+
     #[test]
-    fn leical_parser() {
-        let mut len = 0;
-        let obj = LexicalParser::new(&mut || -> CallbackReturnStatus {
-            len += 1;
-            if len == 2 {
-                return CallbackReturnStatus::End;
-            } else {
-                return CallbackReturnStatus::Continue(VecU8::from_vec_u8(String::from("a = ").as_bytes().to_vec()));
+    fn lexical_lookup_next_n_test() {
+        let mut file = String::from("main.lions");
+        let mut f = match fs::File::open(&file) {
+            Ok(f) => f,
+            Err(err) => {
+                panic!("read file error");
+            }
+        };
+        let mut obj = LexicalParser::new(file.clone(), || -> CallbackReturnStatus {
+            let mut v = Vec::new();
+            let mut f_ref = f.by_ref();
+            match f_ref.take(1024).read_to_end(&mut v) {
+                Ok(len) => {
+                    if len == 0 {
+                        return CallbackReturnStatus::End;
+                    } else {
+                        return CallbackReturnStatus::Continue(VecU8::from_vec_u8(v));
+                    }
+                },
+                Err(_) => {
+                    return CallbackReturnStatus::End;
+                }
             }
         });
+        loop {
+            match obj.lookup_next_n(1) {
+                Some(t) => {
+                    let token_type = &t.context().token_type;
+                    println!("{:?}", token_type);
+                    obj.skip_next_one();
+                },
+                None => {
+                    break;
+                }
+            }
+        }
     }
 }
