@@ -1,4 +1,4 @@
-use libcommon::token::{self, TokenContext, TokenType};
+use libcommon::token::{self, TokenContext, TokenType, NoFunctionToken};
 
 /// store Vec<u8> struct
 #[derive(Debug)]
@@ -80,56 +80,31 @@ pub struct LexicalParser<T: FnMut() -> CallbackReturnStatus> {
 
 impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
     /*
-    // 为什么下面的是错误的呢 ?
-    // 因为 返回值是 self.tokens_buffer的引用
-    // 查看下n个token
     fn lookup_next_n(&mut self, n: usize) -> Option<&TokenVecItem> {
         let tokens_len = self.tokens_buffer.len();
         if tokens_len == 0 {
-            /*
-            ** 缓存中没有数据 => 从 content 中读取
-            */
         } else {
-            /*
-            * 缓存中存在数据
-            */
             match self.tokens_buffer.get(n - 1) {
                 Some(token) => {
-                    /*
-                    * 缓存中的token满足n个
-                    */
                     return Some(token);
                 },
                 None => {
-                    /*
-                    * 缓存中的token不足n个
-                    */
                 }
             }
         }
         loop {
             match self.content.lookup_next_one() {
                 Some(c) => {
-                    self.select(c as char);
+                    self.select('a');
                     return None;
                 },
                 None => {
                     match (self.cb)() {
                         CallbackReturnStatus::Continue(content) => {
-                            /*
-                             * 回调的结果是继续 => 当前解析的文件还存在待解析的字符串
-                             * 1. 使用 回调的content, 修改 self.content
-                             * 2. 下一次的时候就是用最新的 content 循环
-                             */
                             *(&mut self.content) = content;
                             continue;
                         },
-                        CallbackReturnStatus::End(content) => {
-                            // 不存在待解析的字符串 (读到了文件的最尾部)
-                            /*
-                             * 不存在待解析的字符串
-                             * 1. 判断已经获取到的token是否达到了n
-                             */
+                        CallbackReturnStatus::End => {
                              return None;
                         }
                     }
@@ -220,6 +195,11 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
         self.tokens_buffer.push(item);
     }
 
+    fn push_nofunction_token_to_token_buffer(&mut self, token_type: TokenType) {
+        let context = self.build_token_context(token_type);
+        self.push_to_token_buffer(Box::new(NoFunctionToken::new(context)));
+    }
+
     fn lookup_next_one(&mut self) -> Option<TokenVecItem> {
         None
     }
@@ -227,13 +207,42 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
     fn lookup_next_n_with_vec(&mut self) {
     }
 
+    fn is_id_start(&self, c: char) -> bool {
+        if (c == '_') || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') {
+            return true;
+        }
+        false
+    }
+
+    // 除第一位外, 字符是否属于ID
+    fn is_id(&self, c: char) -> bool {
+        if (c == '_') || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') {
+            return true;
+        }
+        false
+    }
+
+    // 是否是数字
+    fn is_number(&self, c: char) -> bool {
+        if c >= '0' && c <= '9' {
+            return true;
+        }
+        false
+    }
+
     fn select(&mut self, c: char) {
         // 此时的 content 位置是 c (没有提取出来)
         match c {
-            '+' => self.plus(),
             '\r' => self.backslash_r(),
             '\n' => self.backslash_n(),
-            _ => {}
+            '+' => self.plus(),
+            _ => {
+                if self.is_id_start(c) {
+                    self.id(c);
+                } else if self.is_number(c) {
+                    self.number(c, &None);
+                }
+            }
         }
     }
 
@@ -276,6 +285,8 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
 mod plus;
 mod backslash_r;
 mod backslash_n;
+mod number;
+mod id;
 
 mod test {
     use super::*;
