@@ -4,19 +4,19 @@ use super::{LexicalParser, CallbackReturnStatus};
 use libcommon::token::{TokenType};
 
 impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
-    fn plus(&mut self) {
-        // 判断 + 后面是否是数值
+    fn minus(&mut self) {
+        // 判断 - 后面是否是数值
         loop {
             match self.content.lookup_next_one() {
                 Some(c) => {
                     if self.is_number_start(c) {
                         // + 后面是 数值
-                        self.number(c, &Some(NumberPrefix::Plus));
+                        self.number(c, &Some(NumberPrefix::Minus));
                         return;
                     }
-                    // + 后面不是 数值 => 生成 Plus token
-                    let context = self.build_token_context(TokenType::Plus);
-                    self.push_to_token_buffer(Box::new(plus::PlusToken::new(context)));
+                    // - 后面不是 数值 => 生成 Minus token
+                    let context = self.build_token_context(TokenType::Minus);
+                    self.push_to_token_buffer(Box::new(minus::MinusToken::new(context)));
                     return;
                 },
                 None => {
@@ -34,22 +34,22 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
         }
     }
 
-    pub fn plus_process(&mut self) {
+    pub fn minus_process(&mut self) {
         // 跳过 + 号
         self.content.skip_next_one();
         loop {
             match self.content.lookup_next_one() {
                 Some(c) => {
                     match c {
-                        '+' => {
-                            // ++
+                        '-' => {
+                            // --
                         },
                         '=' => {
-                            // +=
+                            // -=
                         },
                         _ => {
-                            // +
-                            self.plus();
+                            // -
+                            self.minus();
                             break;
                         }
                     }
@@ -70,6 +70,6 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
     }
 }
 
-mod plus;
-mod plus_plus;
+mod minus;
+mod minus_minus;
 

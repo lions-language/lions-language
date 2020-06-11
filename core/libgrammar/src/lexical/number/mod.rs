@@ -34,7 +34,7 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
                     match self.number_is_8(c) {
                         Some(v) => {
                             self.content.skip_next_one();
-                            value += value * 8 + v as u64;
+                            value = value * 8 + v as u64;
                         },
                         None => {
                             break;
@@ -64,9 +64,9 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
         None
     }
 
-    fn number_10(&mut self, prefix: &Option<NumberPrefix>) {
+    fn number_10(&mut self, prefix: &Option<NumberPrefix>, start_c: char) {
         // 十进制
-        let mut value: u64 = 0;
+        let mut value: u64 = (start_c as u8 - '0' as u8) as u64;
         let mut f_value: f64 = 0.0;
         enum Type {
             // 解析整数部分
@@ -75,8 +75,8 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
             Decimal
         }
         let mut status = Type::Integer;
-        // 存储
         let mut result_type = Type::Integer;
+        let mut f_index = 1;
         loop {
             match self.content.lookup_next_one() {
                 Some(c) => {
@@ -88,11 +88,46 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
                                  * 1. 点后面是数值 => 浮点数
                                  * 2. 点后面是非数值 => 整数 break(可能是.运算符)
                                  * */
+                                // 获取 . 号后面的字符
+                                let mut after_point_c: char = ' ';
+                                match self.content.lookup_next_n(2) {
+                                    Some(ch) => {
+                                        after_point_c = ch;
+                                    },
+                                    None => {
+                                        match (self.cb)() {
+                                            CallbackReturnStatus::Continue(content) => {
+                                                *(&mut self.content) = content;
+                                                if let Some(ch) = self.content.lookup_next_n(2) {
+                                                    after_point_c = ch;
+                                                } else {
+                                                    // cb 返回 continue => 说明 . 号后面一定有字符,
+                                                    // 所以这里是肯定不会发生的, 如果发生了,
+                                                    // 说明 cb 中返回的 content 是空的
+                                                    // (代码逻辑错误)
+                                                    panic!("should not happend");
+                                                }
+                                            },
+                                            CallbackReturnStatus::End => {
+                                                // 源码遇到这种情况: xxx. EOF
+                                                // 也就是说点号后面是结尾 => 语法错误
+                                                self.panic("expect number after or method after point, but found a EOF");
+                                            }
+                                        }
+                                    }
+                                }
+                                if let None = self.number_is_10(after_point_c) {
+                                    // . 后面是非数值
+                                    break;
+                                } else {
+                                    // . 后面是数值 => 跳过 点
+                                    self.content.skip_next_one();
+                                }
                                 status = Type::Decimal;
                                 continue;
                             }
                             if let Some(v) = self.number_is_10(c) {
-                                value += value * 10 + v as u64;
+                                value = value * 10 + v as u64;
                                 self.content.skip_next_one();
                             } else {
                                 // 在整数状态下, 后面既不是 . 也不是数值 => 退出解析
@@ -102,7 +137,9 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
                         },
                         Type::Decimal => {
                             if let Some(v) = self.number_is_10(c) {
-                                f_value += f_value * 0.1 + v as f64;
+                                // 小数部分: 原数值 * 0.1 + v.pow()
+                                f_value += v as f64 * 0.1_f64.powi(f_index);
+                                f_index += 1;
                                 self.content.skip_next_one();
                             } else {
                                 // 在小数状态下, 后面不是数值 => 退出解析
@@ -141,7 +178,7 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
             return Some(c as u8 - 'A' as u8 + 10);
         } else if c >= 'a' && c <= 'f' {
             return Some(c as u8 - 'a' as u8 + 10);
-        } else if self.is_number(c) {
+        } else if let Some(_) = self.number_is_10(c) {
             return Some(c as u8 - '0' as u8);
         }
         None
@@ -150,7 +187,7 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
     fn number_16(&mut self, c: char, prefix: &Option<NumberPrefix>) {
         // 十六进制, c: x|X
         // 跳过 x|X
-        self.skip_next_one();
+        self.content.skip_next_one();
         let mut is = false;
         let mut value: u64 = 0;
         loop {
@@ -160,7 +197,7 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
                         Some(v) => {
                             is = true;
                             self.content.skip_next_one();
-                            value += value * 16 + v as u64;
+                            value = value * 16 + v as u64;
                         },
                         None => {
                             break;
@@ -187,6 +224,18 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
         self.push_nofunction_token_to_token_buffer(TokenType::Number(self.number_range_change(prefix, BeforeChange::Integer(value))));
     }
 
+    fn number_is_mid(&mut self, c: char) -> bool {
+        // 在第一位是数值的情况下, 剩余几位是否是合法数值组成部分
+        if let Some(_) = self.number_is_10(c) {
+            // 是 0-9
+            return true;
+        } else if c == 'x' || c == 'X' || c == '.' {
+            // 是 x | X | .
+            return true;
+        }
+        false
+    }
+
     pub fn number(&mut self, start_c: char, prefix: &Option<NumberPrefix>) {
         // 跳过第一个字符
         self.content.skip_next_one();
@@ -204,7 +253,8 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
                 let mut is_zero = false;
                 match self.content.lookup_next_one() {
                     Some(c) => {
-                        if !self.is_number(c) {
+                        if !self.number_is_mid(c) {
+                            println!("{}", c);
                             is_zero = true;
                         }
                     },
@@ -214,7 +264,7 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
                                 *(&mut self.content) = content;
                                 match self.content.lookup_next_one() {
                                     Some(c) => {
-                                        if !self.is_number(c) {
+                                        if !self.number_is_mid(c) {
                                             is_zero = true;
                                         }
                                     },
@@ -249,10 +299,19 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
                                 'x'|'X' => {
                                     // 十六进制
                                     self.number_16(c, prefix);
+                                    return;
+                                },
+                                '.' => {
+                                    self.number_10(prefix, start_c);
+                                    return;
                                 },
                                 _ => {
-                                    if self.is_number(c) {
+                                    if let Some(_) = self.number_is_10(c) {
                                         // 八进制
+                                        if let None = self.number_is_8(c) {
+                                            // 0 后面是数字, 但是不是 八进制的数值 => 报错
+                                            self.panic("expect 0-7 after 0");
+                                        }
                                         self.number_8(prefix);
                                         return;
                                     } else {
@@ -280,7 +339,7 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
             },
             _ => {
                 // 十进制 (需要考虑存在小数点的情况)
-                self.number_10(prefix);
+                self.number_10(prefix, start_c);
                 return;
             }
         }

@@ -223,7 +223,7 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
     }
 
     // 是否是数字
-    fn is_number(&self, c: char) -> bool {
+    fn is_number_start(&self, c: char) -> bool {
         if c >= '0' && c <= '9' {
             return true;
         }
@@ -235,12 +235,16 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
         match c {
             '\r' => self.backslash_r(),
             '\n' => self.backslash_n(),
-            '+' => self.plus(),
+            '+' => self.plus_process(),
+            '-' => self.minus_process(),
+            ' ' => self.space(),
             _ => {
                 if self.is_id_start(c) {
                     self.id(c);
-                } else if self.is_number(c) {
+                } else if self.is_number_start(c) {
                     self.number(c, &None);
+                } else {
+                    self.panic(&format!("not support char: {}", c));
                 }
             }
         }
@@ -283,6 +287,8 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
 }
 
 mod plus;
+mod minus;
+mod space;
 mod backslash_r;
 mod backslash_n;
 mod number;
@@ -306,7 +312,7 @@ mod test {
         let mut obj = LexicalParser::new(file.clone(), || -> CallbackReturnStatus {
             let mut v = Vec::new();
             let mut f_ref = f.by_ref();
-            match f_ref.take(1024).read_to_end(&mut v) {
+            match f_ref.take(1).read_to_end(&mut v) {
                 Ok(len) => {
                     if len == 0 {
                         return CallbackReturnStatus::End;
