@@ -191,6 +191,10 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
         }
     }
 
+    fn lookup_next_one(&mut self) -> Option<&TokenVecItem> {
+        return self.lookup_next_n(1);
+    }
+
     fn push_to_token_buffer(&mut self, item: TokenVecItem) {
         self.tokens_buffer.push(item);
     }
@@ -198,13 +202,6 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
     fn push_nofunction_token_to_token_buffer(&mut self, token_type: TokenType) {
         let context = self.build_token_context(token_type);
         self.push_to_token_buffer(Box::new(NoFunctionToken::new(context)));
-    }
-
-    fn lookup_next_one(&mut self) -> Option<TokenVecItem> {
-        None
-    }
-
-    fn lookup_next_n_with_vec(&mut self) {
     }
 
     fn is_id_start(&self, c: char) -> bool {
@@ -235,12 +232,16 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
         match c {
             '\r' => self.backslash_r(),
             '\n' => self.backslash_n(),
+            '\t' => self.backslash_t(),
             '+' => self.plus_process(),
             '-' => self.minus_process(),
+            '=' => self.equal_process(),
+            '`' => self.backticks_process(),
+            '"' => self.double_quotes_process(),
             ' ' => self.space(),
             _ => {
                 if self.is_id_start(c) {
-                    self.id(c);
+                    self.id_process(c);
                 } else if self.is_number_start(c) {
                     self.number(c, &None);
                 } else {
@@ -288,9 +289,11 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
 
 mod plus;
 mod minus;
+mod equal;
 mod space;
 mod backslash_r;
 mod backslash_n;
+mod backslash_t;
 mod number;
 mod id;
 

@@ -15,10 +15,21 @@ pub enum NumberValue {
 #[derive(Debug)]
 pub enum TokenType {
     Unknown,
+    // +
     Plus,
+    // -
     Minus,
+    // =
+    Equal,
+    // ==
+    EqualEqual,
+    // \r | \r\n | \n
     NewLine,
+    // if
     If,
+    // else
+    Else,
+    // elif
     ElseIf,
     Id(String),
     Number(NumberValue),
