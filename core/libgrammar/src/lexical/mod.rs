@@ -287,6 +287,7 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
     }
 }
 
+mod common;
 mod plus;
 mod minus;
 mod equal;
@@ -294,6 +295,8 @@ mod space;
 mod backslash_r;
 mod backslash_n;
 mod backslash_t;
+mod backticks;
+mod double_quotes;
 mod number;
 mod id;
 
