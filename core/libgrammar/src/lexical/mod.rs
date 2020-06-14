@@ -3,7 +3,8 @@ use libcommon::token::{self, TokenContext, TokenType, NoFunctionToken};
 /// store Vec<u8> struct
 #[derive(Debug)]
 pub struct VecU8{
-    v: Vec<u8>
+    v: Vec<u8>,
+    index: usize
 }
 
 impl VecU8 {
@@ -15,17 +16,36 @@ impl VecU8 {
         for _ in 0..n {
             self.v.remove(0);
         }
+        self.index = 0;
     }
 
     fn skip_next_one(&mut self) {
         self.skip_next_n(1);
     }
 
+    fn virtual_skip_next_n(&mut self, n: usize) {
+        self.index += n;
+        println!("{}", self.index);
+    }
+
+    fn virtual_skip_next_one(&mut self) {
+        self.virtual_skip_next_n(1);
+    }
+
+    fn backtrack_n(&mut self, n: usize) {
+        // 回溯
+        if n > self.index {
+            panic!(format!("backtrack n > self.index, n: {}, self.index: {}", n, self.index));
+        }
+        let index = self.index - n;
+        self.index -= index;
+    }
+
     fn lookup_next_n(&self, n: usize) -> Option<char> {
         if n == 0 {
             panic!("n > 0");
         }
-        let index = n - 1;
+        let index = self.index + n - 1;
         if (self.v.len() > 0) && (index > self.v.len() - 1) {
             // 没有可以获取的值了
             return None;
@@ -43,13 +63,15 @@ impl VecU8 {
 
     fn from_vec_u8(v: Vec<u8>) -> Self {
         Self{
-            v: v
+            v: v,
+            index: 0
         }
     }
 
     fn new() -> Self {
         Self{
-            v: Vec::new()
+            v: Vec::new(),
+            index: 0
         }
     }
 }
@@ -307,6 +329,7 @@ mod test {
     use std::io::Read;
 
     #[test]
+    // #[ignore]
     fn lexical_lookup_next_n_test() {
         let mut file = String::from("main.lions");
         let mut f = match fs::File::open(&file) {

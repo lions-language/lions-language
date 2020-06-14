@@ -30,6 +30,12 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
         self.push_nofunction_token_to_token_buffer(TokenType::ElseIf);
     }
 
+    fn id_kw_strfmt(&mut self) {
+        // strfmt""
+        // strfmt<><>""
+        self.id_kw_strfmt_process();
+    }
+
     pub fn id_process(&mut self, start_c: char) {
         let mut s = String::new();
         s.push(start_c);
@@ -67,10 +73,15 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
             "elif" => {
                 self.id_kw_else_if();
             },
+            "strfmt" => {
+                self.id_kw_strfmt();
+            },
             _ => {
                 self.id(&s);
             }
         }
     }
 }
+
+mod strfmt;
 
