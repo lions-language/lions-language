@@ -5,10 +5,9 @@ pub struct U8ArrayIsEqual<'a> {
 }
 
 pub enum U8ArrayIsEqualResult {
-    // 到了 输入序列的长度, 但是还没有匹配
-    NoMatchArriveLength(usize),
     // 没有达到输入序列的长度, 就不匹配了
-    NoMatchLessLength(usize),
+    NoMatch(usize),
+    // 当前字符和之前的字符都匹配了
     Continue,
     Match(usize)
 }
@@ -30,20 +29,15 @@ impl<'a> U8ArrayIsEqual<'a> {
                         return U8ArrayIsEqualResult::Continue;
                     }
                 } else {
-                    if self.index == self.length {
-                        self.index = 0;
-                        return U8ArrayIsEqualResult::NoMatchArriveLength(self.length);
-                    } else {
-                        let r = U8ArrayIsEqualResult::NoMatchLessLength(self.index);
-                        self.index = 0;
-                        return r;
-                    }
+                    let r = U8ArrayIsEqualResult::NoMatch(self.index);
+                    self.index = 0;
+                    return r;
                 }
             },
             None => {
-                // 如果到达这个分支, 说明 index > length
-                // 这是不可能发生的, 因为只要和输入的序列匹配了 (index == length) 的时候,
-                // 就会直接返回, 如果中间遇到了不匹配的, 也直接返回了
+                /*
+                 * 如果到达这个分支, 说明 index > length, 这是不可能发生的(注意这里的 index, 在匹配的时候才会自增), 因为只要和输入的序列匹配了 (index == length) 的时候, 就会直接返回, 如果中间遇到了不匹配的, 也直接返回了
+                 * */
                 panic!("should not happend");
             }
         }

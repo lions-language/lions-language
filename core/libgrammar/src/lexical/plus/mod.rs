@@ -70,6 +70,6 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
     }
 }
 
-mod plus;
+pub mod plus;
 mod plus_plus;
 

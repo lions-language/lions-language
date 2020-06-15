@@ -2,10 +2,10 @@ use super::{LexicalParser, CallbackReturnStatus};
 use libcommon::token::{TokenType, NoFunctionToken};
 
 impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
-    pub fn double_quotes_process(&mut self) {
+    pub fn double_quotes_process_content(&mut self) -> Vec<u8> {
         // 跳过双引号
         self.content.skip_next_one();
-        let mut str_content = String::new();
+        let mut vecu8_content = Vec::new();
         loop {
             match self.content.lookup_next_one() {
                 Some(c) => {
@@ -18,16 +18,17 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
                             // 遇到了转义字符
                             match self.escape_change() {
                                 Some(ch) => {
-                                    str_content.push(ch);
+                                    vecu8_content.push(ch as u8);
                                 },
                                 None => {
-                                    str_content.push(c);
+                                    vecu8_content.push(c as u8);
                                 }
                             }
                         },
                         _ => {
+                            self.new_line_check(c);
                             // 添加到字符串中
-                            str_content.push(c);
+                            vecu8_content.push(c as u8);
                             self.content.skip_next_one();
                         }
                     }
@@ -46,6 +47,11 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
                 }
             }
         }
-        self.push_nofunction_token_to_token_buffer(TokenType::Str(str_content));
+        vecu8_content
+    }
+
+    pub fn double_quotes_process(&mut self) {
+        let content = self.double_quotes_process_content();
+        self.push_nofunction_token_to_token_buffer(TokenType::Str(content));
     }
 }

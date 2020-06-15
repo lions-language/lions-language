@@ -33,7 +33,7 @@ pub enum TokenType {
     ElseIf,
     Id(String),
     Number(NumberValue),
-    Str(String)
+    Str(Vec<u8>)
 }
 
 impl Default for TokenType {

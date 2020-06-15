@@ -11,7 +11,7 @@ impl VecU8 {
     fn skip_next_n(&mut self, n: usize) {
         // 跳过n个字符
         if n > self.v.len() {
-            panic!("skip next must be called after lookup");
+            panic!(format!("skip next must be called after lookup, n: {}, self.v.len(): {}", n, self.v.len()));
         }
         for _ in 0..n {
             self.v.remove(0);
@@ -25,7 +25,6 @@ impl VecU8 {
 
     fn virtual_skip_next_n(&mut self, n: usize) {
         self.index += n;
-        println!("{}", self.index);
     }
 
     fn virtual_skip_next_one(&mut self) {
@@ -35,10 +34,15 @@ impl VecU8 {
     fn backtrack_n(&mut self, n: usize) {
         // 回溯
         if n > self.index {
-            panic!(format!("backtrack n > self.index, n: {}, self.index: {}", n, self.index));
+            panic!(format!("backtrack n > self.index(backtrack_n be called times > 1), n: {}, self.index: {}", n, self.index));
         }
-        let index = self.index - n;
-        self.index -= index;
+        /*
+         * 每次回溯时, 将 最前面到回溯点的元素全部移除
+         * 如:
+         *  现存有 "$$$", 回溯 2 个后 剩余 第一个 $, 即: "$", 这个 $ 将永远无法被使用(不支持多次回溯)
+         * */
+        self.skip_next_n(self.index - n);
+        self.index = 0;
     }
 
     fn lookup_next_n(&self, n: usize) -> Option<char> {
@@ -59,6 +63,10 @@ impl VecU8 {
     
     fn lookup_next_one(&self) -> Option<char> {
         return self.lookup_next_n(1);
+    }
+
+    fn append(&mut self, mut content: VecU8) {
+        self.v.append(&mut content.v);
     }
 
     fn from_vec_u8(v: Vec<u8>) -> Self {
@@ -217,6 +225,15 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
         return self.lookup_next_n(1);
     }
 
+    fn content_assign(&mut self, content: VecU8) {
+        if self.content.index > 0 {
+            self.content.append(content);
+        } else {
+            *(&mut self.content) = content;
+        }
+    }
+
+
     fn push_to_token_buffer(&mut self, item: TokenVecItem) {
         self.tokens_buffer.push(item);
     }
@@ -285,6 +302,85 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
         self.line += 1;
     }
 
+    /*
+     * 对存在 cb 的情况下, lookup_next_one 的封装
+     * */
+    fn lookup_next_one_with_cb_wrap<FindF, EndF>(&mut self, mut find_f: FindF, mut end_f: EndF)
+        where FindF: FnMut(&mut LexicalParser<T>, char), EndF: FnMut(&mut LexicalParser<T>) {
+        match self.content.lookup_next_one() {
+            Some(c) => {
+                find_f(self, c);
+            },
+            None => {
+                match (self.cb)() {
+                    CallbackReturnStatus::Continue(content) => {
+                        self.content_assign(content);
+                        match self.content.lookup_next_one() {
+                            Some(c) => {
+                                find_f(self, c);
+                            },
+                            None => {
+                                panic!("should not happend");
+                            }
+                        }
+                    },
+                    CallbackReturnStatus::End => {
+                        end_f(self);
+                    }
+                }
+            }
+        }
+    }
+
+    // 检测是否是新的一行 (用于字符串中的换行)
+    fn new_line_check(&mut self, c: char) {
+        match c {
+            '\r' => {
+                match self.content.lookup_next_one() {
+                    Some(ch) => {
+                        if ch == '\n' {
+                            self.content.virtual_skip_next_one();
+                            self.content.backtrack_n(2);
+                        } else {
+                            self.content.backtrack_n(1);
+                        }
+                        self.line += 1;
+                    },
+                    None => {
+                        match (self.cb)() {
+                            CallbackReturnStatus::Continue(content) => {
+                                self.content_assign(content);
+                                match self.content.lookup_next_one() {
+                                    Some(ch) => {
+                                        if ch == '\n' {
+                                            self.content.virtual_skip_next_one();
+                                            self.content.backtrack_n(2);
+                                        } else {
+                                            self.content.backtrack_n(1);
+                                        }
+                                        self.line += 1;
+                                    },
+                                    None => {
+                                        panic!("should not happend");
+                                    }
+                                }
+                            },
+                            CallbackReturnStatus::End => {
+                                self.content.backtrack_n(1);
+                                self.line += 1;
+                            }
+                        }
+                    }
+                }
+            },
+            '\n' => {
+                self.line += 1;
+            },
+            _ => {
+            }
+        }
+    }
+
     fn panic(&self, msg: &str) {
         panic!("{}: {} => {}", &self.file, self.line, msg);
     }
@@ -299,7 +395,7 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
     pub fn new(file: String, cb: T) -> LexicalParser<T> {
         let parser = LexicalParser{
             file: file,
-            line: 0,
+            line: 1,
             col: 0,
             content: VecU8::new(),
             cb: cb,
@@ -364,6 +460,19 @@ mod test {
                 None => {
                     break;
                 }
+            }
+        }
+    }
+
+    #[test]
+    #[ignore]
+    fn lookup_next_one_with_cb_wrap_test() {
+        impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
+            fn test(&mut self) {
+                self.lookup_next_one_with_cb_wrap(|parser, c| {
+                    parser.panic("error");
+                }, |parser| {
+                });
             }
         }
     }
