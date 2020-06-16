@@ -1,5 +1,4 @@
 use super::super::{LexicalParser, CallbackReturnStatus};
-use crate::lexical::plus::plus;
 use libcommon::token::{TokenType};
 use libcommon::strtool::strcompare::{U8ArrayIsEqual, U8ArrayIsEqualResult};
 
@@ -16,7 +15,7 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
             NotFound
         }
         let mut content = Vec::new();
-        let mut buffer = Vec::new();
+        // let mut buffer = Vec::new();
         let mut status = Status::DoubleQuotes;
         let mut start_u8_array_is_equal = U8ArrayIsEqual::new(start);
         let mut end_u8_array_is_equal = U8ArrayIsEqual::new(end);
@@ -24,6 +23,45 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
         loop {
             match self.content.lookup_next_one() {
                 Some(c) => {
+                    match status {
+                        Status::DoubleQuotes => {
+                            match c {
+                                '"' => {
+                                    self.content.skip_next_one();
+                                    self.push_nofunction_token_to_token_buffer(TokenType::Str(content.clone()));
+                                    break;
+                                },
+                                _ => {
+                                    if self.input_str_match_with_u8arrayisequal(&mut start_u8_array_is_equal) {
+                                        // match start
+                                        status = Status::EndSymbol;
+                                        self.push_nofunction_token_to_token_buffer(TokenType::Str(content.clone()));
+                                        // 模拟生成 token => ... + (...) + ...
+                                        content.clear();
+                                        self.push_token_plus();
+                                        self.push_token_left_parenthese();
+                                    } else {
+                                        self.new_line_check(c);
+                                        content.push(c as u8);
+                                        self.content.skip_next_one();
+                                    }
+                                }
+                            }
+                        },
+                        Status::EndSymbol => {
+                            if self.input_str_match_with_u8arrayisequal(&mut end_u8_array_is_equal) {
+                                status = Status::DoubleQuotes;
+                                self.push_token_right_parenthese();
+                                self.push_token_plus();
+                            } else {
+                                if c == '"' {
+                                    self.panic(&format!("expect {:?}, but arrive \"", &unsafe{String::from_utf8_unchecked(end.to_vec())}));
+                                }
+                                self.select(c);
+                            }
+                        }
+                    }
+                    /*
                     // println!("{}", c);
                     self.new_line_check(c);
                     match status {
@@ -43,8 +81,8 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
                                             self.push_nofunction_token_to_token_buffer(TokenType::Str(content.clone()));
                                             // 模拟生成 token => ... + (...) + ...
                                             content.clear();
-                                            let context = self.build_token_context(TokenType::Plus);
-                                            self.push_to_token_buffer(Box::new(plus::PlusToken::new(context)));
+                                            self.push_token_left_parenthese();
+                                            self.push_token_plus();
                                         },
                                         U8ArrayIsEqualResult::NoMatch(length) => {
                                             /*
@@ -92,8 +130,7 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
                                             status = Status::DoubleQuotes;
                                             self.content.skip_next_n(length);
                                             find_end_status = FindEndStatus::Finding;
-                                            let context = self.build_token_context(TokenType::Plus);
-                                            self.push_to_token_buffer(Box::new(plus::PlusToken::new(context)));
+                                            self.push_token_plus();
                                         },
                                         U8ArrayIsEqualResult::NoMatch(length) => {
                                             self.content.backtrack_n(length);
@@ -114,6 +151,7 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
                             }
                         }
                     }
+                    */
                 },
                 None => {
                     match (self.cb)() {

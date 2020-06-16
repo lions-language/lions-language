@@ -31,6 +31,16 @@ pub enum TokenType {
     Else,
     // elif
     ElseIf,
+    // (
+    LeftParenthese,
+    // )
+    RightParenthese,
+    // [
+    LeftSquareBrackets,
+    // ]
+    RightSquareBrackets,
+    // 注释
+    Annotate(Vec<u8>),
     Id(String),
     Number(NumberValue),
     Str(Vec<u8>)
