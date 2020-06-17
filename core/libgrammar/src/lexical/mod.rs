@@ -63,7 +63,7 @@ impl VecU8 {
         self.v.append(&mut content.v);
     }
 
-    fn from_vec_u8(v: Vec<u8>) -> Self {
+    pub fn from_vec_u8(v: Vec<u8>) -> Self {
         Self{
             v: v,
             index: 0
@@ -138,7 +138,7 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
     }
     */
 
-    fn skip_next_n(&mut self, n: usize) {
+    pub fn skip_next_n(&mut self, n: usize) {
         // 在 lookup 之后调用
         // 也就是说, 此时缓存中一定存在足够skip n个token的长度
         if self.tokens_buffer.len() < n {
@@ -150,11 +150,11 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
         }
     }
 
-    fn skip_next_one(&mut self) {
+    pub fn skip_next_one(&mut self) {
         self.skip_next_n(1);
     }
 
-    fn lookup_next_n(&mut self, n: usize) -> Option<&TokenVecItem> {
+    pub fn lookup_next_n(&mut self, n: usize) -> Option<&TokenVecItem> {
         match self.lookup_next_n_index(n) {
             Some(index) => {
                 return self.tokens_buffer.get(index);
@@ -215,7 +215,7 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
         }
     }
 
-    fn lookup_next_one(&mut self) -> Option<&TokenVecItem> {
+    pub fn lookup_next_one(&mut self) -> Option<&TokenVecItem> {
         return self.lookup_next_n(1);
     }
 
@@ -353,7 +353,7 @@ mod test {
     use std::io::Read;
 
     #[test]
-    // #[ignore]
+    #[ignore]
     fn lexical_lookup_next_n_test() {
         let mut file = String::from("main.lions");
         let mut f = match fs::File::open(&file) {
