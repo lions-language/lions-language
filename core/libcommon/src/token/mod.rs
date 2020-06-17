@@ -39,6 +39,14 @@ pub enum TokenType {
     LeftSquareBrackets,
     // ]
     RightSquareBrackets,
+    // {
+    LeftBigParenthese,
+    // }
+    RightBigParenthese,
+    // *
+    Multiplication,
+    // /
+    Division,
     // 注释
     Annotate(Vec<u8>),
     Id(String),

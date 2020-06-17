@@ -3,9 +3,19 @@ use libcommon::token::{TokenType};
 
 impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
     pub fn parenthese_left_process(&mut self) {
+        /*
+         * 跳过 (
+         * */
+        self.content.skip_next_one();
+        self.push_token_left_parenthese();
     }
 
     pub fn parenthese_right_process(&mut self) {
+        /*
+         * 跳过 )
+         * */
+        self.content.skip_next_one();
+        self.push_token_right_parenthese();
     }
 }
 

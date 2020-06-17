@@ -7,11 +7,6 @@ use libcommon::token::{TokenType, NoFunctionToken, NumberValue};
 
 // #![feature(assoc_int_consts)]
 
-pub enum NumberPrefix {
-    Plus,
-    Minus
-}
-
 enum BeforeChange {
     Integer(u64),
     Float(f64)
@@ -25,7 +20,7 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
         None
     }
 
-    fn number_8(&mut self, prefix: &Option<NumberPrefix>) {
+    fn number_8(&mut self) {
         // 八进制
         let mut value: u64 = 0;
         loop {
@@ -54,7 +49,7 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
                 }
             }
         }
-        self.push_nofunction_token_to_token_buffer(TokenType::Number(self.number_range_change(prefix, BeforeChange::Integer(value))));
+        self.push_nofunction_token_to_token_buffer(TokenType::Number(self.number_range_change(BeforeChange::Integer(value))));
     }
 
     fn number_is_10(&self, c: char) -> Option<u8> {
@@ -64,7 +59,7 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
         None
     }
 
-    fn number_10(&mut self, prefix: &Option<NumberPrefix>, start_c: char) {
+    fn number_10(&mut self, start_c: char) {
         // 十进制
         let mut value: u64 = (start_c as u8 - '0' as u8) as u64;
         let mut f_value: f64 = 0.0;
@@ -164,11 +159,11 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
         }
         match result_type {
             Type::Integer => {
-                self.push_nofunction_token_to_token_buffer(TokenType::Number(self.number_range_change(prefix, BeforeChange::Integer(value))));
+                self.push_nofunction_token_to_token_buffer(TokenType::Number(self.number_range_change(BeforeChange::Integer(value))));
             },
             Type::Decimal => {
                 let result = value as f64 + f_value;
-                self.push_nofunction_token_to_token_buffer(TokenType::Number(self.number_range_change(prefix, BeforeChange::Float(result))));
+                self.push_nofunction_token_to_token_buffer(TokenType::Number(self.number_range_change(BeforeChange::Float(result))));
             }
         }
     }
@@ -184,7 +179,7 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
         None
     }
 
-    fn number_16(&mut self, c: char, prefix: &Option<NumberPrefix>) {
+    fn number_16(&mut self, c: char) {
         // 十六进制, c: x|X
         // 跳过 x|X
         self.content.skip_next_one();
@@ -221,7 +216,7 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
             // 只有 0x => 语法错误
             self.panic("expect 0-9 / a(A)-f(F) after 0x");
         }
-        self.push_nofunction_token_to_token_buffer(TokenType::Number(self.number_range_change(prefix, BeforeChange::Integer(value))));
+        self.push_nofunction_token_to_token_buffer(TokenType::Number(self.number_range_change(BeforeChange::Integer(value))));
     }
 
     fn number_is_mid(&mut self, c: char) -> bool {
@@ -236,7 +231,7 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
         false
     }
 
-    pub fn number(&mut self, start_c: char, prefix: &Option<NumberPrefix>) {
+    pub fn number(&mut self, start_c: char) {
         // 跳过第一个字符
         self.content.skip_next_one();
         match start_c {
@@ -298,11 +293,11 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
                             match c {
                                 'x'|'X' => {
                                     // 十六进制
-                                    self.number_16(c, prefix);
+                                    self.number_16(c);
                                     return;
                                 },
                                 '.' => {
-                                    self.number_10(prefix, start_c);
+                                    self.number_10(start_c);
                                     return;
                                 },
                                 _ => {
@@ -312,7 +307,7 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
                                             // 0 后面是数字, 但是不是 八进制的数值 => 报错
                                             self.panic("expect 0-7 after 0");
                                         }
-                                        self.number_8(prefix);
+                                        self.number_8();
                                         return;
                                     } else {
                                         // 0 后面不是 x|X 也不是 数字, 这种情况下只有是0的时候才会发生,
@@ -339,7 +334,7 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
             },
             _ => {
                 // 十进制 (需要考虑存在小数点的情况)
-                self.number_10(prefix, start_c);
+                self.number_10(start_c);
                 return;
             }
         }
@@ -370,23 +365,8 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
         }
     }
 
-    fn number_float_change(&self, value: f64, prefix: &Option<NumberPrefix>) -> NumberValue {
+    fn number_float_change(&self, value: f64) -> NumberValue {
         let mut val: f64 = value;
-        match prefix {
-            Some(v) => {
-                match v {
-                    NumberPrefix::Plus => {
-                        // 前缀是 +
-                    },
-                    NumberPrefix::Minus => {
-                        val *= -1 as f64;
-                    }
-                }
-            },
-            None => {
-                // 没有前缀 => 正数
-            }
-        }
         if val >= f32::MIN as f64 && val <= f32::MAX as f64 {
             return NumberValue::Float32(val as f32);
         } else {
@@ -395,31 +375,14 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
     }
 
     // 转换合适的数值类型
-    fn number_range_change(&self, prefix: &Option<NumberPrefix>, before: BeforeChange) -> NumberValue {
+    fn number_range_change(&self, before: BeforeChange) -> NumberValue {
         match before {
             BeforeChange::Integer(value) => {
-                match prefix {
-                    Some(v) => {
-                        match v {
-                            NumberPrefix::Plus => {
-                                // 前缀是 +
-                                return self.number_unsigned_int_change(value);
-                            },
-                            NumberPrefix::Minus => {
-                                // 前缀是 -
-                                return self.number_signed_int_change(value);
-                            }
-                        }
-                    },
-                    None => {
-                        // 如果没有前缀就是正数
-                        return self.number_unsigned_int_change(value);
-                    }
-                }
+                return self.number_unsigned_int_change(value);
             },
             BeforeChange::Float(value) => {
                 // float和integer不同, float
-                return self.number_float_change(value, prefix);
+                return self.number_float_change(value);
             }
         }
     }

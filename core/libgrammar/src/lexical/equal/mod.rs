@@ -1,4 +1,3 @@
-use super::number::{NumberPrefix};
 use super::{LexicalParser, CallbackReturnStatus};
 
 use libcommon::token::{TokenType};

@@ -36,13 +36,7 @@ impl VecU8 {
         if n > self.index {
             panic!(format!("backtrack n > self.index(backtrack_n be called times > 1), n: {}, self.index: {}", n, self.index));
         }
-        /*
-         * 每次回溯时, 将 最前面到回溯点的元素全部移除
-         * 如:
-         *  现存有 "$$$", 回溯 2 个后 剩余 第一个 $, 即: "$", 这个 $ 将永远无法被使用(不支持多次回溯)
-         * */
-        self.skip_next_n(self.index - n);
-        self.index = 0;
+        self.index -= n;
     }
 
     fn lookup_next_n(&self, n: usize) -> Option<char> {
@@ -274,11 +268,14 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
             '\t' => self.backslash_t(),
             '+' => self.plus_process(),
             '-' => self.minus_process(),
+            '*' => self.start_process(),
             '=' => self.equal_process(),
             '`' => self.backticks_process(),
             '"' => self.double_quotes_process(),
             '(' => self.parenthese_left_process(),
             ')' => self.parenthese_right_process(),
+            '{' => self.big_parenthese_left_process(),
+            '}' => self.big_parenthese_right_process(),
             '[' => self.square_brackets_left_process(),
             ']' => self.square_brackets_right_process(),
             '/' => self.slash_process(),
@@ -287,7 +284,7 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
                 if self.is_id_start(c) {
                     self.id_process(c);
                 } else if self.is_number_start(c) {
-                    self.number(c, &None);
+                    self.number(c);
                 } else {
                     self.panic(&format!("not support char: {}", c));
                 }
@@ -345,7 +342,9 @@ mod number;
 mod id;
 mod parenthese;
 mod square_brackets;
+mod big_parenthese;
 mod slash;
+mod start;
 
 mod test {
     use super::*;

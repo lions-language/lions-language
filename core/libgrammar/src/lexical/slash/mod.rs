@@ -1,5 +1,7 @@
 use super::{LexicalParser, CallbackReturnStatus};
-use libcommon::strtool::strcompare::{U8ArrayIsEqual, U8ArrayIsEqualResult};
+use libcommon::strtool::strcompare::{U8ArrayIsEqual};
+use libcommon::token::{TokenType};
+use division::DivisionToken;
 
 impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
     pub fn slash_process(&mut self) {
@@ -19,11 +21,11 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
                 },
                 _ => {
                     // 除法运算符
-                    parser.slash_div();
+                    parser.slash_division();
                 }
             }
         }, |parser| {
-            parser.slash_div();
+            parser.slash_division();
         });
     }
 
@@ -107,7 +109,11 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
         self.push_token_annotate(content);
     }
 
-    fn slash_div(&mut self) {
+    fn slash_division(&mut self) {
+        let context = self.build_token_context(TokenType::Division);
+        self.push_to_token_buffer(Box::new(DivisionToken::new(context)));
     }
 }
+
+mod division;
 
