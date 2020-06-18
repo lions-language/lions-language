@@ -1,4 +1,4 @@
-use crate::lexical::{LexicalParser, CallbackReturnStatus};
+use crate::lexical::{LexicalParser, CallbackReturnStatus, TokenVecItem};
 
 pub struct GrammarParser<FT: FnMut() -> CallbackReturnStatus> {
     lexical_parser: LexicalParser<FT>
@@ -6,7 +6,26 @@ pub struct GrammarParser<FT: FnMut() -> CallbackReturnStatus> {
 
 impl<FT: FnMut() -> CallbackReturnStatus> GrammarParser<FT> {
     pub fn parser(&mut self) {
+        loop {
+            let index = match self.lexical_parser.lookup_next_one_index() {
+                Some(idx) => {
+                    idx
+                },
+                None => {
+                    break;
+                }
+            };
+            self.select(index);
+        }
     }
+
+    fn select(&mut self, index: usize) {
+        let token = self.lexical_parser.token_by_index(index);
+    }
+    /*
+    fn select<'a, 'b: 'a>(&'a mut self, token: &'b TokenVecItem) {
+    }
+    */
 
     pub fn new(lexical_parser: LexicalParser<FT>) -> Self {
         Self {

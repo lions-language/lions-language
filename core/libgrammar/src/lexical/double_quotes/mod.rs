@@ -1,5 +1,6 @@
 use super::{LexicalParser, CallbackReturnStatus};
-use libcommon::token::{TokenType, NoFunctionToken};
+use libcommon::token::{TokenType};
+use string::StringToken;
 
 impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
     pub fn double_quotes_process_content(&mut self) -> Vec<u8> {
@@ -52,6 +53,13 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
 
     pub fn double_quotes_process(&mut self) {
         let content = self.double_quotes_process_content();
-        self.push_nofunction_token_to_token_buffer(TokenType::Str(content));
+        self.push_string_token_to_token_buffer(content);
+    }
+
+    pub fn push_string_token_to_token_buffer(&mut self, content: Vec<u8>) {
+        let context = self.build_token_context(TokenType::Str(content));
+        self.push_to_token_buffer(Box::new(StringToken::new(context)));
     }
 }
+
+pub mod string;

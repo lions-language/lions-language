@@ -1,14 +1,22 @@
 use super::{LexicalParser, CallbackReturnStatus};
-use libcommon::token::{TokenType, NoFunctionToken};
+use libcommon::token::{TokenType};
+use id::IdToken;
 
 impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
+    fn id_push_keyword_token(&mut self, token_type: TokenType) {
+        self.push_nooperate_token_to_token_buffer(token_type);
+    }
+
     fn id(&mut self, s: &String) {
+        /*
+         * 存入 context
+         * */
         let context = self.build_token_context(TokenType::Id(s.to_string()));
-        self.push_to_token_buffer(Box::new(NoFunctionToken::new(context)));
+        self.push_to_token_buffer(Box::new(IdToken::new(context)));
     }
 
     fn id_kw_if(&mut self) {
-        self.push_nofunction_token_to_token_buffer(TokenType::If);
+        self.id_push_keyword_token(TokenType::If);
     }
 
     fn id_kw_else(&mut self) {
@@ -20,14 +28,14 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
          * 如果在词法分析阶段处理, 将造成回溯(如果 else 后面不是 if,
          * 那么将回到else后面的字符位置, 重新解析), 回溯将造成效率的降低
          * */
-        self.push_nofunction_token_to_token_buffer(TokenType::Else);
+        self.id_push_keyword_token(TokenType::Else);
     }
 
     fn id_kw_else_if(&mut self) {
         /*
          * 使用 elif 直接表示 else if, 提供这种关键字提升解析效率
          * */
-        self.push_nofunction_token_to_token_buffer(TokenType::ElseIf);
+        self.id_push_keyword_token(TokenType::ElseIf);
     }
 
     fn id_kw_strfmt(&mut self) {
@@ -84,4 +92,5 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
 }
 
 mod strfmt;
+mod id;
 

@@ -1,5 +1,5 @@
 use super::{LexicalParser, CallbackReturnStatus};
-use libcommon::token::{TokenType, NoFunctionToken};
+use libcommon::token::{TokenType};
 
 impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
     pub fn backslash_r(&mut self) {
@@ -39,8 +39,7 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
             }
         }
         // 不管是 \r 还是 \r\n, 都记为 NewLine
-        let context = self.build_token_context(TokenType::NewLine);
-        self.push_to_token_buffer(Box::new(NoFunctionToken::new(context)));
+        self.push_nooperate_token_to_token_buffer(TokenType::NewLine);
         self.add_one_line();
     }
 }

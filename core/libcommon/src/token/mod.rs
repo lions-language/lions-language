@@ -60,9 +60,38 @@ impl Default for TokenType {
     }
 }
 
+pub enum TokenOperType {
+    NoOperate,
+    Operand,
+    Operator
+}
+
+lazy_static!{
+    static ref default_token_attrubute: TokenAttrubute = TokenAttrubute::default();
+}
+
+pub struct TokenAttrubute {
+    pub bp: &'static u8,
+    pub oper_type: &'static TokenOperType
+}
+
+impl Default for TokenAttrubute {
+    fn default() -> Self {
+        Self{
+            bp: &0,
+            oper_type: &TokenOperType::NoOperate
+        }
+    }
+}
+
 pub trait Token {
-    fn nup(&self, context: &TokenContext);
-    fn led(&self, context: &TokenContext);
+    fn nup(&self, _context: &TokenContext) {
+    }
+    fn led(&self, _context: &TokenContext) {
+    }
+    fn token_attrubute(&self) -> &'static TokenAttrubute {
+        &*default_token_attrubute
+    }
     fn context(&self) -> &TokenContext;
 }
 
@@ -75,27 +104,35 @@ pub struct TokenContext {
     pub token_type: TokenType,
 }
 
-// 不需要实现 nup / led 方法的 token 结构
-pub struct NoFunctionToken {
+/*
+ * 无操作 token 的统一结构 (注释 token ...)
+ * */
+lazy_static!{
+    static ref nooperate_token_attrubute: TokenAttrubute = TokenAttrubute{
+        bp: &0,
+        oper_type: &TokenOperType::NoOperate
+    };
+}
+
+pub struct NoOperateToken {
     context: TokenContext
 }
 
-impl Token for NoFunctionToken {
-    fn nup(&self, context: &TokenContext) {
-    }
-
-    fn led(&self, context: &TokenContext) {
-    }
-
+impl Token for NoOperateToken {
     fn context(&self) -> &TokenContext {
-        &self.context
+        return &self.context
+    }
+
+    fn token_attrubute(&self) -> &'static TokenAttrubute {
+        &*nooperate_token_attrubute
     }
 }
 
-impl NoFunctionToken {
+impl NoOperateToken {
     pub fn new(context: TokenContext) -> Self {
         Self{
             context: context
         }
     }
 }
+

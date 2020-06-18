@@ -1,4 +1,4 @@
-use libcommon::token::{self, TokenContext, TokenType, NoFunctionToken};
+use libcommon::token::{self, TokenContext, TokenType, NoOperateToken};
 
 /// store Vec<u8> struct
 #[derive(Debug)]
@@ -154,6 +154,13 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
         self.skip_next_n(1);
     }
 
+    pub fn take_next_one(&mut self) -> TokenVecItem {
+        if self.tokens_buffer.len() == 0 {
+            panic!("take_next_one, tokens_buffer len == 0");
+        }
+        self.tokens_buffer.remove(0)
+    }
+
     pub fn lookup_next_n(&mut self, n: usize) -> Option<&TokenVecItem> {
         match self.lookup_next_n_index(n) {
             Some(index) => {
@@ -215,6 +222,21 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
         }
     }
 
+    pub fn lookup_next_one_index(&mut self) -> Option<usize> {
+        self.lookup_next_n_index(1)
+    }
+
+    pub fn token_by_index(&self, index: usize) -> &TokenVecItem {
+        match self.tokens_buffer.get(index) {
+            Some(token) => {
+                token
+            },
+            None => {
+                panic!("call token_by_index must be after lookup_next ...");
+            }
+        }
+    }
+
     pub fn lookup_next_one(&mut self) -> Option<&TokenVecItem> {
         return self.lookup_next_n(1);
     }
@@ -232,9 +254,9 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
         self.tokens_buffer.push(item);
     }
 
-    fn push_nofunction_token_to_token_buffer(&mut self, token_type: TokenType) {
+    fn push_nooperate_token_to_token_buffer(&mut self, token_type: TokenType) {
         let context = self.build_token_context(token_type);
-        self.push_to_token_buffer(Box::new(NoFunctionToken::new(context)));
+        self.push_to_token_buffer(Box::new(NoOperateToken::new(context)));
     }
 
     fn is_id_start(&self, c: char) -> bool {
@@ -345,6 +367,7 @@ mod square_brackets;
 mod big_parenthese;
 mod slash;
 mod start;
+mod operand;
 
 mod test {
     use super::*;

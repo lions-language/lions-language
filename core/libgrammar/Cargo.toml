@@ -8,4 +8,5 @@ edition = "2018"
 
 [dependencies]
 libcommon = { path = "../libcommon" }
+lazy_static = "1.1.1"
 

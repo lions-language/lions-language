@@ -3,7 +3,8 @@
  * (随着 lions-language 的更新, 将支持更多的数值)
  * */
 use super::{LexicalParser, CallbackReturnStatus};
-use libcommon::token::{TokenType, NoFunctionToken, NumberValue};
+use libcommon::token::{TokenType, NumberValue};
+use number::NumberToken;
 
 // #![feature(assoc_int_consts)]
 
@@ -49,7 +50,7 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
                 }
             }
         }
-        self.push_nofunction_token_to_token_buffer(TokenType::Number(self.number_range_change(BeforeChange::Integer(value))));
+        self.push_number_token_to_token_buffer(self.number_range_change(BeforeChange::Integer(value)));
     }
 
     fn number_is_10(&self, c: char) -> Option<u8> {
@@ -159,11 +160,11 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
         }
         match result_type {
             Type::Integer => {
-                self.push_nofunction_token_to_token_buffer(TokenType::Number(self.number_range_change(BeforeChange::Integer(value))));
+                self.push_number_token_to_token_buffer(self.number_range_change(BeforeChange::Integer(value)));
             },
             Type::Decimal => {
                 let result = value as f64 + f_value;
-                self.push_nofunction_token_to_token_buffer(TokenType::Number(self.number_range_change(BeforeChange::Float(result))));
+                self.push_number_token_to_token_buffer(self.number_range_change(BeforeChange::Float(result)));
             }
         }
     }
@@ -216,7 +217,7 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
             // 只有 0x => 语法错误
             self.panic("expect 0-9 / a(A)-f(F) after 0x");
         }
-        self.push_nofunction_token_to_token_buffer(TokenType::Number(self.number_range_change(BeforeChange::Integer(value))));
+        self.push_number_token_to_token_buffer(self.number_range_change(BeforeChange::Integer(value)));
     }
 
     fn number_is_mid(&mut self, c: char) -> bool {
@@ -277,7 +278,7 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
                     }
                 }
                 if is_zero {
-                    self.push_nofunction_token_to_token_buffer(TokenType::Number(NumberValue::Int64(0)));
+                    self.push_number_token_to_token_buffer(NumberValue::Int64(0));
                     return;
                 }
                 // 下面的 loop 是防止读取content的next时没有数据的情况, 此时需要读取 cb 的返回值,
@@ -366,7 +367,7 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
     }
 
     fn number_float_change(&self, value: f64) -> NumberValue {
-        let mut val: f64 = value;
+        let val: f64 = value;
         if val >= f32::MIN as f64 && val <= f32::MAX as f64 {
             return NumberValue::Float32(val as f32);
         } else {
@@ -386,5 +387,12 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
             }
         }
     }
+
+    pub fn push_number_token_to_token_buffer(&mut self, value: NumberValue) {
+        let context = self.build_token_context(TokenType::Number(value));
+        self.push_to_token_buffer(Box::new(NumberToken::new(context)));
+    }
 }
+
+mod number;
 

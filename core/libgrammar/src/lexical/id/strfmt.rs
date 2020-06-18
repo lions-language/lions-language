@@ -1,6 +1,5 @@
 use super::super::{LexicalParser, CallbackReturnStatus};
-use libcommon::token::{TokenType};
-use libcommon::strtool::strcompare::{U8ArrayIsEqual, U8ArrayIsEqualResult};
+use libcommon::strtool::strcompare::{U8ArrayIsEqual};
 
 impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
     fn id_kw_strfmt_process_content(&mut self, start: &[u8], end: &[u8]) {
@@ -28,14 +27,14 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
                             match c {
                                 '"' => {
                                     self.content.skip_next_one();
-                                    self.push_nofunction_token_to_token_buffer(TokenType::Str(content.clone()));
+                                    self.push_string_token_to_token_buffer(content.clone());
                                     break;
                                 },
                                 _ => {
                                     if self.input_str_match_with_u8arrayisequal(&mut start_u8_array_is_equal) {
                                         // match start
                                         status = Status::EndSymbol;
-                                        self.push_nofunction_token_to_token_buffer(TokenType::Str(content.clone()));
+                                        self.push_string_token_to_token_buffer(content.clone());
                                         // 模拟生成 token => ... + (...) + ...
                                         content.clear();
                                         self.push_token_plus();

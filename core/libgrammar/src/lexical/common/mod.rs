@@ -1,5 +1,5 @@
 use super::{LexicalParser, CallbackReturnStatus};
-use libcommon::token::{TokenType, NoFunctionToken};
+use libcommon::token::{TokenType};
 use crate::lexical::plus::plus;
 use crate::lexical::parenthese::left_parenthese;
 use crate::lexical::parenthese::right_parenthese;
@@ -126,7 +126,7 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
     }
 
     pub fn push_token_annotate(&mut self, content: Vec<u8>) {
-        self.push_nofunction_token_to_token_buffer(TokenType::Annotate(content));
+        self.push_nooperate_token_to_token_buffer(TokenType::Annotate(content));
     }
 
     pub fn push_token_div(&mut self) {
