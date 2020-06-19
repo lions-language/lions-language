@@ -1,4 +1,5 @@
-use crate::lexical::{LexicalParser, CallbackReturnStatus, TokenVecItem};
+use crate::lexical::{LexicalParser, CallbackReturnStatus, TokenVecItem, TokenPointer};
+use libcommon::token::{TokenType};
 
 pub struct GrammarParser<FT: FnMut() -> CallbackReturnStatus> {
     lexical_parser: LexicalParser<FT>
@@ -7,36 +8,39 @@ pub struct GrammarParser<FT: FnMut() -> CallbackReturnStatus> {
 impl<FT: FnMut() -> CallbackReturnStatus> GrammarParser<FT> {
     pub fn parser(&mut self) {
         loop {
-            let index = match self.lexical_parser.lookup_next_one_index() {
-                Some(idx) => {
-                    idx
+            match self.lexical_parser.lookup_next_one_ptr() {
+                Some(p) => {
+                    self.select(&p);
                 },
                 None => {
                     break;
                 }
-            };
-            self.select(index);
+            }
         }
     }
 
-    fn select(&mut self, index: usize) {
-        let token = self.lexical_parser.token_by_index(index);
+    fn select(&mut self, token: &TokenPointer) {
+        match token.as_ref().context().token_type {
+            TokenType::If => {
+            },
+            _ => {
+                self.expression_process(token);
+            }
+        }
     }
-    /*
-    fn select<'a, 'b: 'a>(&'a mut self, token: &'b TokenVecItem) {
-    }
-    */
 
     pub fn new(lexical_parser: LexicalParser<FT>) -> Self {
         Self {
-            lexical_parser: lexical_parser
+            lexical_parser: lexical_parser,
         }
     }
 }
 
+mod expression;
+
 mod test {
     use super::*;
-    use crate::lexical::{VecU8};
+    use crate::lexical::VecU8;
 
     use std::fs;
     use std::io::Read;
@@ -50,7 +54,7 @@ mod test {
                 panic!("read file error");
             }
         };
-        let mut obj = LexicalParser::new(file.clone(), || -> CallbackReturnStatus {
+        let mut lexical_parser = LexicalParser::new(file.clone(), || -> CallbackReturnStatus {
             let mut v = Vec::new();
             let mut f_ref = f.by_ref();
             match f_ref.take(1).read_to_end(&mut v) {
@@ -66,6 +70,8 @@ mod test {
                 }
             }
         });
+        let mut grammar_parser = GrammarParser::new(lexical_parser);
+        grammar_parser.parser();
     }
 }
 

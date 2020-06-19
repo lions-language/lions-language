@@ -93,6 +93,20 @@ pub enum CallbackReturnStatus {
 
 pub type TokenVecItem = Box<dyn token::Token>;
 
+pub struct TokenPointer(usize);
+
+impl TokenPointer {
+    pub fn from_ref(item: &TokenVecItem) -> Self {
+        Self(item as *const TokenVecItem as usize)
+    }
+
+    pub fn as_ref<'a>(&self) -> &'a TokenVecItem {
+        unsafe {
+            (self.0 as *const TokenVecItem).as_ref().expect("should not happend")
+        }
+    }
+}
+
 pub struct LexicalParser<T: FnMut() -> CallbackReturnStatus> {
     file: String,
     line: u64,
@@ -172,6 +186,26 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
         }
     }
 
+    pub fn lookup_next_n_ptr(&mut self, n: usize) -> Option<TokenPointer> {
+        match self.lookup_next_n_index(n) {
+            Some(index) => {
+                match self.tokens_buffer.get(index) {
+                    Some(token) => {
+                        Some(TokenPointer::from_ref(token))
+                    },
+                    None => {
+                        None
+                    }
+                }
+            },
+            None => {
+                None
+            }
+        }
+    }
+
+    // pub fn lookup_next_n(&mut self, n: usize) -> Option<Token>
+
     fn lookup_next_n_index(&mut self, n: usize) -> Option<usize> {
         loop {
             let tokens_len = self.tokens_buffer.len();
@@ -220,6 +254,10 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
                 }
             }
         }
+    }
+
+    pub fn lookup_next_one_ptr(&mut self) -> Option<TokenPointer> {
+        self.lookup_next_n_ptr(1)
     }
 
     pub fn lookup_next_one_index(&mut self) -> Option<usize> {
