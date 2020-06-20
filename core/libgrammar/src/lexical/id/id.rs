@@ -1,4 +1,5 @@
-use libcommon::token::{Token, TokenOperType, TokenAttrubute, TokenContext};
+use crate::token::{Token, TokenOperType, TokenAttrubute, TokenContext};
+use crate::lexical::CallbackReturnStatus;
 
 pub struct IdToken {
     context: TokenContext
@@ -11,7 +12,7 @@ lazy_static!{
     };
 }
 
-impl Token for IdToken {
+impl<T: FnMut() -> CallbackReturnStatus> Token<T> for IdToken {
     fn context(&self) -> &TokenContext {
         return &self.context;
     }

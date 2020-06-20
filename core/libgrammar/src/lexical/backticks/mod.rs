@@ -1,5 +1,5 @@
 use super::{LexicalParser, CallbackReturnStatus};
-use libcommon::token::{TokenType};
+use crate::token::{TokenType};
 
 impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
     pub fn backticks_process(&mut self) {

@@ -1,4 +1,5 @@
-use libcommon::token::{Token, TokenOperType, TokenAttrubute, TokenContext};
+use crate::token::{Token, TokenOperType, TokenAttrubute, TokenContext};
+use crate::lexical::CallbackReturnStatus;
 
 /*
  * 操作数 的统一实现
@@ -14,7 +15,7 @@ pub struct OperandToken {
     context: TokenContext
 }
 
-impl Token for OperandToken {
+impl<T: FnMut() -> CallbackReturnStatus> Token<T> for OperandToken {
     fn context(&self) -> &TokenContext {
         return &self.context;
     }   

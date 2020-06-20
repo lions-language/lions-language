@@ -1,5 +1,5 @@
 use super::{LexicalParser, CallbackReturnStatus};
-use libcommon::token::{TokenType};
+use crate::token::{TokenType};
 use id::IdToken;
 
 impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {

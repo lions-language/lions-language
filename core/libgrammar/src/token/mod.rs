@@ -1,3 +1,6 @@
+use crate::control::grammar::GrammarControl;
+use crate::lexical::{CallbackReturnStatus};
+
 #[derive(Debug)]
 pub enum NumberValue {
     Int8(i8),
@@ -84,10 +87,10 @@ impl Default for TokenAttrubute {
     }
 }
 
-pub trait Token {
-    fn nup(&self, _context: &TokenContext) {
+pub trait Token<T: FnMut() -> CallbackReturnStatus> {
+    fn nup(&self, _context: &TokenContext, grammar_control: &mut GrammarControl<T>) {
     }
-    fn led(&self, _context: &TokenContext) {
+    fn led(&self, _context: &TokenContext, grammar_control: &mut GrammarControl<T>) {
     }
     fn token_attrubute(&self) -> &'static TokenAttrubute {
         &*default_token_attrubute
@@ -118,7 +121,7 @@ pub struct NoOperateToken {
     context: TokenContext
 }
 
-impl Token for NoOperateToken {
+impl<T: FnMut() -> CallbackReturnStatus> Token<T> for NoOperateToken {
     fn context(&self) -> &TokenContext {
         return &self.context
     }

@@ -1,4 +1,4 @@
-use libcommon::token::{self, TokenContext, TokenType, NoOperateToken};
+use crate::token::{self, TokenContext, TokenType, NoOperateToken};
 
 /// store Vec<u8> struct
 #[derive(Debug)]
@@ -91,18 +91,18 @@ pub enum CallbackReturnStatus {
     End
 }
 
-pub type TokenVecItem = Box<dyn token::Token>;
+pub type TokenVecItem<T: FnMut() -> CallbackReturnStatus> = Box<dyn token::Token<T>>;
 
 pub struct TokenPointer(usize);
 
 impl TokenPointer {
-    pub fn from_ref(item: &TokenVecItem) -> Self {
-        Self(item as *const TokenVecItem as usize)
+    pub fn from_ref<T: FnMut() -> CallbackReturnStatus>(item: &TokenVecItem<T>) -> Self {
+        Self(item as *const TokenVecItem<T> as usize)
     }
 
-    pub fn as_ref<'a>(&self) -> &'a TokenVecItem {
+    pub fn as_ref<'a, T: FnMut() -> CallbackReturnStatus>(&self) -> &'a TokenVecItem<T> {
         unsafe {
-            (self.0 as *const TokenVecItem).as_ref().expect("should not happend")
+            (self.0 as *const TokenVecItem<T>).as_ref().expect("should not happend")
         }
     }
 }
@@ -113,7 +113,7 @@ pub struct LexicalParser<T: FnMut() -> CallbackReturnStatus> {
     col: u64,
     content: VecU8,
     cb: T,
-    tokens_buffer: Vec<TokenVecItem>
+    tokens_buffer: Vec<TokenVecItem<T>>
 }
 
 impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
@@ -168,14 +168,14 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
         self.skip_next_n(1);
     }
 
-    pub fn take_next_one(&mut self) -> TokenVecItem {
+    pub fn take_next_one(&mut self) -> TokenVecItem<T> {
         if self.tokens_buffer.len() == 0 {
             panic!("take_next_one, tokens_buffer len == 0");
         }
         self.tokens_buffer.remove(0)
     }
 
-    pub fn lookup_next_n(&mut self, n: usize) -> Option<&TokenVecItem> {
+    pub fn lookup_next_n(&mut self, n: usize) -> Option<&TokenVecItem<T>> {
         match self.lookup_next_n_index(n) {
             Some(index) => {
                 return self.tokens_buffer.get(index);
@@ -264,7 +264,7 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
         self.lookup_next_n_index(1)
     }
 
-    pub fn token_by_index(&self, index: usize) -> &TokenVecItem {
+    pub fn token_by_index(&self, index: usize) -> &TokenVecItem<T> {
         match self.tokens_buffer.get(index) {
             Some(token) => {
                 token
@@ -275,7 +275,7 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
         }
     }
 
-    pub fn lookup_next_one(&mut self) -> Option<&TokenVecItem> {
+    pub fn lookup_next_one(&mut self) -> Option<&TokenVecItem<T>> {
         return self.lookup_next_n(1);
     }
 
@@ -288,7 +288,7 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
     }
 
 
-    fn push_to_token_buffer(&mut self, item: TokenVecItem) {
+    fn push_to_token_buffer(&mut self, item: TokenVecItem<T>) {
         self.tokens_buffer.push(item);
     }
 

@@ -1,5 +1,5 @@
 use super::{LexicalParser, CallbackReturnStatus};
-use libcommon::token::{TokenType};
+use crate::token::{TokenType};
 use crate::lexical::plus::plus;
 use crate::lexical::parenthese::left_parenthese;
 use crate::lexical::parenthese::right_parenthese;

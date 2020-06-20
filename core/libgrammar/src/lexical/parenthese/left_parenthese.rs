@@ -1,14 +1,16 @@
-use libcommon::token::{TokenContext, Token};
+use crate::token::{TokenContext, Token};
+use crate::lexical::CallbackReturnStatus;
+use crate::control::grammar::GrammarControl;
 
 pub struct LeftParentheseToken {
     context: TokenContext
 }
 
-impl Token for LeftParentheseToken {
-    fn nup(&self, context: &TokenContext) {
+impl<T: FnMut() -> CallbackReturnStatus> Token<T> for LeftParentheseToken {
+    fn nup(&self, context: &TokenContext, grammar_control: &mut GrammarControl<T>) {
     }
 
-    fn led(&self, context: &TokenContext) {
+    fn led(&self, context: &TokenContext, grammar_control: &mut GrammarControl<T>) {
     }
 
     fn context(&self) -> &TokenContext {

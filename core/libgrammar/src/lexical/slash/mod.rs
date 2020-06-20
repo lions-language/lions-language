@@ -1,6 +1,6 @@
 use super::{LexicalParser, CallbackReturnStatus};
 use libcommon::strtool::strcompare::{U8ArrayIsEqual};
-use libcommon::token::{TokenType};
+use crate::token::{TokenType};
 use division::DivisionToken;
 
 impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {

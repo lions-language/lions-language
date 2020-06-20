@@ -1,6 +1,6 @@
 use super::{LexicalParser, CallbackReturnStatus};
 
-use libcommon::token::{TokenType};
+use crate::token::{TokenType};
 
 impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
     fn plus(&mut self) {

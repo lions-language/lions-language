@@ -1,4 +1,5 @@
-use libcommon::token::{Token, TokenOperType, TokenAttrubute, TokenContext};
+use crate::token::{Token, TokenOperType, TokenAttrubute, TokenContext};
+use crate::lexical::CallbackReturnStatus;
 
 pub struct NumberToken {
     context: TokenContext
@@ -11,7 +12,7 @@ lazy_static!{
     };
 }
 
-impl Token for NumberToken {
+impl<T: FnMut() -> CallbackReturnStatus> Token<T> for NumberToken {
     fn context(&self) -> &TokenContext {
         return &self.context;
     }

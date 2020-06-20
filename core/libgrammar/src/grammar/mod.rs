@@ -1,5 +1,5 @@
 use crate::lexical::{LexicalParser, CallbackReturnStatus, TokenVecItem, TokenPointer};
-use libcommon::token::{TokenType};
+use crate::token::{TokenType};
 
 pub struct GrammarParser<FT: FnMut() -> CallbackReturnStatus> {
     lexical_parser: LexicalParser<FT>
@@ -20,7 +20,7 @@ impl<FT: FnMut() -> CallbackReturnStatus> GrammarParser<FT> {
     }
 
     fn select(&mut self, token: &TokenPointer) {
-        match token.as_ref().context().token_type {
+        match token.as_ref::<FT>().context().token_type {
             TokenType::If => {
             },
             _ => {

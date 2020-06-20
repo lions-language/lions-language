@@ -3,7 +3,7 @@
  * (随着 lions-language 的更新, 将支持更多的数值)
  * */
 use super::{LexicalParser, CallbackReturnStatus};
-use libcommon::token::{TokenType, NumberValue};
+use crate::token::{TokenType, NumberValue};
 use number::NumberToken;
 
 // #![feature(assoc_int_consts)]
