@@ -1,5 +1,6 @@
 use crate::control::grammar::GrammarControl;
 use crate::lexical::{CallbackReturnStatus};
+use crate::grammar::{GrammarParser, ExpressContext};
 
 #[derive(Debug)]
 pub enum NumberValue {
@@ -111,10 +112,10 @@ pub enum TokenMethodResult {
 }
 
 pub trait Token<T: FnMut() -> CallbackReturnStatus> {
-    fn nup(&self, grammar_control: &mut GrammarControl<T>) -> TokenMethodResult {
+    fn nup(&self, grammar: &mut GrammarParser<T>, express_context: &ExpressContext<T>) -> TokenMethodResult {
         TokenMethodResult::None
     }
-    fn led(&self, grammar_control: &mut GrammarControl<T>) -> TokenMethodResult {
+    fn led(&self, grammar: &mut GrammarParser<T>, express_context: &ExpressContext<T>) -> TokenMethodResult {
         TokenMethodResult::None
     }
     fn token_attrubute(&self) -> &'static TokenAttrubute {

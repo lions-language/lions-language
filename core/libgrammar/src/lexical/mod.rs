@@ -91,7 +91,7 @@ pub enum CallbackReturnStatus {
     End
 }
 
-pub type TokenVecItem<T: FnMut() -> CallbackReturnStatus> = Box<dyn token::Token<T>>;
+pub type TokenVecItem<T> = Box<dyn token::Token<T>>;
 
 pub struct TokenPointer(usize);
 

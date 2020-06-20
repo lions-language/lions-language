@@ -5,6 +5,20 @@ use crate::control::grammar::GrammarControl;
 pub struct GrammarContext {
 }
 
+pub type ExpressEndFunc<T> = fn(&TokenVecItem<T>) -> bool;
+
+pub struct ExpressContext<T: FnMut() -> CallbackReturnStatus> {
+    pub end_f: ExpressEndFunc<T>
+}
+
+impl<T: FnMut() -> CallbackReturnStatus> ExpressContext<T> {
+    pub fn new(end_f: ExpressEndFunc<T>) -> Self {
+        Self {
+            end_f: end_f
+        }
+    }
+}
+
 pub struct GrammarParser<T: FnMut() -> CallbackReturnStatus> {
     control: GrammarControl<T>,
     context: GrammarContext,

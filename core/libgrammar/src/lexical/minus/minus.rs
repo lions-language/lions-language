@@ -1,6 +1,7 @@
 use crate::token::{TokenContext, Token, TokenAttrubute, TokenOperType, TokenMethodResult};
 use crate::lexical::{CallbackReturnStatus};
 use crate::control::grammar::{GrammarControl};
+use crate::grammar::{GrammarParser, ExpressContext};
 
 lazy_static!{
     static ref minus_token_attrubute: TokenAttrubute = TokenAttrubute{
@@ -14,11 +15,11 @@ pub struct MinusToken {
 }
 
 impl<T: FnMut() -> CallbackReturnStatus> Token<T> for MinusToken {
-    fn nup(&self, grammar_control: &mut GrammarControl<T>) -> TokenMethodResult {
+    fn nup(&self, grammar: &mut GrammarParser<T>, express_context: &ExpressContext<T>) -> TokenMethodResult {
         TokenMethodResult::None
     }
 
-    fn led(&self, grammar_control: &mut GrammarControl<T>) -> TokenMethodResult {
+    fn led(&self, grammar: &mut GrammarParser<T>, express_context: &ExpressContext<T>) -> TokenMethodResult {
         TokenMethodResult::None
     }
 
