@@ -1,14 +1,20 @@
 use crate::lexical::{LexicalParser, CallbackReturnStatus, TokenVecItem, TokenPointer};
 use crate::token::{TokenType};
+use crate::control::grammar::GrammarControl;
 
-pub struct GrammarParser<FT: FnMut() -> CallbackReturnStatus> {
-    lexical_parser: LexicalParser<FT>
+pub struct GrammarContext {
 }
 
-impl<FT: FnMut() -> CallbackReturnStatus> GrammarParser<FT> {
+pub struct GrammarParser<T: FnMut() -> CallbackReturnStatus> {
+    control: GrammarControl<T>,
+    context: GrammarContext,
+    current_token: TokenPointer
+}
+
+impl<T: FnMut() -> CallbackReturnStatus> GrammarParser<T> {
     pub fn parser(&mut self) {
         loop {
-            match self.lexical_parser.lookup_next_one_ptr() {
+            match self.control.lookup_next_one_ptr() {
                 Some(p) => {
                     self.select(&p);
                 },
@@ -20,7 +26,7 @@ impl<FT: FnMut() -> CallbackReturnStatus> GrammarParser<FT> {
     }
 
     fn select(&mut self, token: &TokenPointer) {
-        match token.as_ref::<FT>().context().token_type {
+        match token.as_ref::<T>().context().token_type {
             TokenType::If => {
             },
             _ => {
@@ -29,9 +35,23 @@ impl<FT: FnMut() -> CallbackReturnStatus> GrammarParser<FT> {
         }
     }
 
-    pub fn new(lexical_parser: LexicalParser<FT>) -> Self {
+    /*
+     * 必须在 token 没有释放的时候调用
+     * */
+    fn update_current_token(&mut self, token: TokenPointer) {
+        *&mut self.current_token = token;
+    }
+
+    fn panic(&self, msg: &str) {
+        self.control.panic(msg);
+    }
+
+    pub fn new(grammar_control: GrammarControl<T>,
+            grammar_context: GrammarContext) -> Self {
         Self {
-            lexical_parser: lexical_parser,
+            control: grammar_control,
+            context: grammar_context,
+            current_token: TokenPointer::new_null()
         }
     }
 }
@@ -70,7 +90,10 @@ mod test {
                 }
             }
         });
-        let mut grammar_parser = GrammarParser::new(lexical_parser);
+        let mut grammar_control = GrammarControl::new(lexical_parser);
+        let grammar_context = GrammarContext{
+        };
+        let mut grammar_parser = GrammarParser::new(grammar_control, grammar_context);
         grammar_parser.parser();
     }
 }

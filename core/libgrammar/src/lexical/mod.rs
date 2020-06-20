@@ -100,10 +100,22 @@ impl TokenPointer {
         Self(item as *const TokenVecItem<T> as usize)
     }
 
+    pub fn new_null() -> Self {
+        Self(0)
+    }
+
+    pub fn is_null(&self) -> bool {
+        self.0 == 0
+    }
+
     pub fn as_ref<'a, T: FnMut() -> CallbackReturnStatus>(&self) -> &'a TokenVecItem<T> {
         unsafe {
             (self.0 as *const TokenVecItem<T>).as_ref().expect("should not happend")
         }
+    }
+
+    pub fn clone(&self) -> Self {
+        Self(self.0)
     }
 }
 
@@ -339,6 +351,7 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
             '[' => self.square_brackets_left_process(),
             ']' => self.square_brackets_right_process(),
             '/' => self.slash_process(),
+            ';' => self.semicolon_process(),
             ' ' => self.space(),
             _ => {
                 if self.is_id_start(c) {
@@ -364,8 +377,10 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
         self.line += 1;
     }
 
-    fn panic(&self, msg: &str) {
-        panic!("{}: {} => {}", &self.file, self.line, msg);
+    pub fn panic(&self, msg: &str) {
+        // panic!("{}: {} => {}", &self.file, self.line, msg);
+        println!("{}: {} => {}", &self.file, self.line, msg);
+        std::process::exit(0);
     }
 
 }
@@ -406,6 +421,7 @@ mod big_parenthese;
 mod slash;
 mod start;
 mod operand;
+mod semicolon;
 
 mod test {
     use super::*;

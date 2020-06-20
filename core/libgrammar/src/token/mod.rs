@@ -50,6 +50,8 @@ pub enum TokenType {
     Multiplication,
     // /
     Division,
+    // ;
+    Semicolon,
     // 注释
     Annotate(Vec<u8>),
     Id(String),
@@ -60,6 +62,22 @@ pub enum TokenType {
 impl Default for TokenType {
     fn default() -> Self {
         TokenType::Unknown
+    }
+}
+
+impl TokenType {
+    pub fn format(&self) -> &'static str {
+        match self {
+            TokenType::Plus => {
+                "+"
+            },
+            TokenType::Number(_) => {
+                "number"
+            },
+            _ => {
+                "unknow"
+            }
+        }
     }
 }
 
@@ -87,10 +105,17 @@ impl Default for TokenAttrubute {
     }
 }
 
+pub enum TokenMethodResult {
+    None,
+    Expression(u8)
+}
+
 pub trait Token<T: FnMut() -> CallbackReturnStatus> {
-    fn nup(&self, _context: &TokenContext, grammar_control: &mut GrammarControl<T>) {
+    fn nup(&self, grammar_control: &mut GrammarControl<T>) -> TokenMethodResult {
+        TokenMethodResult::None
     }
-    fn led(&self, _context: &TokenContext, grammar_control: &mut GrammarControl<T>) {
+    fn led(&self, grammar_control: &mut GrammarControl<T>) -> TokenMethodResult {
+        TokenMethodResult::None
     }
     fn token_attrubute(&self) -> &'static TokenAttrubute {
         &*default_token_attrubute

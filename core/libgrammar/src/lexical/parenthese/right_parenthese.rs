@@ -1,4 +1,4 @@
-use crate::token::{TokenContext, Token};
+use crate::token::{TokenContext, Token, TokenMethodResult};
 use crate::lexical::CallbackReturnStatus;
 use crate::control::grammar::GrammarControl;
 
@@ -7,10 +7,12 @@ pub struct RightParentheseToken {
 }
 
 impl<T: FnMut() -> CallbackReturnStatus> Token<T> for RightParentheseToken {
-    fn nup(&self, context: &TokenContext, grammar_control: &mut GrammarControl<T>) {
+    fn nup(&self, grammar_control: &mut GrammarControl<T>) -> TokenMethodResult {
+        TokenMethodResult::None
     }
 
-    fn led(&self, context: &TokenContext, grammar_control: &mut GrammarControl<T>) {
+    fn led(&self, grammar_control: &mut GrammarControl<T>) -> TokenMethodResult {
+        TokenMethodResult::None
     }
 
     fn context(&self) -> &TokenContext {

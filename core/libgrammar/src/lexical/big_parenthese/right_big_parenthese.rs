@@ -7,12 +7,6 @@ pub struct RightBigParentheseToken {
 }
 
 impl<T: FnMut() -> CallbackReturnStatus> Token<T> for RightBigParentheseToken {
-    fn nup(&self, context: &TokenContext, grammar_control: &mut GrammarControl<T>) {
-    }
-
-    fn led(&self, context: &TokenContext, grammar_control: &mut GrammarControl<T>) {
-    }
-
     fn context(&self) -> &TokenContext {
         &self.context
     }
