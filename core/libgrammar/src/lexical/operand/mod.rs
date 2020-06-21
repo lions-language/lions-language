@@ -17,9 +17,13 @@ pub struct OperandToken {
 }
 
 impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> Token<T, CB> for OperandToken {
-    fn context(&self) -> &TokenContext {
+    fn context_ref(&self) -> &TokenContext {
         return &self.context;
     }   
+
+    fn context(self) -> TokenContext {
+        self.context
+    }
 
     fn token_attrubute(&self) -> &'static TokenAttrubute {
         &*operand_token_attrubute

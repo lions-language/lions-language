@@ -15,8 +15,12 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> Token<T, CB> for LeftParen
         TokenMethodResult::None
     }
 
-    fn context(&self) -> &TokenContext {
+    fn context_ref(&self) -> &TokenContext {
         &self.context
+    }
+
+    fn context(self) -> TokenContext {
+        self.context
     }
 }
 

@@ -1,4 +1,4 @@
-use crate::lexical::{CallbackReturnStatus};
+use crate::lexical::{CallbackReturnStatus, TokenVecItem};
 use crate::grammar::{GrammarParser, ExpressContext, Grammar};
 
 #[derive(Debug)]
@@ -107,7 +107,25 @@ impl Default for TokenAttrubute {
 
 pub enum TokenMethodResult {
     None,
-    Expression(u8)
+    End,
+    IoEOF,
+    Panic
+}
+
+pub struct TokenValue {
+    pub context: TokenContext,
+    pub token_attrubute: &'static TokenAttrubute
+}
+
+impl TokenValue {
+    /*
+    pub fn from_token<T: FnMut() -> CallbackReturnStatus, CB: Grammar>(token: TokenVecItem<T, CB>) -> Self {
+        Self {
+            token_attrubute: token.token_attrubute(),
+            context: token.context(),
+        }
+    }
+    */
 }
 
 pub trait Token<T: FnMut() -> CallbackReturnStatus, CB: Grammar> {
@@ -120,9 +138,11 @@ pub trait Token<T: FnMut() -> CallbackReturnStatus, CB: Grammar> {
     fn token_attrubute(&self) -> &'static TokenAttrubute {
         &*default_token_attrubute
     }
-    fn context(&self) -> &TokenContext;
+    fn context_ref(&self) -> &TokenContext;
+    fn context(self) -> TokenContext;
 }
 
+#[derive(Default)]
 pub struct TokenContext {
     // 所在行号
     pub line: u64,
@@ -147,8 +167,12 @@ pub struct NoOperateToken {
 }
 
 impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> Token<T, CB> for NoOperateToken {
-    fn context(&self) -> &TokenContext {
+    fn context_ref(&self) -> &TokenContext {
         return &self.context
+    }
+
+    fn context(self) -> TokenContext {
+        self.context
     }
 
     fn token_attrubute(&self) -> &'static TokenAttrubute {

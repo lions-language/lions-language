@@ -14,8 +14,12 @@ lazy_static!{
 }
 
 impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> Token<T, CB> for StringToken {
-    fn context(&self) -> &TokenContext {
+    fn context_ref(&self) -> &TokenContext {
         return &self.context;
+    }
+
+    fn context(self) -> TokenContext {
+        self.context
     }
 
     fn token_attrubute(&self) -> &'static TokenAttrubute {

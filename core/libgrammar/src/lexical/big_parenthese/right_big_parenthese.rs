@@ -1,6 +1,5 @@
 use crate::token::{TokenContext, Token};
 use crate::lexical::CallbackReturnStatus;
-use crate::control::grammar::GrammarControl;
 use crate::grammar::Grammar;
 
 pub struct RightBigParentheseToken {
@@ -8,8 +7,12 @@ pub struct RightBigParentheseToken {
 }
 
 impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> Token<T, CB> for RightBigParentheseToken {
-    fn context(&self) -> &TokenContext {
+    fn context_ref(&self) -> &TokenContext {
         &self.context
+    }
+
+    fn context(self) -> TokenContext {
+        self.context
     }
 }
 

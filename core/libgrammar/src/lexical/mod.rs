@@ -101,6 +101,10 @@ impl TokenPointer {
         Self(item as *const TokenVecItem<T, CB> as usize)
     }
 
+    pub fn from<T: FnMut() -> CallbackReturnStatus, CB: Grammar>(item: TokenVecItem<T, CB>) -> Self {
+        Self(Box::into_raw(item) as *mut TokenVecItem<T, CB> as usize)
+    }    
+
     pub fn new_null() -> Self {
         Self(0)
     }
@@ -114,6 +118,14 @@ impl TokenPointer {
             (self.0 as *const TokenVecItem<T, CB>).as_ref().expect("should not happend")
         }
     }
+
+    /*
+    pub fn take<T: FnMut() -> CallbackReturnStatus, CB: Grammar>(self) -> TokenVecItem<T, CB> {
+        unsafe {
+            Box::from_raw(self.0 as *mut dyn token::Token<T, CB>)
+        }
+    }
+    */
 
     pub fn clone(&self) -> Self {
         Self(self.0)

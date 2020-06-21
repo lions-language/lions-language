@@ -1,6 +1,6 @@
-use crate::token::{Token, TokenOperType, TokenAttrubute, TokenContext};
+use crate::token::{Token, TokenOperType, TokenAttrubute, TokenContext, TokenMethodResult};
 use crate::lexical::CallbackReturnStatus;
-use crate::grammar::Grammar;
+use crate::grammar::{GrammarParser, ExpressContext, Grammar};
 
 pub struct NumberToken {
     context: TokenContext
@@ -14,8 +14,16 @@ lazy_static!{
 }
 
 impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> Token<T, CB> for NumberToken {
-    fn context(&self) -> &TokenContext {
+    fn context_ref(&self) -> &TokenContext {
         return &self.context;
+    }
+
+    fn context(self) -> TokenContext {
+        self.context
+    }
+
+    fn nup(&self, grammar: &mut GrammarParser<T, CB>, express_context: &ExpressContext<T, CB>) -> TokenMethodResult {
+        TokenMethodResult::None
     }
 
     fn token_attrubute(&self) -> &'static TokenAttrubute {
