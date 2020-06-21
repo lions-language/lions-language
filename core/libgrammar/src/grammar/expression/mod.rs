@@ -1,9 +1,9 @@
-use super::{GrammarParser, ExpressContext};
+use super::{GrammarParser, ExpressContext, Grammar};
 use crate::lexical::{CallbackReturnStatus, TokenPointer, TokenVecItem};
 use crate::token::{TokenType, TokenMethodResult};
 
-impl<T: FnMut() -> CallbackReturnStatus> GrammarParser<T> {
-    fn expression_end_normal(token: &TokenVecItem<T>) -> bool {
+impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<T, CB> {
+    fn expression_end_normal(token: &TokenVecItem<T, CB>) -> bool {
         match token.context().token_type {
             TokenType::Semicolon
             | TokenType::NewLine => {
@@ -20,7 +20,7 @@ impl<T: FnMut() -> CallbackReturnStatus> GrammarParser<T> {
         /*
          * 因为 0 比任何的操作数都要小, 所以可以将整个表达式遍历完全
          * */
-        self.expression(0, &ExpressContext::new(GrammarParser::<T>::expression_end_normal));
+        self.expression(0, &ExpressContext::new(GrammarParser::<T, CB>::expression_end_normal));
     }
 
     /*
@@ -30,8 +30,8 @@ impl<T: FnMut() -> CallbackReturnStatus> GrammarParser<T> {
      * 3. token 的 led方法结束后, 下一个 token 应该是 操作符
      * 4. 提供一个函数指针, 用于判断是否结束 (不需要捕获周边环境, 所以使用函数指针, 提高性能)
      * */
-    fn expression(&mut self, operator_bp: u8, express_context: &ExpressContext<T>) {
-        let current_token = self.current_token.as_ref::<T>();
+    fn expression(&mut self, operator_bp: u8, express_context: &ExpressContext<T, CB>) {
+        let current_token = self.current_token.as_ref::<T, CB>();
         match current_token.nup(self, express_context) {
             TokenMethodResult::None => {
                 self.panic(&format!("expect operand, but found {}", current_token.context().token_type.format()));
@@ -53,7 +53,7 @@ impl<T: FnMut() -> CallbackReturnStatus> GrammarParser<T> {
                 return;
             }
         };
-        let mut next_token = next_tp.as_ref::<T>();
+        let mut next_token = next_tp.as_ref::<T, CB>();
         if (express_context.end_f)(next_token) {
             /*
              * 语句结束

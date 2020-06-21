@@ -1,5 +1,4 @@
-use crate::control::grammar::{GrammarControl};
-use crate::grammar::{GrammarParser, ExpressContext};
+use crate::grammar::{GrammarParser, ExpressContext, Grammar};
 use crate::lexical::{CallbackReturnStatus};
 use crate::token::{TokenContext, Token, TokenAttrubute, TokenOperType, TokenMethodResult};
 
@@ -14,12 +13,12 @@ pub struct PlusToken {
     context: TokenContext
 }
 
-impl<T: FnMut() -> CallbackReturnStatus> Token<T> for PlusToken {
-    fn nup(&self, grammar: &mut GrammarParser<T>, express_context: &ExpressContext<T>) -> TokenMethodResult {
+impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> Token<T, CB> for PlusToken {
+    fn nup(&self, grammar: &mut GrammarParser<T, CB>, express_context: &ExpressContext<T, CB>) -> TokenMethodResult {
         TokenMethodResult::None
     }
 
-    fn led(&self, grammar: &mut GrammarParser<T>, express_context: &ExpressContext<T>) -> TokenMethodResult {
+    fn led(&self, grammar: &mut GrammarParser<T, CB>, express_context: &ExpressContext<T, CB>) -> TokenMethodResult {
         TokenMethodResult::None
     }
 

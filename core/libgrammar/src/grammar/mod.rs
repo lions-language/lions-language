@@ -2,30 +2,35 @@ use crate::lexical::{LexicalParser, CallbackReturnStatus, TokenVecItem, TokenPoi
 use crate::token::{TokenType};
 use crate::control::grammar::GrammarControl;
 
-pub struct GrammarContext {
+pub trait Grammar {
+    fn express_const_number(&self);
 }
 
-pub type ExpressEndFunc<T> = fn(&TokenVecItem<T>) -> bool;
-
-pub struct ExpressContext<T: FnMut() -> CallbackReturnStatus> {
-    pub end_f: ExpressEndFunc<T>
+pub struct GrammarContext<T: Grammar> {
+    pub cb: T
 }
 
-impl<T: FnMut() -> CallbackReturnStatus> ExpressContext<T> {
-    pub fn new(end_f: ExpressEndFunc<T>) -> Self {
+pub type ExpressEndFunc<T, CB> = fn(&TokenVecItem<T, CB>) -> bool;
+
+pub struct ExpressContext<T: FnMut() -> CallbackReturnStatus, CB: Grammar> {
+    pub end_f: ExpressEndFunc<T, CB>
+}
+
+impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> ExpressContext<T, CB> {
+    pub fn new(end_f: ExpressEndFunc<T, CB>) -> Self {
         Self {
             end_f: end_f
         }
     }
 }
 
-pub struct GrammarParser<T: FnMut() -> CallbackReturnStatus> {
-    control: GrammarControl<T>,
-    context: GrammarContext,
+pub struct GrammarParser<T: FnMut() -> CallbackReturnStatus, CB: Grammar> {
+    control: GrammarControl<T, CB>,
+    context: GrammarContext<CB>,
     current_token: TokenPointer
 }
 
-impl<T: FnMut() -> CallbackReturnStatus> GrammarParser<T> {
+impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<T, CB> {
     pub fn parser(&mut self) {
         loop {
             match self.control.lookup_next_one_ptr() {
@@ -40,7 +45,7 @@ impl<T: FnMut() -> CallbackReturnStatus> GrammarParser<T> {
     }
 
     fn select(&mut self, token: &TokenPointer) {
-        match token.as_ref::<T>().context().token_type {
+        match token.as_ref::<T, CB>().context().token_type {
             TokenType::If => {
             },
             _ => {
@@ -60,8 +65,8 @@ impl<T: FnMut() -> CallbackReturnStatus> GrammarParser<T> {
         self.control.panic(msg);
     }
 
-    pub fn new(grammar_control: GrammarControl<T>,
-            grammar_context: GrammarContext) -> Self {
+    pub fn new(grammar_control: GrammarControl<T, CB>,
+            grammar_context: GrammarContext<CB>) -> Self {
         Self {
             control: grammar_control,
             context: grammar_context,
@@ -78,6 +83,14 @@ mod test {
 
     use std::fs;
     use std::io::Read;
+
+    struct TestGrammar {
+    }
+
+    impl Grammar for TestGrammar {
+        fn express_const_number(&self) {
+        }
+    }
 
     #[test]
     fn grammar_parser_test() {
@@ -106,6 +119,7 @@ mod test {
         });
         let mut grammar_control = GrammarControl::new(lexical_parser);
         let grammar_context = GrammarContext{
+            cb: TestGrammar{}
         };
         let mut grammar_parser = GrammarParser::new(grammar_control, grammar_context);
         grammar_parser.parser();

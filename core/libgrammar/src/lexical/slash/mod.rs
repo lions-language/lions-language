@@ -2,8 +2,9 @@ use super::{LexicalParser, CallbackReturnStatus};
 use libcommon::strtool::strcompare::{U8ArrayIsEqual};
 use crate::token::{TokenType};
 use division::DivisionToken;
+use crate::grammar::Grammar;
 
-impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
+impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
     pub fn slash_process(&mut self) {
         /*
          * 跳过 /

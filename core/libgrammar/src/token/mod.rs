@@ -1,6 +1,5 @@
-use crate::control::grammar::GrammarControl;
 use crate::lexical::{CallbackReturnStatus};
-use crate::grammar::{GrammarParser, ExpressContext};
+use crate::grammar::{GrammarParser, ExpressContext, Grammar};
 
 #[derive(Debug)]
 pub enum NumberValue {
@@ -111,11 +110,11 @@ pub enum TokenMethodResult {
     Expression(u8)
 }
 
-pub trait Token<T: FnMut() -> CallbackReturnStatus> {
-    fn nup(&self, grammar: &mut GrammarParser<T>, express_context: &ExpressContext<T>) -> TokenMethodResult {
+pub trait Token<T: FnMut() -> CallbackReturnStatus, CB: Grammar> {
+    fn nup(&self, grammar: &mut GrammarParser<T, CB>, express_context: &ExpressContext<T, CB>) -> TokenMethodResult {
         TokenMethodResult::None
     }
-    fn led(&self, grammar: &mut GrammarParser<T>, express_context: &ExpressContext<T>) -> TokenMethodResult {
+    fn led(&self, grammar: &mut GrammarParser<T, CB>, express_context: &ExpressContext<T, CB>) -> TokenMethodResult {
         TokenMethodResult::None
     }
     fn token_attrubute(&self) -> &'static TokenAttrubute {
@@ -147,7 +146,7 @@ pub struct NoOperateToken {
     context: TokenContext
 }
 
-impl<T: FnMut() -> CallbackReturnStatus> Token<T> for NoOperateToken {
+impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> Token<T, CB> for NoOperateToken {
     fn context(&self) -> &TokenContext {
         return &self.context
     }

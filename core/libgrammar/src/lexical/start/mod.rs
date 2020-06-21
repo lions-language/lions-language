@@ -1,8 +1,9 @@
 use super::{LexicalParser, CallbackReturnStatus};
 use crate::token::{TokenType};
 use multiplication::MultiplicationToken;
+use crate::grammar::Grammar;
 
-impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
+impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
     fn start_multiplication(&mut self) {
         let context = self.build_token_context(TokenType::Multiplication);
         self.push_to_token_buffer(Box::new(MultiplicationToken::new(context)));

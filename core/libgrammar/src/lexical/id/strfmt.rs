@@ -1,7 +1,8 @@
 use super::super::{LexicalParser, CallbackReturnStatus};
 use libcommon::strtool::strcompare::{U8ArrayIsEqual};
+use crate::grammar::Grammar;
 
-impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
+impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
     fn id_kw_strfmt_process_content(&mut self, start: &[u8], end: &[u8]) {
         // 跳过 "
         self.content.skip_next_one();

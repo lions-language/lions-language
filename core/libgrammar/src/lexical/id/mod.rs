@@ -1,8 +1,9 @@
 use super::{LexicalParser, CallbackReturnStatus};
 use crate::token::{TokenType};
 use id::IdToken;
+use crate::grammar::Grammar;
 
-impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
+impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
     fn id_push_keyword_token(&mut self, token_type: TokenType) {
         self.push_nooperate_token_to_token_buffer(token_type);
     }

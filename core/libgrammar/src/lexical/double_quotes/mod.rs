@@ -1,8 +1,9 @@
 use super::{LexicalParser, CallbackReturnStatus};
 use crate::token::{TokenType};
 use string::StringToken;
+use crate::grammar::Grammar;
 
-impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
+impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
     pub fn double_quotes_process_content(&mut self) -> Vec<u8> {
         // 跳过双引号
         self.content.skip_next_one();

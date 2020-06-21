@@ -1,11 +1,12 @@
 use super::{LexicalParser, CallbackReturnStatus};
+use crate::grammar::Grammar;
 
-impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
+impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
     /*
      * 对存在 cb 的情况下, lookup_next_one 的封装
      * */
     pub fn lookup_next_one_with_cb_wrap<FindF, EndF>(&mut self, mut find_f: FindF, mut end_f: EndF)
-        where FindF: FnMut(&mut LexicalParser<T>, char), EndF: FnMut(&mut LexicalParser<T>) {
+        where FindF: FnMut(&mut LexicalParser<T, CB>, char), EndF: FnMut(&mut LexicalParser<T, CB>) {
         match self.content.lookup_next_one() {
             Some(c) => {
                 find_f(self, c);
@@ -32,7 +33,7 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
     }
 
     pub fn lookup_next_loop_with_cb_wrap<FindF, EndF>(&mut self, mut find_f: FindF, mut end_f: EndF)
-        where FindF: FnMut(&mut LexicalParser<T>, char) -> bool, EndF: FnMut(&mut LexicalParser<T>) {
+        where FindF: FnMut(&mut LexicalParser<T, CB>, char) -> bool, EndF: FnMut(&mut LexicalParser<T, CB>) {
         loop {
             match self.content.lookup_next_one() {
                 Some(c) => {

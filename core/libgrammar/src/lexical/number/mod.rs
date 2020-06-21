@@ -5,6 +5,7 @@
 use super::{LexicalParser, CallbackReturnStatus};
 use crate::token::{TokenType, NumberValue};
 use number::NumberToken;
+use crate::grammar::Grammar;
 
 // #![feature(assoc_int_consts)]
 
@@ -13,7 +14,7 @@ enum BeforeChange {
     Float(f64)
 }
 
-impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
+impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
     fn number_is_8(&self, c: char) -> Option<u8> {
         if c >= '0' && c <= '7' {
             return Some(c as u8 - '0' as u8);

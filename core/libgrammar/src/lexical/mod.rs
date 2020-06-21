@@ -1,4 +1,5 @@
 use crate::token::{self, TokenContext, TokenType, NoOperateToken};
+use crate::grammar::Grammar;
 
 /// store Vec<u8> struct
 #[derive(Debug)]
@@ -91,13 +92,13 @@ pub enum CallbackReturnStatus {
     End
 }
 
-pub type TokenVecItem<T> = Box<dyn token::Token<T>>;
+pub type TokenVecItem<T, CB> = Box<dyn token::Token<T, CB>>;
 
 pub struct TokenPointer(usize);
 
 impl TokenPointer {
-    pub fn from_ref<T: FnMut() -> CallbackReturnStatus>(item: &TokenVecItem<T>) -> Self {
-        Self(item as *const TokenVecItem<T> as usize)
+    pub fn from_ref<T: FnMut() -> CallbackReturnStatus, CB: Grammar>(item: &TokenVecItem<T, CB>) -> Self {
+        Self(item as *const TokenVecItem<T, CB> as usize)
     }
 
     pub fn new_null() -> Self {
@@ -108,9 +109,9 @@ impl TokenPointer {
         self.0 == 0
     }
 
-    pub fn as_ref<'a, T: FnMut() -> CallbackReturnStatus>(&self) -> &'a TokenVecItem<T> {
+    pub fn as_ref<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar>(&self) -> &'a TokenVecItem<T, CB> {
         unsafe {
-            (self.0 as *const TokenVecItem<T>).as_ref().expect("should not happend")
+            (self.0 as *const TokenVecItem<T, CB>).as_ref().expect("should not happend")
         }
     }
 
@@ -119,16 +120,16 @@ impl TokenPointer {
     }
 }
 
-pub struct LexicalParser<T: FnMut() -> CallbackReturnStatus> {
+pub struct LexicalParser<T: FnMut() -> CallbackReturnStatus, CB: Grammar> {
     file: String,
     line: u64,
     col: u64,
     content: VecU8,
     cb: T,
-    tokens_buffer: Vec<TokenVecItem<T>>
+    tokens_buffer: Vec<TokenVecItem<T, CB>>
 }
 
-impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
+impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
     /*
     fn lookup_next_n(&mut self, n: usize) -> Option<&TokenVecItem> {
         let tokens_len = self.tokens_buffer.len();
@@ -180,14 +181,14 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
         self.skip_next_n(1);
     }
 
-    pub fn take_next_one(&mut self) -> TokenVecItem<T> {
+    pub fn take_next_one(&mut self) -> TokenVecItem<T, CB> {
         if self.tokens_buffer.len() == 0 {
             panic!("take_next_one, tokens_buffer len == 0");
         }
         self.tokens_buffer.remove(0)
     }
 
-    pub fn lookup_next_n(&mut self, n: usize) -> Option<&TokenVecItem<T>> {
+    pub fn lookup_next_n(&mut self, n: usize) -> Option<&TokenVecItem<T, CB>> {
         match self.lookup_next_n_index(n) {
             Some(index) => {
                 return self.tokens_buffer.get(index);
@@ -276,7 +277,7 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
         self.lookup_next_n_index(1)
     }
 
-    pub fn token_by_index(&self, index: usize) -> &TokenVecItem<T> {
+    pub fn token_by_index(&self, index: usize) -> &TokenVecItem<T, CB> {
         match self.tokens_buffer.get(index) {
             Some(token) => {
                 token
@@ -287,7 +288,7 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
         }
     }
 
-    pub fn lookup_next_one(&mut self) -> Option<&TokenVecItem<T>> {
+    pub fn lookup_next_one(&mut self) -> Option<&TokenVecItem<T, CB>> {
         return self.lookup_next_n(1);
     }
 
@@ -300,7 +301,7 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
     }
 
 
-    fn push_to_token_buffer(&mut self, item: TokenVecItem<T>) {
+    fn push_to_token_buffer(&mut self, item: TokenVecItem<T, CB>) {
         self.tokens_buffer.push(item);
     }
 
@@ -385,12 +386,12 @@ impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
 
 }
 
-impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
+impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
     pub fn get_file(&self) -> &String {
         &self.file
     }
 
-    pub fn new(file: String, cb: T) -> LexicalParser<T> {
+    pub fn new(file: String, cb: T) -> LexicalParser<T, CB> {
         let parser = LexicalParser{
             file: file,
             line: 1,
@@ -426,53 +427,10 @@ mod semicolon;
 mod test {
     use super::*;
 
-    use std::fs;
-    use std::io::Read;
-
-    #[test]
-    #[ignore]
-    fn lexical_lookup_next_n_test() {
-        let mut file = String::from("main.lions");
-        let mut f = match fs::File::open(&file) {
-            Ok(f) => f,
-            Err(err) => {
-                panic!("read file error");
-            }
-        };
-        let mut obj = LexicalParser::new(file.clone(), || -> CallbackReturnStatus {
-            let mut v = Vec::new();
-            let mut f_ref = f.by_ref();
-            match f_ref.take(1).read_to_end(&mut v) {
-                Ok(len) => {
-                    if len == 0 {
-                        return CallbackReturnStatus::End;
-                    } else {
-                        return CallbackReturnStatus::Continue(VecU8::from_vec_u8(v));
-                    }
-                },
-                Err(_) => {
-                    return CallbackReturnStatus::End;
-                }
-            }
-        });
-        loop {
-            match obj.lookup_next_n(1) {
-                Some(t) => {
-                    let token_type = &t.context().token_type;
-                    println!("{:?}", token_type);
-                    obj.skip_next_one();
-                },
-                None => {
-                    break;
-                }
-            }
-        }
-    }
-
     #[test]
     #[ignore]
     fn lookup_next_one_with_cb_wrap_test() {
-        impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
+        impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
             fn test(&mut self) {
                 self.lookup_next_one_with_cb_wrap(|parser, _| {
                     parser.panic("error");

@@ -1,7 +1,8 @@
 use crate::lexical::{LexicalParser, CallbackReturnStatus};
 use crate::token::TokenType;
+use crate::grammar::Grammar;
 
-impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
+impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
     pub fn semicolon_process(&mut self) {
         self.push_nooperate_token_to_token_buffer(TokenType::Semicolon);
     }

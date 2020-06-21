@@ -1,5 +1,6 @@
 use crate::token::{Token, TokenOperType, TokenAttrubute, TokenContext};
 use crate::lexical::CallbackReturnStatus;
+use crate::grammar::Grammar;
 
 pub struct NumberToken {
     context: TokenContext
@@ -12,7 +13,7 @@ lazy_static!{
     };
 }
 
-impl<T: FnMut() -> CallbackReturnStatus> Token<T> for NumberToken {
+impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> Token<T, CB> for NumberToken {
     fn context(&self) -> &TokenContext {
         return &self.context;
     }

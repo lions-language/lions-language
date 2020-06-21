@@ -1,5 +1,6 @@
 use crate::token::{Token, TokenOperType, TokenAttrubute, TokenContext};
 use crate::lexical::CallbackReturnStatus;
+use crate::grammar::Grammar;
 
 /*
  * 操作数 的统一实现
@@ -15,7 +16,7 @@ pub struct OperandToken {
     context: TokenContext
 }
 
-impl<T: FnMut() -> CallbackReturnStatus> Token<T> for OperandToken {
+impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> Token<T, CB> for OperandToken {
     fn context(&self) -> &TokenContext {
         return &self.context;
     }   

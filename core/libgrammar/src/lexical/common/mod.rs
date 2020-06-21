@@ -3,8 +3,9 @@ use crate::token::{TokenType};
 use crate::lexical::plus::plus;
 use crate::lexical::parenthese::left_parenthese;
 use crate::lexical::parenthese::right_parenthese;
+use crate::grammar::Grammar;
 
-impl<T: FnMut() -> CallbackReturnStatus> LexicalParser<T> {
+impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
     fn escape_change_select(&mut self, c: char) -> Option<char> {
         let mut r = None;
         match c {
