@@ -13,32 +13,23 @@ pub struct PlusToken {
     context: TokenContext
 }
 
-impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> Token<T, CB> for PlusToken {
-    fn nup(&self, grammar: &mut GrammarParser<T, CB>, express_context: &ExpressContext<T, CB>) -> TokenMethodResult {
+impl PlusToken {
+    fn nup<T: FnMut() -> CallbackReturnStatus, CB: Grammar>(token: &Token<T, CB>, grammar: &mut GrammarParser<T, CB>, express_context: &ExpressContext<T, CB>) -> TokenMethodResult {
         TokenMethodResult::None
     }
 
-    fn led(&self, grammar: &mut GrammarParser<T, CB>, express_context: &ExpressContext<T, CB>) -> TokenMethodResult {
+    fn led<T: FnMut() -> CallbackReturnStatus, CB: Grammar>(token: &Token<T, CB>, grammar: &mut GrammarParser<T, CB>, express_context: &ExpressContext<T, CB>) -> TokenMethodResult {
         TokenMethodResult::None
-    }
-
-    fn context_ref(&self) -> &TokenContext {
-        &self.context
-    }
-
-    fn context(self) -> TokenContext {
-        self.context
-    }
-
-    fn token_attrubute(&self) -> &'static TokenAttrubute {
-        &*plus_token_attrubute
     }
 }
 
 impl PlusToken {
-    pub fn new(context: TokenContext) -> Self {
-        Self{
-            context: context
+    pub fn new<T: FnMut() -> CallbackReturnStatus, CB: Grammar>(context: TokenContext) -> Token<T, CB> {
+        Token{
+            context: context,
+            attrubute: &*plus_token_attrubute,
+            nup: PlusToken::nup,
+            led: PlusToken::led
         }
     }
 }

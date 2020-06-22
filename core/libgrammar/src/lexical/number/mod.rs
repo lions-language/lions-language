@@ -391,7 +391,7 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
 
     pub fn push_number_token_to_token_buffer(&mut self, value: NumberValue) {
         let context = self.build_token_context(TokenType::Number(value));
-        self.push_to_token_buffer(Box::new(NumberToken::new(context)));
+        self.push_to_token_buffer(NumberToken::new(context));
     }
 }
 

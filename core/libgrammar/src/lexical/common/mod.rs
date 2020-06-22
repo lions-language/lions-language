@@ -113,17 +113,17 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
 
     pub fn push_token_plus(&mut self) {
         let context = self.build_token_context(TokenType::Plus);
-        self.push_to_token_buffer(Box::new(plus::PlusToken::new(context)));
+        self.push_to_token_buffer(plus::PlusToken::new(context));
     }
 
     pub fn push_token_left_parenthese(&mut self) {
         let context = self.build_token_context(TokenType::LeftParenthese);
-        self.push_to_token_buffer(Box::new(left_parenthese::LeftParentheseToken::new(context)));
+        self.push_to_token_buffer(left_parenthese::LeftParentheseToken::new(context));
     }
 
     pub fn push_token_right_parenthese(&mut self) {
         let context = self.build_token_context(TokenType::RightParenthese);
-        self.push_to_token_buffer(Box::new(right_parenthese::RightParentheseToken::new(context)));
+        self.push_to_token_buffer(right_parenthese::RightParentheseToken::new(context));
     }
 
     pub fn push_token_annotate(&mut self, content: Vec<u8>) {

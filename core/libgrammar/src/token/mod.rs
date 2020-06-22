@@ -88,7 +88,7 @@ pub enum TokenOperType {
 }
 
 lazy_static!{
-    static ref default_token_attrubute: TokenAttrubute = TokenAttrubute::default();
+    pub static ref default_token_attrubute: TokenAttrubute = TokenAttrubute::default();
 }
 
 pub struct TokenAttrubute {
@@ -118,16 +118,15 @@ pub struct TokenValue {
 }
 
 impl TokenValue {
-    /*
     pub fn from_token<T: FnMut() -> CallbackReturnStatus, CB: Grammar>(token: TokenVecItem<T, CB>) -> Self {
         Self {
             token_attrubute: token.token_attrubute(),
-            context: token.context(),
+            context: token.context,
         }
     }
-    */
 }
 
+/*
 pub trait Token<T: FnMut() -> CallbackReturnStatus, CB: Grammar> {
     fn nup(&self, grammar: &mut GrammarParser<T, CB>, express_context: &ExpressContext<T, CB>) -> TokenMethodResult {
         TokenMethodResult::None
@@ -141,6 +140,7 @@ pub trait Token<T: FnMut() -> CallbackReturnStatus, CB: Grammar> {
     fn context_ref(&self) -> &TokenContext;
     fn context(self) -> TokenContext;
 }
+*/
 
 #[derive(Default)]
 pub struct TokenContext {
@@ -150,6 +150,42 @@ pub struct TokenContext {
     pub col: u64,
     // token类型
     pub token_type: TokenType,
+}
+
+type NupFunc<T, CB> = fn(token: &Token<T, CB>, grammar: &mut GrammarParser<T, CB>, express_context: &ExpressContext<T, CB>) -> TokenMethodResult;
+type LedFunc<T, CB> = fn(token: &Token<T, CB>, grammar: &mut GrammarParser<T, CB>, express_context: &ExpressContext<T, CB>) -> TokenMethodResult;
+
+pub struct Token<T: FnMut() -> CallbackReturnStatus, CB: Grammar> {
+    pub context: TokenContext,
+    pub attrubute: &'static TokenAttrubute,
+    pub nup: NupFunc<T, CB>,
+    pub led: LedFunc<T, CB>
+}
+
+impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> Token<T, CB> {
+    pub fn context_ref(&self) -> &TokenContext {
+        &self.context
+    }
+
+    pub fn token_attrubute(&self) -> &'static TokenAttrubute {
+        self.attrubute
+    }
+
+    pub fn nup(&self, grammar: &mut GrammarParser<T, CB>, express_context: &ExpressContext<T, CB>) -> TokenMethodResult {
+        (self.nup)(self, grammar, express_context)
+    }
+
+    pub fn led(&self, grammar: &mut GrammarParser<T, CB>, express_context: &ExpressContext<T, CB>) -> TokenMethodResult {
+        (self.led)(self, grammar, express_context)
+    }
+}
+
+pub fn default_nup<T: FnMut() -> CallbackReturnStatus, CB: Grammar>(token: &Token<T, CB>, grammar: &mut GrammarParser<T, CB>, express_context: &ExpressContext<T, CB>) -> TokenMethodResult {
+    TokenMethodResult::None
+}
+
+pub fn default_led<T: FnMut() -> CallbackReturnStatus, CB: Grammar>(token: &Token<T, CB>, grammar: &mut GrammarParser<T, CB>, express_context: &ExpressContext<T, CB>) -> TokenMethodResult {
+    TokenMethodResult::None
 }
 
 /*
@@ -166,24 +202,13 @@ pub struct NoOperateToken {
     context: TokenContext
 }
 
-impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> Token<T, CB> for NoOperateToken {
-    fn context_ref(&self) -> &TokenContext {
-        return &self.context
-    }
-
-    fn context(self) -> TokenContext {
-        self.context
-    }
-
-    fn token_attrubute(&self) -> &'static TokenAttrubute {
-        &*nooperate_token_attrubute
-    }
-}
-
 impl NoOperateToken {
-    pub fn new(context: TokenContext) -> Self {
-        Self{
-            context: context
+    pub fn new<T: FnMut() -> CallbackReturnStatus, CB: Grammar>(context: TokenContext) -> Token<T, CB> {
+        Token{
+            context: context,
+            attrubute: &*nooperate_token_attrubute,
+            nup: default_nup,
+            led: default_led
         }
     }
 }

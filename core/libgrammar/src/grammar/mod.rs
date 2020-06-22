@@ -27,8 +27,7 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> ExpressContext<T, CB> {
 
 pub struct GrammarParser<T: FnMut() -> CallbackReturnStatus, CB: Grammar> {
     lexical_parser: LexicalParser<T, CB>,
-    context: GrammarContext<CB>,
-    current_token: TokenPointer
+    context: GrammarContext<CB>
 }
 
 impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<T, CB> {
@@ -55,13 +54,6 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<T, CB> {
         }
     }
 
-    /*
-     * 必须在 token 没有释放的时候调用
-     * */
-    fn update_current_token(&mut self, token: TokenPointer) {
-        *&mut self.current_token = token;
-    }
-
     fn panic(&self, msg: &str) {
         self.lexical_parser.panic(msg);
     }
@@ -70,8 +62,7 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<T, CB> {
             grammar_context: GrammarContext<CB>) -> Self {
         Self {
             lexical_parser: lexical_parser,
-            context: grammar_context,
-            current_token: TokenPointer::new_null()
+            context: grammar_context
         }
     }
 }

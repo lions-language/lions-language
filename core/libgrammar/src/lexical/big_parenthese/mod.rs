@@ -9,7 +9,7 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
          * */
         self.content.skip_next_one();
         let context = self.build_token_context(TokenType::LeftBigParenthese);
-        self.push_to_token_buffer(Box::new(left_big_parenthese::LeftBigParentheseToken::new(context)));
+        self.push_to_token_buffer(left_big_parenthese::LeftBigParentheseToken::new(context));
     }
 
     pub fn big_parenthese_right_process(&mut self) {
@@ -18,7 +18,7 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
          * */
         self.content.skip_next_one();
         let context = self.build_token_context(TokenType::RightBigParenthese);
-        self.push_to_token_buffer(Box::new(right_big_parenthese::RightBigParentheseToken::new(context)));
+        self.push_to_token_buffer(right_big_parenthese::RightBigParentheseToken::new(context));
     }
 }
 

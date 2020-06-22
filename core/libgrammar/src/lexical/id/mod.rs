@@ -13,7 +13,7 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
          * 存入 context
          * */
         let context = self.build_token_context(TokenType::Id(s.to_string()));
-        self.push_to_token_buffer(Box::new(IdToken::new(context)));
+        self.push_to_token_buffer(IdToken::new(context));
     }
 
     fn id_kw_if(&mut self) {

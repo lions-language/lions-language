@@ -59,7 +59,7 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
 
     pub fn push_string_token_to_token_buffer(&mut self, content: Vec<u8>) {
         let context = self.build_token_context(TokenType::Str(content));
-        self.push_to_token_buffer(Box::new(StringToken::new(context)));
+        self.push_to_token_buffer(StringToken::new(context));
     }
 }
 

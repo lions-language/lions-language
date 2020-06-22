@@ -92,7 +92,7 @@ pub enum CallbackReturnStatus {
     End
 }
 
-pub type TokenVecItem<T, CB> = Box<dyn token::Token<T, CB>>;
+pub type TokenVecItem<T, CB> = token::Token<T, CB>;
 
 pub struct TokenPointer(usize);
 
@@ -100,10 +100,6 @@ impl TokenPointer {
     pub fn from_ref<T: FnMut() -> CallbackReturnStatus, CB: Grammar>(item: &TokenVecItem<T, CB>) -> Self {
         Self(item as *const TokenVecItem<T, CB> as usize)
     }
-
-    pub fn from<T: FnMut() -> CallbackReturnStatus, CB: Grammar>(item: TokenVecItem<T, CB>) -> Self {
-        Self(Box::into_raw(item) as *mut TokenVecItem<T, CB> as usize)
-    }    
 
     pub fn new_null() -> Self {
         Self(0)
@@ -319,7 +315,7 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
 
     fn push_nooperate_token_to_token_buffer(&mut self, token_type: TokenType) {
         let context = self.build_token_context(token_type);
-        self.push_to_token_buffer(Box::new(NoOperateToken::new(context)));
+        self.push_to_token_buffer(NoOperateToken::new(context));
     }
 
     fn is_id_start(&self, c: char) -> bool {

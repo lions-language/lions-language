@@ -1,4 +1,4 @@
-use crate::token::{TokenContext, Token};
+use crate::token::{self, TokenContext, Token};
 use crate::lexical::CallbackReturnStatus;
 use crate::grammar::Grammar;
 
@@ -6,20 +6,16 @@ pub struct RightBigParentheseToken {
     context: TokenContext
 }
 
-impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> Token<T, CB> for RightBigParentheseToken {
-    fn context_ref(&self) -> &TokenContext {
-        &self.context
-    }
-
-    fn context(self) -> TokenContext {
-        self.context
-    }
+impl RightBigParentheseToken {
 }
 
 impl RightBigParentheseToken {
-    pub fn new(context: TokenContext) -> Self {
-        Self{
-            context: context
+    pub fn new<T: FnMut() -> CallbackReturnStatus, CB: Grammar>(context: TokenContext) -> Token<T, CB> {
+        Token{
+            context: context,
+            attrubute: &*token::default_token_attrubute,
+            nup: token::default_nup,
+            led: token::default_led
         }
     }
 }

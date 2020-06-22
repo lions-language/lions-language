@@ -1,4 +1,4 @@
-use crate::token::{Token, TokenOperType, TokenAttrubute, TokenContext};
+use crate::token::{self, Token, TokenOperType, TokenAttrubute, TokenContext};
 use crate::lexical::CallbackReturnStatus;
 use crate::grammar::Grammar;
 
@@ -13,27 +13,15 @@ lazy_static!{
 }
 
 pub struct OperandToken {
-    context: TokenContext
-}
-
-impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> Token<T, CB> for OperandToken {
-    fn context_ref(&self) -> &TokenContext {
-        return &self.context;
-    }   
-
-    fn context(self) -> TokenContext {
-        self.context
-    }
-
-    fn token_attrubute(&self) -> &'static TokenAttrubute {
-        &*operand_token_attrubute
-    }   
 }
 
 impl OperandToken {
-    pub fn new(context: TokenContext) -> Self {
-        Self{
-            context: context
+    pub fn new<T: FnMut() -> CallbackReturnStatus, CB: Grammar>(context: TokenContext) -> Token<T, CB> {
+        Token{
+            context: context,
+            attrubute: &*operand_token_attrubute,
+            nup: token::default_nup,
+            led: token::default_led
         }
     }   
 }
