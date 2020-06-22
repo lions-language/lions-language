@@ -2,7 +2,7 @@ use super::{GrammarParser, ExpressContext, Grammar};
 use crate::lexical::{CallbackReturnStatus, TokenPointer, TokenVecItem};
 use crate::token::{TokenType, TokenMethodResult};
 
-impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<T, CB> {
+impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, CB> {
     fn expression_end_normal(token: &TokenVecItem<T, CB>) -> bool {
         match &token.context_ref().token_type {
             TokenType::Semicolon
@@ -19,7 +19,7 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<T, CB> {
         /*
          * 因为 0 比任何的操作数都要小, 所以可以将整个表达式遍历完全
          * */
-        self.expression(0, &ExpressContext::new(GrammarParser::<T, CB>::expression_end_normal), token);
+        self.expression(&0, &ExpressContext::new(GrammarParser::<T, CB>::expression_end_normal), token);
     }
 
     /*
@@ -29,7 +29,7 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<T, CB> {
      * 3. token 的 led方法结束后, 下一个 token 应该是 操作符
      * 4. 提供一个函数指针, 用于判断是否结束 (不需要捕获周边环境, 所以使用函数指针, 提高性能)
      * */
-    fn expression(&mut self, operator_bp: u8, express_context: &ExpressContext<T, CB>, input_token_ptr: &TokenPointer) -> TokenMethodResult {
+    pub fn expression(&mut self, operator_bp: &u8, express_context: &ExpressContext<T, CB>, input_token_ptr: &TokenPointer) -> TokenMethodResult {
         let input_token = input_token_ptr.as_ref::<T, CB>();
         match input_token.nup(self, express_context) {
             TokenMethodResult::None => {
@@ -67,11 +67,12 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<T, CB> {
              * */
             return TokenMethodResult::End;
         }
+        // println!("{}", next_token.context.token_type.format());
         /*
          * 如果到达这里, 说明 next_token 是操作符
          * 比较优先级, 找到比输入的小(或者等于)的为止 (也就是说 只要大于就继续)
          * */
-        while next_token.token_attrubute().bp > &operator_bp {
+        while next_token.token_attrubute().bp > operator_bp {
             /*
              * 这里的 led 就是继续比对 next_token 这个操作符的 优先级, 找到比 next_token 优先级还要低(或者等于)的为止
              * */

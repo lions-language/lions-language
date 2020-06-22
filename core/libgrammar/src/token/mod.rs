@@ -71,6 +71,12 @@ impl TokenType {
             TokenType::Plus => {
                 "+"
             },
+            TokenType::Minus => {
+                "-"
+            },
+            TokenType::Multiplication => {
+                "*"
+            },
             TokenType::Number(_) => {
                 "number"
             },
