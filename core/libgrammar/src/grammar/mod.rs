@@ -3,10 +3,16 @@ use crate::token::{TokenType, TokenValue};
 
 pub trait Grammar {
     fn express_const_number(&self, value: TokenValue) {
-        println!("express_const_number");
+        value.print_token_type();
     }
     fn operator_plus(&self, value: TokenValue) {
-        println!("operator_plus");
+        value.print_token_type();
+    }
+    fn operator_multiplication(&self, value: TokenValue) {
+        value.print_token_type();
+    }
+    fn operator_minus(&self, value: TokenValue) {
+        value.print_token_type();
     }
 }
 
@@ -15,7 +21,7 @@ pub struct GrammarContext<CB>
     pub cb: CB
 }
 
-pub type ExpressEndFunc<T, CB> = fn(&TokenVecItem<T, CB>) -> bool;
+pub type ExpressEndFunc<T, CB> = fn(&mut GrammarParser<T, CB>, &TokenVecItem<T, CB>) -> bool;
 
 pub struct ExpressContext<T: FnMut() -> CallbackReturnStatus, CB: Grammar> {
     pub end_f: ExpressEndFunc<T, CB>
@@ -52,9 +58,6 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         match token.as_ref::<T, CB>().context_ref().token_type {
             TokenType::If => {
             },
-            TokenType::NewLine => {
-                self.take_next_one();
-            },
             _ => {
                 self.expression_process(token);
             }
@@ -63,6 +66,10 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
 
     pub fn take_next_one(&mut self) -> TokenVecItem<T, CB> {
         self.lexical_parser.take_next_one()
+    }
+
+    pub fn skip_next_one(&mut self) {
+        self.lexical_parser.skip_next_one()
     }
 
     pub fn lookup_next_one_ptr(&mut self) -> Option<TokenPointer> {

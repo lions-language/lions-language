@@ -431,6 +431,7 @@ mod slash;
 mod start;
 mod operand;
 mod semicolon;
+mod whitespace;
 
 mod test {
     use super::*;

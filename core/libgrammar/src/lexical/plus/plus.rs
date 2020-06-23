@@ -10,7 +10,6 @@ lazy_static!{
 }
 
 pub struct PlusToken {
-    context: TokenContext
 }
 
 impl PlusToken {
@@ -22,7 +21,14 @@ impl PlusToken {
         /*
          * 移除 + token
          * */
+        // println!("{}", token.context.token_type.format());
         let t = grammar.take_next_one();
+        /*
+         * 注意: 在 take_next_one() 之后, 第一个传入参数已经是无效的了
+         * 因为 take_next_one 的 token 和 传入的token是同一个对象(本次调用是由 token 发起的)
+         * 所以, 如果想利用 传入的token, 需要在之前就进行值拷贝, 或者使用 take_next_one 的结果
+         * (这就是之前 unsafe 可能导致的问题, rust 不让编译, 是有道理的, 幸运的是, 我们知道问题在哪里, 可以合理的使用内存)
+         * */
         /*
          * 查找, 直到找到比 + 优先级小或者等于的为止
          * */
@@ -34,25 +40,15 @@ impl PlusToken {
                 /*
                  * 操作符之后没有token => 语法错误
                  * */
-                grammar.panic("expect one token, but found EOF");
+                grammar.panic("expect one token, but arrive EOF");
                 return TokenMethodResult::Panic;
             }
         };
         // println!("{}", tp.as_ref::<T, CB>().context.token_type.format());
-        let r =  grammar.expression(token.token_attrubute().bp, express_context, &tp);
-        match r {
-            TokenMethodResult::End
-                | TokenMethodResult::IoEOF => {
-                /*
-                 * 这里的判断实际是多余的, 因为 expression 只可能返回这两个值, 否则都抛出异常了
-                 * */
-            },
-            _ => {
-                return r;
-            }
-        }
+        // println!("{}", token.context.token_type.format());
+        let r =  grammar.expression(t.token_attrubute().bp, express_context, &tp);
         grammar.grammar_context().cb.operator_plus(TokenValue::from_token(t));
-        TokenMethodResult::End
+        r
     }
 }
 

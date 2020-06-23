@@ -7,3 +7,4 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
         self.content.skip_next_one();
     }
 }
+

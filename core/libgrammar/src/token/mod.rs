@@ -113,9 +113,12 @@ impl Default for TokenAttrubute {
 
 pub enum TokenMethodResult {
     None,
+    // 正常结束
     End,
-    IoEOF,
-    Panic
+    // 异常
+    Panic,
+    // 语句结束
+    StmtEnd
 }
 
 pub struct TokenValue {
@@ -129,6 +132,10 @@ impl TokenValue {
             token_attrubute: token.token_attrubute(),
             context: token.context,
         }
+    }
+
+    pub fn print_token_type(&self) {
+        println!("{:?}", &self.context.token_type);
     }
 }
 

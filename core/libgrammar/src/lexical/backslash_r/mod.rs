@@ -40,7 +40,7 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
             }
         }
         // 不管是 \r 还是 \r\n, 都记为 NewLine
-        self.push_nooperate_token_to_token_buffer(TokenType::NewLine);
+        self.push_token_newline();
         self.add_one_line();
     }
 }

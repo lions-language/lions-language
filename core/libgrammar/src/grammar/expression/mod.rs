@@ -1,18 +1,29 @@
 use super::{GrammarParser, ExpressContext, Grammar};
 use crate::lexical::{CallbackReturnStatus, TokenPointer, TokenVecItem};
-use crate::token::{TokenType, TokenMethodResult};
+use crate::token::{TokenType, TokenMethodResult, TokenOperType};
 
 impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, CB> {
-    fn expression_end_normal(token: &TokenVecItem<T, CB>) -> bool {
+    fn expression_end_normal(grammar: &mut GrammarParser<T, CB>, token: &TokenVecItem<T, CB>) -> bool {
         match &token.context_ref().token_type {
             TokenType::Semicolon
             | TokenType::NewLine => {
-                true
+                grammar.skip_next_one();
+                return true;
             },
             _ => {
-                false
             }
         }
+        match token.token_attrubute().oper_type {
+            TokenOperType::Operator => {
+            },
+            _ => {
+                /*
+                 * 如果 token 不是操作數 => 表达式结束
+                 * */
+                return true;
+            }
+        }
+        false
     }
 
     pub fn expression_process(&mut self, token: &TokenPointer) {
@@ -40,8 +51,8 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                  * */
                 self.panic(&format!("expect operand, but found {}", input_token.context_ref().token_type.format()));
             },
-            TokenMethodResult::IoEOF => {
-                return TokenMethodResult::IoEOF;
+            TokenMethodResult::StmtEnd => {
+                return TokenMethodResult::StmtEnd;
             },
             _ => {}
         }
@@ -53,7 +64,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                 /*
                  * 操作数之后是 EOF => 结束
                  * */
-                return TokenMethodResult::IoEOF;
+                return TokenMethodResult::StmtEnd;
             }
         };
         let mut next_token = next_tp.as_ref::<T, CB>();
@@ -61,11 +72,11 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
          * 检测是否需要结束
          * 一条语句的结束一定在操作数之后
          * */
-        if (express_context.end_f)(next_token) {
+        if (express_context.end_f)(self, next_token) {
             /*
              * 语句结束
              * */
-            return TokenMethodResult::End;
+            return TokenMethodResult::StmtEnd;
         }
         // println!("{}", next_token.context.token_type.format());
         /*
@@ -76,6 +87,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
             /*
              * 这里的 led 就是继续比对 next_token 这个操作符的 优先级, 找到比 next_token 优先级还要低(或者等于)的为止
              * */
+            // println!{"{}", next_token.context.token_type.format()};
             match next_token.led(self, express_context) {
                 TokenMethodResult::None => {
                     /*
@@ -83,8 +95,8 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                      * */
                     panic!(format!("operator: {} not implement", next_token.context_ref().token_type.format()));
                 },
-                TokenMethodResult::IoEOF => {
-                    return TokenMethodResult::IoEOF;
+                TokenMethodResult::StmtEnd => {
+                    return TokenMethodResult::StmtEnd;
                 },
                 _ => {}
             }
@@ -96,7 +108,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                     /*
                      * 如果到达这里, 说明 led 方法返回的不是 IoEOF, 那么这一次的 lookup next 一定不会是 None
                      * */
-                    self.panic("should not happend");
+                    panic!("should not happend");
                     return TokenMethodResult::Panic;
                 }
             };

@@ -3,6 +3,7 @@ use crate::token::{TokenType};
 use crate::lexical::plus::plus;
 use crate::lexical::parenthese::left_parenthese;
 use crate::lexical::parenthese::right_parenthese;
+use crate::lexical::whitespace::newline;
 use crate::grammar::Grammar;
 
 impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
@@ -128,6 +129,11 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
 
     pub fn push_token_annotate(&mut self, content: Vec<u8>) {
         self.push_nooperate_token_to_token_buffer(TokenType::Annotate(content));
+    }
+
+    pub fn push_token_newline(&mut self) {
+        let context = self.build_token_context(TokenType::NewLine);
+        self.push_to_token_buffer(newline::NewLineToken::new(context));
     }
 
     pub fn push_token_div(&mut self) {
