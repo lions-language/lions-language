@@ -20,6 +20,8 @@ pub enum TokenType {
     Unknown,
     // +
     Plus,
+    // ++
+    PlusPlus,
     // -
     Minus,
     // =
@@ -134,8 +136,15 @@ impl TokenValue {
         }
     }
 
-    pub fn print_token_type(&self) {
-        println!("{:?}", &self.context.token_type);
+    pub fn print_token_type(&self, msg: Option<&str>) {
+        match msg {
+            Some(s) => {
+                println!("{} {:?}", s, &self.context.token_type);
+            },
+            None => {
+                println!("{:?}", &self.context.token_type);
+            }
+        }
     }
 }
 
@@ -190,6 +199,10 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> Token<T, CB> {
 
     pub fn led(&self, grammar: &mut GrammarParser<T, CB>, express_context: &ExpressContext<T, CB>) -> TokenMethodResult {
         (self.led)(self, grammar, express_context)
+    }
+
+    pub fn context_format(&self) -> &'static str {
+        self.context.token_type.format()
     }
 }
 

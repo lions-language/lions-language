@@ -9,6 +9,15 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
         self.push_to_token_buffer(plus::PlusToken::new(context));
     }
 
+    fn plus_plus(&mut self) {
+        /*
+         * 跳过 + 号
+         * */
+        self.content.skip_next_one();
+        let context = self.build_token_context(TokenType::PlusPlus);
+        self.push_to_token_buffer(plus_plus::PlusPlusToken::new(context));
+    }
+
     pub fn plus_process(&mut self) {
         // 跳过 + 号
         self.content.skip_next_one();
@@ -18,6 +27,7 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
                     match c {
                         '+' => {
                             // ++
+                            self.plus_plus();
                         },
                         '=' => {
                             // +=
@@ -25,9 +35,9 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
                         _ => {
                             // +
                             self.plus();
-                            break;
                         }
                     }
+                    return;
                 },
                 None => {
                     match (self.cb)() {

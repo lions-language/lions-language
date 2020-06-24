@@ -14,7 +14,37 @@ pub struct PlusToken {
 
 impl PlusToken {
     fn nup<T: FnMut() -> CallbackReturnStatus, CB: Grammar>(token: &Token<T, CB>, grammar: &mut GrammarParser<T, CB>, express_context: &ExpressContext<T, CB>) -> TokenMethodResult {
-        TokenMethodResult::None
+        /*
+         * 移除 token
+         * */
+        let t = grammar.take_next_one();
+        /*
+         * 找到下一个 token, 然后调用下一个 token 的 nup
+         * */
+        let tp = match grammar.lookup_next_one_ptr() {
+            Some(tp) => {
+                tp
+            },
+            None => {
+                /*
+                 * - 后面遇到了 EOF => 语法错误
+                 * */
+                grammar.panic("expect operand, but arrive EOF");
+                return TokenMethodResult::Panic;
+            }
+        };
+        let next = tp.as_ref::<T, CB>();
+        let r = next.nup(grammar, express_context);
+        match r {
+            TokenMethodResult::None => {
+                grammar.panic(&format!("expect operand, but found: {}", next.context_format()));
+                return TokenMethodResult::Panic;
+            },
+            _ => {
+            }
+        }
+        grammar.grammar_context().cb.operator_positive(TokenValue::from_token(t));
+        r
     }
 
     fn led<T: FnMut() -> CallbackReturnStatus, CB: Grammar>(token: &Token<T, CB>, grammar: &mut GrammarParser<T, CB>, express_context: &ExpressContext<T, CB>) -> TokenMethodResult {

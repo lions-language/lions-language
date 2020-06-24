@@ -3,16 +3,28 @@ use crate::token::{TokenType, TokenValue};
 
 pub trait Grammar {
     fn express_const_number(&self, value: TokenValue) {
-        value.print_token_type();
+        value.print_token_type(None);
     }
     fn operator_plus(&self, value: TokenValue) {
-        value.print_token_type();
+        value.print_token_type(None);
+    }
+    fn operator_prefix_increase(&self, value: TokenValue) {
+        value.print_token_type(Some("prefix increase:"));
+    }
+    fn operator_suffix_increase(&self, value: TokenValue) {
+        value.print_token_type(Some("suffix increase:"));
     }
     fn operator_multiplication(&self, value: TokenValue) {
-        value.print_token_type();
+        value.print_token_type(None);
     }
     fn operator_minus(&self, value: TokenValue) {
-        value.print_token_type();
+        value.print_token_type(None);
+    }
+    fn operator_negative(&self, value: TokenValue) {
+        value.print_token_type(Some("prefix operator:"));
+    }
+    fn operator_positive(&self, value: TokenValue) {
+        value.print_token_type(Some("prefix operator:"));
     }
 }
 
