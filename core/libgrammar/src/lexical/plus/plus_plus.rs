@@ -72,11 +72,17 @@ impl PlusPlusToken {
             }
         };
         let next = tp.as_ref::<T, CB>();
-        if (express_context.end_f)(grammar, next) {
-            /*
-             * 情况 2
-             * */
-            return TokenMethodResult::StmtEnd;
+        let cb_r = (express_context.end_f)(grammar, next);
+        match cb_r {
+            TokenMethodResult::StmtEnd
+            | TokenMethodResult::End => {
+                /*
+                 * 情况 2
+                 * */
+                return cb_r;
+            },
+            _ => {
+            }
         }
         /*
          * 调用 next 的 led 方法, 处理连续后缀运算符的情况 (情况 3)

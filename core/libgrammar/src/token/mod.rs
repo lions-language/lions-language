@@ -115,6 +115,7 @@ impl Default for TokenAttrubute {
 
 pub enum TokenMethodResult {
     None,
+    Continue,
     // 正常结束
     End,
     // 异常

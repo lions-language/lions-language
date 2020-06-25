@@ -3,12 +3,12 @@ use crate::lexical::{CallbackReturnStatus, TokenPointer, TokenVecItem};
 use crate::token::{TokenType, TokenMethodResult, TokenOperType};
 
 impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, CB> {
-    fn expression_end_normal(grammar: &mut GrammarParser<T, CB>, token: &TokenVecItem<T, CB>) -> bool {
+    fn expression_end_normal(grammar: &mut GrammarParser<T, CB>, token: &TokenVecItem<T, CB>) -> TokenMethodResult {
         match &token.context_ref().token_type {
             TokenType::Semicolon
             | TokenType::NewLine => {
                 grammar.skip_next_one();
-                return true;
+                return TokenMethodResult::StmtEnd;
             },
             _ => {
             }
@@ -18,12 +18,12 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
             },
             _ => {
                 /*
-                 * 如果 token 不是操作數 => 表达式结束
+                 * 如果 token 不是操作符 => 表达式结束
                  * */
-                return true;
+                return TokenMethodResult::StmtEnd;
             }
         }
-        false
+        TokenMethodResult::Continue
     }
 
     pub fn expression_process(&mut self, token: &TokenPointer) {
@@ -72,11 +72,17 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
          * 检测是否需要结束
          * 一条语句的结束一定在操作数之后
          * */
-        if (express_context.end_f)(self, next_token) {
-            /*
-             * 语句结束
-             * */
-            return TokenMethodResult::StmtEnd;
+        let cb_r = (express_context.end_f)(self, next_token);
+        match cb_r {
+            TokenMethodResult::StmtEnd
+            | TokenMethodResult::End => {
+                /*
+                 * 语句结束 或者 是 () 内的结束
+                 * */
+                return cb_r;
+            },
+            _ => {
+            }
         }
         // println!("{}", next_token.context.token_type.format());
         /*

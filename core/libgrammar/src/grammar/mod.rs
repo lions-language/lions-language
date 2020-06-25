@@ -1,5 +1,5 @@
 use crate::lexical::{LexicalParser, CallbackReturnStatus, TokenVecItem, TokenPointer};
-use crate::token::{TokenType, TokenValue};
+use crate::token::{TokenType, TokenValue, TokenMethodResult};
 
 pub trait Grammar {
     fn express_const_number(&self, value: TokenValue) {
@@ -33,7 +33,7 @@ pub struct GrammarContext<CB>
     pub cb: CB
 }
 
-pub type ExpressEndFunc<T, CB> = fn(&mut GrammarParser<T, CB>, &TokenVecItem<T, CB>) -> bool;
+pub type ExpressEndFunc<T, CB> = fn(&mut GrammarParser<T, CB>, &TokenVecItem<T, CB>) -> TokenMethodResult;
 
 pub struct ExpressContext<T: FnMut() -> CallbackReturnStatus, CB: Grammar> {
     pub end_f: ExpressEndFunc<T, CB>
@@ -73,6 +73,49 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
             _ => {
                 self.expression_process(token);
             }
+        }
+    }
+
+    fn token_is_white_space(&self, token: &TokenVecItem<T, CB>) -> bool {
+        match &token.context_ref().token_type {
+            TokenType::NewLine => {
+                return true;
+            },
+            _ => {
+                return false;
+            }
+        }
+    }
+
+    /*
+     * 跳过空白
+     * 如果跳过所有的空白之后, 还有有效的 token, 将返回 Some(token), 否则返回 None
+     * */
+    pub fn skip_white_space_token(&mut self) -> Option<TokenPointer> {
+        loop {
+            let tp = match self.lookup_next_one_ptr() {
+                Some(tp) => {
+                    tp
+                },
+                None => {
+                    return None;
+                }
+            };
+            let next = tp.as_ref::<T, CB>();
+            if self.token_is_white_space(next) {
+                    self.skip_next_one();
+            } else {
+                return Some(tp);
+            }
+        }
+    }
+
+    pub fn skip_white_space_token_with_input(&mut self, input_tp: TokenPointer) -> Option<TokenPointer> {
+        let input_token = input_tp.as_ref::<T, CB>();
+        if self.token_is_white_space(input_token) {
+            return self.skip_white_space_token();
+        } else {
+            return Some(input_tp);
         }
     }
 
