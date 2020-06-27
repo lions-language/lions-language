@@ -14,7 +14,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
          * 含有名称 function
          * */
         let next = self.take_next_one();
-        self.grammar_context().cb.function_named_start(TokenValue::from_token(next));
+        self.grammar_context().cb.function_named_define_start(TokenValue::from_token(next));
         /*
          * 查找 (
          * */
@@ -149,7 +149,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
          * 语法正确的情况下, 到达了这里 => 下一个 token 一定是 id
          * */
         let type_token = self.take_next_one();
-        self.grammar_context().cb.function_param(TokenValue::from_token(name_token), TokenValue::from_token(type_token));
+        self.grammar_context().cb.function_named_define_param(TokenValue::from_token(name_token), TokenValue::from_token(type_token));
     }
 
     pub fn function_process(&mut self) {

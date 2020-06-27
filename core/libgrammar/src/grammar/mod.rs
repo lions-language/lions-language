@@ -26,13 +26,13 @@ pub trait Grammar {
     fn operator_positive(&mut self, value: TokenValue) {
         value.print_token_type(Some("prefix operator:"));
     }
-    fn function_named_start(&mut self, value: TokenValue) {
+    fn function_named_define_start(&mut self, value: TokenValue) {
         /*
          * 命名函数 start
          * */
         value.print_token_type(None);
     }
-    fn function_param(&mut self, name_token: TokenValue, type_token: TokenValue) {
+    fn function_named_define_param(&mut self, name_token: TokenValue, type_token: TokenValue) {
         name_token.print_token_type(Some("function param name:"));
         type_token.print_token_type(Some("function param type:"));
     }
