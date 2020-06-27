@@ -1,7 +1,7 @@
 use crate::lexical::{CallbackReturnStatus, TokenVecItem};
 use crate::grammar::{GrammarParser, ExpressContext, Grammar};
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum NumberValue {
     Int8(i8),
     Int16(i16),
@@ -15,7 +15,7 @@ pub enum NumberValue {
     Float64(f64)
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum TokenType {
     Unknown,
     // +
@@ -36,6 +36,8 @@ pub enum TokenType {
     Else,
     // elif
     ElseIf,
+    // func
+    Function,
     // (
     LeftParenthese,
     // )
@@ -54,6 +56,10 @@ pub enum TokenType {
     Division,
     // ;
     Semicolon,
+    // :
+    Colon,
+    // ,
+    Comma,
     // 注释
     Annotate(Vec<u8>),
     Id(String),

@@ -2,30 +2,46 @@ use crate::lexical::{LexicalParser, CallbackReturnStatus, TokenVecItem, TokenPoi
 use crate::token::{TokenType, TokenValue, TokenMethodResult};
 
 pub trait Grammar {
-    fn express_const_number(&self, value: TokenValue) {
+    fn express_const_number(&mut self, value: TokenValue) {
         value.print_token_type(None);
     }
-    fn operator_plus(&self, value: TokenValue) {
+    fn operator_plus(&mut self, value: TokenValue) {
         value.print_token_type(None);
     }
-    fn operator_prefix_increase(&self, value: TokenValue) {
+    fn operator_prefix_increase(&mut self, value: TokenValue) {
         value.print_token_type(Some("prefix increase:"));
     }
-    fn operator_suffix_increase(&self, value: TokenValue) {
+    fn operator_suffix_increase(&mut self, value: TokenValue) {
         value.print_token_type(Some("suffix increase:"));
     }
-    fn operator_multiplication(&self, value: TokenValue) {
+    fn operator_multiplication(&mut self, value: TokenValue) {
         value.print_token_type(None);
     }
-    fn operator_minus(&self, value: TokenValue) {
+    fn operator_minus(&mut self, value: TokenValue) {
         value.print_token_type(None);
     }
-    fn operator_negative(&self, value: TokenValue) {
+    fn operator_negative(&mut self, value: TokenValue) {
         value.print_token_type(Some("prefix operator:"));
     }
-    fn operator_positive(&self, value: TokenValue) {
+    fn operator_positive(&mut self, value: TokenValue) {
         value.print_token_type(Some("prefix operator:"));
     }
+    fn function_named_start(&mut self, value: TokenValue) {
+        /*
+         * 命名函数 start
+         * */
+        value.print_token_type(None);
+    }
+    fn function_param(&mut self, name_token: TokenValue, type_token: TokenValue) {
+        name_token.print_token_type(Some("function param name:"));
+        type_token.print_token_type(Some("function param type:"));
+    }
+}
+
+enum NextToken<T: FnMut() -> CallbackReturnStatus, CB: Grammar> {
+    True(TokenVecItem<T, CB>),
+    False(TokenPointer),
+    None
 }
 
 pub struct GrammarContext<CB>
@@ -70,6 +86,9 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         match token.as_ref::<T, CB>().context_ref().token_type {
             TokenType::If => {
             },
+            TokenType::Function => {
+                self.function_process();
+            },
             _ => {
                 self.expression_process(token);
             }
@@ -85,6 +104,44 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                 return false;
             }
         }
+    }
+
+    fn expect_and_take_next_token(&mut self, token_type: TokenType) -> NextToken<T, CB> {
+        let tp = match self.lookup_next_one_ptr() {
+            Some(tp) => {
+                tp
+            },
+            None => {
+                /*
+                 * 期望下一个 token, 但是遇到了 IO EOF => 语法错误
+                 * */
+                self.panic(&format!("expect {:?}, but arrive IO EOF", &token_type));
+                return NextToken::<T, CB>::None;
+            }
+        };
+        let next = tp.as_ref::<T, CB>();
+        if token_type == next.context_ref().token_type {
+            NextToken::<T, CB>::True(self.take_next_one())
+        } else {
+            NextToken::<T, CB>::False(tp)
+        }
+    }
+
+    fn expect_next_token<F>(&mut self, mut f: F, token_prompt: &'static str)
+        where F: FnMut(&mut GrammarParser<T, CB>, TokenPointer) {
+        let tp = match self.lookup_next_one_ptr() {
+            Some(tp) => {
+                tp
+            },
+            None => {
+                /*
+                 * 期望下一个 token, 但是遇到了 IO EOF => 语法错误
+                 * */
+                self.panic(&format!("expect {}, but arrive IO EOF", token_prompt));
+                return;
+            }
+        };
+        f(self, tp)
     }
 
     /*
@@ -149,6 +206,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
 }
 
 mod expression;
+mod function;
 
 mod test {
     use super::*;

@@ -40,9 +40,18 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
     }
 
     fn id_kw_strfmt(&mut self) {
-        // strfmt""
-        // strfmt<><>""
+        /*
+         * strfmt""
+         * strfmt<><>""
+         * */
         self.id_kw_strfmt_process();
+    }
+
+    fn id_kw_func(&mut self) {
+        /*
+         * function
+         * */
+        self.id_push_keyword_token(TokenType::Function);
     }
 
     pub fn id_process(&mut self, start_c: char) {
@@ -84,6 +93,9 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
             },
             "strfmt" => {
                 self.id_kw_strfmt();
+            },
+            "func"|"fn" => {
+                self.id_kw_func();
             },
             _ => {
                 self.id(&s);

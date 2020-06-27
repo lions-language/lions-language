@@ -361,6 +361,8 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
             ']' => self.square_brackets_right_process(),
             '/' => self.slash_process(),
             ';' => self.semicolon_process(),
+            ':' => self.colon_process(),
+            ',' => self.comma_process(),
             ' ' => self.space(),
             _ => {
                 if self.is_id_start(c) {
@@ -432,6 +434,8 @@ mod start;
 mod operand;
 mod semicolon;
 mod whitespace;
+mod colon;
+mod comma;
 
 mod test {
     use super::*;
