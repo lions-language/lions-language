@@ -26,15 +26,27 @@ pub trait Grammar {
     fn operator_positive(&mut self, value: TokenValue) {
         value.print_token_type(Some("prefix operator:"));
     }
-    fn function_named_define_start(&mut self, value: TokenValue) {
+    fn function_named_stmt(&mut self, func_name: TokenValue) {
         /*
-         * 命名函数 start
+         * 命名函数语句
          * */
-        value.print_token_type(None);
+        func_name.print_token_type(Some("named function stmt:"));
+    }
+    fn function_named_define_start(&mut self, _value: TokenValue) {
+        /*
+         * 命名函数函数体开始
+         * */
+        println!("named function define start");
     }
     fn function_named_define_param(&mut self, name_token: TokenValue, type_token: TokenValue) {
         name_token.print_token_type(Some("function param name:"));
         type_token.print_token_type(Some("function param type:"));
+    }
+    fn function_named_define_end(&mut self, _value: TokenValue) {
+        /*
+         * 命名函数函数体结束
+         * */
+        println!("named function define end");
     }
 }
 
@@ -71,7 +83,8 @@ pub struct GrammarParser<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> {
 impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, CB> {
     pub fn parser(&mut self) {
         loop {
-            match self.lexical_parser.lookup_next_one_ptr() {
+            // match self.lexical_parser.lookup_next_one_ptr() {
+            match self.skip_white_space_token() {
                 Some(p) => {
                     self.select(&p);
                 },
@@ -82,7 +95,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         }
     }
 
-    fn select(&mut self, token: &TokenPointer) {
+    fn select_with_exprcontext(&mut self, token: &TokenPointer, express_context: &ExpressContext<T, CB>) {
         match token.as_ref::<T, CB>().context_ref().token_type {
             TokenType::If => {
             },
@@ -90,9 +103,13 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                 self.function_process();
             },
             _ => {
-                self.expression_process(token);
+                self.expression_process(token, express_context);
             }
         }
+    }
+
+    fn select(&mut self, token: &TokenPointer) {
+        self.select_with_exprcontext(token, &ExpressContext::new(GrammarParser::<T, CB>::expression_end_normal));
     }
 
     fn token_is_white_space(&self, token: &TokenVecItem<T, CB>) -> bool {
@@ -144,6 +161,10 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         f(self, tp)
     }
 
+    fn cb(&mut self) -> &mut Grammar {
+        &mut self.grammar_context().cb
+    }
+
     /*
      * 跳过空白
      * 如果跳过所有的空白之后, 还有有效的 token, 将返回 Some(token), 否则返回 None
@@ -160,7 +181,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
             };
             let next = tp.as_ref::<T, CB>();
             if self.token_is_white_space(next) {
-                    self.skip_next_one();
+                self.skip_next_one();
             } else {
                 return Some(tp);
             }

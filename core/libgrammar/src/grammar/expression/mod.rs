@@ -3,7 +3,7 @@ use crate::lexical::{CallbackReturnStatus, TokenPointer, TokenVecItem};
 use crate::token::{TokenType, TokenMethodResult, TokenOperType};
 
 impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, CB> {
-    fn expression_end_normal(grammar: &mut GrammarParser<T, CB>, token: &TokenVecItem<T, CB>) -> TokenMethodResult {
+    pub fn expression_end_normal(grammar: &mut GrammarParser<T, CB>, token: &TokenVecItem<T, CB>) -> TokenMethodResult {
         match &token.context_ref().token_type {
             TokenType::Semicolon
             | TokenType::NewLine => {
@@ -26,12 +26,42 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         TokenMethodResult::Continue
     }
 
-    pub fn expression_process(&mut self, token: &TokenPointer) {
+    pub fn expression_end_right_big_parenthese(grammar: &mut GrammarParser<T, CB>, token: &TokenVecItem<T, CB>) -> TokenMethodResult {
+        match &token.context_ref().token_type {
+            TokenType::RightBigParenthese => {
+                return TokenMethodResult::StmtEnd;
+            },
+            _ => {
+            }
+        }
+        TokenMethodResult::Continue
+    }
+
+    pub fn expression_process_default_exprcontext(&mut self, token: &TokenPointer) {
+        self.expression(&0, &ExpressContext::new(GrammarParser::<T, CB>::expression_end_normal), token);
+    }
+
+    pub fn expression_process(&mut self, token: &TokenPointer, express_context: &ExpressContext<T, CB>) {
         /*
          * 因为 0 比任何的操作数都要小, 所以可以将整个表达式遍历完全
          * */
-        self.expression(&0, &ExpressContext::new(GrammarParser::<T, CB>::expression_end_normal), token);
+        self.expression(&0, express_context, token);
     }
+
+    /*
+    pub fn express(&mut self, operator_bp: &u8, express_context: &ExpressContext<T, CB>, input_token_ptr: &TokenPointer) -> TokenMethodResult {
+        let input_token = input_token_ptr.as_ref::<T, CB>();
+        input_token.nup(self, express_context);
+        let mut next_tp = self.lexical_parser.lookup_next_one_ptr().unwrap();
+        let mut next_token = next_tp.as_ref::<T, CB>();
+        while next_token.token_attrubute().bp > operator_bp {
+            next_token.led(self, express_context);
+            next_tp = self.lexical_parser.lookup_next_one_ptr().unwrap();
+            next_token = next_tp.as_ref::<T, CB>();
+        }
+        TokenMethodResult::End
+    }
+    */
 
     /*
      * 找到比输入的优先级小的操作符为止
@@ -49,7 +79,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                  * 比如说, 解析到 -1:
                  * 1. 首先调用 - 号的 nup 方法, - 号的 nup 方法中获取 next token. 调用 next token 的 nup 方法, 如果 next token 的  nup 方法返回 None, 需要报错
                  * */
-                self.panic(&format!("expect operand, but found {}", input_token.context_ref().token_type.format()));
+                self.panic(&format!("expect operand, but found {:?}", &input_token.context_ref().token_type));
             },
             TokenMethodResult::StmtEnd => {
                 return TokenMethodResult::StmtEnd;

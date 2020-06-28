@@ -1,20 +1,28 @@
-use super::{GrammarParser, Grammar, NextToken};
+use super::{GrammarParser, Grammar, NextToken, ExpressContext};
 use crate::lexical::{CallbackReturnStatus};
 use crate::token::{TokenType, TokenValue};
 
 impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, CB> {
+    /*
     fn function_anonymous(&mut self) {
         /*
          * 匿名 function
          * */
     }
+    */
 
-    fn function_with_name(&mut self) {
+    fn function_method_define(&mut self) {
+        /*
+         * 结构体成员方法的定义
+         * */
+    }
+
+    fn function_define(&mut self) {
         /*
          * 含有名称 function
          * */
         let next = self.take_next_one();
-        self.grammar_context().cb.function_named_define_start(TokenValue::from_token(next));
+        self.grammar_context().cb.function_named_stmt(TokenValue::from_token(next));
         /*
          * 查找 (
          * */
@@ -57,6 +65,76 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         /*
          * 查找 {
          * */
+        match self.expect_and_take_next_token(TokenType::LeftBigParenthese) {
+            NextToken::<T, CB>::False(t) => {
+                self.panic(&format!("expect `{}`, but found {:?}", "{", t.as_ref::<T, CB>().context_ref().token_type));
+                return;
+            },
+            NextToken::<T, CB>::True(t) => {
+                /*
+                 * 回调定义开始
+                 * */
+                self.cb().function_named_define_start(TokenValue::from_token(t));
+            },
+            _ => {
+                return;
+            }
+        }
+        /*
+         * { 后面可能是语句, 也可能是 } (空语句)
+         * */
+        let tp = match self.skip_white_space_token() {
+            Some(tp) => {
+                tp
+            },
+            None => {
+                self.panic("expect `}` or function body, but arrive IO EOF");
+                return;
+            }
+        };
+        let next = tp.as_ref::<T, CB>();
+        match &next.context_ref().token_type {
+            TokenType::RightBigParenthese => {
+                /*
+                 * { 后面是 }
+                 * */
+            },
+            _ => {
+                /*
+                 * { 后面是语句块 => 处理语句块
+                 * */
+                self.select_with_exprcontext(&tp, &ExpressContext::new(GrammarParser::<T, CB>::expression_end_right_big_parenthese));
+                /*
+                 * 删除所有的空白
+                 * */
+                let tp = match self.skip_white_space_token() {
+                    Some(tp) => {
+                        tp
+                    },
+                    None => {
+                        /*
+                         * 取出空白后不存在下一个token, 到达了 IO EOF, 但是期望的是 } => 语法错误
+                         * */
+                        self.panic("expect `}`, but arrive IO EOF");
+                        return;
+                    }
+                };
+                let token = tp.as_ref::<T, CB>();
+                /*
+                 * 判断是否是 }, 如果不是 } => 语法错误
+                 * */
+                if let TokenType::RightBigParenthese = &token.context_ref().token_type {
+                } else {
+                    self.panic(&format!("expect `{}`, but found: {:?}", "}", &token.context_ref().token_type));
+                    return;
+                }
+            }
+        }
+        /*
+         * 到达这里说明 next token 是 } => 表达式结束
+         * */
+        let t = self.take_next_one();
+        self.grammar_context().cb.function_named_define_end(TokenValue::from_token(t));
     }
 
     fn function_find_params(&mut self) {
@@ -99,8 +177,22 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
 
     fn function_find_param(&mut self) {
         /*
-         * 进入这里时, next 一定是 id token
+         * 查找 name id
          * */
+        self.expect_next_token(|parser, t| {
+            let token = t.as_ref::<T, CB>();
+            match token.context_ref().token_type {
+                TokenType::Id(_) => {
+                },
+                _ => {
+                    /*
+                     * 期望一个id作为参数名, 但是token不是id => 语法错误
+                     * */
+                    parser.panic(&format!("expect id as param name, but found {:?}", &token.context_ref().token_type));
+                    return;
+                }
+            }
+        }, "id as param name");
         let name_token = self.take_next_one();
         /*
          * 支持 name type 的方式, 也支持 name: type 的方式
@@ -175,17 +267,17 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                 /*
                  * func xxx(...)
                  * */
-                self.function_with_name();
+                self.function_define();
             },
             TokenType::LeftParenthese => {
                 /*
-                 * func(...)
+                 * func (self *ttt) xxx()
                  * */
-                self.function_anonymous();
+                self.function_method_define();
             },
             _ => {
                 /*
-                 * 两种形式否不是 => 语法错误
+                 * 两种形式都不是 => 语法错误
                  * */
                 self.panic(&format!("expect id or `(` after func, but found {:?}", next_token.context_ref().token_type));
             }
