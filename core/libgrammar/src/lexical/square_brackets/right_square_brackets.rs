@@ -2,13 +2,13 @@ use crate::token::{self, TokenContext, Token};
 use crate::lexical::CallbackReturnStatus;
 use crate::grammar::Grammar;
 
-pub struct LeftBigParentheseToken {
+pub struct RightSquareBracketsToken {
 }
 
-impl LeftBigParentheseToken {
+impl RightSquareBracketsToken {
 }
 
-impl LeftBigParentheseToken {
+impl RightSquareBracketsToken {
     pub fn new<T: FnMut() -> CallbackReturnStatus, CB: Grammar>(context: TokenContext) -> Token<T, CB> {
         Token{
             context: context,
