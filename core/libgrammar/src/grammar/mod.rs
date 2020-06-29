@@ -1,9 +1,26 @@
 use crate::lexical::{LexicalParser, CallbackReturnStatus, TokenVecItem, TokenPointer};
 use crate::token::{TokenType, TokenValue, TokenMethodResult};
 
+pub trait IdUse {
+    fn key(&mut self);
+}
+
+struct DefaultIdUse {
+}
+
+impl IdUse for DefaultIdUse {
+    fn key(&mut self) {
+    }
+}
+
 pub trait Grammar {
+    // type IdUse;
+    
     fn express_const_number(&mut self, value: TokenValue) {
         value.print_token_type(None);
+    }
+    fn annotate(&mut self, _value: TokenValue) {
+        println!("multi annotate");
     }
     fn operator_plus(&mut self, value: TokenValue) {
         value.print_token_type(None);
@@ -32,21 +49,40 @@ pub trait Grammar {
          * */
         func_name.print_token_type(Some("named function stmt:"));
     }
-    fn function_named_define_start(&mut self, _value: TokenValue) {
+    fn function_define_start(&mut self, _value: TokenValue) {
         /*
          * 命名函数函数体开始
          * */
         println!("named function define start");
     }
-    fn function_named_define_param(&mut self, name_token: TokenValue, type_token: TokenValue) {
+    fn function_define_param(&mut self, name_token: TokenValue, type_token: TokenValue) {
         name_token.print_token_type(Some("function param name:"));
         type_token.print_token_type(Some("function param type:"));
     }
-    fn function_named_define_end(&mut self, _value: TokenValue) {
+    fn function_define_end(&mut self, _value: TokenValue) {
         /*
          * 命名函数函数体结束
          * */
         println!("named function define end");
+    }
+    /*
+     * 实现方式一:
+     *  只需要 id_use_end 方法, grammar_parser, 调用 compiler 中定义的 结构方法, 然后将该结构回传到
+     *  id_use_end 方法中
+     *  缺点: 耦合性太高
+     * 实现方式二:
+     *  静态泛型, T: IdUse
+     *  优点: 性能好
+     *  缺点: 如果在 Grammar 中新增一种 trait, 将改动 Grammar, 为 Grammar 添加泛型参数
+     * 实现方式三:
+     *  动态分发, 使用 Box 对 trait 封装
+     *  优点: 可拓展性强
+     *  缺点: 存在运行时消耗
+     * */
+    fn id_use_start(&mut self) -> Box<IdUse> {
+        Box::new(DefaultIdUse{})
+    }
+    fn id_use_end(&mut self, id_use: Box<IdUse>) {
     }
 }
 
@@ -99,6 +135,9 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         match token.as_ref::<T, CB>().context_ref().token_type {
             TokenType::If => {
             },
+            TokenType::Annotate(_) => {
+                self.annotate_process();
+            },
             TokenType::Function => {
                 self.function_process();
             },
@@ -124,7 +163,10 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
     }
 
     fn expect_and_take_next_token(&mut self, token_type: TokenType) -> NextToken<T, CB> {
-        let tp = match self.lookup_next_one_ptr() {
+        /*
+         * 注意: 该方法会先去除全部的空白
+         * */
+        let tp = match self.skip_white_space_token() {
             Some(tp) => {
                 tp
             },
@@ -145,8 +187,11 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
     }
 
     fn expect_next_token<F>(&mut self, mut f: F, token_prompt: &'static str)
+        /*
+         * 注意: 该方法会先去除全部的空白
+         * */
         where F: FnMut(&mut GrammarParser<T, CB>, TokenPointer) {
-        let tp = match self.lookup_next_one_ptr() {
+        let tp = match self.skip_white_space_token() {
             Some(tp) => {
                 tp
             },
@@ -228,6 +273,9 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
 
 mod expression;
 mod function;
+mod token_extend;
+mod annotate;
+mod typesof;
 
 mod test {
     use super::*;

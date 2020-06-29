@@ -4,6 +4,7 @@ use crate::token::{TokenType, TokenMethodResult, TokenOperType};
 
 impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, CB> {
     pub fn expression_end_normal(grammar: &mut GrammarParser<T, CB>, token: &TokenVecItem<T, CB>) -> TokenMethodResult {
+        // println!("normal end ... ");
         match &token.context_ref().token_type {
             TokenType::Semicolon
             | TokenType::NewLine => {
@@ -72,7 +73,8 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
      * */
     pub fn expression(&mut self, operator_bp: &u8, express_context: &ExpressContext<T, CB>, input_token_ptr: &TokenPointer) -> TokenMethodResult {
         let input_token = input_token_ptr.as_ref::<T, CB>();
-        match input_token.nup(self, express_context) {
+        let nup_r = input_token.nup(self, express_context);
+        match nup_r {
             TokenMethodResult::None => {
                 /*
                  * 如果 nup 中遇到了 前缀运算符, 内部会进行自身调用, 如果 前缀运算符后面不是 nup 可以处理的 token, 对应的 token 会自己抛出异常
@@ -82,7 +84,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                 self.panic(&format!("expect operand, but found {:?}", &input_token.context_ref().token_type));
             },
             TokenMethodResult::StmtEnd => {
-                return TokenMethodResult::StmtEnd;
+                return nup_r;
             },
             _ => {}
         }
@@ -105,7 +107,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         let cb_r = (express_context.end_f)(self, next_token);
         match cb_r {
             TokenMethodResult::StmtEnd
-            | TokenMethodResult::End => {
+            | TokenMethodResult::ParentheseEnd => {
                 /*
                  * 语句结束 或者 是 () 内的结束
                  * */
@@ -124,15 +126,17 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
              * 这里的 led 就是继续比对 next_token 这个操作符的 优先级, 找到比 next_token 优先级还要低(或者等于)的为止
              * */
             // println!{"{}", next_token.context.token_type.format()};
-            match next_token.led(self, express_context) {
+            let led_r = next_token.led(self, express_context);
+            match led_r {
                 TokenMethodResult::None => {
                     /*
                      * 操作符的 led 方法没有实现
                      * */
                     panic!(format!("operator: {} not implement", next_token.context_ref().token_type.format()));
                 },
-                TokenMethodResult::StmtEnd => {
-                    return TokenMethodResult::StmtEnd;
+                TokenMethodResult::StmtEnd
+                | TokenMethodResult::ParentheseEnd => {
+                    return led_r;
                 },
                 _ => {}
             }

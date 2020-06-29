@@ -15,7 +15,7 @@ impl LeftParentheseToken {
                 /*
                  * 查找 ) 时, 遇到了 IoEOF => 语法错误
                  * */
-                 grammar.panic("expect a ), but arrive IoEOF");
+                 grammar.panic("expect a `)`, but arrive IoEOF");
                  return TokenMethodResult::Panic;
             }
         };
@@ -23,7 +23,7 @@ impl LeftParentheseToken {
         match &t.context_ref().token_type {
             TokenType::RightParenthese => {
                 grammar.skip_next_one();
-                return TokenMethodResult::End;
+                return TokenMethodResult::ParentheseEnd;
             },
             _ => {
             }

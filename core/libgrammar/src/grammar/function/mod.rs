@@ -1,28 +1,41 @@
 use super::{GrammarParser, Grammar, NextToken, ExpressContext};
-use crate::lexical::{CallbackReturnStatus};
+use crate::lexical::{CallbackReturnStatus, TokenVecItem};
 use crate::token::{TokenType, TokenValue};
 
 impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, CB> {
-    /*
     fn function_anonymous(&mut self) {
         /*
          * 匿名 function
          * */
     }
-    */
 
-    fn function_method_define(&mut self) {
+    fn function_method(&mut self) {
         /*
          * 结构体成员方法的定义
          * */
+        /*
+         * 跳过 [
+         * */
+        self.skip_next_one();
+        /*
+         * func [Type]()
+         * func [self: Type]()
+         * 通过 冒号来判断是 结构方法, 还是成员方法的定义
+         * */
     }
 
-    fn function_define(&mut self) {
+    fn function_named(&mut self) {
         /*
          * 含有名称 function
+         * 命名函数
          * */
         let next = self.take_next_one();
         self.grammar_context().cb.function_named_stmt(TokenValue::from_token(next));
+        self.function_parse_param_list();
+        self.function_parse_block();
+    }
+
+    fn function_parse_param_list(&mut self) {
         /*
          * 查找 (
          * */
@@ -62,6 +75,9 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                 return;
             }
         }
+    }
+
+    fn function_parse_block(&mut self) {
         /*
          * 查找 {
          * */
@@ -74,7 +90,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                 /*
                  * 回调定义开始
                  * */
-                self.cb().function_named_define_start(TokenValue::from_token(t));
+                self.cb().function_define_start(TokenValue::from_token(t));
             },
             _ => {
                 return;
@@ -134,7 +150,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
          * 到达这里说明 next token 是 } => 表达式结束
          * */
         let t = self.take_next_one();
-        self.grammar_context().cb.function_named_define_end(TokenValue::from_token(t));
+        self.grammar_context().cb.function_define_end(TokenValue::from_token(t));
     }
 
     fn function_find_params(&mut self) {
@@ -175,7 +191,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         }
     }
 
-    fn function_find_param(&mut self) {
+    fn function_find_param_name(&mut self) -> TokenVecItem<T, CB> {
         /*
          * 查找 name id
          * */
@@ -193,7 +209,10 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                 }
             }
         }, "id as param name");
-        let name_token = self.take_next_one();
+        self.take_next_one()
+    }
+
+    fn function_find_param_type(&mut self) -> TokenVecItem<T, CB> {
         /*
          * 支持 name type 的方式, 也支持 name: type 的方式
          * 所以如果后面是 :(冒号) => 跳过
@@ -204,6 +223,11 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                 TokenType::Id(_) => {
                     /*
                      * name type 形式
+                     * */
+                },
+                TokenType::Multiplication => {
+                    /*
+                     * name *type 形式
                      * */
                 },
                 TokenType::Colon => {
@@ -241,7 +265,16 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
          * 语法正确的情况下, 到达了这里 => 下一个 token 一定是 id
          * */
         let type_token = self.take_next_one();
-        self.grammar_context().cb.function_named_define_param(TokenValue::from_token(name_token), TokenValue::from_token(type_token));
+        type_token
+    }
+
+    fn function_find_param(&mut self) {
+        /*
+         * 查找 name id
+         * */
+        let name_token = self.function_find_param_name();
+        let type_token = self.function_find_param_type();
+        self.grammar_context().cb.function_define_param(TokenValue::from_token(name_token), TokenValue::from_token(type_token));
     }
 
     pub fn function_process(&mut self) {
@@ -267,13 +300,20 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                 /*
                  * func xxx(...)
                  * */
-                self.function_define();
+                self.function_named();
+            },
+            TokenType::LeftSquareBrackets => {
+                /*
+                 * func [Type]() => 结构的静态方法
+                 * func [self: Type]() => 结构的成员方法
+                 * */
+                self.function_method();
             },
             TokenType::LeftParenthese => {
                 /*
-                 * func (self *ttt) xxx()
+                 * func() => 匿名
                  * */
-                self.function_method_define();
+                self.function_anonymous();
             },
             _ => {
                 /*

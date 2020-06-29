@@ -74,8 +74,6 @@ impl PlusToken {
                 return TokenMethodResult::Panic;
             }
         };
-        // println!("{}", tp.as_ref::<T, CB>().context.token_type.format());
-        // println!("{}", token.context.token_type.format());
         let r =  grammar.expression(t.token_attrubute().bp, express_context, &tp);
         grammar.grammar_context().cb.operator_plus(TokenValue::from_token(t));
         r

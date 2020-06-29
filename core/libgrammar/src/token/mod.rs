@@ -119,6 +119,7 @@ impl Default for TokenAttrubute {
     }
 }
 
+#[derive(Debug)]
 pub enum TokenMethodResult {
     None,
     Continue,
@@ -127,7 +128,9 @@ pub enum TokenMethodResult {
     // 异常
     Panic,
     // 语句结束
-    StmtEnd
+    StmtEnd,
+    // () 结束
+    ParentheseEnd
 }
 
 pub struct TokenValue {
