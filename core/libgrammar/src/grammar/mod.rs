@@ -1,5 +1,6 @@
 use crate::lexical::{LexicalParser, CallbackReturnStatus, TokenVecItem, TokenPointer};
 use crate::token::{TokenType, TokenValue, TokenMethodResult};
+use libcommon::typesof::{Type};
 
 pub trait IdUse {
     fn key(&mut self);
@@ -48,6 +49,12 @@ pub trait Grammar {
          * 命名函数语句
          * */
         func_name.print_token_type(Some("named function stmt:"));
+    }
+    fn function_object_method_stmt(&mut self, object_name: TokenValue
+        , object_type: Type, function_name: TokenValue) {
+        println!("object method stmt");
+    }
+    fn function_struct_method_stmt(&mut self) {
     }
     fn function_define_start(&mut self, _value: TokenValue) {
         /*
@@ -186,7 +193,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         }
     }
 
-    fn expect_next_token<F>(&mut self, mut f: F, token_prompt: &'static str)
+    fn expect_next_token<F>(&mut self, mut f: F, token_prompt: &'static str) -> Option<TokenPointer>
         /*
          * 注意: 该方法会先去除全部的空白
          * */
@@ -200,10 +207,29 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                  * 期望下一个 token, 但是遇到了 IO EOF => 语法错误
                  * */
                 self.panic(&format!("expect {}, but arrive IO EOF", token_prompt));
-                return;
+                return None;
             }
         };
-        f(self, tp)
+        /*
+         * TokenPointer 中的 clone, 只是 地址的拷贝
+         * */
+        f(self, tp.clone());
+        Some(tp)
+    }
+
+    fn virtual_expect_next_token<F>(&mut self, mut f: F, token_prompt: &'static str) -> Option<TokenPointer>
+        where F: FnMut(&mut GrammarParser<T, CB>, TokenPointer) {
+        let tp = match self.virtual_skip_white_space_token() {
+            Some(tp) => {
+                tp
+            },
+            None => {
+                self.panic(&format!("expect {}, but arrive IO EOF", token_prompt));
+                return None;
+            }
+        };
+        f(self, tp.clone());
+        Some(tp)
     }
 
     fn cb(&mut self) -> &mut Grammar {
@@ -215,6 +241,24 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
      * 如果跳过所有的空白之后, 还有有效的 token, 将返回 Some(token), 否则返回 None
      * */
     pub fn skip_white_space_token(&mut self) -> Option<TokenPointer> {
+        loop { let tp = match self.lookup_next_one_ptr() {
+                Some(tp) => {
+                    tp
+                },
+                None => {
+                    return None;
+                }
+            };
+            let next = tp.as_ref::<T, CB>();
+            if self.token_is_white_space(next) {
+                self.skip_next_one();
+            } else {
+                return Some(tp);
+            }
+        }
+    }
+
+    pub fn virtual_skip_white_space_token(&mut self) -> Option<TokenPointer> {
         loop {
             let tp = match self.lookup_next_one_ptr() {
                 Some(tp) => {
@@ -226,7 +270,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
             };
             let next = tp.as_ref::<T, CB>();
             if self.token_is_white_space(next) {
-                self.skip_next_one();
+                self.virtual_skip_next_one();
             } else {
                 return Some(tp);
             }
@@ -252,6 +296,26 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
 
     pub fn lookup_next_one_ptr(&mut self) -> Option<TokenPointer> {
         self.lexical_parser.lookup_next_one_ptr()
+    }
+
+    pub fn virtual_skip_next_n(&mut self, n: usize) {
+        self.lexical_parser.virtual_skip_next_n(n);
+    }
+
+    pub fn virtual_skip_next_one(&mut self) {
+        self.lexical_parser.virtual_skip_next_one();
+    }
+
+    pub fn set_backtrack_point(&mut self) {
+        self.lexical_parser.set_backtrack_point();
+    }
+
+    pub fn restore_from_backtrack_point(&mut self) {
+        self.lexical_parser.restore_from_backtrack_point();
+    }
+
+    pub fn backtrack_n(&mut self, n: usize) {
+        self.lexical_parser.backtrack_n(n);
     }
 
     pub fn grammar_context(&mut self) -> &mut GrammarContext<CB> {

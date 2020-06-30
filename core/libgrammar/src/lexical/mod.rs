@@ -134,7 +134,9 @@ pub struct LexicalParser<T: FnMut() -> CallbackReturnStatus, CB: Grammar> {
     col: u64,
     content: VecU8,
     cb: T,
-    tokens_buffer: Vec<TokenVecItem<T, CB>>
+    tokens_buffer: Vec<TokenVecItem<T, CB>>,
+    index: usize,
+    backtrack_point: usize
 }
 
 impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
@@ -207,6 +209,38 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
         }
     }
 
+    pub fn virtual_skip_next_n(&mut self, n: usize) {
+        self.index += n;
+    }
+
+    pub fn virtual_skip_next_one(&mut self) {
+        self.virtual_skip_next_n(1);
+    }
+
+    pub fn set_backtrack_point(&mut self) {
+        /*
+         * 设置回溯点
+         * */
+        self.backtrack_point = self.index;
+    }
+
+    pub fn restore_from_backtrack_point(&mut self) {
+        /*
+         * 从设置的回溯点恢复
+         * */
+        self.index = self.backtrack_point;
+    }
+
+    pub fn backtrack_n(&mut self, n: usize) {
+        /*
+         * 回溯
+         * */
+        if n > self.index {
+            panic!(format!("backtrack n > self.index(backtrack_n be called times > 1), n: {}, self.index: {}", n, self.index));
+        }
+        self.index -= n;
+    }
+
     pub fn lookup_next_n_ptr(&mut self, n: usize) -> Option<TokenPointer> {
         match self.lookup_next_n_index(n) {
             Some(index) => {
@@ -238,11 +272,11 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
                 /*
                 * 缓存中存在数据
                 */
-                if tokens_len >= n {
+                if tokens_len >= (n + self.index) {
                     /*
                     * 缓存中的token满足n个
                     */
-                    return Some(n - 1);
+                    return Some(n - 1 + self.index);
                 } else {
                     /*
                     * 缓存中的token不足n个 => 从 content 中读取
@@ -408,7 +442,9 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
             col: 0,
             content: VecU8::new(),
             cb: cb,
-            tokens_buffer: Vec::new()
+            tokens_buffer: Vec::new(),
+            index: 0,
+            backtrack_point: 0
         };
         parser
     }

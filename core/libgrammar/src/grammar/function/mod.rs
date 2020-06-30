@@ -1,40 +1,16 @@
 use super::{GrammarParser, Grammar, NextToken, ExpressContext};
-use crate::lexical::{CallbackReturnStatus, TokenVecItem};
+use crate::lexical::{CallbackReturnStatus, TokenVecItem, TokenPointer};
 use crate::token::{TokenType, TokenValue};
 
+enum FunctionType {
+    Unknown,
+    Named,
+    Anonymous,
+    ObjectMethod,
+    StructMethod
+}
+
 impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, CB> {
-    fn function_anonymous(&mut self) {
-        /*
-         * 匿名 function
-         * */
-    }
-
-    fn function_method(&mut self) {
-        /*
-         * 结构体成员方法的定义
-         * */
-        /*
-         * 跳过 [
-         * */
-        self.skip_next_one();
-        /*
-         * func [Type]()
-         * func [self: Type]()
-         * 通过 冒号来判断是 结构方法, 还是成员方法的定义
-         * */
-    }
-
-    fn function_named(&mut self) {
-        /*
-         * 含有名称 function
-         * 命名函数
-         * */
-        let next = self.take_next_one();
-        self.grammar_context().cb.function_named_stmt(TokenValue::from_token(next));
-        self.function_parse_param_list();
-        self.function_parse_block();
-    }
-
     fn function_parse_param_list(&mut self) {
         /*
          * 查找 (
@@ -212,55 +188,70 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         self.take_next_one()
     }
 
-    fn function_find_param_type(&mut self) -> TokenVecItem<T, CB> {
+    fn function_find_param_type_with_token(&mut self, t: TokenPointer) {
         /*
          * 支持 name type 的方式, 也支持 name: type 的方式
          * 所以如果后面是 :(冒号) => 跳过
          * */
-        self.expect_next_token(|parser, t| {
-            let token = t.as_ref::<T, CB>();
-            match token.context_ref().token_type {
-                TokenType::Id(_) => {
-                    /*
-                     * name type 形式
-                     * */
-                },
-                TokenType::Multiplication => {
-                    /*
-                     * name *type 形式
-                     * */
-                },
-                TokenType::Colon => {
-                    /*
-                     * name: type 形式
-                     * */
-                    parser.skip_next_one();
-                    /*
-                     * 查找 : 后面的 id
-                     * 如果不是 id => 语法错误
-                     * */
-                    parser.expect_next_token(|parser, t| {
-                        let token = t.as_ref::<T, CB>();
-                        match token.context_ref().token_type {
-                            TokenType::Id(_) => {
-                            },
-                            _ => {
-                                /*
-                                 * : 后面不是 id => 语法错误
-                                 * */
-                                parser.panic(&format!("expect id as type, but found: {:?}", &token.context_ref().token_type));
-                            }
+        let token = t.as_ref::<T, CB>();
+        match token.context_ref().token_type {
+            TokenType::Id(_) => {
+                /*
+                 * name type 形式
+                 * */
+            },
+            TokenType::Multiplication => {
+                /*
+                 * name *type 形式
+                 * */
+            },
+            TokenType::Colon => {
+                /*
+                 * name: type 形式
+                 * */
+                self.skip_next_one();
+                /*
+                 * 查找 : 后面的 id
+                 * 如果不是 id => 语法错误
+                 * */
+                self.expect_next_token(|parser, t| {
+                    let token = t.as_ref::<T, CB>();
+                    match token.context_ref().token_type {
+                        TokenType::Id(_) => {
+                        },
+                        _ => {
+                            /*
+                             * : 后面不是 id => 语法错误
+                             * */
+                            parser.panic(&format!("expect id as type, but found: {:?}", &token.context_ref().token_type));
                         }
-                    }, "id as type");
-                },
-                _ => {
-                    /*
-                     * 应该是 id (type), 但是没有给定 id token => 语法错误
-                     * */
-                    parser.panic(&format!("expect id as type or `:`, but found: {:?}", &token.context_ref().token_type));
-                }
+                    }
+                }, "id as type");
+            },
+            _ => {
+                /*
+                 * 应该是 id (type), 但是没有给定 id token => 语法错误
+                 * */
+                self.panic(&format!("expect id as type or `:`, but found: {:?}", &token.context_ref().token_type));
             }
-        }, "id as type or `:`");
+        }
+    }
+
+    fn function_find_param_type(&mut self, tp: Option<TokenPointer>) -> TokenVecItem<T, CB> {
+        /*
+         * 如果已经获取了next token, 那么直接传入 token
+         * 否则, 查看下一个, 再调用
+         * */
+        match tp {
+            Some(tp) => {
+                self.function_find_param_type_with_token(tp);
+            },
+            None => {
+                self.expect_next_token(|parser, t| {
+                    parser.function_find_param_type_with_token(t);
+                }, "type");
+            }
+        }
         /*
          * 语法正确的情况下, 到达了这里 => 下一个 token 一定是 id
          * */
@@ -273,7 +264,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
          * 查找 name id
          * */
         let name_token = self.function_find_param_name();
-        let type_token = self.function_find_param_type();
+        let type_token = self.function_find_param_type(None);
         self.grammar_context().cb.function_define_param(TokenValue::from_token(name_token), TokenValue::from_token(type_token));
     }
 
@@ -324,3 +315,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         }
     }
 }
+
+mod anonymous;
+mod method;
+mod named;
