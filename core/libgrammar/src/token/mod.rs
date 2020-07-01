@@ -1,5 +1,6 @@
 use crate::lexical::{CallbackReturnStatus, TokenVecItem};
 use crate::grammar::{GrammarParser, ExpressContext, Grammar};
+use libcommon::typesof::{PrimevalType};
 
 #[derive(Debug, PartialEq)]
 pub enum NumberValue {
@@ -64,34 +65,13 @@ pub enum TokenType {
     Annotate(Vec<u8>),
     Id(String),
     Number(NumberValue),
-    Str(Vec<u8>)
+    Str(Vec<u8>),
+    PrimevalType(PrimevalType)
 }
 
 impl Default for TokenType {
     fn default() -> Self {
         TokenType::Unknown
-    }
-}
-
-impl TokenType {
-    pub fn format(&self) -> &'static str {
-        match self {
-            TokenType::Plus => {
-                "+"
-            },
-            TokenType::Minus => {
-                "-"
-            },
-            TokenType::Multiplication => {
-                "*"
-            },
-            TokenType::Number(_) => {
-                "number"
-            },
-            _ => {
-                "unknow"
-            }
-        }
     }
 }
 
@@ -211,8 +191,8 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> Token<T, CB> {
         (self.led)(self, grammar, express_context)
     }
 
-    pub fn context_format(&self) -> &'static str {
-        self.context.token_type.format()
+    pub fn context_token_type(&self) -> &TokenType {
+        &self.context.token_type
     }
 }
 

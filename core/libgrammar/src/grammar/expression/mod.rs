@@ -132,7 +132,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                     /*
                      * 操作符的 led 方法没有实现
                      * */
-                    panic!(format!("operator: {} not implement", next_token.context_ref().token_type.format()));
+                    panic!(format!("operator: {:?} not implement", next_token.context_token_type()));
                 },
                 TokenMethodResult::StmtEnd
                 | TokenMethodResult::ParentheseEnd => {

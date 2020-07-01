@@ -1,7 +1,7 @@
 use crate::grammar::{GrammarParser, Grammar};
 use crate::lexical::{CallbackReturnStatus, TokenVecItem};
 use crate::token::{TokenType};
-use libcommon::typesof::{Type};
+use libcommon::typesof::{Type, Primeval, PrimevalType, StructItem};
 
 impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, CB> {
     fn typesof_calc_startwith_id(&mut self) -> Option<Type> {
@@ -12,7 +12,29 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         /*
          * 查看下一个token是否是 ::
          * */
-        Some(Type::Primeval)
+        match first.context.token_type {
+            TokenType::Id(id) => {
+                return Some(Type::Structure(StructItem::new(id)));
+            },
+            _ => {
+                panic!("should not happend");
+            }
+        }
+    }
+
+    fn typesof_calc_primeval_type(&mut self) -> Option<Type> {
+        /*
+         * 获取第一个 token
+         * */
+        let first = self.take_next_one();
+        match first.context.token_type {
+            TokenType::PrimevalType(t) => {
+                return Some(Type::Primeval(Primeval::new(t)));
+            },
+            _ => {
+                panic!("should not happend");
+            }
+        }
     }
 
     pub fn typesof_calc(&mut self) -> Option<Type> {
@@ -37,6 +59,12 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                  * type / space1::space2::type
                  * */
                 return self.typesof_calc_startwith_id();
+            },
+            TokenType::PrimevalType(_) => {
+                /*
+                 * 原生类型
+                 * */
+                return self.typesof_calc_primeval_type();
             },
             TokenType::Multiplication => {
                 /*

@@ -37,7 +37,7 @@ impl PlusToken {
         let r = next.nup(grammar, express_context);
         match r {
             TokenMethodResult::None => {
-                grammar.panic(&format!("expect operand, but found: {}", next.context_format()));
+                grammar.panic(&format!("expect operand, but found: {:?}", next.context_token_type()));
                 return TokenMethodResult::Panic;
             },
             _ => {

@@ -2,18 +2,6 @@ use crate::lexical::{LexicalParser, CallbackReturnStatus, TokenVecItem, TokenPoi
 use crate::token::{TokenType, TokenValue, TokenMethodResult};
 use libcommon::typesof::{Type};
 
-pub trait IdUse {
-    fn key(&mut self);
-}
-
-struct DefaultIdUse {
-}
-
-impl IdUse for DefaultIdUse {
-    fn key(&mut self) {
-    }
-}
-
 pub trait Grammar {
     // type IdUse;
     
@@ -71,25 +59,6 @@ pub trait Grammar {
          * 命名函数函数体结束
          * */
         println!("named function define end");
-    }
-    /*
-     * 实现方式一:
-     *  只需要 id_use_end 方法, grammar_parser, 调用 compiler 中定义的 结构方法, 然后将该结构回传到
-     *  id_use_end 方法中
-     *  缺点: 耦合性太高
-     * 实现方式二:
-     *  静态泛型, T: IdUse
-     *  优点: 性能好
-     *  缺点: 如果在 Grammar 中新增一种 trait, 将改动 Grammar, 为 Grammar 添加泛型参数
-     * 实现方式三:
-     *  动态分发, 使用 Box 对 trait 封装
-     *  优点: 可拓展性强
-     *  缺点: 存在运行时消耗
-     * */
-    fn id_use_start(&mut self) -> Box<IdUse> {
-        Box::new(DefaultIdUse{})
-    }
-    fn id_use_end(&mut self, id_use: Box<IdUse>) {
     }
 }
 
