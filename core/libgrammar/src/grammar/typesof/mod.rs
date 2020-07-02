@@ -1,7 +1,7 @@
 use crate::grammar::{GrammarParser, Grammar};
 use crate::lexical::{CallbackReturnStatus, TokenVecItem};
 use crate::token::{TokenType};
-use libcommon::typesof::{Type, Primeval, PrimevalType, StructItem};
+use libcommon::typesof::{Type, Primeval, PrimevalType, Structure};
 
 impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, CB> {
     fn typesof_calc_startwith_id(&mut self) -> Option<Type> {
@@ -14,7 +14,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
          * */
         match first.context.token_type {
             TokenType::Id(id) => {
-                return Some(Type::Structure(StructItem::new(id)));
+                return Some(Type::Structure(Structure::new(id)));
             },
             _ => {
                 panic!("should not happend");

@@ -100,6 +100,7 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
                 }
             } else {
                 // not match
+                parser.new_line_check(c);
                 content.push(c as u8);
                 parser.content.skip_next_one();
             }

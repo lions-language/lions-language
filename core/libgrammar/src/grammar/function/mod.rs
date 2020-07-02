@@ -15,10 +15,17 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         /*
          * 查找 (
          * */
-        if let NextToken::<T, CB>::False(t) = self.expect_and_take_next_token(TokenType::LeftParenthese) {
-            self.panic(&format!("expect `(`, but found {:?}", t.as_ref::<T, CB>().context_ref().token_type));
-            return;
-        }
+        self.expect_next_token(|parser, t| {
+            let token = t.as_ref::<T, CB>();
+            match token.context_token_type() {
+                TokenType::LeftParenthese => {
+                    parser.skip_next_one();
+                },
+                _ => {
+                    parser.panic(&format!("expect `(`, but found {:?}", token.context_token_type()));
+                }
+            }
+        }, "`(`");
         /*
          * 查找 参数 (id id) 或者 (id: id)
          * */
@@ -57,9 +64,25 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         /*
          * 查找 {
          * */
+        self.expect_next_token(|parser, t| {
+            let token = t.as_ref::<T, CB>();
+            let tt = token.context_token_type();
+            match tt {
+                TokenType::LeftBigParenthese => {
+                },
+                _ => {
+                    parser.panic(&format!("expect `{}`, but found {:?}", "{", tt));
+                }
+            }
+        }, "`{`");
+        /*
+         * 如果没有 panic, 那么一定可以 take 到下一个 token
+         * */
+        let next = self.take_next_one();
+        self.cb().function_define_start(TokenValue::from_token(next));
+        /*
         match self.expect_and_take_next_token(TokenType::LeftBigParenthese) {
             NextToken::<T, CB>::False(t) => {
-                self.panic(&format!("expect `{}`, but found {:?}", "{", t.as_ref::<T, CB>().context_ref().token_type));
                 return;
             },
             NextToken::<T, CB>::True(t) => {
@@ -72,6 +95,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                 return;
             }
         }
+        */
         /*
          * { 后面可能是语句, 也可能是 } (空语句)
          * */
@@ -273,7 +297,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
          * 跳过 function 关键字
          * */
         self.skip_next_one();
-        let tp = match self.lookup_next_one_ptr() {
+        let tp = match self.skip_white_space_token() {
             Some(tp) => {
                 tp
             },

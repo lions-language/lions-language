@@ -1,9 +1,9 @@
-#[derive(Debug, PartialEq)]
-pub struct StructItem {
+#[derive(Debug)]
+pub struct Structure {
     pub name: String
 }
 
-impl StructItem {
+impl Structure {
     pub fn new(name: String) -> Self {
         Self {
             name: name
@@ -11,7 +11,7 @@ impl StructItem {
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug)]
 pub enum PrimevalType {
     Bool,
     Int8,
@@ -29,7 +29,7 @@ pub enum PrimevalType {
     Map
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug)]
 pub struct Primeval {
     pub typ: PrimevalType,
     pub ptr: bool
@@ -51,7 +51,7 @@ impl Primeval {
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug)]
 pub enum Type {
     /*
      * 原生类型
@@ -60,5 +60,6 @@ pub enum Type {
     /*
      * 结构体类型
      * */
-    Structure(StructItem)
+    Structure(Structure)
 }
+

@@ -3,7 +3,7 @@ use crate::lexical::{CallbackReturnStatus};
 use crate::token::{TokenContext, Token, TokenAttrubute, TokenOperType, TokenMethodResult, TokenValue};
 
 lazy_static!{
-    static ref plus_token_attrubute: TokenAttrubute = TokenAttrubute{
+    static ref PLUS_TOKEN_ATTRUBUTE: TokenAttrubute = TokenAttrubute{
         bp: &20,
         oper_type: &TokenOperType::Operator
     };
@@ -84,7 +84,7 @@ impl PlusToken {
     pub fn new<T: FnMut() -> CallbackReturnStatus, CB: Grammar>(context: TokenContext) -> Token<T, CB> {
         Token{
             context: context,
-            attrubute: &*plus_token_attrubute,
+            attrubute: &*PLUS_TOKEN_ATTRUBUTE,
             nup: PlusToken::nup,
             led: PlusToken::led
         }

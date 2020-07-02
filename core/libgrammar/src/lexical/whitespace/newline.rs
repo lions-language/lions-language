@@ -36,7 +36,7 @@ impl NewLineToken {
     pub fn new<T: FnMut() -> CallbackReturnStatus, CB: Grammar>(context: TokenContext) -> Token<T, CB> {
         Token{
             context: context,
-            attrubute: &*token::default_token_attrubute,
+            attrubute: token::default_token_attrubute(),
             nup: NewLineToken::nup,
             led: token::default_led
         }

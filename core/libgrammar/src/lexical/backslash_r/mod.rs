@@ -6,6 +6,7 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
     pub fn backslash_r(&mut self) {
         // 跳过 \r 号
         self.content.skip_next_one();
+        let mut is_io_end = false;
         match self.content.lookup_next_one() {
             Some(c) => {
                 if c == '\n' {
@@ -35,13 +36,16 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
                     CallbackReturnStatus::End => {
                         // 文件尾部
                         // \r后面是文件结束
+                        is_io_end = true;
                     }
                 }
             }
         }
         // 不管是 \r 还是 \r\n, 都记为 NewLine
         self.push_token_newline();
-        self.add_one_line();
+        if !is_io_end {
+            self.add_one_line();
+        }
     }
 }
 

@@ -10,9 +10,14 @@ pub struct VecU8{
 
 impl VecU8 {
     fn skip_next_n(&mut self, n: usize) {
-        // 跳过n个字符
+        /*
+         * 跳过n个字符
+         * */
         if n > self.v.len() {
-            panic!(format!("skip next must be called after lookup, n: {}, self.v.len(): {}", n, self.v.len()));
+            panic!(
+            format!(
+            "skip next must be called after lookup, n: {}, self.v.len(): {}",
+            n, self.v.len()));
         }
         for _ in 0..n {
             self.v.remove(0);
@@ -25,6 +30,9 @@ impl VecU8 {
     }
 
     fn virtual_skip_next_n(&mut self, n: usize) {
+        /*
+         * 没有实际的skip, 只是追加索引, 这个方法是为了回溯使用
+         * */
         self.index += n;
     }
 
@@ -33,9 +41,14 @@ impl VecU8 {
     }
 
     fn backtrack_n(&mut self, n: usize) {
-        // 回溯
+        /*
+         * 回溯
+         * */
         if n > self.index {
-            panic!(format!("backtrack n > self.index(backtrack_n be called times > 1), n: {}, self.index: {}", n, self.index));
+            panic!(
+            format!(
+            "backtrack n > self.index(backtrack_n be called times > 1), n: {}, self.index: {}",
+            n, self.index));
         }
         self.index -= n;
     }
@@ -46,7 +59,9 @@ impl VecU8 {
         }
         let index = self.index + n - 1;
         if (self.v.len() > 0) && (index > self.v.len() - 1) {
-            // 没有可以获取的值了
+            /*
+             * 没有可以获取的值了
+             * */
             return None;
         } else {
             if self.v.len() == 0 {

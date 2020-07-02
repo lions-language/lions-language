@@ -2,7 +2,7 @@ use crate::lexical::{CallbackReturnStatus, TokenVecItem};
 use crate::grammar::{GrammarParser, ExpressContext, Grammar};
 use libcommon::typesof::{PrimevalType};
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug)]
 pub enum NumberValue {
     Int8(i8),
     Int16(i16),
@@ -16,7 +16,7 @@ pub enum NumberValue {
     Float64(f64)
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug)]
 pub enum TokenType {
     Unknown,
     // +
@@ -82,7 +82,11 @@ pub enum TokenOperType {
 }
 
 lazy_static!{
-    pub static ref default_token_attrubute: TokenAttrubute = TokenAttrubute::default();
+    pub static ref DEFAULT_TOKEN_ATTRUBUTE: TokenAttrubute = TokenAttrubute::default();
+}
+
+pub fn default_token_attrubute() -> &'static TokenAttrubute {
+    return &*DEFAULT_TOKEN_ATTRUBUTE;
 }
 
 pub struct TokenAttrubute {
@@ -208,7 +212,7 @@ pub fn default_led<T: FnMut() -> CallbackReturnStatus, CB: Grammar>(token: &Toke
  * 无操作 token 的统一结构 (注释 token ...)
  * */
 lazy_static!{
-    static ref nooperate_token_attrubute: TokenAttrubute = TokenAttrubute{
+    static ref NOOPERATE_TOKEN_ATTRUBUTE: TokenAttrubute = TokenAttrubute{
         bp: &0,
         oper_type: &TokenOperType::NoOperate
     };
@@ -222,7 +226,7 @@ impl NoOperateToken {
     pub fn new<T: FnMut() -> CallbackReturnStatus, CB: Grammar>(context: TokenContext) -> Token<T, CB> {
         Token{
             context: context,
-            attrubute: &*nooperate_token_attrubute,
+            attrubute: &*NOOPERATE_TOKEN_ATTRUBUTE,
             nup: default_nup,
             led: default_led
         }
