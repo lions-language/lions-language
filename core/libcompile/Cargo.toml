@@ -1,5 +1,5 @@
 [package]
-name = "libvm"
+name = "libcompile"
 version = "0.1.0"
 authors = ["lions-language <lions_language@163.com>"]
 edition = "2020"
