@@ -1,5 +1,7 @@
+# 宿主语言实现的类型
+
 [package]
-name = "libcompile"
+name = "libhosttype"
 version = "0.1.0"
 authors = ["lions-language <lions_language@163.com>"]
 edition = "2018"
