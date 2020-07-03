@@ -1,40 +1,48 @@
 use primeval_method_struct::*;
+use libcommon::module::Module;
+use libcommon::address::FunctionAddress;
+use libcommon::function::FunctionKey;
+use libcommon::typesof::function::{FunctionObject};
 
 pub enum PrimevalMethod {
-    Uint32PlusUint32(Uint32PlusUint32)
+    Uint32PlusUint32(Uint32PlusUint32),
+    None(FunctionObject)
 }
 
-pub trait PrimevalSet {
-    fn find(&self);
+pub trait FinderMap {
+    /*
+     * 关联类型
+     * 这里使用关联类型是为了不进行二次查找
+     * */
+    type FunctionSet;
+
+    fn module_exists(&self, module: &Module) -> Option<&Self::FunctionSet> {
+        unimplemented!();
+    }
+
+    fn find<'a>(&self, key: &FunctionKey, set: &'a Self::FunctionSet) -> Option<&'a FunctionAddress> {
+        unimplemented!();
+    }
 }
 
-pub trait OverrideMap {
-    fn find(&self);
+struct PrimevalContext<M>
+    where M: FinderMap {
+    primeval_set: PrimevalMethod,
+    override_map: M,
+    define_map: M
 }
 
-pub trait DefineMap {
-    fn find(&self);
+pub struct PrimevalControl<M>
+    where M: FinderMap {
+    context: PrimevalContext<M>
 }
 
-struct PrimevalContext<PS, OM, DM>
-    where PS: PrimevalSet,
-          OM: OverrideMap,
-          DM: DefineMap {
-    primeval_set: PS,
-    override_map: OM,
-    define_map: DM
+pub enum CompileResult {
+    Address(FunctionAddress),
+    SingleOptCode()
 }
 
-pub struct PrimevalControl<PS, OM, DM>
-    where PS: PrimevalSet,
-          OM: OverrideMap,
-          DM: DefineMap {
-    context: PrimevalContext<PS, OM, DM>
-}
-
-mod primeval_set;
-mod override_map;
-mod define_map;
+mod finder_map;
 mod primeval_control;
 mod primeval_method;
 mod primeval_method_struct;

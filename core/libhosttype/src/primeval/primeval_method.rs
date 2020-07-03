@@ -1,8 +1,14 @@
 use super::{PrimevalMethod};
-use super::primeval_method_struct::*;
 
 impl PrimevalMethod {
-    pub fn from_function_meta() -> Self {
-        PrimevalMethod::Uint32PlusUint32(Uint32PlusUint32::new(0, 1))
+    pub fn to_string(&self) -> String {
+        match self {
+            PrimevalMethod::Uint32PlusUint32(_) => {
+                String::from("uint32_+_uint32")
+            },
+            _ => {
+                String::new()
+            }
+        }
     }
 }

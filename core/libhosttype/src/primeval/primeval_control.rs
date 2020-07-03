@@ -1,13 +1,9 @@
-use super::{PrimevalControl, PrimevalSet, OverrideMap, DefineMap};
+use super::{PrimevalControl, FinderMap, PrimevalMethod, CompileResult};
 
-impl<PS, OM, DM> PrimevalControl<PS, OM, DM>
-    where PS: PrimevalSet,
-          OM: OverrideMap,
-          DM: DefineMap {
-    fn run() {
-    }
-
-    fn compile() {
+impl<M> PrimevalControl<M>
+    where M: FinderMap {
+    pub fn compile(&self, method: PrimevalMethod) -> CompileResult {
+        CompileResult::SingleOptCode()
     }
 }
 
