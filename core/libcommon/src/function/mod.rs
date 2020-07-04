@@ -1,6 +1,9 @@
 use std::cmp::Eq;
 use std::hash::Hash;
 
+/*
+ * TODO: 待优化, 考虑使用 phf_map (完美散列)
+ * */
 #[derive(Eq, PartialEq, Hash)]
 pub enum FunctionKey {
     /*
