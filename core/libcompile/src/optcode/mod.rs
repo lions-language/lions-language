@@ -1,4 +1,3 @@
 pub enum OptCode {
-    Uint32PlusOperatorUint32,
-    Unknown
+    Uint32PlusOperatorUint32
 }

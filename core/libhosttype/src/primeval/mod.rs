@@ -9,9 +9,19 @@ pub enum PrimevalData {
     Uint32(Uint32Data)
 }
 
+pub enum PrimevalType {
+    Uint32(Uint32Method)
+}
+
 pub enum PrimevalMethod {
-    Uint32(Uint32Method),
-    None(FunctionObject)
+    /*
+     * 与原生类型的方法匹配, 可能就是原生类型方法, 也可能是原生类型方法的重写
+     * */
+    Type(PrimevalType),
+    /*
+     * 是原生类型的拓展方法 (属于原生类型, 但是方法不是原生类型提供的)
+     * */
+    RightNotMatched((PrimevalType, FunctionObject))
 }
 
 pub trait FinderMap {
@@ -79,4 +89,5 @@ pub enum FindMethodResult<'a> {
 mod finder_map;
 mod primeval_control;
 mod primeval_method;
+mod primeval_type;
 

@@ -1,4 +1,6 @@
-use super::{PrimevalControl, FinderMap, PrimevalMethod, FindMethodResult, PrimevalData, Panic};
+use super::{PrimevalControl, FinderMap, PrimevalMethod
+    , FindMethodResult, PrimevalData
+    , PrimevalType, Panic};
 use libcommon::module::{ModuleKey};
 use libcompile::optcode::OptCode;
 
@@ -8,20 +10,20 @@ impl<M> PrimevalControl<M>
         , method: &PrimevalMethod, module_key: &ModuleKey)
         -> FindMethodResult {
         match method {
-            PrimevalMethod::None(_) => {
-                /*
-                 * 不属于任何原生方法
-                 *  => 一定不在 override_map 中, 可能在 define_map 中
-                 * */
-                return self.find_method_from_define(data, method, module_key);
-            },
-            _ => {
+            PrimevalMethod::Type(_) => {
                 /*
                  * 可能是:
                  * 1. 重写的原生方法
                  * 2. 原生方法
                  * */
                 return self.find_method_from_override(data, method, module_key);
+            },
+            PrimevalMethod::RightNotMatched(_) => {
+                /*
+                 * 不属于任何原生方法
+                 *  => 一定不在 override_map 中, 可能在 define_map 中
+                 * */
+                return self.find_method_from_define(data, method, module_key);
             }
         }
     }
