@@ -10,3 +10,4 @@ edition = "2018"
 
 [dependencies]
 libcommon = { path = "../libcommon" }
+libcompile = { path = "../libcompile" }
