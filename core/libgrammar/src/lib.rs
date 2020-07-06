@@ -1,8 +1,8 @@
 #[macro_use]
 extern crate lazy_static;
 
-mod lexical;
-mod grammar;
+pub mod lexical;
+pub mod grammar;
 mod control;
-mod token;
+pub mod token;
 

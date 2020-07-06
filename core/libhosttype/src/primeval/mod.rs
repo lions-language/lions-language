@@ -1,18 +1,16 @@
-use crate::number::uint32::{Uint32Method, Uint32Data};
+use crate::number::uint32::{Uint32Method};
 use libcommon::module::{ModuleKey};
 use libcommon::address::FunctionAddress;
 use libcommon::function::FunctionKey;
 use libcommon::typesof::function::{FunctionObject};
 use libcompile::optcode::OptCode;
-
-pub enum PrimevalData {
-    Uint32(Uint32Data)
-}
+use phf::{phf_map};
 
 pub enum PrimevalType {
     Uint32(Uint32Method)
 }
 
+/*
 pub struct PrimevalMethodMatched {
     pub typ: PrimevalType,
     /*
@@ -35,6 +33,11 @@ pub enum PrimevalMethod {
      * 是原生类型的拓展方法 (属于原生类型, 但是方法不是原生类型提供的)
      * */
     RightNotMatched(PrimevalMethodRightNotMatched)
+}
+*/
+pub struct PrimevalMethod {
+    pub typ: PrimevalType,
+    pub func_key: FunctionKey
 }
 
 pub trait FinderMap {
@@ -73,7 +76,6 @@ pub trait FinderMap {
 
 pub struct PrimevalContext<M>
     where M: FinderMap {
-    primeval_set: PrimevalMethod,
     define_map: M
 }
 
@@ -89,7 +91,7 @@ pub enum Panic {
 
 pub enum FindMethodResult<'a> {
     Address(&'a FunctionAddress),
-    SingleOptCode(OptCode),
+    SingleOptCode(&'static OptCode),
     Panic(Panic)
 }
 
@@ -103,6 +105,7 @@ mod primeval_control;
 mod primeval_method;
 mod primeval_type;
 
+/*
 impl PrimevalMethod {
     pub fn new_primeval_type_right_not_matched(typ: PrimevalType, func_obj: FunctionObject)
         /* 
@@ -118,5 +121,43 @@ impl PrimevalMethod {
             func_key: FunctionKey::Dynamic(key_s)
         })
     }
+}
+*/
+
+impl PrimevalMethod {
+    pub fn new(typ: PrimevalType, func_obj: FunctionObject) -> Self {
+        let mut key_s = String::from(typ.to_str());
+        key_s.push('_');
+        key_s.push_str(func_obj.function_string());
+        Self {
+            typ: typ,
+            func_key: FunctionKey::new(key_s)
+        }
+    }
+
+    pub fn from_func_key(typ: PrimevalType, func_key: FunctionKey) -> Self {
+        Self {
+            typ: typ,
+            func_key: func_key
+        }
+    }
+}
+
+pub struct PrimevalMethodBindValue {
+    single_optcode: OptCode
+}
+
+/*
+ * 完美hash
+ * 静态映射
+ * */
+static PRIMEVAL_METHOD_MAP: phf::Map<&'static str, PrimevalMethodBindValue> = phf_map! {
+    "uint32_+_uint32" => PrimevalMethodBindValue{
+        single_optcode: OptCode::Uint32PlusOperatorUint32
+    }
+};
+
+pub fn primeval_method(key: &FunctionKey) -> Option<&'static PrimevalMethodBindValue> {
+    PRIMEVAL_METHOD_MAP.get(key.key_ref())
 }
 

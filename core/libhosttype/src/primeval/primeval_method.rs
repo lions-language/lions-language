@@ -5,6 +5,10 @@ use libcommon::function::{FunctionKey};
 use libcompile::optcode::{OptCode};
 
 impl PrimevalMethod {
+    pub fn function_key(&self) -> &FunctionKey {
+        &self.func_key
+    }
+    /*
     /*
      * TODO: 优化, 在结构对象 new 的时候计算 function key(存储到成员), 因为访问要多于写入
      * 为了提高访问效率
@@ -44,12 +48,14 @@ impl PrimevalMethod {
             }
         }
     }
+    */
 }
 
 /*
  * 下面的实现写在本文件中, 是为了不容易忘记更新
  * */
 impl<M: FinderMap> PrimevalControl<M> {
+    /*
     fn context_by_primeval_type(&self, typ: &PrimevalType) -> &PrimevalContext<M> {
         match typ {
             PrimevalType::Uint32(_) => {
@@ -73,6 +79,15 @@ impl<M: FinderMap> PrimevalControl<M> {
             },
             PrimevalMethod::RightNotMatched(v) => {
                 self.context_mut_by_primeval_type(&v.typ)
+            }
+        }
+    }
+    */
+
+    pub fn context_mut(&mut self, method: &PrimevalMethod) -> &mut PrimevalContext<M> {
+        match &method.typ {
+            PrimevalType::Uint32(_) => {
+                &mut self.uint32_method
             }
         }
     }
