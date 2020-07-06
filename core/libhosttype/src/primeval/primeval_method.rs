@@ -58,15 +58,27 @@ impl<M: FinderMap> PrimevalControl<M> {
         }
     }
 
-    pub fn context(&self, method: &PrimevalMethod) -> &PrimevalContext<M> {
-        match method {
-            PrimevalMethod::Matched(t) => {
-                self.context_by_primeval_type(&t.typ)
-            },
-            PrimevalMethod::RightNotMatched(v) => {
-                self.context_by_primeval_type(&v.typ)
+    fn context_mut_by_primeval_type(&mut self, typ: &PrimevalType) -> &mut PrimevalContext<M> {
+        match typ {
+            PrimevalType::Uint32(_) => {
+                &mut self.uint32_method
             }
         }
+    }
+
+    pub fn context_mut(&mut self, method: &PrimevalMethod) -> &mut PrimevalContext<M> {
+        match method {
+            PrimevalMethod::Matched(t) => {
+                self.context_mut_by_primeval_type(&t.typ)
+            },
+            PrimevalMethod::RightNotMatched(v) => {
+                self.context_mut_by_primeval_type(&v.typ)
+            }
+        }
+    }
+
+    pub fn context(&self, method: &PrimevalMethod) -> &PrimevalContext<M> {
+        self.context(method)
     }
 }
 

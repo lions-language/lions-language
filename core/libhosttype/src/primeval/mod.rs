@@ -60,6 +60,15 @@ pub trait FinderMap {
     fn find_method(&self, key: &FunctionKey) -> Option<&FunctionAddress> {
         unimplemented!();
     }
+
+    fn insert_module_method(&mut self, module: &ModuleKey, key: &FunctionKey
+        , addr: FunctionAddress) {
+        unimplemented!();
+    }
+
+    fn insert_method(&mut self, key: &FunctionKey, addr: FunctionAddress) {
+        unimplemented!();
+    }
 }
 
 pub struct PrimevalContext<M>
@@ -74,13 +83,19 @@ pub struct PrimevalControl<M>
 }
 
 pub enum Panic {
-    Undefine(Option<&'static str>)
+    Undefine(Option<&'static str>),
+    AlreadyDefine
 }
 
 pub enum FindMethodResult<'a> {
     Address(&'a FunctionAddress),
     SingleOptCode(OptCode),
     Panic(Panic)
+}
+
+pub enum AddMethodResult {
+    Panic(Panic),
+    Success
 }
 
 mod finder_map;
