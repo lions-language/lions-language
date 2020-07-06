@@ -1,37 +1,35 @@
 use super::{PrimevalControl, FinderMap, PrimevalMethod
     , FindMethodResult, PrimevalData
-    , PrimevalType, Panic};
+    , Panic};
 use libcommon::module::{ModuleKey};
-use libcompile::optcode::OptCode;
 
 impl<M> PrimevalControl<M>
     where M: FinderMap {
-    pub fn find_method(&self, data: PrimevalData
-        , method: &PrimevalMethod, module_key: &ModuleKey)
+    pub fn find_method(&self, method: &PrimevalMethod, module_key: &ModuleKey)
         -> FindMethodResult {
         match method {
-            PrimevalMethod::Type(_) => {
+            PrimevalMethod::Matched(_) => {
                 /*
                  * 可能是:
                  * 1. 重写的原生方法
                  * 2. 原生方法
                  * */
-                return self.find_method_from_override(data, method, module_key);
+                return self.find_method_from_override(method, module_key);
             },
             PrimevalMethod::RightNotMatched(_) => {
                 /*
                  * 不属于任何原生方法
                  *  => 一定不在 override_map 中, 可能在 define_map 中
                  * */
-                return self.find_method_from_define(data, method, module_key);
+                return self.find_method_from_define(method, module_key);
             }
         }
     }
 
-    fn find_method_from_define(&self, data: PrimevalData
-        , method: &PrimevalMethod, module_key: &ModuleKey)
+    fn find_method_from_define(&self, method: &PrimevalMethod
+        , module_key: &ModuleKey)
         -> FindMethodResult {
-        let (r, key) = self.uint32_method.define_map.find_module_method(module_key, method);
+        let r = self.uint32_method.define_map.find_module_method(module_key, method.function_key());
         match r {
             Some(addr) => {
                 /*
@@ -44,8 +42,8 @@ impl<M> PrimevalControl<M>
                  * 在模块方法中没找到 => 没有重写, 可能在没有模块信息的方法集合中
                  * 检测是否在 不含有模块的方法集合中
                  * */
-                match self.uint32_method.define_map.find_method_key(
-                    &key.expect("should not happend")) {
+                match self.uint32_method.define_map.find_method(
+                    method.function_key()) {
                     Some(addr) => {
                         FindMethodResult::Address(addr)
                     },
@@ -57,10 +55,9 @@ impl<M> PrimevalControl<M>
         }
     }
 
-    fn find_method_from_override(&self, data: PrimevalData
-        , method: &PrimevalMethod, module_key: &ModuleKey)
+    fn find_method_from_override(&self, method: &PrimevalMethod, module_key: &ModuleKey)
         -> FindMethodResult {
-        let (r, key) = self.uint32_method.define_map.find_module_method(module_key, method);
+        let r = self.uint32_method.define_map.find_module_method(module_key, method.function_key());
         match r {
             Some(addr) => {
                 /*

@@ -15,6 +15,9 @@ impl FunctionObject {
     }
 
     pub fn type_function_string(&self) -> &str {
+        /*
+         * 类型_函数名_参数类型_返回值类型
+         * */
         return &self.type_function_str
     }
 }
