@@ -1,13 +1,34 @@
-use crate::number::uint32::{Uint32Method};
+use crate::number::int8::{Int8};
+use crate::number::int16::{Int16};
+use crate::number::int32::{Int32};
+use crate::number::int64::{Int64};
+use crate::number::uint8::{Uint8};
+use crate::number::uint16::{Uint16};
+use crate::number::uint32::{Uint32};
+use crate::number::uint64::{Uint64};
+use crate::number::float32::{Float32};
+use crate::number::float64::{Float64};
+use crate::string::{Str};
 use libcommon::module::{ModuleKey};
 use libcommon::address::FunctionAddress;
 use libcommon::function::FunctionKey;
 use libcommon::typesof::function::{FunctionObject};
-use libcompile::optcode::OptCode;
+use libcommon::optcode::OptCode;
 use phf::{phf_map};
 
+#[derive(Debug)]
 pub enum PrimevalType {
-    Uint32(Uint32Method)
+    Uint8(Option<Uint8>),
+    Uint16(Option<Uint16>),
+    Uint32(Option<Uint32>),
+    Uint64(Option<Uint64>),
+    Int8(Option<Int8>),
+    Int16(Option<Int16>),
+    Int32(Option<Int32>),
+    Int64(Option<Int64>),
+    Float32(Option<Float32>),
+    Float64(Option<Float64>),
+    Str(Option<Str>)
 }
 
 /*
@@ -81,7 +102,17 @@ pub struct PrimevalContext<M>
 
 pub struct PrimevalControl<M>
     where M: FinderMap {
-    uint32_method: PrimevalContext<M>
+    int8_method: PrimevalContext<M>,
+    int16_method: PrimevalContext<M>,
+    int32_method: PrimevalContext<M>,
+    int64_method: PrimevalContext<M>,
+    uint8_method: PrimevalContext<M>,
+    uint16_method: PrimevalContext<M>,
+    uint32_method: PrimevalContext<M>,
+    uint64_method: PrimevalContext<M>,
+    float32_method: PrimevalContext<M>,
+    float64_method: PrimevalContext<M>,
+    string_method: PrimevalContext<M>
 }
 
 pub enum Panic {

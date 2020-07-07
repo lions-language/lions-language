@@ -2,7 +2,7 @@ use super::{LexicalParser, CallbackReturnStatus};
 use crate::token::{TokenType};
 use id::IdToken;
 use crate::grammar::Grammar;
-use libcommon::typesof::{PrimevalType};
+use libhosttype::primeval::{PrimevalType};
 
 impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
     fn id_push_keyword_token(&mut self, token_type: TokenType) {
@@ -103,37 +103,37 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
                 self.id_kw_func();
             },
             "i8"|"int8" => {
-                self.id_primeval_type(PrimevalType::Int8);
+                self.id_primeval_type(PrimevalType::Int8(None));
             },
             "i16"|"int16" => {
-                self.id_primeval_type(PrimevalType::Int16);
+                self.id_primeval_type(PrimevalType::Int16(None));
             },
             "i32"|"int32" => {
-                self.id_primeval_type(PrimevalType::Int32);
+                self.id_primeval_type(PrimevalType::Int32(None));
             },
             "i64"|"int64" => {
-                self.id_primeval_type(PrimevalType::Int64);
+                self.id_primeval_type(PrimevalType::Int64(None));
             },
             "u8"|"uint8" => {
-                self.id_primeval_type(PrimevalType::Uint8);
+                self.id_primeval_type(PrimevalType::Uint8(None));
             },
             "u16"|"uint16" => {
-                self.id_primeval_type(PrimevalType::Uint16);
+                self.id_primeval_type(PrimevalType::Uint16(None));
             },
             "u32"|"uint32" => {
-                self.id_primeval_type(PrimevalType::Uint32);
+                self.id_primeval_type(PrimevalType::Uint32(None));
             },
             "u64"|"uint64" => {
-                self.id_primeval_type(PrimevalType::Uint64);
+                self.id_primeval_type(PrimevalType::Uint64(None));
             },
             "f32"|"float32" => {
-                self.id_primeval_type(PrimevalType::Float32);
+                self.id_primeval_type(PrimevalType::Float32(None));
             },
             "f64"|"float64" => {
-                self.id_primeval_type(PrimevalType::Float64);
+                self.id_primeval_type(PrimevalType::Float64(None));
             },
             "string" => {
-                self.id_primeval_type(PrimevalType::Str);
+                self.id_primeval_type(PrimevalType::Str(None));
             },
             _ => {
                 self.id(&s);

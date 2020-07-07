@@ -1,8 +1,6 @@
 use super::{PrimevalMethod, PrimevalControl, FinderMap
     , PrimevalContext, PrimevalType};
-use crate::number::uint32::{Uint32Method};
 use libcommon::function::{FunctionKey};
-use libcompile::optcode::{OptCode};
 
 impl PrimevalMethod {
     pub fn function_key(&self) -> &FunctionKey {
@@ -86,8 +84,38 @@ impl<M: FinderMap> PrimevalControl<M> {
 
     pub fn context_mut(&mut self, method: &PrimevalMethod) -> &mut PrimevalContext<M> {
         match &method.typ {
+            PrimevalType::Uint8(_) => {
+                &mut self.uint8_method
+            },
+            PrimevalType::Uint16(_) => {
+                &mut self.uint16_method
+            },
             PrimevalType::Uint32(_) => {
                 &mut self.uint32_method
+            },
+            PrimevalType::Uint64(_) => {
+                &mut self.uint64_method
+            },
+            PrimevalType::Int8(_) => {
+                &mut self.int8_method
+            },
+            PrimevalType::Int16(_) => {
+                &mut self.int16_method
+            },
+            PrimevalType::Int32(_) => {
+                &mut self.int32_method
+            },
+            PrimevalType::Int64(_) => {
+                &mut self.int64_method
+            },
+            PrimevalType::Float32(_) => {
+                &mut self.float32_method
+            },
+            PrimevalType::Float64(_) => {
+                &mut self.float64_method
+            },
+            PrimevalType::Str(_) => {
+                &mut self.string_method
             }
         }
     }

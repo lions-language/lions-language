@@ -1,7 +1,7 @@
 use crate::grammar::{GrammarParser, Grammar};
 use crate::lexical::{CallbackReturnStatus, TokenVecItem};
 use crate::token::{TokenType};
-use libcommon::typesof::{Type, Primeval, PrimevalType, Structure};
+use libtype::{Type, Primeval, Structure};
 
 impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, CB> {
     fn typesof_calc_startwith_id(&mut self) -> Option<Type> {
@@ -10,7 +10,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
          * */
         let first = self.take_next_one();
         /*
-         * 查看下一个token是否是 ::
+         * TODO: 查看下一个token是否是 ::
          * */
         match first.context.token_type {
             TokenType::Id(id) => {

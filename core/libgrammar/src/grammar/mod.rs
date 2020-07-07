@@ -1,6 +1,6 @@
 use crate::lexical::{LexicalParser, CallbackReturnStatus, TokenVecItem, TokenPointer};
 use crate::token::{TokenType, TokenValue, TokenMethodResult};
-use libcommon::typesof::{Type};
+use libtype::{Type};
 
 pub trait Grammar {
     // type IdUse;

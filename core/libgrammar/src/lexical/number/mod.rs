@@ -4,8 +4,10 @@
  * */
 use super::{LexicalParser, CallbackReturnStatus};
 use crate::token::{TokenType, NumberValue};
-use number::NumberToken;
+use number_token::NumberToken;
 use crate::grammar::Grammar;
+use libhosttype::primeval::{PrimevalType};
+use libhosttype::number;
 
 // #![feature(assoc_int_consts)]
 
@@ -279,7 +281,8 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
                     }
                 }
                 if is_zero {
-                    self.push_number_token_to_token_buffer(NumberValue::Int64(0));
+                    self.push_number_token_to_token_buffer(PrimevalType::Uint32(
+                            Some(number::uint32::Uint32::new(0))));
                     return;
                 }
                 // 下面的 loop 是防止读取content的next时没有数据的情况, 此时需要读取 cb 的返回值,
@@ -342,42 +345,42 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
         }
     }
 
-    fn number_unsigned_int_change(&self, value: u64) -> NumberValue {
+    fn number_unsigned_int_change(&self, value: u64) -> PrimevalType {
         if value >= u8::min_value() as u64 && value <= u8::max_value() as u64 {
-            return NumberValue::Uint8(value as u8);
+            return PrimevalType::Uint8(Some(number::uint8::Uint8::new(value as u8)));
         } else if value > u8::max_value() as u64 && value <= u16::max_value() as u64 {
-            return NumberValue::Uint16(value as u16);
+            return PrimevalType::Uint16(Some(number::uint16::Uint16::new(value as u16)));
         } else if value > u16::max_value() as u64 && value <= u32::max_value() as u64 {
-            return NumberValue::Uint32(value as u32);
+            return PrimevalType::Uint32(Some(number::uint32::Uint32::new(value as u32)));
         } else {
-            return NumberValue::Uint64(value);
+            return PrimevalType::Uint64(Some(number::uint64::Uint64::new(value)));
         }
     }
 
-    fn number_signed_int_change(&self, value: u64) -> NumberValue {
+    fn number_signed_int_change(&self, value: u64) -> PrimevalType {
         let v = value as i64 * -1;
         if v >= i8::min_value() as i64 && v <= i8::max_value() as i64 {
-            return NumberValue::Int8(v as i8);
+            return PrimevalType::Int8(Some(number::int8::Int8::new(v as i8)));
         } else if v > i8::max_value() as i64 && v <= i16::max_value() as i64 {
-            return NumberValue::Int16(v as i16);
+            return PrimevalType::Int16(Some(number::int16::Int16::new(v as i16)));
         } else if v > i16::max_value() as i64 && v <= i32::max_value() as i64 {
-            return NumberValue::Int32(v as i32);
+            return PrimevalType::Int32(Some(number::int32::Int32::new(v as i32)));
         } else {
-            return NumberValue::Int64(v);
+            return PrimevalType::Int64(Some(number::int64::Int64::new(v)));
         }
     }
 
-    fn number_float_change(&self, value: f64) -> NumberValue {
+    fn number_float_change(&self, value: f64) -> PrimevalType {
         let val: f64 = value;
         if val >= f32::MIN as f64 && val <= f32::MAX as f64 {
-            return NumberValue::Float32(val as f32);
+            return PrimevalType::Float32(Some(number::float32::Float32::new(val as f32)));
         } else {
-            return NumberValue::Float64(val as f64);
+            return PrimevalType::Float64(Some(number::float64::Float64::new(val)));
         }
     }
 
     // 转换合适的数值类型
-    fn number_range_change(&self, before: BeforeChange) -> NumberValue {
+    fn number_range_change(&self, before: BeforeChange) -> PrimevalType {
         match before {
             BeforeChange::Integer(value) => {
                 return self.number_unsigned_int_change(value);
@@ -389,11 +392,11 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
         }
     }
 
-    pub fn push_number_token_to_token_buffer(&mut self, value: NumberValue) {
-        let context = self.build_token_context(TokenType::Number(value));
+    pub fn push_number_token_to_token_buffer(&mut self, value: PrimevalType) {
+        let context = self.build_token_context(TokenType::Const(value));
         self.push_to_token_buffer(NumberToken::new(context));
     }
 }
 
-mod number;
+mod number_token;
 

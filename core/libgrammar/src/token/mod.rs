@@ -1,6 +1,6 @@
 use crate::lexical::{CallbackReturnStatus, TokenVecItem};
 use crate::grammar::{GrammarParser, ExpressContext, Grammar};
-use libcommon::typesof::{PrimevalType};
+use libhosttype::primeval::{PrimevalType};
 
 #[derive(Debug)]
 pub enum NumberValue {
@@ -64,8 +64,7 @@ pub enum TokenType {
     // 注释
     Annotate(Vec<u8>),
     Id(String),
-    Number(NumberValue),
-    Str(Vec<u8>),
+    Const(PrimevalType),
     PrimevalType(PrimevalType)
 }
 

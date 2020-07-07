@@ -2,6 +2,8 @@ use super::{LexicalParser, CallbackReturnStatus};
 use crate::token::{TokenType};
 use string::StringToken;
 use crate::grammar::Grammar;
+use libhosttype::primeval::{PrimevalType};
+use libhosttype::string::{Str, StrValue};
 
 impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
     pub fn double_quotes_process_content(&mut self) -> Vec<u8> {
@@ -58,7 +60,8 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
     }
 
     pub fn push_string_token_to_token_buffer(&mut self, content: Vec<u8>) {
-        let context = self.build_token_context(TokenType::Str(content));
+        let context = self.build_token_context(TokenType::Const(
+                PrimevalType::Str(Some(Str::new(StrValue::VecU8(content))))));
         self.push_to_token_buffer(StringToken::new(context));
     }
 }
