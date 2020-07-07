@@ -8,3 +8,5 @@ edition = "2018"
 
 [dependencies]
 libgrammar = { path = "../libgrammar" }
+libhosttype = { path = "../libhosttype" }
+libcommon = { path = "../libcommon" }

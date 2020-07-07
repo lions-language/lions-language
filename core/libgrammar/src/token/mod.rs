@@ -129,6 +129,10 @@ impl TokenValue {
         }
     }
 
+    pub fn token_type(&self) -> &TokenType {
+        &self.context.token_type
+    }
+
     pub fn print_token_type(&self, msg: Option<&str>) {
         match msg {
             Some(s) => {

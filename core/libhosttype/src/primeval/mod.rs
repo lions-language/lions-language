@@ -131,7 +131,7 @@ pub enum AddMethodResult {
     Success
 }
 
-mod finder_map;
+pub mod finder_map;
 mod primeval_control;
 mod primeval_method;
 mod primeval_type;
