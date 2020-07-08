@@ -3,15 +3,14 @@ use libcommon::address::FunctionAddress;
 use libcommon::function::FunctionKey;
 use libcommon::module::{ModuleKey};
 use std::collections::{HashMap};
-use libtype::function::{Function};
 
 pub struct FunctionSet {
-    mapping: HashMap<FunctionKey, Function>
+    mapping: HashMap<FunctionKey, FunctionAddress>
 }
 
 pub struct Finder {
     mod_map: HashMap<ModuleKey, FunctionSet>,
-    map: HashMap<FunctionKey, Function>
+    map: HashMap<FunctionKey, FunctionAddress>
 }
 
 impl FinderMap for Finder {
@@ -21,7 +20,7 @@ impl FinderMap for Finder {
         self.mod_map.get(module)
     }
 
-    fn find<'a>(&self, key: &FunctionKey, set: &'a FunctionSet) -> Option<&'a Function> {
+    fn find<'a>(&self, key: &FunctionKey, set: &'a FunctionSet) -> Option<&'a FunctionAddress> {
         /*
          * 这里的 set 就是查找, module 是否存在的时候传出去的
          * 如果第一步不传出来, 这里将再找一次module的value
@@ -30,7 +29,7 @@ impl FinderMap for Finder {
     }
     
     fn find_module_method(&self, module: &ModuleKey, key: &FunctionKey)
-        -> Option<&Function> {
+        -> Option<&FunctionAddress> {
         match self.mod_map.get(module) {
             Some(ms) => {
                 ms.mapping.get(key)
@@ -41,7 +40,7 @@ impl FinderMap for Finder {
         }
     }
 
-    fn find_method(&self, key: &FunctionKey) -> Option<&Function> {
+    fn find_method(&self, key: &FunctionKey) -> Option<&FunctionAddress> {
         self.map.get(key)
     }
 }

@@ -1,4 +1,4 @@
-use libhosttype::primeval::{PrimevalType};
+use primeval::{PrimevalType};
 
 #[derive(Debug)]
 pub struct Structure {
@@ -54,4 +54,5 @@ pub enum Type {
 }
 
 pub mod function;
+pub mod primeval;
 

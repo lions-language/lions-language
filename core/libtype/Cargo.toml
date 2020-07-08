@@ -7,4 +7,5 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-libhosttype = { path = "../libhosttype" }
+libcommon = { path = "../libcommon" }
+phf = { version = "0.7.24", features = ["macros"] }

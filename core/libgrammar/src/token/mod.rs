@@ -1,6 +1,6 @@
 use crate::lexical::{CallbackReturnStatus, TokenVecItem};
 use crate::grammar::{GrammarParser, ExpressContext, Grammar};
-use libhosttype::primeval::{PrimevalType};
+use libtype::primeval::{PrimevalType};
 
 #[derive(Debug)]
 pub enum NumberValue {

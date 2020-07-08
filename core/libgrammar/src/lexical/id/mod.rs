@@ -2,7 +2,7 @@ use super::{LexicalParser, CallbackReturnStatus};
 use crate::token::{TokenType};
 use id::IdToken;
 use crate::grammar::Grammar;
-use libhosttype::primeval::{PrimevalType};
+use libtype::primeval::{PrimevalType};
 
 impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
     fn id_push_keyword_token(&mut self, token_type: TokenType) {

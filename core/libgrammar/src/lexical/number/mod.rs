@@ -6,8 +6,8 @@ use super::{LexicalParser, CallbackReturnStatus};
 use crate::token::{TokenType, NumberValue};
 use number_token::NumberToken;
 use crate::grammar::Grammar;
-use libhosttype::primeval::{PrimevalType};
-use libhosttype::number;
+use libtype::primeval::{PrimevalType};
+use libtype::primeval::number;
 
 // #![feature(assoc_int_consts)]
 
