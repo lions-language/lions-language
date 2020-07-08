@@ -45,7 +45,7 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
                         },
                         CallbackReturnStatus::End => {
                             // 到达 IO尾部, 但是没有遇到结束的 双引号 (没有配对)
-                            self.panic("expect double quote, but arrive EOF");
+                            self.panic("expect colsed double quote, but arrive EOF");
                         }
                     }
                 }

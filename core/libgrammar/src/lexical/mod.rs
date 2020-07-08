@@ -488,6 +488,7 @@ mod whitespace;
 mod colon;
 mod comma;
 
+#[cfg(test)]
 mod test {
     use super::*;
 

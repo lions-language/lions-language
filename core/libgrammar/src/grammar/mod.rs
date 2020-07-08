@@ -310,6 +310,7 @@ mod token_extend;
 mod annotate;
 mod typesof;
 
+#[cfg(test)]
 mod test {
     use super::*;
     use crate::lexical::VecU8;

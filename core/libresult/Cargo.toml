@@ -1,5 +1,5 @@
 [package]
-name = "libcompile"
+name = "libresult"
 version = "0.1.0"
 authors = ["lions-language <lions_language@163.com>"]
 edition = "2018"
@@ -7,8 +7,6 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-libgrammar = { path = "../libgrammar" }
-libhosttype = { path = "../libhosttype" }
-libcommon = { path = "../libcommon" }
 libtype = { path = "../libtype" }
-libresult = { path = "../libresult" }
+libcommon = { path = "../libcommon" }
+libobject = { path = "../libobject" }

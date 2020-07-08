@@ -53,3 +53,5 @@ pub enum Type {
     Structure(Structure)
 }
 
+pub mod function;
+
