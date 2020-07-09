@@ -38,6 +38,10 @@ pub struct FunctionParamDataItem {
 }
 
 pub enum FunctionParamData {
+    /*
+     * 其实可以写成一个, 之所以分开, 是因为如果只有一个参数, 没必要构建一个Vec, 提高效率,
+     * 降低内存消耗
+     * */
     Single(FunctionParamDataItem),
     Multi(Vec<FunctionParamDataItem>)
 }
@@ -114,4 +118,6 @@ pub enum AddFunctionResult {
 pub enum AddFuncPanic {
     AlreadyDefine
 }
+
+mod function_statement;
 

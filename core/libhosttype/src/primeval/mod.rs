@@ -107,7 +107,7 @@ lazy_static!{
     */
     static ref PRIMEVAL_METHOD_MAP: phf::Map<&'static str, u32> = {
         phf_map! {
-            "+(uint32,uint32)->(uint32)" => 0
+            "uint32:+(uint32)->(uint32)" => 0
         }
     };
     static ref uint32_plus_operator_uint32_function: Function = Function{
