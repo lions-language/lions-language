@@ -100,6 +100,16 @@ pub struct PrimevalMethodBindValue {
  * 静态映射
  * */
 lazy_static!{
+    /*
+    static ref PRIMEVAL_METHOD_MAP: phf::Map<&'static str, &'static Function> = phf_map! {
+        "uint32_+_uint32" => &*uint32_plus_operator_uint32_function
+    };
+    */
+    static ref PRIMEVAL_METHOD_MAP: phf::Map<&'static str, u32> = {
+        phf_map! {
+            "+(uint32,uint32)->(uint32)" => 0
+        }
+    };
     static ref uint32_plus_operator_uint32_function: Function = Function{
         func_statement: FunctionStatement{
             func_name: String::from("+"),
@@ -111,49 +121,32 @@ lazy_static!{
             optcode: OptCode::Uint32PlusOperatorUint32
         })
     };
-
-    /*
-    static ref PRIMEVAL_METHOD_MAP: phf::Map<&'static str, &'static Function> = phf_map! {
-        "uint32_+_uint32" => &*uint32_plus_operator_uint32_function
+    static ref FUNCTION_VEC: Vec<&'static Function> = {
+        let mut v = Vec::with_capacity(PRIMEVAL_METHOD_MAP.len());
+        v.push(&*uint32_plus_operator_uint32_function);
+        v
     };
-    static ref PRIMEVAL_METHOD_MAP: phf::Map<&'static str, Function> = phf_map! {
-        "uint32_+_uint32" => Function{
-            func_statement: FunctionStatement{
-                func_name: String::from("+"),
-                func_param: None,
-                func_return: None,
-                typ: Some(Type::Primeval(Primeval::new(PrimevalType::Uint32(None))))
-            },
-            func_define: FunctionDefine::Optcode(OptcodeFunctionDefine{
-                optcode: OptCode::Uint32PlusOperatorUint32
-            })
-        }
-    };
-    */
 }
 
-/*
-static PRIMEVAL_METHOD_MAP: phf::Map<&'static str, Function> = phf_map! {
-    "uint32_+_uint32" => Function{
-        func_statement: FunctionStatement{
-            func_name: String::from("+"),
-            func_param: None,
-            func_return: None,
-            typ: Some(Type::Primeval(Primeval::new(PrimevalType::Uint32(None))))
-        },
-        func_define: FunctionDefine::Optcode(OptcodeFunctionDefine{
-            optcode: OptCode::Uint32PlusOperatorUint32
-        })
-    }
-};
-*/
-
-static TEST: phf::Map<&'static str, &'static str> = phf_map!{
-    "1" => "2"
-};
-
 pub fn primeval_method(key: &FunctionKey) -> Option<&'static Function> {
-    // PRIMEVAL_METHOD_MAP.get(key.key_ref())
-    None
+    let index = match PRIMEVAL_METHOD_MAP.get(key.key_ref()) {
+        Some(index) => {
+            index
+        },
+        None => {
+            return None;
+        }
+    };
+    if *index > FUNCTION_VEC.len() as u32 {
+        return None;
+    }
+    match FUNCTION_VEC.get(*index as usize) {
+        Some(v) => {
+            Some(v)
+        },
+        None => {
+            None
+        }
+    }
 }
 
