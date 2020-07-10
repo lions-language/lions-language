@@ -120,4 +120,5 @@ pub enum AddFuncPanic {
 }
 
 mod function_statement;
+mod splice;
 
