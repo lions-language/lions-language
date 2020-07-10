@@ -51,10 +51,10 @@ impl FunctionStatement {
         /*
          * 拼接返回值
          * */
-        s.push_str("->");
-        s.push('(');
         match func_return {
             Some(ret) => {
+                s.push_str("->");
+                s.push('(');
                 match &ret.data {
                     FunctionReturnData::Single(r) => {
                         s.push_str(r.typ.to_str());
@@ -68,11 +68,11 @@ impl FunctionStatement {
                         }
                     }
                 }
+                s.push(')');
             },
             None => {
             }
         }
-        s.push(')');
         s
     }
 }

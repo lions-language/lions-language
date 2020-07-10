@@ -18,6 +18,14 @@ pub enum FunctionReturnData {
     Multi(Vec<FunctionReturnDataItem>)
 }
 
+impl FunctionReturnDataItem {
+    pub fn new(typ: Type) -> Self {
+        Self {
+            typ: typ
+        }
+    }
+}
+
 impl FunctionReturn {
     pub fn new(data: FunctionReturnData) -> Self {
         Self {
@@ -44,6 +52,14 @@ pub enum FunctionParamData {
      * */
     Single(FunctionParamDataItem),
     Multi(Vec<FunctionParamDataItem>)
+}
+
+impl FunctionParamDataItem {
+    pub fn new(typ: Type) -> Self {
+        Self {
+            typ: typ
+        }
+    }
 }
 
 /*
@@ -118,7 +134,15 @@ pub enum AddFunctionResult {
 pub enum AddFuncPanic {
     AlreadyDefine
 }
+/*
+ * 查找函数上下文
+ * */
+pub struct FindFunctionContext<'a> {
+    pub typ: Type,
+    pub func_str: &'a str
+}
 
 mod function_statement;
-mod splice;
+pub mod splice;
+
 

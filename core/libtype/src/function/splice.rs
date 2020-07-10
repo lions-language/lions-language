@@ -4,7 +4,14 @@ use crate::function::{FunctionParamData, FunctionReturnData};
 pub struct FunctionSplice;
 
 impl FunctionSplice {
-    fn get_function_string_by_type(func_name: &str, func_param: &Option<&FunctionParamData>
+    pub fn get_function_without_return_string_by_type(
+        func_name: &str, func_param: &Option<&FunctionParamData>
+        , typ: &Option<&Type>) -> String {
+        FunctionSplice::get_function_string_by_type(
+            func_name, func_param, &None, typ)
+    }
+
+    pub fn get_function_string_by_type(func_name: &str, func_param: &Option<&FunctionParamData>
             , func_return: &Option<&FunctionReturnData>, typ: &Option<&Type>) -> String {
         /*
          * 函数名(参数类型列表)->(返回值类型列表)
@@ -52,10 +59,10 @@ impl FunctionSplice {
         /*
          * 拼接返回值
          * */
-        s.push_str("->");
-        s.push('(');
         match func_return {
             Some(ret) => {
+                s.push_str("->");
+                s.push('(');
                 match ret {
                     FunctionReturnData::Single(r) => {
                         s.push_str(r.typ.to_str());
@@ -69,11 +76,11 @@ impl FunctionSplice {
                         }
                     }
                 }
+                s.push(')');
             },
             None => {
             }
         }
-        s.push(')');
         s
     }
 }

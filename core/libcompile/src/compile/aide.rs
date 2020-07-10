@@ -1,8 +1,20 @@
 use libgrammar::token::{TokenValue, TokenType};
 use libcommon::function::{FunctionKey};
+use libtype::{Type, Primeval};
 use super::Compile;
 
 impl Compile {
+    pub fn tokentype_to_type(&self, typ: TokenType) -> Type {
+        match typ {
+            TokenType::Const(pt) => {
+                Type::Primeval(Primeval::new(pt))
+            },
+            _ => {
+                unimplemented!();
+            }
+        }
+    }
+
     pub fn tokenvalue_type_str<'a>(&self, value: &'a TokenValue) -> &'a str {
         match value.token_type() {
             TokenType::Const(pt) => {
