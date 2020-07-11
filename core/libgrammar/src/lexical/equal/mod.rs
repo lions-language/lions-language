@@ -5,7 +5,7 @@ use crate::token::{TokenType};
 
 impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
     fn equal(&mut self) {
-        let context = self.build_token_context(TokenType::Equal);
+        let context = self.build_token_context_without_data(TokenType::Equal);
         self.push_to_token_buffer(equal::EqualToken::new(context));
     }
 

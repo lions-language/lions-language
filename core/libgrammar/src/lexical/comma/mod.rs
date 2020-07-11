@@ -4,13 +4,13 @@ use crate::token::{TokenType};
 
 impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
     fn comma(&mut self) {
-        let context = self.build_token_context(TokenType::Comma);
+        let context = self.build_token_context_without_data(TokenType::Comma);
         self.push_to_token_buffer(comma::CommaToken::new(context));
     }
 
     pub fn comma_process(&mut self) {
         /*
-         * 跳过 :
+         * 跳过 ,
          * */
         self.content.skip_next_one();
         self.comma();

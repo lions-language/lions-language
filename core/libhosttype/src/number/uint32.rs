@@ -24,18 +24,18 @@ lazy_static!{
             func_param: Some(FunctionParam::new(
                 FunctionParamData::Single(
                     FunctionParamDataItem::new(
-                        Type::Primeval(Primeval::new(PrimevalType::Uint32(None)))
+                        Type::Primeval(Primeval::new(PrimevalType::Uint32))
                         )
                     )
                 )),
             func_return: Some(FunctionReturn::new(
                 FunctionReturnData::Single(
                     FunctionReturnDataItem::new(
-                        Type::Primeval(Primeval::new(PrimevalType::Uint32(None)))
+                        Type::Primeval(Primeval::new(PrimevalType::Uint32))
                         )
                     )
                 )),
-            typ: Some(Type::Primeval(Primeval::new(PrimevalType::Uint32(None))))
+            typ: Some(Type::Primeval(Primeval::new(PrimevalType::Uint32)))
         },
         func_define: FunctionDefine::Optcode(OptcodeFunctionDefine{
             optcode: OptCode::Uint32PlusOperatorUint32

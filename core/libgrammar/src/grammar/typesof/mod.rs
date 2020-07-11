@@ -1,6 +1,6 @@
 use crate::grammar::{GrammarParser, Grammar};
 use crate::lexical::{CallbackReturnStatus, TokenVecItem};
-use crate::token::{TokenType};
+use crate::token::{TokenType, TokenData};
 use libtype::{Type, Primeval, Structure};
 
 impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, CB> {
@@ -12,8 +12,8 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         /*
          * TODO: 查看下一个token是否是 ::
          * */
-        match first.context.token_type {
-            TokenType::Id(id) => {
+        match first.context.token_data_unchecked() {
+            TokenData::Id(id) => {
                 return Some(Type::Structure(Structure::new(id)));
             },
             _ => {
@@ -27,7 +27,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
          * 获取第一个 token
          * */
         let first = self.take_next_one();
-        match first.context.token_type {
+        match first.context.token_type_move() {
             TokenType::PrimevalType(t) => {
                 return Some(Type::Primeval(Primeval::new(t)));
             },
@@ -53,8 +53,8 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
             }
         };
         let next_token = tp.as_ref::<T, CB>();
-        match &next_token.context_ref().token_type {
-            TokenType::Id(_) => {
+        match next_token.context_ref().token_type() {
+            TokenType::Id => {
                 /*
                  * type / space1::space2::type
                  * */

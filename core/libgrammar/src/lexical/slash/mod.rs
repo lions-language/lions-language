@@ -112,7 +112,7 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
     }
 
     fn slash_division(&mut self) {
-        let context = self.build_token_context(TokenType::Division);
+        let context = self.build_token_context_without_data(TokenType::Division);
         self.push_to_token_buffer(DivisionToken::new(context));
     }
 }

@@ -39,8 +39,8 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
             }
         };
         let next = tp.as_ref::<T, CB>();
-        match &next.context_ref().token_type {
-            TokenType::Id(_) => {
+        match next.context_ref().token_type() {
+            TokenType::Id => {
                 self.function_find_params();
             },
             TokenType::RightParenthese => {
@@ -54,7 +54,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                 /*
                  * 既不是 ) 也不是 id => 语法错误
                  * */
-                self.panic(&format!("expect `)` or id, after `(`, but found: {:?}", &next.context_ref().token_type));
+                self.panic(&format!("expect `)` or id, after `(`, but found: {:?}", next.context_ref().token_type()));
                 return;
             }
         }
@@ -79,7 +79,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
          * 如果没有 panic, 那么一定可以 take 到下一个 token
          * */
         let next = self.take_next_one();
-        self.cb().function_define_start(TokenValue::from_token(next));
+        self.cb().function_define_start(next.token_value());
         /*
         match self.expect_and_take_next_token(TokenType::LeftBigParenthese) {
             NextToken::<T, CB>::False(t) => {
@@ -109,7 +109,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
             }
         };
         let next = tp.as_ref::<T, CB>();
-        match &next.context_ref().token_type {
+        match next.context_ref().token_type() {
             TokenType::RightBigParenthese => {
                 /*
                  * { 后面是 }
@@ -139,9 +139,9 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                 /*
                  * 判断是否是 }, 如果不是 } => 语法错误
                  * */
-                if let TokenType::RightBigParenthese = &token.context_ref().token_type {
+                if let TokenType::RightBigParenthese = token.context_ref().token_type() {
                 } else {
-                    self.panic(&format!("expect `{}`, but found: {:?}", "}", &token.context_ref().token_type));
+                    self.panic(&format!("expect `{}`, but found: {:?}", "}", token.context_ref().token_type()));
                     return;
                 }
             }
@@ -150,7 +150,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
          * 到达这里说明 next token 是 } => 表达式结束
          * */
         let t = self.take_next_one();
-        self.grammar_context().cb.function_define_end(TokenValue::from_token(t));
+        self.grammar_context().cb.function_define_end(t.token_value());
     }
 
     fn function_find_params(&mut self) {
@@ -170,7 +170,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                 }
             };
             let next = tp.as_ref::<T, CB>();
-            match &next.context_ref().token_type {
+            match next.context_ref().token_type() {
                 TokenType::Comma => {
                     /*
                      * name type,
@@ -197,14 +197,14 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
          * */
         self.expect_next_token(|parser, t| {
             let token = t.as_ref::<T, CB>();
-            match token.context_ref().token_type {
-                TokenType::Id(_) => {
+            match token.context_ref().token_type() {
+                TokenType::Id => {
                 },
                 _ => {
                     /*
                      * 期望一个id作为参数名, 但是token不是id => 语法错误
                      * */
-                    parser.panic(&format!("expect id as param name, but found {:?}", &token.context_ref().token_type));
+                    parser.panic(&format!("expect id as param name, but found {:?}", token.context_ref().token_type()));
                     return;
                 }
             }
@@ -218,8 +218,8 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
          * 所以如果后面是 :(冒号) => 跳过
          * */
         let token = t.as_ref::<T, CB>();
-        match token.context_ref().token_type {
-            TokenType::Id(_) => {
+        match token.context_ref().token_type() {
+            TokenType::Id => {
                 /*
                  * name type 形式
                  * */
@@ -240,14 +240,14 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                  * */
                 self.expect_next_token(|parser, t| {
                     let token = t.as_ref::<T, CB>();
-                    match token.context_ref().token_type {
-                        TokenType::Id(_) => {
+                    match token.context_ref().token_type() {
+                        TokenType::Id => {
                         },
                         _ => {
                             /*
                              * : 后面不是 id => 语法错误
                              * */
-                            parser.panic(&format!("expect id as type, but found: {:?}", &token.context_ref().token_type));
+                            parser.panic(&format!("expect id as type, but found: {:?}", token.context_ref().token_type()));
                         }
                     }
                 }, "id as type");
@@ -256,7 +256,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                 /*
                  * 应该是 id (type), 但是没有给定 id token => 语法错误
                  * */
-                self.panic(&format!("expect id as type or `:`, but found: {:?}", &token.context_ref().token_type));
+                self.panic(&format!("expect id as type or `:`, but found: {:?}", token.context_ref().token_type()));
             }
         }
     }
@@ -289,7 +289,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
          * */
         let name_token = self.function_find_param_name();
         let type_token = self.function_find_param_type(None);
-        self.grammar_context().cb.function_define_param(TokenValue::from_token(name_token), TokenValue::from_token(type_token));
+        self.grammar_context().cb.function_define_param(name_token.token_value(), type_token.token_value());
     }
 
     pub fn function_process(&mut self) {
@@ -310,8 +310,8 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
             }
         };
         let next_token = tp.as_ref::<T, CB>();
-        match &next_token.context_ref().token_type {
-            TokenType::Id(_) => {
+        match next_token.context_ref().token_type() {
+            TokenType::Id => {
                 /*
                  * func xxx(...)
                  * */
@@ -334,7 +334,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                 /*
                  * 两种形式都不是 => 语法错误
                  * */
-                self.panic(&format!("expect id or `(` after func, but found {:?}", next_token.context_ref().token_type));
+                self.panic(&format!("expect id or `(` after func, but found {:?}", next_token.context_ref().token_type()));
             }
         }
     }

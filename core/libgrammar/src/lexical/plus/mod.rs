@@ -5,8 +5,7 @@ use crate::token::{TokenType};
 
 impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
     fn plus(&mut self) {
-        let context = self.build_token_context(TokenType::Plus);
-        self.push_to_token_buffer(plus::PlusToken::new(context));
+        self.push_token_plus();
     }
 
     fn plus_plus(&mut self) {
@@ -14,7 +13,7 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
          * 跳过 + 号
          * */
         self.content.skip_next_one();
-        let context = self.build_token_context(TokenType::PlusPlus);
+        let context = self.build_token_context_without_data(TokenType::PlusPlus);
         self.push_to_token_buffer(plus_plus::PlusPlusToken::new(context));
     }
 

@@ -5,7 +5,7 @@ use crate::token::{TokenType};
 
 impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
     fn minus(&mut self) {
-        let context = self.build_token_context(TokenType::Minus);
+        let context = self.build_token_context_without_data(TokenType::Minus);
         self.push_to_token_buffer(minus::MinusToken::new(context));
     }
 

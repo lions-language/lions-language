@@ -28,12 +28,12 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
          * */
         self.expect_next_token(|parser, t| {
             let token = t.as_ref::<T, CB>();
-            match &token.context_ref().token_type {
+            match token.context_ref().token_type() {
                 TokenType::RightSquareBrackets => {
                     parser.skip_next_one();
                 },
                 _ => {
-                    parser.panic(&format!("expect a `]`, and make `[` closed, but found {:?}", &token.context_ref().token_type));
+                    parser.panic(&format!("expect a `]`, and make `[` closed, but found {:?}", token.context_ref().token_type()));
                 }
             }
         }, "a `]`, and make `[` closed");
@@ -42,8 +42,8 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
          * */
         self.expect_next_token(|parser, t| {
             let token = t.as_ref::<T, CB>();
-            match &token.context_ref().token_type {
-                TokenType::Id(_) => {
+            match token.context_ref().token_type() {
+                TokenType::Id => {
                 },
                 _ => {
                 }
@@ -53,8 +53,8 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
          * 语法正确的情况下, next token 是函数名称
          * */
         let function_name = self.take_next_one();
-        self.cb().function_object_method_stmt(TokenValue::from_token(object_name)
-            , typ, TokenValue::from_token(function_name));
+        self.cb().function_object_method_stmt(object_name.token_value()
+            , typ, function_name.token_value());
         self.function_parse_param_list();
         self.function_parse_block();
     }
@@ -93,7 +93,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
          * 如果 [ 后面直接就是 ] => 语法错误
          * */
         let next_token = tp.as_ref::<T, CB>();
-        if let TokenType::RightSquareBrackets = &next_token.context_ref().token_type {
+        if let TokenType::RightSquareBrackets = next_token.context_ref().token_type() {
             self.panic("must not be empty between `[]`");
         }
         /*
@@ -115,7 +115,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
              * 先回到回溯点
              * */
             parser.restore_from_backtrack_point();
-            match &token.context_ref().token_type {
+            match token.context_ref().token_type() {
                 TokenType::Colon => {
                     /*
                      * 成员方法

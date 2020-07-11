@@ -5,7 +5,7 @@ use crate::grammar::Grammar;
 
 impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
     fn start_multiplication(&mut self) {
-        let context = self.build_token_context(TokenType::Multiplication);
+        let context = self.build_token_context_without_data(TokenType::Multiplication);
         self.push_to_token_buffer(MultiplicationToken::new(context));
     }
 

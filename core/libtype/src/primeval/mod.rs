@@ -10,8 +10,23 @@ use number::float32::{Float32};
 use number::float64::{Float64};
 use string::{Str};
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum PrimevalType {
+    Uint8,
+    Uint16,
+    Uint32,
+    Uint64,
+    Int8,
+    Int16,
+    Int32,
+    Int64,
+    Float32,
+    Float64,
+    Str
+}
+
+#[derive(Debug)]
+pub enum PrimevalData {
     Uint8(Option<Uint8>),
     Uint16(Option<Uint16>),
     Uint32(Option<Uint32>),

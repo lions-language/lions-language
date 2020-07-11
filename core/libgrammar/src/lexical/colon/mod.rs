@@ -4,7 +4,7 @@ use crate::token::{TokenType};
 
 impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
     fn colon(&mut self) {
-        let context = self.build_token_context(TokenType::Colon);
+        let context = self.build_token_context_without_data(TokenType::Colon);
         self.push_to_token_buffer(colon::ColonToken::new(context));
     }
 
@@ -18,6 +18,11 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
                 '=' => {
                     /*
                      * :=
+                     * */
+                },
+                ':' => {
+                    /*
+                     * ::
                      * */
                 },
                 _ => {

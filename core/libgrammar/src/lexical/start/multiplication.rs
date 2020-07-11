@@ -38,7 +38,7 @@ impl MultiplicationToken {
             }
         };
         let r = grammar.expression(t.token_attrubute().bp, express_context, &tp);
-        grammar.grammar_context().cb.operator_multiplication(TokenValue::from_token(t));
+        grammar.grammar_context().cb.operator_multiplication(t.token_value());
         r
     }
 }

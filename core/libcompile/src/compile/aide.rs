@@ -16,7 +16,7 @@ impl Compile {
     }
 
     pub fn tokenvalue_type_str<'a>(&self, value: &'a TokenValue) -> &'a str {
-        match value.token_type() {
+        match value.token_type_ref() {
             TokenType::Const(pt) => {
                 pt.to_str()
             },

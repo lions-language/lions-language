@@ -195,37 +195,37 @@ impl PrimevalControl {
             }
         };
         match t {
-            PrimevalType::Uint8(_) => {
+            PrimevalType::Uint8 => {
                 &mut self.uint8_method
             },
-            PrimevalType::Uint16(_) => {
+            PrimevalType::Uint16 => {
                 &mut self.uint16_method
             },
-            PrimevalType::Uint32(_) => {
+            PrimevalType::Uint32 => {
                 &mut self.uint32_method
             },
-            PrimevalType::Uint64(_) => {
+            PrimevalType::Uint64 => {
                 &mut self.uint64_method
             },
-            PrimevalType::Int8(_) => {
+            PrimevalType::Int8 => {
                 &mut self.int8_method
             },
-            PrimevalType::Int16(_) => {
+            PrimevalType::Int16 => {
                 &mut self.int16_method
             },
-            PrimevalType::Int32(_) => {
+            PrimevalType::Int32 => {
                 &mut self.int32_method
             },
-            PrimevalType::Int64(_) => {
+            PrimevalType::Int64 => {
                 &mut self.int64_method
             },
-            PrimevalType::Float32(_) => {
+            PrimevalType::Float32 => {
                 &mut self.float32_method
             },
-            PrimevalType::Float64(_) => {
+            PrimevalType::Float64 => {
                 &mut self.float64_method
             },
-            PrimevalType::Str(_) => {
+            PrimevalType::Str => {
                 &mut self.string_method
             },
             _ => {

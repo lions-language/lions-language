@@ -1,4 +1,5 @@
-use crate::token::{self, TokenContext, TokenType, NoOperateToken};
+use crate::token::{self, TokenContext, TokenType
+    , TokenData, NoOperateToken, TokenValue};
 use crate::grammar::Grammar;
 
 /// store Vec<u8> struct
@@ -362,11 +363,6 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
         self.tokens_buffer.push(item);
     }
 
-    fn push_nooperate_token_to_token_buffer(&mut self, token_type: TokenType) {
-        let context = self.build_token_context(token_type);
-        self.push_to_token_buffer(NoOperateToken::new(context));
-    }
-
     fn is_id_start(&self, c: char) -> bool {
         if (c == '_') || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') {
             return true;
@@ -425,11 +421,19 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
         }
     }
 
-    fn build_token_context(&self, token_type: TokenType) -> TokenContext {
+    fn build_token_context_without_data(&self, token_type: TokenType) -> TokenContext {
         TokenContext {
             line: self.line,
             col: self.col,
-            token_type: token_type
+            token_value: TokenValue::new(token_type, None)
+        }
+    }
+
+    fn build_token_context(&self, token_type: TokenType, token_data: TokenData) -> TokenContext {
+        TokenContext {
+            line: self.line,
+            col: self.col,
+            token_value: TokenValue::new(token_type, Some(token_data))
         }
     }
 

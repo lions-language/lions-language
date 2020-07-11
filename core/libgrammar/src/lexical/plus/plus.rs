@@ -43,7 +43,7 @@ impl PlusToken {
             _ => {
             }
         }
-        grammar.grammar_context().cb.operator_positive(TokenValue::from_token(t));
+        grammar.grammar_context().cb.operator_positive(t.token_value());
         r
     }
 
@@ -75,7 +75,7 @@ impl PlusToken {
             }
         };
         let r =  grammar.expression(t.token_attrubute().bp, express_context, &tp);
-        grammar.grammar_context().cb.operator_plus(TokenValue::from_token(t));
+        grammar.grammar_context().cb.operator_plus(t.token_value());
         r
     }
 }

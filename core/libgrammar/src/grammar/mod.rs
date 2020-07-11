@@ -110,10 +110,10 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
     }
 
     fn select_with_exprcontext(&mut self, token: &TokenPointer, express_context: &ExpressContext<T, CB>) {
-        match token.as_ref::<T, CB>().context_ref().token_type {
+        match token.as_ref::<T, CB>().context_ref().token_type() {
             TokenType::If => {
             },
-            TokenType::Annotate(_) => {
+            TokenType::Annotate => {
                 self.annotate_process();
             },
             TokenType::Function => {
@@ -130,7 +130,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
     }
 
     fn token_is_white_space(&self, token: &TokenVecItem<T, CB>) -> bool {
-        match &token.context_ref().token_type {
+        match token.context_ref().token_type() {
             TokenType::NewLine => {
                 return true;
             },

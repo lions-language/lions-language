@@ -5,7 +5,7 @@ use crate::token::{TokenType, TokenMethodResult, TokenOperType};
 impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, CB> {
     pub fn expression_end_normal(grammar: &mut GrammarParser<T, CB>, token: &TokenVecItem<T, CB>) -> TokenMethodResult {
         // println!("normal end ... ");
-        match &token.context_ref().token_type {
+        match token.context_ref().token_type() {
             TokenType::Semicolon
             | TokenType::NewLine => {
                 grammar.skip_next_one();
@@ -28,7 +28,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
     }
 
     pub fn expression_end_right_big_parenthese(grammar: &mut GrammarParser<T, CB>, token: &TokenVecItem<T, CB>) -> TokenMethodResult {
-        match &token.context_ref().token_type {
+        match token.context_ref().token_type() {
             TokenType::RightBigParenthese => {
                 return TokenMethodResult::StmtEnd;
             },
@@ -81,7 +81,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                  * 比如说, 解析到 -1:
                  * 1. 首先调用 - 号的 nup 方法, - 号的 nup 方法中获取 next token. 调用 next token 的 nup 方法, 如果 next token 的  nup 方法返回 None, 需要报错
                  * */
-                self.panic(&format!("expect operand, but found {:?}", &input_token.context_ref().token_type));
+                self.panic(&format!("expect operand, but found {:?}", input_token.context_ref().token_type()));
             },
             TokenMethodResult::StmtEnd => {
                 return nup_r;

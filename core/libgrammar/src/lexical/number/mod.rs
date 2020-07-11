@@ -3,10 +3,10 @@
  * (随着 lions-language 的更新, 将支持更多的数值)
  * */
 use super::{LexicalParser, CallbackReturnStatus};
-use crate::token::{TokenType, NumberValue};
+use crate::token::{TokenType, TokenData};
 use number_token::NumberToken;
 use crate::grammar::Grammar;
-use libtype::primeval::{PrimevalType};
+use libtype::primeval::{PrimevalType, PrimevalData};
 use libtype::primeval::number;
 
 // #![feature(assoc_int_consts)]
@@ -281,8 +281,8 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
                     }
                 }
                 if is_zero {
-                    self.push_number_token_to_token_buffer(PrimevalType::Uint32(
-                            Some(number::uint32::Uint32::new(0))));
+                    self.push_number_token_to_token_buffer((PrimevalType::Uint32, PrimevalData::Uint32(
+                            Some(number::uint32::Uint32::new(0)))));
                     return;
                 }
                 // 下面的 loop 是防止读取content的next时没有数据的情况, 此时需要读取 cb 的返回值,
@@ -345,42 +345,42 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
         }
     }
 
-    fn number_unsigned_int_change(&self, value: u64) -> PrimevalType {
+    fn number_unsigned_int_change(&self, value: u64) -> (PrimevalType, PrimevalData) {
         if value >= u8::min_value() as u64 && value <= u8::max_value() as u64 {
-            return PrimevalType::Uint8(Some(number::uint8::Uint8::new(value as u8)));
+            return (PrimevalType::Uint8, PrimevalData::Uint8(Some(number::uint8::Uint8::new(value as u8))));
         } else if value > u8::max_value() as u64 && value <= u16::max_value() as u64 {
-            return PrimevalType::Uint16(Some(number::uint16::Uint16::new(value as u16)));
+            return (PrimevalType::Uint8, PrimevalData::Uint16(Some(number::uint16::Uint16::new(value as u16))));
         } else if value > u16::max_value() as u64 && value <= u32::max_value() as u64 {
-            return PrimevalType::Uint32(Some(number::uint32::Uint32::new(value as u32)));
+            return (PrimevalType::Uint8, PrimevalData::Uint32(Some(number::uint32::Uint32::new(value as u32))));
         } else {
-            return PrimevalType::Uint64(Some(number::uint64::Uint64::new(value)));
+            return (PrimevalType::Uint8, PrimevalData::Uint64(Some(number::uint64::Uint64::new(value))));
         }
     }
 
-    fn number_signed_int_change(&self, value: u64) -> PrimevalType {
+    fn number_signed_int_change(&self, value: u64) -> (PrimevalType, PrimevalData) {
         let v = value as i64 * -1;
         if v >= i8::min_value() as i64 && v <= i8::max_value() as i64 {
-            return PrimevalType::Int8(Some(number::int8::Int8::new(v as i8)));
+            return (PrimevalType::Int8, PrimevalData::Int8(Some(number::int8::Int8::new(v as i8))));
         } else if v > i8::max_value() as i64 && v <= i16::max_value() as i64 {
-            return PrimevalType::Int16(Some(number::int16::Int16::new(v as i16)));
+            return (PrimevalType::Int16, PrimevalData::Int16(Some(number::int16::Int16::new(v as i16))));
         } else if v > i16::max_value() as i64 && v <= i32::max_value() as i64 {
-            return PrimevalType::Int32(Some(number::int32::Int32::new(v as i32)));
+            return (PrimevalType::Int32, PrimevalData::Int32(Some(number::int32::Int32::new(v as i32))));
         } else {
-            return PrimevalType::Int64(Some(number::int64::Int64::new(v)));
+            return (PrimevalType::Int64, PrimevalData::Int64(Some(number::int64::Int64::new(v))));
         }
     }
 
-    fn number_float_change(&self, value: f64) -> PrimevalType {
+    fn number_float_change(&self, value: f64) -> (PrimevalType, PrimevalData) {
         let val: f64 = value;
         if val >= f32::MIN as f64 && val <= f32::MAX as f64 {
-            return PrimevalType::Float32(Some(number::float32::Float32::new(val as f32)));
+            return (PrimevalType::Float32, PrimevalData::Float32(Some(number::float32::Float32::new(val as f32))));
         } else {
-            return PrimevalType::Float64(Some(number::float64::Float64::new(val)));
+            return (PrimevalType::Float64, PrimevalData::Float64(Some(number::float64::Float64::new(val))));
         }
     }
 
     // 转换合适的数值类型
-    fn number_range_change(&self, before: BeforeChange) -> PrimevalType {
+    fn number_range_change(&self, before: BeforeChange) -> (PrimevalType, PrimevalData) {
         match before {
             BeforeChange::Integer(value) => {
                 return self.number_unsigned_int_change(value);
@@ -392,8 +392,8 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
         }
     }
 
-    pub fn push_number_token_to_token_buffer(&mut self, value: PrimevalType) {
-        let context = self.build_token_context(TokenType::Const(value));
+    pub fn push_number_token_to_token_buffer(&mut self, value: (PrimevalType, PrimevalData)) {
+        let context = self.build_token_context(TokenType::Const(value.0), TokenData::Const(value.1));
         self.push_to_token_buffer(NumberToken::new(context));
     }
 }

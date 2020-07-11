@@ -1,19 +1,19 @@
 use super::{LexicalParser, CallbackReturnStatus};
-use crate::token::{TokenType};
+use crate::token::{TokenType, TokenData};
 use id::IdToken;
 use crate::grammar::Grammar;
 use libtype::primeval::{PrimevalType};
 
 impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
     fn id_push_keyword_token(&mut self, token_type: TokenType) {
-        self.push_nooperate_token_to_token_buffer(token_type);
+        self.push_nooperate_nodata_token_to_token_buffer(token_type);
     }
 
     fn id(&mut self, s: &String) {
         /*
          * 存入 context
          * */
-        let context = self.build_token_context(TokenType::Id(s.to_string()));
+        let context = self.build_token_context(TokenType::Id, TokenData::Id(s.to_string()));
         self.push_to_token_buffer(IdToken::new(context));
     }
 
@@ -56,7 +56,7 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
     }
 
     fn id_primeval_type(&mut self, typ: PrimevalType) {
-        self.push_nooperate_token_to_token_buffer(TokenType::PrimevalType(typ));
+        self.push_nooperate_nodata_token_to_token_buffer(TokenType::PrimevalType(typ));
     }
 
     pub fn id_process(&mut self, start_c: char) {
@@ -103,37 +103,37 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
                 self.id_kw_func();
             },
             "i8"|"int8" => {
-                self.id_primeval_type(PrimevalType::Int8(None));
+                self.id_primeval_type(PrimevalType::Int8);
             },
             "i16"|"int16" => {
-                self.id_primeval_type(PrimevalType::Int16(None));
+                self.id_primeval_type(PrimevalType::Int16);
             },
             "i32"|"int32" => {
-                self.id_primeval_type(PrimevalType::Int32(None));
+                self.id_primeval_type(PrimevalType::Int32);
             },
             "i64"|"int64" => {
-                self.id_primeval_type(PrimevalType::Int64(None));
+                self.id_primeval_type(PrimevalType::Int64);
             },
             "u8"|"uint8" => {
-                self.id_primeval_type(PrimevalType::Uint8(None));
+                self.id_primeval_type(PrimevalType::Uint8);
             },
             "u16"|"uint16" => {
-                self.id_primeval_type(PrimevalType::Uint16(None));
+                self.id_primeval_type(PrimevalType::Uint16);
             },
             "u32"|"uint32" => {
-                self.id_primeval_type(PrimevalType::Uint32(None));
+                self.id_primeval_type(PrimevalType::Uint32);
             },
             "u64"|"uint64" => {
-                self.id_primeval_type(PrimevalType::Uint64(None));
+                self.id_primeval_type(PrimevalType::Uint64);
             },
             "f32"|"float32" => {
-                self.id_primeval_type(PrimevalType::Float32(None));
+                self.id_primeval_type(PrimevalType::Float32);
             },
             "f64"|"float64" => {
-                self.id_primeval_type(PrimevalType::Float64(None));
+                self.id_primeval_type(PrimevalType::Float64);
             },
             "string" => {
-                self.id_primeval_type(PrimevalType::Str(None));
+                self.id_primeval_type(PrimevalType::Str);
             },
             _ => {
                 self.id(&s);

@@ -3,37 +3,37 @@ use super::{PrimevalType};
 impl PrimevalType {
     pub fn to_str(&self) -> &'static str {
         match self {
-            PrimevalType::Int8(_) => {
+            PrimevalType::Int8 => {
                 "int8"
             },
-            PrimevalType::Int16(_) => {
+            PrimevalType::Int16 => {
                 "int16"
             },
-            PrimevalType::Int32(_) => {
+            PrimevalType::Int32 => {
                 "int32"
             },
-            PrimevalType::Int64(_) => {
+            PrimevalType::Int64 => {
                 "int64"
             },
-            PrimevalType::Uint8(_) => {
+            PrimevalType::Uint8 => {
                 "uint8"
             },
-            PrimevalType::Uint16(_) => {
+            PrimevalType::Uint16 => {
                 "uint16"
             },
-            PrimevalType::Uint32(_) => {
+            PrimevalType::Uint32 => {
                 "uint32"
             },
-            PrimevalType::Uint64(_) => {
+            PrimevalType::Uint64 => {
                 "uint64"
             },
-            PrimevalType::Float32(_) => {
+            PrimevalType::Float32 => {
                 "float32"
             },
-            PrimevalType::Float64(_) => {
+            PrimevalType::Float64 => {
                 "float64"
             },
-            PrimevalType::Str(_) => {
+            PrimevalType::Str => {
                 "str"
             }
         }

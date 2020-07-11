@@ -43,7 +43,7 @@ impl MinusToken {
             _ => {
             }
         }
-        grammar.grammar_context().cb.operator_negative(TokenValue::from_token(t));
+        grammar.grammar_context().cb.operator_negative(t.token_value());
         r
     }
 
@@ -68,7 +68,7 @@ impl MinusToken {
             }
         };
         let r = grammar.expression(t.token_attrubute().bp, express_context, &tp);
-        grammar.grammar_context().cb.operator_minus(TokenValue::from_token(t));
+        grammar.grammar_context().cb.operator_minus(t.token_value());
         r
     }
 }

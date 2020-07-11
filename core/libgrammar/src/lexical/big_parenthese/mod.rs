@@ -8,7 +8,7 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
          * 跳过 {
          * */
         self.content.skip_next_one();
-        let context = self.build_token_context(TokenType::LeftBigParenthese);
+        let context = self.build_token_context_without_data(TokenType::LeftBigParenthese);
         self.push_to_token_buffer(left_big_parenthese::LeftBigParentheseToken::new(context));
     }
 
@@ -17,7 +17,7 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
          * 跳过 }
          * */
         self.content.skip_next_one();
-        let context = self.build_token_context(TokenType::RightBigParenthese);
+        let context = self.build_token_context_without_data(TokenType::RightBigParenthese);
         self.push_to_token_buffer(right_big_parenthese::RightBigParentheseToken::new(context));
     }
 }

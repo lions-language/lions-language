@@ -14,7 +14,7 @@ lazy_static!{
 
 impl NumberToken {
     fn nup<T: FnMut() -> CallbackReturnStatus, CB: Grammar>(token: &Token<T, CB>, grammar: &mut GrammarParser<T, CB>, express_context: &ExpressContext<T, CB>) -> TokenMethodResult {
-        let mut token_value = TokenValue::from_token(grammar.take_next_one());
+        let mut token_value = grammar.take_next_one().token_value();
         grammar.grammar_context().cb.express_const_number(token_value);
         TokenMethodResult::End
     }

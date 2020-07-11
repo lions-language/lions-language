@@ -1,5 +1,5 @@
 use super::{LexicalParser, CallbackReturnStatus};
-use crate::token::{TokenType};
+use crate::token::{TokenType, TokenData, NoOperateToken};
 use crate::lexical::plus::plus;
 use crate::lexical::parenthese::left_parenthese;
 use crate::lexical::parenthese::right_parenthese;
@@ -113,27 +113,33 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
     }
 
     pub fn push_token_plus(&mut self) {
-        let context = self.build_token_context(TokenType::Plus);
+        let context = self.build_token_context_without_data(TokenType::Plus);
         self.push_to_token_buffer(plus::PlusToken::new(context));
     }
 
     pub fn push_token_left_parenthese(&mut self) {
-        let context = self.build_token_context(TokenType::LeftParenthese);
+        let context = self.build_token_context_without_data(TokenType::LeftParenthese);
         self.push_to_token_buffer(left_parenthese::LeftParentheseToken::new(context));
     }
 
     pub fn push_token_right_parenthese(&mut self) {
-        let context = self.build_token_context(TokenType::RightParenthese);
+        let context = self.build_token_context_without_data(TokenType::RightParenthese);
         self.push_to_token_buffer(right_parenthese::RightParentheseToken::new(context));
     }
 
     pub fn push_token_annotate(&mut self, content: Vec<u8>) {
-        self.push_nooperate_token_to_token_buffer(TokenType::Annotate(content));
+        let context = self.build_token_context(TokenType::RightParenthese, TokenData::Annotate(content));
+        self.push_to_token_buffer(right_parenthese::RightParentheseToken::new(context));
     }
 
     pub fn push_token_newline(&mut self) {
-        let context = self.build_token_context(TokenType::NewLine);
+        let context = self.build_token_context_without_data(TokenType::NewLine);
         self.push_to_token_buffer(newline::NewLineToken::new(context));
+    }
+
+    pub fn push_nooperate_nodata_token_to_token_buffer(&mut self, token_type: TokenType) {
+        let context = self.build_token_context_without_data(token_type);
+        self.push_to_token_buffer(NoOperateToken::new(context));
     }
 
     pub fn push_token_div(&mut self) {

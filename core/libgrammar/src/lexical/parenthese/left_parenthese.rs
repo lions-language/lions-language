@@ -20,7 +20,7 @@ impl LeftParentheseToken {
             }
         };
         let t = tp.as_ref::<T, CB>();
-        match &t.context_ref().token_type {
+        match t.context_ref().token_type() {
             TokenType::RightParenthese => {
                 grammar.skip_next_one();
                 return TokenMethodResult::ParentheseEnd;

@@ -43,7 +43,7 @@ impl PlusPlusToken {
             _ => {
             }
         }
-        grammar.grammar_context().cb.operator_prefix_increase(TokenValue::from_token(t));
+        grammar.grammar_context().cb.operator_prefix_increase(t.token_value());
         r
     }
 
@@ -52,7 +52,7 @@ impl PlusPlusToken {
          * 移除 ++ token
          * */
         let t = grammar.take_next_one();
-        grammar.grammar_context().cb.operator_suffix_increase(TokenValue::from_token(t));
+        grammar.grammar_context().cb.operator_suffix_increase(t.token_value());
         /*
          * 后置运算符, 不用继续查找下一个运算符
          * 但是后缀运算符后面只有如下几种token是合法的

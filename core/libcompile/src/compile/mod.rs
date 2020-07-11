@@ -18,7 +18,7 @@ pub struct Compile {
 
 impl Grammar for Compile {
     fn express_const_number(&mut self, value: TokenValue) {
-        let tt = value.move_token_type();
+        let tt = value.token_type();
         let t = self.tokentype_to_type(tt);
         self.value_buffer.push(t);
     }

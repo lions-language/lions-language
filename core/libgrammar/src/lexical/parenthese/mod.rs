@@ -1,5 +1,4 @@
 use super::{LexicalParser, CallbackReturnStatus};
-use crate::token::{TokenType};
 use crate::grammar::Grammar;
 
 impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {

@@ -1,6 +1,6 @@
 use crate::lexical::{CallbackReturnStatus, TokenVecItem};
 use crate::grammar::{GrammarParser, ExpressContext, Grammar};
-use libtype::primeval::{PrimevalType};
+use libtype::primeval::{PrimevalType, PrimevalData};
 
 #[derive(Debug)]
 pub enum NumberValue {
@@ -16,7 +16,7 @@ pub enum NumberValue {
     Float64(f64)
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum TokenType {
     Unknown,
     // +
@@ -62,10 +62,17 @@ pub enum TokenType {
     // ,
     Comma,
     // 注释
-    Annotate(Vec<u8>),
-    Id(String),
+    Annotate,
+    Id,
     Const(PrimevalType),
     PrimevalType(PrimevalType)
+}
+
+#[derive(Debug)]
+pub enum TokenData {
+    Annotate(Vec<u8>),
+    Id(String),
+    Const(PrimevalData),
 }
 
 impl Default for TokenType {
@@ -116,6 +123,7 @@ pub enum TokenMethodResult {
     ParentheseEnd
 }
 
+/*
 pub struct TokenValue {
     pub context: TokenContext,
     pub token_attrubute: &'static TokenAttrubute
@@ -148,6 +156,41 @@ impl TokenValue {
         }
     }
 }
+*/
+
+#[derive(Default)]
+pub struct TokenValue {
+    pub token_type: TokenType,
+    pub token_data: Option<TokenData>
+}
+
+impl TokenValue {
+    pub fn print_token_type(&self, msg: Option<&str>) {
+        match msg {
+            Some(s) => {
+                println!("{} {:?}", s, &self.token_type);
+            },
+            None => {
+                println!("{:?}", &self.token_type);
+            }
+        }
+    }
+
+    pub fn token_type(self) -> TokenType {
+        self.token_type
+    }
+
+    pub fn token_type_ref(&self) -> &TokenType {
+        &self.token_type
+    }
+
+    pub fn new(typ: TokenType, data: Option<TokenData>) -> Self {
+        Self {
+            token_type: typ,
+            token_data: data
+        }
+    }
+}
 
 /*
 pub trait Token<T: FnMut() -> CallbackReturnStatus, CB: Grammar> {
@@ -172,11 +215,27 @@ pub struct TokenContext {
     // 列号
     pub col: u64,
     // token类型
-    pub token_type: TokenType,
+    pub token_value: TokenValue
 }
 
-type NupFunc<T, CB> = fn(token: &Token<T, CB>, grammar: &mut GrammarParser<T, CB>, express_context: &ExpressContext<T, CB>) -> TokenMethodResult;
-type LedFunc<T, CB> = fn(token: &Token<T, CB>, grammar: &mut GrammarParser<T, CB>, express_context: &ExpressContext<T, CB>) -> TokenMethodResult;
+impl TokenContext {
+    pub fn token_type(&self) -> &TokenType {
+        &self.token_value.token_type
+    }
+
+    pub fn token_type_move(self) -> TokenType {
+        self.token_value.token_type
+    }
+
+    pub fn token_data_unchecked(self) -> TokenData {
+        self.token_value.token_data.expect("token data is None")
+    }
+}
+
+type NupFunc<T, CB> = fn(token: &Token<T, CB>, grammar: &mut GrammarParser<T, CB>
+    , express_context: &ExpressContext<T, CB>) -> TokenMethodResult;
+type LedFunc<T, CB> = fn(token: &Token<T, CB>, grammar: &mut GrammarParser<T, CB>
+    , express_context: &ExpressContext<T, CB>) -> TokenMethodResult;
 
 pub struct Token<T: FnMut() -> CallbackReturnStatus, CB: Grammar> {
     pub context: TokenContext,
@@ -203,7 +262,11 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> Token<T, CB> {
     }
 
     pub fn context_token_type(&self) -> &TokenType {
-        &self.context.token_type
+        &self.context.token_value.token_type
+    }
+
+    pub fn token_value(self) -> TokenValue {
+        self.context.token_value
     }
 }
 
