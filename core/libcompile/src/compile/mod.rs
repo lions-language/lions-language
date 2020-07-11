@@ -5,10 +5,13 @@ use libhosttype::primeval::finder_map::hash;
 use libtype::{Type, primeval::PrimevalType, Primeval};
 use libtype::function::splice::FunctionSplice;
 use libtype::function::{FunctionParamData, FunctionReturnData
-        , FunctionParamDataItem, FunctionReturnDataItem};
+        , FunctionParamDataItem, FunctionReturnDataItem
+        , FindFunctionContext, FindFunctionResult};
+use libtypecontrol::function::FunctionControl;
+use libresult::*;
 
 pub struct Compile {
-    primeval_control: PrimevalControl<hash::Finder>,
+    function_control: FunctionControl,
     value_buffer: value_buffer::ValueBuffer,
     module_stack: module_stack::ModuleStack
 }
@@ -20,7 +23,7 @@ impl Grammar for Compile {
         self.value_buffer.push(t);
     }
 
-    fn operator_plus(&mut self, value: TokenValue) {
+    fn operator_plus(&mut self, value: TokenValue) -> NullResult {
         /*
          * 取出前两个token, 查找第一个函数的 plus 方法
          * */
@@ -40,6 +43,18 @@ impl Grammar for Compile {
         /*
          * 查找方法声明
          * */
+        match self.function_control.find_function(&FindFunctionContext{
+            typ: &typ,
+            func_str: &statement_str,
+            module_str: self.module_stack.current().to_str()
+        }) {
+            FindFunctionResult::Success(_) => {
+            },
+            FindFunctionResult::Panic(desc) => {
+                return Err(desc);
+            }
+        }
+        NULLOK
         /*
         let left_type_str = self.tokenvalue_type_str(left);
         let right = self.value_buffer.top_n_with_panic(1);

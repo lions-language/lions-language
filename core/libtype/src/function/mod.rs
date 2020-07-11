@@ -54,6 +54,14 @@ pub enum FunctionParamData {
     Multi(Vec<FunctionParamDataItem>)
 }
 
+impl FunctionParam {
+    pub fn new(data: FunctionParamData) -> Self {
+        Self {
+            data: data
+        }
+    }
+}
+
 impl FunctionParamDataItem {
     pub fn new(typ: Type) -> Self {
         Self {
@@ -104,11 +112,7 @@ pub struct Function {
  * */
 pub enum FindFunctionResult<'a> {
     Success(FindFuncSuccess<'a>),
-    Panic(FindFuncPanic)
-}
-
-pub enum FindFuncPanic {
-    Undefine(Option<&'static str>),
+    Panic(&'static str)
 }
 
 pub struct FindFuncSuccess<'a> {
@@ -134,12 +138,32 @@ pub enum AddFunctionResult {
 pub enum AddFuncPanic {
     AlreadyDefine
 }
+
 /*
  * 查找函数上下文
  * */
 pub struct FindFunctionContext<'a> {
-    pub typ: Type,
-    pub func_str: &'a str
+    pub typ: &'a Type,
+    pub func_str: &'a str,
+    pub module_str: &'a str
+}
+
+/*
+ * 添加函数上下文
+ * */
+pub struct AddFunctionContext<'a> {
+    /*
+     * 通过typ 区别应该存储在哪个对象中
+     * */
+    pub typ: &'a Type,
+    pub func_str: String,
+    pub module_str: String
+}
+
+pub trait FunctionControlInterface {
+    fn find_function(&self, context: &FindFunctionContext) -> FindFunctionResult;
+    fn add_function(&mut self, context: AddFunctionContext
+        , func: Function) -> AddFunctionResult;
 }
 
 mod function_statement;

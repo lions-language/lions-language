@@ -1,4 +1,4 @@
-use libcommon::module::{Module};
+use libtype::module::{Module};
 
 pub struct ModuleStack {
     stack: Vec<Module>

@@ -56,4 +56,5 @@ pub enum Type {
 pub mod function;
 pub mod primeval;
 pub mod typ;
+pub mod module;
 

@@ -1,6 +1,7 @@
 use crate::lexical::{LexicalParser, CallbackReturnStatus, TokenVecItem, TokenPointer};
 use crate::token::{TokenType, TokenValue, TokenMethodResult};
 use libtype::{Type};
+use libresult::*;
 
 pub trait Grammar {
     // type IdUse;
@@ -11,8 +12,9 @@ pub trait Grammar {
     fn annotate(&mut self, _value: TokenValue) {
         println!("multi annotate");
     }
-    fn operator_plus(&mut self, value: TokenValue) {
+    fn operator_plus(&mut self, value: TokenValue) -> NullResult {
         value.print_token_type(None);
+        NULLOK
     }
     fn operator_prefix_increase(&mut self, value: TokenValue) {
         value.print_token_type(Some("prefix increase:"));

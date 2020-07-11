@@ -1,5 +1,5 @@
 [package]
-name = "libgrammar"
+name = "libtypecontrol"
 version = "0.1.0"
 authors = ["lions-language <lions_language@163.com>"]
 edition = "2018"
@@ -7,9 +7,5 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-libcommon = { path = "../libcommon" }
-libhosttype = { path = "../libhosttype" }
 libtype = { path = "../libtype" }
-libresult = { path = "../libresult" }
-lazy_static = "1.1.1"
-
+libhosttype = { path = "../libhosttype" }
