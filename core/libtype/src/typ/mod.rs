@@ -4,10 +4,10 @@ impl Type {
     pub fn to_str(&self) -> &str {
         match self {
             Type::Primeval(v) => {
-                return &v.typ.to_str();
+                v.typ.to_str()
             },
-            Type::Structure(_) => {
-                unimplemented!();
+            Type::Structure(sp) => {
+                sp.struct_obj_ptr.as_ref().name_str()
             }
         }
     }

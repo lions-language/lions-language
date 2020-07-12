@@ -14,7 +14,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
          * */
         match first.context.token_data_unchecked() {
             TokenData::Id(_) => {
-                return Some(Type::Structure(Structure::new()));
+                unimplemented!();
             },
             _ => {
                 panic!("should not happend");

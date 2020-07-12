@@ -74,9 +74,12 @@ impl<F: Compile> Grammar for Compiler<F> {
                          * */
                         match &ret.data {
                             FunctionReturnData::Single(item) => {
-                                // self.value_buffer.push(item.typ.clone());
+                                self.value_buffer.push(item.typ.clone());
                             },
                             FunctionReturnData::Multi(item) => {
+                                for it in item {
+                                    self.value_buffer.push(it.typ.clone());
+                                }
                             }
                         }
                         // let t = ret.data.typ.clone();
