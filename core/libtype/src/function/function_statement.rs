@@ -3,6 +3,12 @@ use super::{FunctionStatement, FunctionParam, FunctionReturn
 use crate::{Type};
 
 impl FunctionStatement {
+    pub fn statement_full_str(&self) -> &str {
+        &self.statement_str
+    }
+}
+
+impl FunctionStatement {
     fn calc_function_statement_string(func_name: &str, func_param: &Option<FunctionParam>
             , func_return: &Option<FunctionReturn>, typ: &Option<Type>) -> String {
         /*
@@ -80,11 +86,14 @@ impl FunctionStatement {
 impl FunctionStatement {
     pub fn new(func_name: String, func_param: Option<FunctionParam>
             , func_return: Option<FunctionReturn>, typ: Option<Type>) -> Self {
+        let statement_str = FunctionStatement::calc_function_statement_string(
+            &func_name, &func_param, &func_return, &typ);
         Self {
             func_name: func_name,
             func_param: func_param,
             func_return: func_return,
-            typ: typ
+            typ: typ,
+            statement_str: statement_str
         }
     }
 }

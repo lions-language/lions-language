@@ -6,7 +6,7 @@ use libresult::*;
 pub trait Grammar {
     // type IdUse;
     
-    fn express_const_number(&mut self, value: TokenValue) {
+    fn const_number(&mut self, value: TokenValue) {
         value.print_token_type(None);
     }
     fn annotate(&mut self, _value: TokenValue) {

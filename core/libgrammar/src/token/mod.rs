@@ -180,6 +180,13 @@ impl TokenValue {
         self.token_type
     }
 
+    /*
+     * 因为 TokenType 中都是枚举, 所以拷贝的消耗非常小
+     * */
+    pub fn token_type_clone(&self) -> TokenType {
+        self.token_type.clone()
+    }
+
     pub fn token_type_ref(&self) -> &TokenType {
         &self.token_type
     }

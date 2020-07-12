@@ -235,7 +235,55 @@ impl PrimevalControl {
     }
 
     pub fn context(&self, typ: &Type) -> &PrimevalContext {
-        self.context(typ)
+        let t = match typ {
+            Type::Primeval(p) => {
+                &p.typ
+            },
+            _ => {
+                /*
+                 * 进入到这里一定是处理原生类型的, 所以这里不会发生
+                 * */
+                panic!("should not happend");
+            }
+        };
+        match t {
+            PrimevalType::Uint8 => {
+                &self.uint8_method
+            },
+            PrimevalType::Uint16 => {
+                &self.uint16_method
+            },
+            PrimevalType::Uint32 => {
+                &self.uint32_method
+            },
+            PrimevalType::Uint64 => {
+                &self.uint64_method
+            },
+            PrimevalType::Int8 => {
+                &self.int8_method
+            },
+            PrimevalType::Int16 => {
+                &self.int16_method
+            },
+            PrimevalType::Int32 => {
+                &self.int32_method
+            },
+            PrimevalType::Int64 => {
+                &self.int64_method
+            },
+            PrimevalType::Float32 => {
+                &self.float32_method
+            },
+            PrimevalType::Float64 => {
+                &self.float64_method
+            },
+            PrimevalType::Str => {
+                &self.string_method
+            },
+            _ => {
+                unimplemented!();
+            }
+        }
     }
 }
 

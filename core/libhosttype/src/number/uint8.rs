@@ -14,43 +14,43 @@ use phf::phf_map;
  * 静态映射
  * */
 lazy_static!{
-    static ref UINT32_METHOD: phf::Map<&'static str, u32> = {
+    static ref UINT8_METHOD: phf::Map<&'static str, u32> = {
         phf_map! {
-            "+(uint32)" => 0
+            "+(uint8)" => 0
         }
     };
-    static ref PLUS_OPERATOR_UINT32_FUNCTION: Function = Function{
+    static ref PLUS_OPERATOR_UINT8_FUNCTION: Function = Function{
         func_statement: FunctionStatement::new(
             String::from(consts::OPERATOR_FUNCTION_NAME),
             Some(FunctionParam::new(
                 FunctionParamData::Single(
                     FunctionParamDataItem::new(
-                        Type::Primeval(Primeval::new(PrimevalType::Uint32))
+                        Type::Primeval(Primeval::new(PrimevalType::Uint8))
                         )
                     )
                 )),
             Some(FunctionReturn::new(
                 FunctionReturnData::Single(
                     FunctionReturnDataItem::new(
-                        Type::Primeval(Primeval::new(PrimevalType::Uint32))
+                        Type::Primeval(Primeval::new(PrimevalType::Uint8))
                         )
                     )
                 )),
-            Some(Type::Primeval(Primeval::new(PrimevalType::Uint32)))
+            Some(Type::Primeval(Primeval::new(PrimevalType::Uint8)))
         ),
         func_define: FunctionDefine::Optcode(OptcodeFunctionDefine{
-            optcode: OptCode::Uint32PlusOperatorUint32
+            optcode: OptCode::Uint8PlusOperatorUint8
         })
     };
-    static ref UINT32_FUNCTION_VEC: Vec<&'static Function> = {
-        let mut v = Vec::with_capacity(UINT32_METHOD.len());
-        v.push(&*PLUS_OPERATOR_UINT32_FUNCTION);
+    static ref UINT8_FUNCTION_VEC: Vec<&'static Function> = {
+        let mut v = Vec::with_capacity(UINT8_METHOD.len());
+        v.push(&*PLUS_OPERATOR_UINT8_FUNCTION);
         v
     };
 }
 
 pub fn get_method(func_str: &str) -> Option<&'static Function> {
-    let index = match UINT32_METHOD.get(func_str) {
+    let index = match UINT8_METHOD.get(func_str) {
         Some(index) => {
             index
         },
@@ -58,10 +58,10 @@ pub fn get_method(func_str: &str) -> Option<&'static Function> {
             return None;
         }
     };  
-    if *index > UINT32_FUNCTION_VEC.len() as u32 {
+    if *index > UINT8_FUNCTION_VEC.len() as u32 {
         return None;
     }   
-    match UINT32_FUNCTION_VEC.get(*index as usize) {
+    match UINT8_FUNCTION_VEC.get(*index as usize) {
         Some(v) => {
             Some(v)
         },

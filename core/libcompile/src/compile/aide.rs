@@ -1,9 +1,8 @@
 use libgrammar::token::{TokenValue, TokenType};
-use libcommon::function::{FunctionKey};
 use libtype::{Type, Primeval};
-use super::Compile;
+use super::{Compiler, Compile, ConstContext};
 
-impl Compile {
+impl<F: Compile> Compiler<F> {
     pub fn tokentype_to_type(&self, typ: TokenType) -> Type {
         match typ {
             TokenType::Const(pt) => {
@@ -13,28 +12,5 @@ impl Compile {
                 unimplemented!();
             }
         }
-    }
-
-    pub fn tokenvalue_type_str<'a>(&self, value: &'a TokenValue) -> &'a str {
-        match value.token_type_ref() {
-            TokenType::Const(pt) => {
-                pt.to_str()
-            },
-            _ => {
-                unimplemented!();
-            }
-        }
-    }
-
-    pub fn splice_binary_operator_funckey(&self, left_str: &str, right_str: &str
-        , op: &str) -> FunctionKey {
-        let len = left_str.len() + 1 + op.len() + 1 + right_str.len();
-        let mut key = String::with_capacity(len);
-        key.push_str(left_str);
-        key.push('_');
-        key.push_str(op);
-        key.push('_');
-        key.push_str(right_str);
-        FunctionKey::new(key)
     }
 }

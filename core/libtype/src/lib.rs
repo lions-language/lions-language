@@ -2,13 +2,14 @@ use primeval::{PrimevalType};
 
 #[derive(Debug)]
 pub struct Structure {
-    pub name: String
+    /*
+     * 存储的应该是 Address
+     * */
 }
 
 impl Structure {
-    pub fn new(name: String) -> Self {
+    pub fn new() -> Self {
         Self {
-            name: name
         }
     }
 }

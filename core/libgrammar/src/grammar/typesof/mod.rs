@@ -13,8 +13,8 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
          * TODO: 查看下一个token是否是 ::
          * */
         match first.context.token_data_unchecked() {
-            TokenData::Id(id) => {
-                return Some(Type::Structure(Structure::new(id)));
+            TokenData::Id(_) => {
+                return Some(Type::Structure(Structure::new()));
             },
             _ => {
                 panic!("should not happend");

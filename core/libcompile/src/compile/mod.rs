@@ -1,29 +1,44 @@
 use libgrammar::grammar::Grammar;
 use libgrammar::token::{TokenValue};
-use libhosttype::primeval::{PrimevalControl, PrimevalMethod};
-use libhosttype::primeval::finder_map::hash;
-use libtype::{Type, primeval::PrimevalType, Primeval};
 use libtype::function::splice::FunctionSplice;
-use libtype::function::{FunctionParamData, FunctionReturnData
-        , FunctionParamDataItem, FunctionReturnDataItem
+use libtype::function::{FunctionParamData
+        , FunctionParamDataItem, FunctionReturnData
         , FindFunctionContext, FindFunctionResult};
 use libtypecontrol::function::FunctionControl;
+use libtype::primeval::{PrimevalType, PrimevalData};
+use libtype::module::Module;
 use libresult::*;
 
-pub struct Compile {
-    function_control: FunctionControl,
-    value_buffer: value_buffer::ValueBuffer,
-    module_stack: module_stack::ModuleStack
+#[derive(Debug)]
+pub struct ConstContext {
+    pub typ: PrimevalType,
+    pub data: PrimevalData
 }
 
-impl Grammar for Compile {
-    fn express_const_number(&mut self, value: TokenValue) {
-        let tt = value.token_type();
+pub trait Compile {
+    fn const_number(&mut self, context: ConstContext) {
+        println!("{:?}", context);
+    }
+}
+
+pub struct Compiler<F: Compile> {
+    function_control: FunctionControl,
+    value_buffer: value_buffer::ValueBuffer,
+    module_stack: module_stack::ModuleStack,
+    cb: F
+}
+
+impl<F: Compile> Grammar for Compiler<F> {
+    fn const_number(&mut self, value: TokenValue) {
+        let tt = value.token_type_clone();
         let t = self.tokentype_to_type(tt);
         self.value_buffer.push(t);
+        let const_context = ConstContext::from_token_value(value);
+        self.cb.const_number(const_context);
     }
 
-    fn operator_plus(&mut self, value: TokenValue) -> NullResult {
+    fn operator_plus(&mut self, _value: TokenValue) -> NullResult {
+        use libtype::function::consts;
         /*
          * 取出前两个token, 查找第一个函数的 plus 方法
          * */
@@ -38,8 +53,8 @@ impl Grammar for Compile {
          * + 号运算一定只有一个参数
          * */
         let param = FunctionParamData::Single(FunctionParamDataItem::new(right));
-        let statement_str = FunctionSplice::get_function_without_return_string_by_type(
-            "+", &Some(&param), &Some(&typ));
+        let statement_str = FunctionSplice::get_function_without_return_and_type_string(
+            consts::OPERATOR_FUNCTION_NAME, &Some(&param));
         /*
          * 查找方法声明
          * */
@@ -48,25 +63,96 @@ impl Grammar for Compile {
             func_str: &statement_str,
             module_str: self.module_stack.current().to_str()
         }) {
-            FindFunctionResult::Success(_) => {
+            FindFunctionResult::Success(r) => {
+                /*
+                 * 获取返回类型, 如果存在返回类型, 将其写入到队列中
+                 * */
+                match &r.func.func_statement.func_return {
+                    Some(ret) => {
+                        /*
+                         * 存在返回值
+                         * */
+                        match &ret.data {
+                            FunctionReturnData::Single(item) => {
+                                // self.value_buffer.push(item.typ.clone());
+                            },
+                            FunctionReturnData::Multi(item) => {
+                            }
+                        }
+                        // let t = ret.data.typ.clone();
+                        // self.value_buffer.push(t);
+                    },
+                    None => {
+                    }
+                }
+                println!("{:?}", r);
             },
             FindFunctionResult::Panic(desc) => {
                 return Err(desc);
             }
         }
         NULLOK
-        /*
-        let left_type_str = self.tokenvalue_type_str(left);
-        let right = self.value_buffer.top_n_with_panic(1);
-        let right_type_str = self.tokenvalue_type_str(right);
-        let func_key = self.splice_binary_operator_funckey(
-            left_type_str, "+", right_type_str);
-        let current_module = self.module_stack.current();
-        */
-        // self.primeval_control
     }
 }
 
 mod module_stack;
 mod value_buffer;
 mod aide;
+mod context;
+
+#[cfg(test)]
+mod test {
+    use libgrammar::lexical::VecU8;
+    use libgrammar::lexical::LexicalParser;
+    use libgrammar::grammar::GrammarParser;
+    use libgrammar::lexical::CallbackReturnStatus;
+    use libgrammar::grammar::GrammarContext;
+    use super::*;
+
+    use std::fs;
+    use std::io::Read;
+
+    struct TestComplie {
+    }
+
+    impl Compile for TestComplie {
+    }
+
+    #[test]
+    fn grammar_parser_test() {
+        let file = String::from("main.lions");
+        let mut f = match fs::File::open(&file) {
+            Ok(f) => f,
+            Err(_err) => {
+                panic!("read file error");
+            }
+        };
+        let lexical_parser = LexicalParser::new(file.clone(), || -> CallbackReturnStatus {
+            let mut v = Vec::new();
+            let f_ref = f.by_ref();
+            match f_ref.take(1).read_to_end(&mut v) {
+                Ok(len) => {
+                    if len == 0 {
+                        return CallbackReturnStatus::End;
+                    } else {
+                        return CallbackReturnStatus::Continue(VecU8::from_vec_u8(v));
+                    }
+                },
+                Err(_) => {
+                    return CallbackReturnStatus::End;
+                }
+            }
+        });
+        let mut grammar_context = GrammarContext{
+            cb: Compiler{
+                function_control: FunctionControl::new(),
+                value_buffer: value_buffer::ValueBuffer::new(),
+                module_stack: module_stack::ModuleStack::new(
+                    Module::new(String::from("main"))),
+                cb: TestComplie{}
+            }
+        };
+        let mut grammar_parser = GrammarParser::new(lexical_parser, &mut grammar_context);
+        grammar_parser.parser();
+    }
+}

@@ -11,6 +11,12 @@ impl FunctionSplice {
             func_name, func_param, &None, typ)
     }
 
+    pub fn get_function_without_return_and_type_string(
+        func_name: &str, func_param: &Option<&FunctionParamData>) -> String {
+        FunctionSplice::get_function_string_by_type(
+            func_name, func_param, &None, &None)
+    }
+
     pub fn get_function_string_by_type(func_name: &str, func_param: &Option<&FunctionParamData>
             , func_return: &Option<&FunctionReturnData>, typ: &Option<&Type>) -> String {
         /*

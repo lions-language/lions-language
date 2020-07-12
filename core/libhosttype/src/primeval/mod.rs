@@ -81,10 +81,14 @@ pub struct PrimevalMethodBindValue {
 }
 
 use crate::number::uint32;
+use crate::number::uint8;
 pub fn primeval_method(typ: &Type, func_str: &str) -> Option<&'static Function> {
     match typ {
         Type::Primeval(p) => {
             match &p.typ {
+                PrimevalType::Uint8 => {
+                    uint8::get_method(func_str)
+                },
                 PrimevalType::Uint32 => {
                     uint32::get_method(func_str)
                 },
