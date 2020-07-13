@@ -1,6 +1,7 @@
 use crate::grammar::{GrammarParser, ExpressContext, Grammar};
 use crate::lexical::{CallbackReturnStatus};
 use crate::token::{TokenContext, Token, TokenAttrubute, TokenOperType, TokenMethodResult, TokenValue};
+use libresult::*;
 
 lazy_static!{
     static ref PLUS_TOKEN_ATTRUBUTE: TokenAttrubute = TokenAttrubute{
@@ -75,7 +76,9 @@ impl PlusToken {
             }
         };
         let r =  grammar.expression(t.token_attrubute().bp, express_context, &tp);
-        grammar.grammar_context().cb.operator_plus(t.token_value());
+        if let DescResult::Error(err) = grammar.grammar_context().cb.operator_plus(t.token_value()) {
+            grammar.panic(&err);
+        };
         r
     }
 }

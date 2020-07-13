@@ -3,52 +3,27 @@ use libgrammar::token::{TokenValue};
 use libtype::function::{Function};
 use libtypecontrol::function::FunctionControl;
 use libtype::primeval::{PrimevalType, PrimevalData};
+use libtype::instruction::Instruction;
 use libresult::*;
+use crate::compile::{ConstContext, CallFunctionContext
+    , Compile, Compiler};
 
-#[derive(Debug)]
-pub struct ConstContext {
-    pub typ: PrimevalType,
-    pub data: PrimevalData
+pub trait Writer {
+    fn write(&mut self, instruction: Instruction);
 }
 
-#[derive(Debug)]
-pub struct CallFunctionContext<'a> {
-    pub func: &'a Function
+pub struct GenerateBytecode {
 }
 
-pub trait Compile {
+impl Compile for GenerateBytecode {
     fn const_number(&mut self, context: ConstContext) {
-        println!("{:?}", context);
+        // let instruction = Instruction::LoadConstNumber(context.data);
     }
 
     fn call_function(&mut self, context: CallFunctionContext) {
-        println!("{:?}", context);
+        // let instruction = Instruction::CallFunction(&context.func.func_define);
     }
 }
-
-pub struct Compiler<F: Compile> {
-    function_control: FunctionControl,
-    value_buffer: value_buffer::ValueBuffer,
-    module_stack: module_stack::ModuleStack,
-    cb: F
-}
-
-impl<F: Compile> Grammar for Compiler<F> {
-    fn const_number(&mut self, value: TokenValue) {
-	self.const_number(value);
-    }
-
-    fn operator_plus(&mut self, value: TokenValue) -> DescResult {
-        self.operator_plus(value)
-    }
-}
-
-mod module_stack;
-mod value_buffer;
-mod aide;
-mod context;
-mod constant;
-mod operator;
 
 #[cfg(test)]
 mod test {
@@ -62,12 +37,6 @@ mod test {
 
     use std::fs;
     use std::io::Read;
-
-    struct TestComplie {
-    }
-
-    impl Compile for TestComplie {
-    }
 
     #[test]
     fn grammar_parser_test() {
@@ -100,7 +69,7 @@ mod test {
                 value_buffer: value_buffer::ValueBuffer::new(),
                 module_stack: module_stack::ModuleStack::new(
                     Module::new(String::from("main"))),
-                cb: TestComplie{}
+                cb: GenerateBytecode{}
             }
         };
         let mut grammar_parser = GrammarParser::new(lexical_parser, &mut grammar_context);

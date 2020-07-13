@@ -16,9 +16,13 @@ use phf::phf_map;
 lazy_static!{
     static ref UINT8_METHOD: phf::Map<&'static str, u32> = {
         phf_map! {
-            "+(uint8)" => 0
+            "+(uint8)" => 0,
+            "+(uint16)" => 1,
         }
     };
+    /*
+     * uint8 + uint8
+     * */
     static ref PLUS_OPERATOR_UINT8_FUNCTION: Function = Function{
         func_statement: FunctionStatement::new(
             String::from(consts::OPERATOR_FUNCTION_NAME),
@@ -40,9 +44,35 @@ lazy_static!{
             optcode: OptCode::Uint8PlusOperatorUint8
         })
     };
+    /*
+     * uint8 + uint16
+     * */
+    static ref PLUS_OPERATOR_UINT16_FUNCTION: Function = Function{
+        func_statement: FunctionStatement::new(
+            String::from(consts::OPERATOR_FUNCTION_NAME),
+            Some(FunctionParam::new(
+                FunctionParamData::Single(
+                    FunctionParamDataItem::new(
+                        Type::Primeval(Primeval::new(PrimevalType::Uint16))
+                        )
+                    )
+                )),
+            FunctionReturn::new(
+                FunctionReturnData::new(
+                    Type::Primeval(Primeval::new(PrimevalType::Uint16))
+                    )
+                ),
+            Some(Type::Primeval(Primeval::new(PrimevalType::Uint8)))
+        ),
+        func_define: FunctionDefine::Optcode(OptcodeFunctionDefine{
+            optcode: OptCode::Uint8PlusOperatorUint16
+        })
+    };
+
     static ref UINT8_FUNCTION_VEC: Vec<&'static Function> = {
         let mut v = Vec::with_capacity(UINT8_METHOD.len());
         v.push(&*PLUS_OPERATOR_UINT8_FUNCTION);
+        v.push(&*PLUS_OPERATOR_UINT16_FUNCTION);
         v
     };
 }

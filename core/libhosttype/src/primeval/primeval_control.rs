@@ -8,6 +8,7 @@ use libtype::function::{FindFunctionResult
     , FunctionControlInterface
     , FindFunctionContext
     , AddFunctionContext};
+use libtype::function::format::{Format};
 
 impl FunctionControlInterface for PrimevalControl {
     fn find_function(&self, context: &FindFunctionContext) -> FindFunctionResult {
@@ -99,7 +100,7 @@ impl PrimevalControl {
                     None => {
                         FindFunctionResult::Panic(
                             format!("module: {}, function: {} is not define"
-                                , module_str, func_str))
+                                , module_str, Format::splice_type_funcstr(typ, func_str)))
                     }
                 }
             }
@@ -185,6 +186,12 @@ impl PrimevalControl {
         }
         AddFunctionResult::Success
     }
+
+    /*
+     * 以下两个方法是查找 原生类型对象实例
+     * 存在更加简单的方法 (通过类型字符串, 超找实例), 但是为了效率, 使用硬编码方式 (不用查找, match
+     * 结果)
+     * */
     pub fn context_mut(&mut self, typ: &Type) -> &mut PrimevalContext {
         let t = match typ {
             Type::Primeval(p) => {

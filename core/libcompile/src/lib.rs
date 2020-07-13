@@ -1,2 +1,2 @@
 pub mod compile;
-mod function;
+pub mod bytecode;
