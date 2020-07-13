@@ -34,6 +34,16 @@ impl FunctionReturn {
     }
 }
 
+impl Default for FunctionReturn {
+    fn default() -> Self {
+        Self {
+            data: FunctionReturnData{
+                typ: Type::Empty
+            }
+        }
+    }
+}
+
 /*
  * 函数参数
  * */
@@ -80,7 +90,10 @@ impl FunctionParamDataItem {
 pub struct FunctionStatement {
     pub func_name: String,
     pub func_param: Option<FunctionParam>,
-    pub func_return: Option<FunctionReturn>,
+    /*
+     * 任何方法都有返回值, 如果没有任何有效的返回值, 那么返回的就是 Empty
+     * */
+    pub func_return: FunctionReturn,
     /*
      * 如果是类方法, 给出类型
      * */

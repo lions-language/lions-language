@@ -10,7 +10,7 @@ impl FunctionStatement {
 
 impl FunctionStatement {
     fn calc_function_statement_string(func_name: &str, func_param: &Option<FunctionParam>
-            , func_return: &Option<FunctionReturn>, typ: &Option<Type>) -> String {
+            , func_return: &FunctionReturn, typ: &Option<Type>) -> String {
         /*
          * 函数名(参数类型列表)->(返回值类型列表)
          * */
@@ -57,21 +57,15 @@ impl FunctionStatement {
         /*
          * 拼接返回值
          * */
-        match func_return {
-            Some(ret) => {
-                s.push_str("->");
-                s.push_str(ret.data.typ.to_str());
-            },
-            None => {
-            }
-        }
+        s.push_str("->");
+        s.push_str(func_return.data.typ.to_str());
         s
     }
 }
 
 impl FunctionStatement {
     pub fn new(func_name: String, func_param: Option<FunctionParam>
-            , func_return: Option<FunctionReturn>, typ: Option<Type>) -> Self {
+            , func_return: FunctionReturn, typ: Option<Type>) -> Self {
         let statement_str = FunctionStatement::calc_function_statement_string(
             &func_name, &func_param, &func_return, &typ);
         Self {

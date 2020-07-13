@@ -29,11 +29,11 @@ lazy_static!{
                         )
                     )
                 )),
-            Some(FunctionReturn::new(
+            FunctionReturn::new(
                 FunctionReturnData::new(
                     Type::Primeval(Primeval::new(PrimevalType::Uint8))
                     )
-                )),
+                ),
             Some(Type::Primeval(Primeval::new(PrimevalType::Uint8)))
         ),
         func_define: FunctionDefine::Optcode(OptcodeFunctionDefine{

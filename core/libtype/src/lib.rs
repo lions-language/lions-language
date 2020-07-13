@@ -41,7 +41,8 @@ impl StructObjectPtr {
 #[derive(Debug, Clone)]
 pub struct Structure {
     /*
-     * 存储的应该是 Address
+     * 因为每一个结构的类型信息在整个系统中只有一份, 所以这里将结构的内存指针存储下来
+     * 之后获取类型 string 的时候, 就只要访问地址中的字符串就可以, 降低内存消耗, 提高效率
      * */
     struct_obj_ptr: StructObjectPtr
 }
@@ -91,7 +92,11 @@ pub enum Type {
     /*
      * 结构体类型
      * */
-    Structure(Structure)
+    Structure(Structure),
+    /*
+     * 空类型
+     * */
+    Empty
 }
 
 pub mod function;

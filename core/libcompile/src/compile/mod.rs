@@ -1,8 +1,8 @@
 use libgrammar::grammar::Grammar;
 use libgrammar::token::{TokenValue};
 use libtype::function::splice::FunctionSplice;
-use libtype::function::{FunctionParamData
-        , FunctionParamDataItem
+use libtype::function::{Function
+        , FunctionParamData, FunctionParamDataItem
         , FindFunctionContext, FindFunctionResult};
 use libtypecontrol::function::FunctionControl;
 use libtype::primeval::{PrimevalType, PrimevalData};
@@ -15,8 +15,17 @@ pub struct ConstContext {
     pub data: PrimevalData
 }
 
+#[derive(Debug)]
+pub struct CallFunctionContext<'a> {
+    func: &'a Function
+}
+
 pub trait Compile {
     fn const_number(&mut self, context: ConstContext) {
+        println!("{:?}", context);
+    }
+
+    fn call_function(&mut self, context: CallFunctionContext) {
         println!("{:?}", context);
     }
 }
@@ -67,16 +76,10 @@ impl<F: Compile> Grammar for Compiler<F> {
                 /*
                  * 获取返回类型, 如果存在返回类型, 将其写入到队列中
                  * */
-                match &r.func.func_statement.func_return {
-                    Some(ret) => {
-                        /*
-                         * 存在返回值
-                         * */
-                        self.value_buffer.push(ret.data.typ.clone());
-                    },
-                    None => {
-                    }
-                }
+                self.cb.call_function(CallFunctionContext{
+                    func: r.func
+                });
+                self.value_buffer.push(r.func.func_statement.func_return.data.typ.clone());
             },
             FindFunctionResult::Panic(desc) => {
                 return DescResult::Error(desc);

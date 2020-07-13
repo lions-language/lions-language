@@ -8,7 +8,12 @@ impl Type {
             },
             Type::Structure(sp) => {
                 sp.struct_obj_ptr.as_ref().name_str()
+            },
+            Type::Empty => {
+                consts::EMPTY_TYPE
             }
         }
     }
 }
+
+mod consts;
