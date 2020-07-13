@@ -4,7 +4,6 @@ use libtype::{Type};
 use libtype::primeval::PrimevalType;
 use libtype::function::{FindFunctionResult
     , AddFunctionResult, FindFuncSuccess
-    , AddFuncPanic
     , Function, FunctionDefine
     , FunctionControlInterface
     , FindFunctionContext
@@ -98,7 +97,9 @@ impl PrimevalControl {
                         FindFunctionResult::Success(FindFuncSuccess::new(func))
                     },
                     None => {
-                        FindFunctionResult::Panic("undefine")
+                        FindFunctionResult::Panic(
+                            format!("module: {}, function: {} is not define"
+                                , module_str, func_str))
                     }
                 }
             }
@@ -168,7 +169,9 @@ impl PrimevalControl {
                         /*
                          * 当前模块已经定义过了 => 报错
                          * */
-                        return AddFunctionResult::Panic(AddFuncPanic::AlreadyDefine);
+                        return AddFunctionResult::Panic(
+                            format!("module: {}, func_str: {} already define"
+                                , module_str, func_str));
                     }
                 }
             },

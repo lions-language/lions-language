@@ -2,7 +2,7 @@ use libgrammar::grammar::Grammar;
 use libgrammar::token::{TokenValue};
 use libtype::function::splice::FunctionSplice;
 use libtype::function::{FunctionParamData
-        , FunctionParamDataItem, FunctionReturnData
+        , FunctionParamDataItem
         , FindFunctionContext, FindFunctionResult};
 use libtypecontrol::function::FunctionControl;
 use libtype::primeval::{PrimevalType, PrimevalData};
@@ -37,7 +37,7 @@ impl<F: Compile> Grammar for Compiler<F> {
         self.cb.const_number(const_context);
     }
 
-    fn operator_plus(&mut self, _value: TokenValue) -> NullResult {
+    fn operator_plus(&mut self, _value: TokenValue) -> DescResult {
         use libtype::function::consts;
         /*
          * 取出前两个token, 查找第一个函数的 plus 方法
@@ -72,29 +72,17 @@ impl<F: Compile> Grammar for Compiler<F> {
                         /*
                          * 存在返回值
                          * */
-                        match &ret.data {
-                            FunctionReturnData::Single(item) => {
-                                self.value_buffer.push(item.typ.clone());
-                            },
-                            FunctionReturnData::Multi(item) => {
-                                for it in item {
-                                    self.value_buffer.push(it.typ.clone());
-                                }
-                            }
-                        }
-                        // let t = ret.data.typ.clone();
-                        // self.value_buffer.push(t);
+                        self.value_buffer.push(ret.data.typ.clone());
                     },
                     None => {
                     }
                 }
-                println!("{:?}", r);
             },
             FindFunctionResult::Panic(desc) => {
-                return Err(desc);
+                return DescResult::Error(desc);
             }
         }
-        NULLOK
+        DescResult::Success
     }
 }
 

@@ -1,4 +1,6 @@
-pub type NullResult = Result<(), &'static str>;
-pub static NULLOK: Result<(), &'static str> = Ok(());
+pub enum DescResult {
+    Success,
+    Error(String)
+}
 
 pub mod function;

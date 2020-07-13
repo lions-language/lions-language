@@ -5,23 +5,20 @@ use libcommon::optcode::OptCode;
 /*
  * 函数返回值
  * */
- #[derive(Debug)]
+#[derive(Debug)]
 pub struct FunctionReturn {
     pub data: FunctionReturnData
 }
 
- #[derive(Debug)]
-pub struct FunctionReturnDataItem {
+/*
+ * 如果返回值是多个值, 将抽象为元组
+ * */
+#[derive(Debug)]
+pub struct FunctionReturnData {
     pub typ: Type
 }
 
- #[derive(Debug)]
-pub enum FunctionReturnData {
-    Single(FunctionReturnDataItem),
-    Multi(Vec<FunctionReturnDataItem>)
-}
-
-impl FunctionReturnDataItem {
+impl FunctionReturnData {
     pub fn new(typ: Type) -> Self {
         Self {
             typ: typ
@@ -40,17 +37,17 @@ impl FunctionReturn {
 /*
  * 函数参数
  * */
- #[derive(Debug)]
+#[derive(Debug)]
 pub struct FunctionParam {
     pub data: FunctionParamData
 }
 
- #[derive(Debug)]
+#[derive(Debug)]
 pub struct FunctionParamDataItem {
     pub typ: Type
 }
 
- #[derive(Debug)]
+#[derive(Debug)]
 pub enum FunctionParamData {
     /*
      * 其实可以写成一个, 之所以分开, 是因为如果只有一个参数, 没必要构建一个Vec, 提高效率,
@@ -79,7 +76,7 @@ impl FunctionParamDataItem {
 /*
  * 函数声明
  * */
- #[derive(Debug)]
+#[derive(Debug)]
 pub struct FunctionStatement {
     pub func_name: String,
     pub func_param: Option<FunctionParam>,
@@ -94,18 +91,18 @@ pub struct FunctionStatement {
 /*
  * 函数定义
  * */
- #[derive(Debug)]
+#[derive(Debug)]
 pub enum FunctionDefine {
     Optcode(OptcodeFunctionDefine),
     Address(AddressFunctionDefine)
 }
 
- #[derive(Debug)]
+#[derive(Debug)]
 pub struct OptcodeFunctionDefine {
     pub optcode: OptCode
 }
 
- #[derive(Debug)]
+#[derive(Debug)]
 pub struct AddressFunctionDefine {
     pub addr: FunctionAddress
 }
@@ -113,7 +110,7 @@ pub struct AddressFunctionDefine {
 /*
  * 函数
  * */
- #[derive(Debug)]
+#[derive(Debug)]
 pub struct Function {
     pub func_statement: FunctionStatement,
     pub func_define: FunctionDefine
@@ -122,13 +119,13 @@ pub struct Function {
 /*
  * 查找函数结果
  * */
- #[derive(Debug)]
+#[derive(Debug)]
 pub enum FindFunctionResult<'a> {
     Success(FindFuncSuccess<'a>),
-    Panic(&'static str)
+    Panic(String)
 }
 
- #[derive(Debug)]
+#[derive(Debug)]
 pub struct FindFuncSuccess<'a> {
     pub func: &'a Function
 }
@@ -144,21 +141,16 @@ impl<'a> FindFuncSuccess<'a> {
 /*
  * 添加函数结果
  * */
- #[derive(Debug)]
+#[derive(Debug)]
 pub enum AddFunctionResult {
     Success,
-    Panic(AddFuncPanic)
-}
-
- #[derive(Debug)]
-pub enum AddFuncPanic {
-    AlreadyDefine
+    Panic(String)
 }
 
 /*
  * 查找函数上下文
  * */
- #[derive(Debug)]
+#[derive(Debug)]
 pub struct FindFunctionContext<'a> {
     pub typ: &'a Type,
     pub func_str: &'a str,
@@ -168,7 +160,7 @@ pub struct FindFunctionContext<'a> {
 /*
  * 添加函数上下文
  * */
- #[derive(Debug)]
+#[derive(Debug)]
 pub struct AddFunctionContext<'a> {
     /*
      * 通过typ 区别应该存储在哪个对象中

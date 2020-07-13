@@ -4,7 +4,7 @@ use libtype::function::consts;
 use libtype::function::{FunctionStatement, Function
     , FunctionDefine, OptcodeFunctionDefine
     , FunctionParam, FunctionParamData, FunctionParamDataItem
-    , FunctionReturn, FunctionReturnData, FunctionReturnDataItem
+    , FunctionReturn, FunctionReturnData
     };
 use libcommon::optcode::{OptCode};
 use phf::phf_map;
@@ -30,10 +30,8 @@ lazy_static!{
                     )
                 )),
             Some(FunctionReturn::new(
-                FunctionReturnData::Single(
-                    FunctionReturnDataItem::new(
-                        Type::Primeval(Primeval::new(PrimevalType::Uint8))
-                        )
+                FunctionReturnData::new(
+                    Type::Primeval(Primeval::new(PrimevalType::Uint8))
                     )
                 )),
             Some(Type::Primeval(Primeval::new(PrimevalType::Uint8)))

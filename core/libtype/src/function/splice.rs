@@ -68,21 +68,7 @@ impl FunctionSplice {
         match func_return {
             Some(ret) => {
                 s.push_str("->");
-                s.push('(');
-                match ret {
-                    FunctionReturnData::Single(r) => {
-                        s.push_str(r.typ.to_str());
-                    },
-                    FunctionReturnData::Multi(rs) => {
-                        for (i, r) in rs.iter().enumerate() {
-                            if i > 0 {
-                                s.push(',');
-                            }
-                            s.push_str(r.typ.to_str());
-                        }
-                    }
-                }
-                s.push(')');
+                s.push_str(ret.typ.to_str());
             },
             None => {
             }

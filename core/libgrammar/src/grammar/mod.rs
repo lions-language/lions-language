@@ -12,9 +12,9 @@ pub trait Grammar {
     fn annotate(&mut self, _value: TokenValue) {
         println!("multi annotate");
     }
-    fn operator_plus(&mut self, value: TokenValue) -> NullResult {
+    fn operator_plus(&mut self, value: TokenValue) -> DescResult {
         value.print_token_type(None);
-        NULLOK
+        DescResult::Success
     }
     fn operator_prefix_increase(&mut self, value: TokenValue) {
         value.print_token_type(Some("prefix increase:"));
