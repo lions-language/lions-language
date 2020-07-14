@@ -35,7 +35,6 @@ impl<F: Writer> Compile for Bytecode<F> {
     }
 
     fn call_function(&mut self, context: CallFunctionContext) {
-        // let instruction = Instruction::CallFunction(&context.func.func_define);
         match &context.func.func_define {
             FunctionDefine::Optcode(def) => {
                 let instruction = Instruction::CallPrimevalFunction(def.optcode.clone());

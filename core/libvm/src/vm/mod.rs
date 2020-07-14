@@ -16,6 +16,7 @@ impl Writer for VirtualMachine {
     }
 }
 
+mod load_const;
 
 #[cfg(test)]
 mod test {

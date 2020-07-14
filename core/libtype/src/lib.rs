@@ -17,6 +17,11 @@ pub struct Structure {
     /*
      * 因为每一个结构的类型信息在整个系统中只有一份, 所以这里将结构的内存指针存储下来
      * 之后获取类型 string 的时候, 就只要访问地址中的字符串就可以, 降低内存消耗, 提高效率
+     *
+     * 在构造 结构类型时, 会从 struct_control 中找到 StructObject 指针
+     *  比如: let a = mod1::Test{};
+     *  compile 阶段会通过 mod1 从 struct_control 中找到 StructObject 指针, 然后通过这个指针, 构造
+     *  Type对象, 调用 function_control 获取方法定义
      * */
     struct_obj_ptr: RefPtr
 }
