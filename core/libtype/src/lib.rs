@@ -1,5 +1,5 @@
-use primeval::{PrimevalType};
 use libcommon::ptr::RefPtr;
+use crate::primeval::PrimevalType;
 
 #[derive(Debug)]
 pub struct StructObject {

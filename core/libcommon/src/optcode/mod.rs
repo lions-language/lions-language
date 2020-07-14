@@ -1,4 +1,4 @@
- #[derive(Debug)]
+ #[derive(Debug, Clone)]
 pub enum OptCode {
     Uint8PlusOperatorUint8,
     Uint8PlusOperatorUint16,

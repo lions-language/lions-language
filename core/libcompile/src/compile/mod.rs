@@ -3,6 +3,7 @@ use libgrammar::token::{TokenValue};
 use libtype::function::{Function};
 use libtypecontrol::function::FunctionControl;
 use libtype::primeval::{PrimevalType, PrimevalData};
+use libtype::module::Module;
 use libresult::*;
 
 #[derive(Debug)]
@@ -43,6 +44,17 @@ impl<F: Compile> Grammar for Compiler<F> {
     }
 }
 
+impl<F: Compile> Compiler<F> {
+    pub fn new(module: Module, cb: F) -> Self {
+        Self {
+            function_control: FunctionControl::new(),
+            value_buffer: value_buffer::ValueBuffer::new(),
+            module_stack: module_stack::ModuleStack::new(module),
+            cb: cb
+        }
+    }
+}
+
 mod module_stack;
 mod value_buffer;
 mod aide;
@@ -70,6 +82,7 @@ mod test {
     }
 
     #[test]
+    #[ignore]
     fn grammar_parser_test() {
         let file = String::from("main.lions");
         let mut f = match fs::File::open(&file) {
