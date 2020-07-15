@@ -1,12 +1,18 @@
 use libtype::Type;
+use crate::compile::address_dispatch::{Address};
 use std::collections::{VecDeque};
 
+pub struct Item {
+    pub typ: Type,
+    pub addr: Address
+}
+
 pub struct ValueBuffer {
-    buffer: VecDeque<Type>
+    buffer: VecDeque<Item>
 }
 
 impl ValueBuffer {
-    pub fn top_n_with_panic(&self, n: usize) -> &Type {
+    pub fn top_n_with_panic(&self, n: usize) -> &Item {
         /*
          * 获取 top 往前数的 第n个值
          * 如果找不到就抛出异常
@@ -21,7 +27,7 @@ impl ValueBuffer {
         }
     }
 
-    pub fn top_n(&self, n: usize) -> Option<&Type> {
+    pub fn top_n(&self, n: usize) -> Option<&Item> {
         if self.buffer.len() < n {
             return None;
         }
@@ -29,7 +35,7 @@ impl ValueBuffer {
         self.buffer.get(index)
     }
 
-    pub fn take_top(&mut self) -> Type {
+    pub fn take_top(&mut self) -> Item {
         match self.buffer.pop_back() {
             Some(t) => {
                 t
@@ -40,8 +46,18 @@ impl ValueBuffer {
         }
     }
 
+    pub fn push_with_addr(&mut self, typ: Type, addr: Address) {
+        self.buffer.push_back(Item {
+            typ: typ,
+            addr: addr
+        });
+    }
+    
     pub fn push(&mut self, typ: Type) {
-        self.buffer.push_back(typ);
+        self.buffer.push_back(Item {
+            typ: typ,
+            addr: Address::new()
+        });
     }
 
     pub fn new() -> Self {

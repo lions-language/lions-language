@@ -21,14 +21,14 @@ impl<F: Compile> Compiler<F> {
          * 构建 函数参数
          * + 号运算一定只有一个参数
          * */
-        let param = FunctionParamData::Single(FunctionParamDataItem::new(right));
+        let param = FunctionParamData::Single(FunctionParamDataItem::new(right.typ));
         let statement_str = FunctionSplice::get_function_without_return_string_by_type(
-            consts::OPERATOR_FUNCTION_NAME, &Some(&param), &Some(&typ));
+            consts::OPERATOR_FUNCTION_NAME, &Some(&param), &Some(&typ.typ));
         /*
          * 查找方法声明
          * */
         match self.function_control.find_function(&FindFunctionContext{
-            typ: &typ,
+            typ: &typ.typ,
             func_str: &statement_str,
             module_str: self.module_stack.current().to_str()
         }) {

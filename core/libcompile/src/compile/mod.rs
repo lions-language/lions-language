@@ -31,6 +31,7 @@ pub struct Compiler<F: Compile> {
     function_control: FunctionControl,
     value_buffer: value_buffer::ValueBuffer,
     module_stack: module_stack::ModuleStack,
+    address_dispatch: address_dispatch::AddressDispatch,
     cb: F
 }
 
@@ -50,6 +51,7 @@ impl<F: Compile> Compiler<F> {
             function_control: FunctionControl::new(),
             value_buffer: value_buffer::ValueBuffer::new(),
             module_stack: module_stack::ModuleStack::new(module),
+            address_dispatch: address_dispatch::AddressDispatch::new(),
             cb: cb
         }
     }
