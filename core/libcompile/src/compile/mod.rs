@@ -57,6 +57,7 @@ impl<F: Compile> Compiler<F> {
 
 mod module_stack;
 mod value_buffer;
+mod address_dispatch;
 mod aide;
 mod context;
 mod constant;

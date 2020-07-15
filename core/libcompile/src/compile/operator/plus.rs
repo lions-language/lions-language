@@ -22,8 +22,8 @@ impl<F: Compile> Compiler<F> {
          * + 号运算一定只有一个参数
          * */
         let param = FunctionParamData::Single(FunctionParamDataItem::new(right));
-        let statement_str = FunctionSplice::get_function_without_return_and_type_string(
-            consts::OPERATOR_FUNCTION_NAME, &Some(&param));
+        let statement_str = FunctionSplice::get_function_without_return_string_by_type(
+            consts::OPERATOR_FUNCTION_NAME, &Some(&param), &Some(&typ));
         /*
          * 查找方法声明
          * */

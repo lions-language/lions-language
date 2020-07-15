@@ -10,3 +10,4 @@ edition = "2018"
 libcompile = { path = "../libcompile" }
 libgrammar = { path = "../libgrammar" }
 libtype = { path = "../libtype" }
+libcommon = { path = "../libcommon" }

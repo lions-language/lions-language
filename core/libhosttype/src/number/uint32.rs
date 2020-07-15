@@ -16,7 +16,7 @@ use phf::phf_map;
 lazy_static!{
     static ref UINT32_METHOD: phf::Map<&'static str, u32> = {
         phf_map! {
-            "+(uint32)" => 0
+            "&uint32:+(&uint32)" => 0
         }
     };
     static ref PLUS_OPERATOR_UINT32_FUNCTION: Function = Function{

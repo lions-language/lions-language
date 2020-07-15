@@ -16,8 +16,8 @@ use phf::phf_map;
 lazy_static!{
     static ref UINT8_METHOD: phf::Map<&'static str, u32> = {
         phf_map! {
-            "+(uint8)" => 0,
-            "+(uint16)" => 1,
+            "&uint8:+(&uint8)" => 0,
+            "&uint8:+(&uint16)" => 1,
         }
     };
     /*

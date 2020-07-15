@@ -6,13 +6,28 @@ use libtype::instruction::Instruction;
 use libcompile::compile::{ConstContext, CallFunctionContext
     , Compile, Compiler};
 use libcompile::bytecode::{Bytecode, Writer};
+use libcommon::optcode;
+use crate::memory::thread_stack;
 
 pub struct VirtualMachine {
+    thread_stack: thread_stack::Stack
 }
 
 impl Writer for VirtualMachine {
     fn write(&mut self, instruction: Instruction) {
-        println!("{:?}", instruction);
+        match instruction {
+            Instruction::LoadUint8Const(d) => {
+                self.load_const_uint8(d);
+            },
+            Instruction::LoadUint16Const(d) => {
+                self.load_const_uint16(d);
+            },
+            Instruction::CallPrimevalFunction(d) => {
+            },
+            _ => {
+                unimplemented!();
+            }
+        }
     }
 }
 
@@ -60,7 +75,9 @@ mod test {
             cb: Compiler::new(
                 Module::new(String::from("main")),
                 Bytecode::new(
-                    VirtualMachine{}
+                    VirtualMachine{
+                        thread_stack: thread_stack::Stack::new()
+                    }
                 )
             )
         };

@@ -14,6 +14,17 @@ impl Type {
             }
         }
     }
+
+    pub fn to_attrubute_str(&self) -> &str {
+        match self {
+            Type::Primeval(v) => {
+                v.attr.to_str()
+            },
+            _ => {
+                unimplemented!();
+            }
+        }
+    }
 }
 
 mod consts;

@@ -41,14 +41,47 @@ pub enum BoolType {
 }
 
 #[derive(Debug, Clone)]
+pub enum TypeAttrubute {
+    // Replicate,
+    Move,
+    Pointer,
+    Ref,
+}
+
+impl TypeAttrubute {
+    pub fn to_str(&self) -> &'static str {
+        match self {
+            TypeAttrubute::Move => {
+                ""
+            },
+            TypeAttrubute::Ref => {
+                "&"
+            },
+            TypeAttrubute::Pointer => {
+                "*"
+            }
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
 pub struct Primeval {
-    pub typ: PrimevalType
+    pub typ: PrimevalType,
+    pub attr: TypeAttrubute
 }
 
 impl Primeval {
     pub fn new(typ: PrimevalType) -> Self {
         Self{
             typ: typ,
+            attr: TypeAttrubute::Move
+        }
+    }
+
+    pub fn new_with_attr(typ: PrimevalType, attr: TypeAttrubute) -> Self {
+        Self {
+            typ: typ,
+            attr: attr
         }
     }
 }

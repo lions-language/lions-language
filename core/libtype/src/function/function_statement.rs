@@ -20,6 +20,7 @@ impl FunctionStatement {
          * */
         match typ {
             Some(t) => {
+                s.push_str(t.to_attrubute_str());
                 s.push_str(t.to_str());
                 s.push(':');
             },
@@ -38,6 +39,7 @@ impl FunctionStatement {
             Some(param) => {
                 match &param.data {
                     FunctionParamData::Single(p) => {
+                        s.push_str(p.typ.to_attrubute_str());
                         s.push_str(p.typ.to_str());
                     },
                     FunctionParamData::Multi(ps) => {
@@ -45,6 +47,7 @@ impl FunctionStatement {
                             if i > 0 {
                                 s.push(',');
                             }
+                            s.push_str(p.typ.to_attrubute_str());
                             s.push_str(p.typ.to_str());
                         }
                     }
@@ -58,6 +61,7 @@ impl FunctionStatement {
          * 拼接返回值
          * */
         s.push_str("->");
+        s.push_str(func_return.data.typ.to_attrubute_str());
         s.push_str(func_return.data.typ.to_str());
         s
     }

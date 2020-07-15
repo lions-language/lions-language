@@ -4,7 +4,8 @@ pub enum StackData {
     Uint8(u8),
     Uint16(u16),
     Uint32(u32),
-    Uint64(u64)
+    Uint64(u64),
+    Invalid
 }
 
 pub struct Stack {
