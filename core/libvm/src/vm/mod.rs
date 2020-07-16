@@ -21,7 +21,7 @@ impl Writer for VirtualMachine {
                 self.load_const_uint8(d.value);
             },
             Instruction::LoadUint16Const(d) => {
-                self.load_const_uint16(d);
+                self.load_const_uint16(d.value);
             },
             Instruction::CallPrimevalFunction(d) => {
             },
