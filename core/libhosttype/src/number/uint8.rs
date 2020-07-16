@@ -108,5 +108,5 @@ pub fn get_method(func_str: &str) -> Option<&'static Function> {
         None => {
             None
         }
-    }   
+    }
 }
