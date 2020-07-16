@@ -3,7 +3,7 @@ use libgrammar::token::{TokenValue, TokenType
         , TokenData};
 
 impl ConstContext {
-    pub fn from_token_value(token_value: TokenValue) -> Self {
+    pub fn from_token_value(token_value: TokenValue, addr: u64) -> Self {
         match token_value.token_type {
             TokenType::Const(t) => {
                 match token_value.token_data {
@@ -12,7 +12,8 @@ impl ConstContext {
                             TokenData::Const(d) => {
                                 Self {
                                     typ: t,
-                                    data: d
+                                    data: d,
+                                    addr: addr
                                 }
                             },
                             _ => {

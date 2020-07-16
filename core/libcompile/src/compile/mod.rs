@@ -9,17 +9,23 @@ use libresult::*;
 #[derive(Debug)]
 pub struct ConstContext {
     pub typ: PrimevalType,
-    pub data: PrimevalData
+    pub data: PrimevalData,
+    pub addr: u64
 }
 
 #[derive(Debug)]
 pub struct CallFunctionContext<'a> {
-    pub func: &'a Function
+    pub func: &'a Function,
+    pub return_addr: u64
 }
 
 pub trait Compile {
     fn const_number(&mut self, context: ConstContext) {
         println!("{:?}", context);
+    }
+
+    fn load_variant(&mut self, addr: &address_dispatch::Address) {
+        println!("{:?}", addr);
     }
 
     fn call_function(&mut self, context: CallFunctionContext) {
@@ -32,6 +38,7 @@ pub struct Compiler<F: Compile> {
     value_buffer: value_buffer::ValueBuffer,
     module_stack: module_stack::ModuleStack,
     address_dispatch: address_dispatch::AddressDispatch,
+    static_addr_dispatch: address_dispatch::AddressDispatch,
     cb: F
 }
 
@@ -52,6 +59,7 @@ impl<F: Compile> Compiler<F> {
             value_buffer: value_buffer::ValueBuffer::new(),
             module_stack: module_stack::ModuleStack::new(module),
             address_dispatch: address_dispatch::AddressDispatch::new(),
+            static_addr_dispatch: address_dispatch::AddressDispatch::new(),
             cb: cb
         }
     }
@@ -59,7 +67,7 @@ impl<F: Compile> Compiler<F> {
 
 mod module_stack;
 mod value_buffer;
-mod address_dispatch;
+pub mod address_dispatch;
 mod aide;
 mod context;
 mod constant;
@@ -111,13 +119,8 @@ mod test {
             }
         });
         let mut grammar_context = GrammarContext{
-            cb: Compiler{
-                function_control: FunctionControl::new(),
-                value_buffer: value_buffer::ValueBuffer::new(),
-                module_stack: module_stack::ModuleStack::new(
-                    Module::new(String::from("main"))),
-                cb: TestComplie{}
-            }
+            cb: Compiler::new(Module::new(String::from("main"))
+                    , TestComplie{})
         };
         let mut grammar_parser = GrammarParser::new(lexical_parser, &mut grammar_context);
         grammar_parser.parser();

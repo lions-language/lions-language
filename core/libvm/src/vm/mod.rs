@@ -15,14 +15,17 @@ pub struct VirtualMachine {
 
 impl Writer for VirtualMachine {
     fn write(&mut self, instruction: Instruction) {
+        println!("{:?}", &instruction);
         match instruction {
             Instruction::LoadUint8Const(d) => {
-                self.load_const_uint8(d);
+                self.load_const_uint8(d.value);
             },
             Instruction::LoadUint16Const(d) => {
                 self.load_const_uint16(d);
             },
             Instruction::CallPrimevalFunction(d) => {
+            },
+            Instruction::LoadVariant(a) => {
             },
             _ => {
                 unimplemented!();

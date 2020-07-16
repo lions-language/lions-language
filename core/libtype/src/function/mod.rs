@@ -10,18 +10,37 @@ pub struct FunctionReturn {
     pub data: FunctionReturnData
 }
 
+#[derive(Debug)]
+pub enum FunctionReturnDataAttr {
+    RefParamIndex(u8),
+    Empty
+}
+
 /*
  * 如果返回值是多个值, 将抽象为元组
  * */
 #[derive(Debug)]
 pub struct FunctionReturnData {
-    pub typ: Type
+    pub typ: Type,
+    /*
+     * 如果是引用类型, 需要指定引用的是哪个输入参数
+     * */
+    pub attr: FunctionReturnDataAttr
 }
 
 impl FunctionReturnData {
+    pub fn new_with_attr(typ: Type,
+        attr: FunctionReturnDataAttr) -> Self {
+        Self {
+            typ: typ,
+            attr: attr
+        }
+    }
+
     pub fn new(typ: Type) -> Self {
         Self {
-            typ: typ
+            typ: typ,
+            attr: FunctionReturnDataAttr::Empty
         }
     }
 }
@@ -38,7 +57,8 @@ impl Default for FunctionReturn {
     fn default() -> Self {
         Self {
             data: FunctionReturnData{
-                typ: Type::Empty
+                typ: Type::Empty,
+                attr: FunctionReturnDataAttr::Empty
             }
         }
     }

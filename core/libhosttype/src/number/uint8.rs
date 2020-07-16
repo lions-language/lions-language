@@ -1,4 +1,4 @@
-use libtype::{Type, Primeval};
+use libtype::{Type, Primeval, TypeAttrubute};
 use libtype::primeval::{PrimevalType};
 use libtype::function::consts;
 use libtype::function::{FunctionStatement, Function
@@ -21,58 +21,70 @@ lazy_static!{
         }
     };
     /*
-     * uint8 + uint8
+     * &uint8 + &uint8 -> uint8
      * */
-    static ref PLUS_OPERATOR_UINT8_FUNCTION: Function = Function{
+    static ref REF_UINT8_PLUS_OPERATOR_REF_UINT8_FUNCTION: Function = Function{
         func_statement: FunctionStatement::new(
             String::from(consts::OPERATOR_FUNCTION_NAME),
             Some(FunctionParam::new(
                 FunctionParamData::Single(
                     FunctionParamDataItem::new(
-                        Type::Primeval(Primeval::new(PrimevalType::Uint8))
+                        Type::Primeval(Primeval::new_with_attr(
+                                PrimevalType::Uint8,
+                                TypeAttrubute::Ref))
                         )
                     )
                 )),
             FunctionReturn::new(
                 FunctionReturnData::new(
-                    Type::Primeval(Primeval::new(PrimevalType::Uint8))
+                    Type::Primeval(Primeval::new_with_attr(
+                            PrimevalType::Uint8,
+                            TypeAttrubute::Move))
                     )
                 ),
-            Some(Type::Primeval(Primeval::new(PrimevalType::Uint8)))
+            Some(Type::Primeval(Primeval::new_with_attr(
+                        PrimevalType::Uint8,
+                        TypeAttrubute::Ref)))
         ),
         func_define: FunctionDefine::Optcode(OptcodeFunctionDefine{
-            optcode: OptCode::Uint8PlusOperatorUint8
+            optcode: OptCode::RefUint8PlusOperatorRefUint8
         })
     };
     /*
-     * uint8 + uint16
+     * &uint8 + &uint16 -> uint16
      * */
-    static ref PLUS_OPERATOR_UINT16_FUNCTION: Function = Function{
+    static ref REF_UINT8_PLUS_OPERATOR_REF_UINT16_FUNCTION: Function = Function{
         func_statement: FunctionStatement::new(
             String::from(consts::OPERATOR_FUNCTION_NAME),
             Some(FunctionParam::new(
                 FunctionParamData::Single(
                     FunctionParamDataItem::new(
-                        Type::Primeval(Primeval::new(PrimevalType::Uint16))
+                        Type::Primeval(Primeval::new_with_attr(
+                                PrimevalType::Uint16,
+                                TypeAttrubute::Ref))
                         )
                     )
                 )),
             FunctionReturn::new(
                 FunctionReturnData::new(
-                    Type::Primeval(Primeval::new(PrimevalType::Uint16))
+                    Type::Primeval(Primeval::new_with_attr(
+                            PrimevalType::Uint16,
+                            TypeAttrubute::Move))
                     )
                 ),
-            Some(Type::Primeval(Primeval::new(PrimevalType::Uint8)))
+            Some(Type::Primeval(Primeval::new_with_attr(
+                        PrimevalType::Uint8,
+                        TypeAttrubute::Ref)))
         ),
         func_define: FunctionDefine::Optcode(OptcodeFunctionDefine{
-            optcode: OptCode::Uint8PlusOperatorUint16
+            optcode: OptCode::RefUint8PlusOperatorRefUint16
         })
     };
 
     static ref UINT8_FUNCTION_VEC: Vec<&'static Function> = {
         let mut v = Vec::with_capacity(UINT8_METHOD.len());
-        v.push(&*PLUS_OPERATOR_UINT8_FUNCTION);
-        v.push(&*PLUS_OPERATOR_UINT16_FUNCTION);
+        v.push(&*REF_UINT8_PLUS_OPERATOR_REF_UINT8_FUNCTION);
+        v.push(&*REF_UINT8_PLUS_OPERATOR_REF_UINT16_FUNCTION);
         v
     };
 }
