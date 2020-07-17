@@ -3,6 +3,7 @@ pub enum AddressType {
     Ref,
     Static,
     New,
+    Move,
     Invalid
 }
 
@@ -82,14 +83,20 @@ impl Address {
 }
 
 pub struct AddressDispatch {
-    pub index: u64
+    pub index: u64,
+    pub recycles: Vec<u64>
 }
 
 impl AddressDispatch {
     fn alloc(&mut self, typ: AddressType, direction: Option<AddressValue>, is_add: bool) -> Address {
-        let index = self.index;
-        if is_add {
-            self.index += 1;
+        let mut index = 0;
+        if self.recycles.len() == 0 {
+            index = self.index;
+            if is_add {
+                self.index += 1;
+            }
+        } else {
+            index = self.recycles.remove(0);
         }
         let dir = match direction {
             Some(v) => {
@@ -113,6 +120,10 @@ impl AddressDispatch {
         self.alloc(AddressType::New, None, true)
     }
 
+    pub fn alloc_move(&mut self, src: AddressValue) -> Address {
+        self.alloc(AddressType::Move, Some(src), true)
+    }
+
     pub fn alloc_ref(&mut self, src: AddressValue) -> Address {
         self.alloc(AddressType::Ref, Some(src), true)
     }
@@ -121,9 +132,14 @@ impl AddressDispatch {
         self.alloc(AddressType::Ref, Some(src), false)
     }
 
+    pub fn recycle_addr(&mut self, addr: u64) {
+        self.recycles.push(addr);
+    }
+
     pub fn new() -> Self {
         Self {
-            index: 0
+            index: 0,
+            recycles: Vec::new()
         }
     }
 }

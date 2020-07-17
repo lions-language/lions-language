@@ -39,6 +39,12 @@ pub struct Uint16Static {
     pub value: u16
 }
 
+#[derive(Debug)]
+pub struct Uint32Static {
+    pub addr: u64,
+    pub value: u32
+}
+
 /*
  * 指令
  * */
@@ -46,6 +52,7 @@ pub struct Uint16Static {
 pub enum Instruction {
     LoadUint8Const(Uint8Static),
     LoadUint16Const(Uint16Static),
+    LoadUint32Const(Uint32Static),
     LoadVariant(VariantValue),
     CallPrimevalFunction(CallPrimevalFunction)
 }

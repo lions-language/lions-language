@@ -13,6 +13,8 @@ pub struct FunctionReturn {
 #[derive(Debug)]
 pub enum FunctionReturnDataAttr {
     RefParamIndex(u8),
+    MoveIndex(u8),
+    Create,
     Empty
 }
 

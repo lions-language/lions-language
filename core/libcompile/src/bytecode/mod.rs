@@ -5,7 +5,7 @@ use libtypecontrol::function::FunctionControl;
 use libtype::primeval::{PrimevalType, PrimevalData};
 use libtype::instruction::{Instruction, CallPrimevalFunction
     , VariantValue, AddressValue, Uint8Static
-    , Uint16Static};
+    , Uint16Static, Uint32Static};
 use libresult::*;
 use crate::compile::{ConstContext, CallFunctionContext
     , Compile, Compiler};
@@ -32,6 +32,13 @@ impl<F: Writer> Compile for Bytecode<F> {
             },
             PrimevalData::Uint16(v) => {
                 let instruction = Instruction::LoadUint16Const(Uint16Static{
+                    addr: context.addr,
+                    value: v.expect("should not happend").to_std()
+                });
+                self.writer.write(instruction);
+            },
+            PrimevalData::Uint32(v) => {
+                let instruction = Instruction::LoadUint32Const(Uint32Static{
                     addr: context.addr,
                     value: v.expect("should not happend").to_std()
                 });

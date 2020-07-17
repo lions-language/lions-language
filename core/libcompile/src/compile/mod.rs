@@ -31,6 +31,10 @@ pub trait Compile {
     fn call_function(&mut self, context: CallFunctionContext) {
         println!("{:?}", context);
     }
+
+    fn free(&mut self, addr: u64) {
+        println!("free: {}", addr);
+    }
 }
 
 pub struct Compiler<F: Compile> {
@@ -39,6 +43,7 @@ pub struct Compiler<F: Compile> {
     module_stack: module_stack::ModuleStack,
     address_dispatch: address_dispatch::AddressDispatch,
     static_addr_dispatch: address_dispatch::AddressDispatch,
+    ref_counter: ref_count::RefCounter,
     cb: F
 }
 
@@ -60,6 +65,7 @@ impl<F: Compile> Compiler<F> {
             module_stack: module_stack::ModuleStack::new(module),
             address_dispatch: address_dispatch::AddressDispatch::new(),
             static_addr_dispatch: address_dispatch::AddressDispatch::new(),
+            ref_counter: ref_count::RefCounter::new(),
             cb: cb
         }
     }
@@ -67,6 +73,7 @@ impl<F: Compile> Compiler<F> {
 
 mod module_stack;
 mod value_buffer;
+mod ref_count;
 pub mod address_dispatch;
 mod aide;
 mod context;
