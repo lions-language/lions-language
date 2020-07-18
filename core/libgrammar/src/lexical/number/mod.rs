@@ -253,7 +253,7 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
                 match self.content.lookup_next_one() {
                     Some(c) => {
                         if !self.number_is_mid(c) {
-                            println!("{}", c);
+                            // println!("{}", c);
                             is_zero = true;
                         }
                     },
@@ -281,8 +281,8 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
                     }
                 }
                 if is_zero {
-                    self.push_number_token_to_token_buffer((PrimevalType::Uint32, PrimevalData::Uint32(
-                            Some(number::uint32::Uint32::new(0)))));
+                    self.push_number_token_to_token_buffer((PrimevalType::Uint8, PrimevalData::Uint8(
+                            Some(number::uint8::Uint8::new(0)))));
                     return;
                 }
                 // 下面的 loop 是防止读取content的next时没有数据的情况, 此时需要读取 cb 的返回值,

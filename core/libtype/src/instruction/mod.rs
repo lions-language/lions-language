@@ -1,15 +1,16 @@
 use libcommon::optcode;
 
 #[derive(Debug)]
-pub struct CallPrimevalFunction {
-    pub opt: optcode::OptCode,
-    pub return_addr: u64
+pub enum AddressValue {
+    Static(u64),
+    Stack(u64),
+    Calc(u64)
 }
 
 #[derive(Debug)]
-pub enum AddressValue {
-    Static(u64),
-    Stack(u64)
+pub struct CallPrimevalFunction {
+    pub opt: optcode::OptCode,
+    pub return_addr: AddressValue
 }
 
 #[derive(Debug)]

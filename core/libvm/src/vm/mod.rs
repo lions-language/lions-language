@@ -2,39 +2,73 @@ use libgrammar::grammar::Grammar;
 use libgrammar::token::{TokenValue};
 use libtype::function::{FunctionDefine};
 use libtype::primeval::{PrimevalType, PrimevalData};
-use libtype::instruction::Instruction;
+use libtype::instruction::{Instruction, AddressValue};
 use libcompile::compile::{ConstContext, CallFunctionContext
     , Compile, Compiler};
 use libcompile::bytecode::{Bytecode, Writer};
 use libcommon::optcode;
-use crate::memory::thread_stack;
+use crate::memory::{stack, Memory};
 
 pub struct VirtualMachine {
-    thread_stack: thread_stack::Stack
+    static_stack: stack::Stack,
+    thread_stack: stack::Stack,
+    addr_mapping: addr_mapping::AddressMapping
 }
 
 impl Writer for VirtualMachine {
     fn write(&mut self, instruction: Instruction) {
         println!("{:?}", &instruction);
         match instruction {
-            Instruction::LoadUint8Const(d) => {
-                self.load_const_uint8(d.value);
+            Instruction::LoadUint8Const(v) => {
+                self.load_const_uint8(v);
             },
-            Instruction::LoadUint16Const(d) => {
-                self.load_const_uint16(d.value);
+            Instruction::LoadUint16Const(v) => {
+                self.load_const_uint16(v);
             },
-            Instruction::CallPrimevalFunction(d) => {
+            Instruction::LoadUint32Const(v) => {
+                self.load_const_uint32(v);
             },
-            Instruction::LoadVariant(a) => {
+            Instruction::CallPrimevalFunction(v) => {
+                self.call_primeval_function(v);
+            },
+            Instruction::LoadVariant(v) => {
+                self.load_variant(v);
             },
             _ => {
-                unimplemented!();
+                unimplemented!("{:?}", &instruction);
             }
         }
     }
 }
 
+impl VirtualMachine {
+    fn memory_mut(&mut self, addr: &AddressValue) -> &mut dyn Memory {
+        match addr {
+            AddressValue::Static(_) => {
+                &mut self.static_stack
+            },
+            AddressValue::Stack(_) => {
+                &mut self.thread_stack
+            },
+            _ => {
+                panic!("should not happend");
+            }
+        }
+    }
+
+    pub fn new() -> Self {
+        Self {
+            static_stack: stack::Stack::new(),
+            thread_stack: stack::Stack::new(),
+            addr_mapping: addr_mapping::AddressMapping::new()
+        }
+    }
+}
+
 mod load_const;
+mod load_variant;
+mod primeval_func_call;
+mod addr_mapping;
 
 #[cfg(test)]
 mod test {
@@ -78,9 +112,7 @@ mod test {
             cb: Compiler::new(
                 Module::new(String::from("main")),
                 Bytecode::new(
-                    VirtualMachine{
-                        thread_stack: thread_stack::Stack::new()
-                    }
+                    VirtualMachine::new()
                 )
             )
         };

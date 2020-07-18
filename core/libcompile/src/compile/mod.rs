@@ -5,6 +5,7 @@ use libtypecontrol::function::FunctionControl;
 use libtype::primeval::{PrimevalType, PrimevalData};
 use libtype::module::Module;
 use libresult::*;
+use crate::address;
 
 #[derive(Debug)]
 pub struct ConstContext {
@@ -16,7 +17,7 @@ pub struct ConstContext {
 #[derive(Debug)]
 pub struct CallFunctionContext<'a> {
     pub func: &'a Function,
-    pub return_addr: u64
+    pub return_addr: address::AddressValue
 }
 
 pub trait Compile {
@@ -24,7 +25,7 @@ pub trait Compile {
         println!("{:?}", context);
     }
 
-    fn load_variant(&mut self, addr: &address_dispatch::Address) {
+    fn load_variant(&mut self, addr: &address::Address) {
         println!("{:?}", addr);
     }
 
@@ -74,7 +75,7 @@ impl<F: Compile> Compiler<F> {
 mod module_stack;
 mod value_buffer;
 mod ref_count;
-pub mod address_dispatch;
+mod address_dispatch;
 mod aide;
 mod context;
 mod constant;

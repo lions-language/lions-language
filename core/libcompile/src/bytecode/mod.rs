@@ -9,7 +9,7 @@ use libtype::instruction::{Instruction, CallPrimevalFunction
 use libresult::*;
 use crate::compile::{ConstContext, CallFunctionContext
     , Compile, Compiler};
-use crate::compile::address_dispatch;
+use crate::address;
 
 pub trait Writer {
     fn write(&mut self, instruction: Instruction) {
@@ -50,17 +50,9 @@ impl<F: Writer> Compile for Bytecode<F> {
         }
     }
 
-    fn load_variant(&mut self, addr: &address_dispatch::Address) {
-        match &addr.direction_ref().typ_ref() {
-            address_dispatch::AddressType::Static => {
-                self.writer.write(Instruction::LoadVariant(VariantValue::new(
-                            addr.addr_ref().addr(), AddressValue::Static(addr.direction_ref().addr()))));
-            },
-            _ => {
-                self.writer.write(Instruction::LoadVariant(VariantValue::new(
-                            addr.addr_ref().addr(), AddressValue::Stack(addr.direction_ref().addr()))));
-            }
-        }
+    fn load_variant(&mut self, addr: &address::Address) {
+        self.writer.write(Instruction::LoadVariant(VariantValue::new(
+                    addr.addr_ref().addr(), addr.direction_ref().to_instruction_value())));
     }
 
     fn call_function(&mut self, context: CallFunctionContext) {
@@ -69,7 +61,7 @@ impl<F: Writer> Compile for Bytecode<F> {
                 let instruction = Instruction::CallPrimevalFunction(
                     CallPrimevalFunction{
                         opt: def.optcode.clone(),
-                        return_addr: context.return_addr
+                        return_addr: context.return_addr.to_instruction_value()
                     }
                     );
                 self.writer.write(instruction);

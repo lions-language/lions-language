@@ -7,19 +7,20 @@ use libtype::function::{FunctionParamData, FunctionParamDataItem
         , Function};
 use libcommon::ptr::{RefPtr};
 use crate::compile::{Compile, Compiler, CallFunctionContext};
-use crate::compile::address_dispatch::{Address, AddressType};
+use crate::address::{Address};
+use crate::address::{AddressType, AddressValue};
 use std::collections::HashSet;
 
 struct Context {
-    recycle_addrs: HashSet<u64>
+    recycle_addrs: HashSet<AddressValue>
 }
 
 impl Context {
-    fn push(&mut self, addr: u64) {
+    fn push(&mut self, addr: AddressValue) {
         self.recycle_addrs.insert(addr);
     }
 
-    fn remove(&mut self, addr: &u64) {
+    fn remove(&mut self, addr: &AddressValue) {
         self.recycle_addrs.remove(addr);
     }
 
@@ -56,7 +57,7 @@ impl<F: Compile> Compiler<F> {
                 /*
                  * 为了回收地址, 需要添加到回收中
                  * */
-                context.push(addr.addr_ref().addr());
+                context.push(addr.addr());
             },
             _ => {}
         }
@@ -179,11 +180,11 @@ impl<F: Compile> Compiler<F> {
                                 /*
                                  * 将移入的值移出来了, 所以 不用回收地址 (这个地址还是存在的)
                                  * */
-                                context.remove(ref_addr.addr_ref());
+                                context.remove(ref_addr);
                             },
                             _ => {}
                         }
-                        let a = self.address_dispatch.alloc_new();
+                        let a = self.address_dispatch.alloc_stack();
                         self.ref_counter.create(a.addr_ref().addr());
                         a
                     },
@@ -198,14 +199,14 @@ impl<F: Compile> Compiler<F> {
         };
         self.cb.call_function(CallFunctionContext{
             func: func,
-            return_addr: return_addr.addr_ref().addr()
+            return_addr: return_addr.addr()
         });
         /*
          * 回收地址
          * */
         for addr in context.recycle_addrs.iter() {
-            println!("2222222, {}", *addr);
-            self.address_dispatch.recycle_addr(*addr);
+            self.address_dispatch.recycle_addr(addr.clone());
+            // println!("free: {:?}", addr);
         }
         /*
          * 获取返回类型, 将其写入到队列中

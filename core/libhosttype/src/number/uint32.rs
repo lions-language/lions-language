@@ -1,10 +1,11 @@
-use libtype::{Type, Primeval};
+use libtype::{Type, Primeval, TypeAttrubute};
 use libtype::primeval::{PrimevalType};
 use libtype::function::consts;
 use libtype::function::{FunctionStatement, Function
     , FunctionDefine, OptcodeFunctionDefine
     , FunctionParam, FunctionParamData, FunctionParamDataItem
     , FunctionReturn, FunctionReturnData
+    , FunctionReturnDataAttr
     };
 use libcommon::optcode::{OptCode};
 use phf::phf_map;
@@ -16,33 +17,70 @@ use phf::phf_map;
 lazy_static!{
     static ref UINT32_METHOD: phf::Map<&'static str, u32> = {
         phf_map! {
-            "&uint32:+(&uint32)" => 0
+            "&uint32:+(&uint32)" => 0,
+            "uint32:+(&uint8)" => 1
         }
     };
-    static ref PLUS_OPERATOR_UINT32_FUNCTION: Function = Function{
+    static ref REF_UINT32_PLUS_OPERATOR_REF_UINT32_FUNCTION: Function = Function{
         func_statement: FunctionStatement::new(
             String::from(consts::OPERATOR_FUNCTION_NAME),
             Some(FunctionParam::new(
                 FunctionParamData::Single(
                     FunctionParamDataItem::new(
-                        Type::Primeval(Primeval::new(PrimevalType::Uint32))
+                        Type::Primeval(Primeval::new_with_attr(
+                                PrimevalType::Uint32
+                                , TypeAttrubute::Ref))
                         )
                     )
                 )),
             FunctionReturn::new(
-                FunctionReturnData::new(
-                    Type::Primeval(Primeval::new(PrimevalType::Uint32))
+                FunctionReturnData::new_with_attr(
+                    Type::Primeval(Primeval::new_with_attr(
+                            PrimevalType::Uint32
+                            , TypeAttrubute::Move))
+                        , FunctionReturnDataAttr::Create
                     )
                 ),
-            Some(Type::Primeval(Primeval::new(PrimevalType::Uint32)))
+            Some(Type::Primeval(Primeval::new_with_attr(
+                        PrimevalType::Uint32
+                        , TypeAttrubute::Ref)))
         ),
         func_define: FunctionDefine::Optcode(OptcodeFunctionDefine{
-            optcode: OptCode::Uint32PlusOperatorUint32
+            optcode: OptCode::RefUint32PlusOperatorRefUint32
+        })
+    };
+    static ref MOVE_UINT32_PLUS_OPERATOR_REF_UINT8_FUNCTION: Function = Function{
+        func_statement: FunctionStatement::new(
+            String::from(consts::OPERATOR_FUNCTION_NAME),
+            Some(FunctionParam::new(
+                FunctionParamData::Single(
+                    FunctionParamDataItem::new(
+                        Type::Primeval(Primeval::new_with_attr(
+                                PrimevalType::Uint8
+                                , TypeAttrubute::Ref))
+                        )
+                    )
+                )),
+            FunctionReturn::new(
+                FunctionReturnData::new_with_attr(
+                    Type::Primeval(Primeval::new_with_attr(
+                            PrimevalType::Uint64
+                            , TypeAttrubute::Move))
+                        , FunctionReturnDataAttr::Create
+                    )
+                ),
+            Some(Type::Primeval(Primeval::new_with_attr(
+                        PrimevalType::Uint32
+                        , TypeAttrubute::Move)))
+        ),
+        func_define: FunctionDefine::Optcode(OptcodeFunctionDefine{
+            optcode: OptCode::MoveUint32PlusOperatorRefUint8
         })
     };
     static ref UINT32_FUNCTION_VEC: Vec<&'static Function> = {
         let mut v = Vec::with_capacity(UINT32_METHOD.len());
-        v.push(&*PLUS_OPERATOR_UINT32_FUNCTION);
+        v.push(&*REF_UINT32_PLUS_OPERATOR_REF_UINT32_FUNCTION);
+        v.push(&*MOVE_UINT32_PLUS_OPERATOR_REF_UINT8_FUNCTION);
         v
     };
 }

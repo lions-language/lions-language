@@ -1,5 +1,5 @@
 use libtype::Type;
-use crate::compile::address_dispatch::{Address};
+use crate::address::{Address};
 use std::collections::{VecDeque};
 
 pub struct Item {
