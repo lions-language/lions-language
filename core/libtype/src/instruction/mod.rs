@@ -15,12 +15,12 @@ pub struct CallPrimevalFunction {
 
 #[derive(Debug)]
 pub struct VariantValue {
-    pub addr: u64,
+    pub addr: AddressValue,
     pub direction: AddressValue
 }
 
 impl VariantValue {
-    pub fn new(addr: u64, direction: AddressValue) -> Self {
+    pub fn new(addr: AddressValue, direction: AddressValue) -> Self {
         Self {
             addr: addr,
             direction: direction

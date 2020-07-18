@@ -66,7 +66,7 @@ impl<F: Compile> Compiler<F> {
                 /*
                  * 如果上一个函数调用的返回值是引用, 那么需要取出存储在引用中的实际地址
                  * */
-                self.address_dispatch.prepare_ref(addr.direction())
+                self.address_dispatch.prepare_calc(addr.direction())
             },
             _ => {
                 /*
@@ -74,7 +74,7 @@ impl<F: Compile> Compiler<F> {
                  *  1. 上一次不是函数调用 (写入 value_buffer 中的地址一定是解析后的实际地址)
                  *  2. 上一次是函数调用, 但是返回的不是引用
                  * */
-                self.address_dispatch.prepare_ref(addr.addr())
+                self.address_dispatch.prepare_calc(addr.addr())
             }
         }
     }
@@ -147,6 +147,7 @@ impl<F: Compile> Compiler<F> {
          * */
         self.cb.load_variant(&right_addr);
         self.cb.load_variant(&left_addr);
+        // println!("{:?}", &right_addr);
         /*
          * 判断返回值是 Move / Ref / Pointer
          * Move: 分配一个新的变量地址, 虚拟机将函数计算后的值与该地址绑定

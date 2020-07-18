@@ -1,6 +1,6 @@
 use libtype::instruction::*;
 use libcompile::address::AddressKey;
-use crate::memory::{Memory};
+use crate::memory::{Rand};
 use crate::vm::{VirtualMachine};
 use crate::data::Data;
 

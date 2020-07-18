@@ -7,17 +7,18 @@ use libcompile::compile::{ConstContext, CallFunctionContext
     , Compile, Compiler};
 use libcompile::bytecode::{Bytecode, Writer};
 use libcommon::optcode;
-use crate::memory::{stack, Memory};
+use crate::memory::{stack, Rand};
 
 pub struct VirtualMachine {
-    static_stack: stack::Stack,
-    thread_stack: stack::Stack,
+    static_stack: stack::RandStack,
+    thread_stack: stack::RandStack,
+    calc_stack: stack::TopStack<AddressValue>,
     addr_mapping: addr_mapping::AddressMapping
 }
 
 impl Writer for VirtualMachine {
     fn write(&mut self, instruction: Instruction) {
-        println!("{:?}", &instruction);
+        // println!("{:?}", &instruction);
         match instruction {
             Instruction::LoadUint8Const(v) => {
                 self.load_const_uint8(v);
@@ -42,7 +43,7 @@ impl Writer for VirtualMachine {
 }
 
 impl VirtualMachine {
-    fn memory_mut(&mut self, addr: &AddressValue) -> &mut dyn Memory {
+    fn memory_mut(&mut self, addr: &AddressValue) -> &mut dyn Rand {
         match addr {
             AddressValue::Static(_) => {
                 &mut self.static_stack
@@ -58,8 +59,9 @@ impl VirtualMachine {
 
     pub fn new() -> Self {
         Self {
-            static_stack: stack::Stack::new(),
-            thread_stack: stack::Stack::new(),
+            static_stack: stack::RandStack::new(),
+            thread_stack: stack::RandStack::new(),
+            calc_stack: stack::TopStack::new(),
             addr_mapping: addr_mapping::AddressMapping::new()
         }
     }
