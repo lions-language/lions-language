@@ -6,6 +6,16 @@ use crate::memory::stack;
 use crate::data::Data;
 use libcommon::ptr::{RefPtr};
 
+macro_rules! extract_data_ref {
+    ($data_ref:expr, $typ:ident) => {
+        if let Data::$typ(d) = $data_ref {
+            d
+        } else {
+            panic!("should not happend");
+        }
+    };
+}
+
 impl VirtualMachine {
     pub fn ref_uint8_plus_operator_ref_uint8(&mut self, value: CallPrimevalFunction) {
         /*
@@ -13,9 +23,23 @@ impl VirtualMachine {
          * */
         let left_compile_addr = self.calc_stack.pop_uncheck();
         let right_compile_addr = self.calc_stack.pop_uncheck();
-        let left_value = left_compile_addr.get_data_unchecked(&mut self.memory_context);
-        let right_value = right_compile_addr.get_data_unchecked(&mut self.memory_context);
-        println!("{:?}, {:?}", left_value.as_ref::<Data>(), right_value.as_ref::<Data>());
+        /*
+         * 获取数据
+         * */
+        let left_value = left_compile_addr.get_data_unchecked(&self.memory_context);
+        let right_value = right_compile_addr.get_data_unchecked(&self.memory_context);
+        let left_value = extract_data_ref!(left_value.as_ref::<Data>(), Uint8);
+        let right_value = extract_data_ref!(right_value.as_ref::<Data>(), Uint8);
+        /*
+         * 计算返回值
+         * */
+        let result = *left_value as u16 + *right_value as u16;
+        /*
+         * 将返回值写入到内存
+         * */
+        value.return_addr.alloc_and_write_data(
+            Data::Uint16(result)
+            , &mut self.memory_context);
         /*
         /*
          * 将编译期的地址转换为运行时的地址

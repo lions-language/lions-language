@@ -62,7 +62,7 @@ impl Writer for VirtualMachine {
 }
 
 trait AddressControl {
-    fn get_data_unchecked(&self, memory_context: &mut MemoryContext)
+    fn get_data_unchecked(&self, memory_context: &MemoryContext)
         -> RefPtr;
     fn alloc_and_write_data(&self, data: Data
         , memory_context: &mut MemoryContext);
@@ -72,7 +72,7 @@ impl AddressControl for AddressValue {
     /*
      * 获取编译期地址对应的数据
      * */
-    fn get_data_unchecked(&self, memory_context: &mut MemoryContext)
+    fn get_data_unchecked(&self, memory_context: &MemoryContext)
         -> RefPtr {
         match self {
             AddressValue::Static(a) => {
