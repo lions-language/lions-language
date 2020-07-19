@@ -20,7 +20,7 @@ impl Rand for RandStack {
         }
     }
 
-    fn get_unwrap(&mut self, index: &MemoryValue) -> &Data {
+    fn get_unwrap(&self, index: &MemoryValue) -> &Data {
         self.datas.get(index.get()).unwrap()
     }
 

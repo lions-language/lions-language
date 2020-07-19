@@ -127,6 +127,29 @@ impl Address {
         }
     }
 
+/*
+    TODO: 处理 Ref 的情况
+    pub fn to_instruction_value(&self) -> instruction::AddressValue {
+        match self.typ {
+            AddressType::Static => {
+                instruction::AddressValue::Static(self.addr)
+            },
+            AddressType::Stack => {
+                instruction::AddressValue::Stack(self.addr)
+            },
+            AddressType::Calc => {
+                instruction::AddressValue::Calc(self.addr)
+            },
+            _ => {
+                /*
+                 * compile 会将所有的 Ref 都转换为实际的地址
+                 * */
+                panic!("should not happend: {:?}", self.typ);
+            }
+        }
+    }
+*/
+
     pub fn new(addr: AddressValue, direction: AddressValue) -> Self {
         Self {
             addr: addr,
