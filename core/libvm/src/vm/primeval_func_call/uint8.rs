@@ -1,6 +1,6 @@
 use libcompile::address::AddressKey;
 use libtype::instruction::{CallPrimevalFunction, AddressValue};
-use crate::vm::VirtualMachine;
+use crate::vm::{VirtualMachine, AddressControl};
 use crate::memory::{MemoryValue, Rand};
 use crate::memory::stack;
 use crate::data::Data;
@@ -11,8 +11,12 @@ impl VirtualMachine {
         /*
          * 加载参数
          * */
-        let left = self.calc_stack.pop_uncheck();
-        let right = self.calc_stack.pop_uncheck();
+        let left_compile_addr = self.calc_stack.pop_uncheck();
+        let right_compile_addr = self.calc_stack.pop_uncheck();
+        let left_value = left_compile_addr.get_data_unchecked(&mut self.memory_context);
+        let right_value = right_compile_addr.get_data_unchecked(&mut self.memory_context);
+        println!("{:?}, {:?}", left_value.as_ref::<Data>(), right_value.as_ref::<Data>());
+        /*
         /*
          * 将编译期的地址转换为运行时的地址
          * */
@@ -65,6 +69,7 @@ impl VirtualMachine {
         };
         // let a = RefPtr::from_ref::<stack::RandStack>(self.memory_mut(&left));
         println!("{:?}, {:?}", left_value.as_ref::<Data>(), right_value.as_ref::<Data>());
+        */
     }
 }
 

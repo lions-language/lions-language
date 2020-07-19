@@ -20,6 +20,12 @@ impl RefPtr {
         }
     }
 
+    pub fn as_mut<T>(&self) -> &T {
+        unsafe {
+            (self.0 as *mut T).as_mut().expect("should not happend")
+        }
+    }
+
     pub fn clone(&self) -> Self {
         Self(self.0)
     }

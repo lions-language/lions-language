@@ -9,8 +9,8 @@ macro_rules! load_const {
         /*
          * 在静态区分配一个地址, 并与编译器传来的地址进行绑定
          * */
-        let addr = $self.static_stack.alloc(Data::$typ($value.value));
-        $self.addr_mapping.bind(AddressKey::new_without_module($value.addr)
+        let addr = $self.memory_context.static_stack.alloc(Data::$typ($value.value));
+        $self.memory_context.static_addr_mapping.bind(AddressKey::new_without_module($value.addr)
             , addr);
     }
 }

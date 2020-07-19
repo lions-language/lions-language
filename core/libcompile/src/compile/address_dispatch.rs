@@ -39,6 +39,10 @@ impl AddressDispatch {
         self.alloc(AddressType::Ref, Some(src), true)
     }
 
+    pub fn copy_from_ref(&mut self, src: AddressValue) -> Address {
+        Address::new(src, AddressValue::new_invalid())
+    }
+
     pub fn prepare_ref(&mut self, src: AddressValue) -> Address {
         self.alloc(AddressType::Ref, Some(src), false)
     }
