@@ -52,8 +52,7 @@ impl<F: Writer> Compile for Bytecode<F> {
 
     fn load_variant(&mut self, addr: &address::Address) {
         self.writer.write(Instruction::LoadVariant(VariantValue::new(
-                    addr.addr().to_instruction_value()
-                    , addr.direction_ref().to_instruction_value())));
+                    addr.to_instruction_value())));
     }
 
     fn call_function(&mut self, context: CallFunctionContext) {

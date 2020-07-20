@@ -1,20 +1,21 @@
 use crate::address::{Address, AddressType, AddressValue};
+use libtype::instruction::{AddressKey};
 
 pub struct AddressDispatch {
-    pub index: u64,
+    pub addr_key: AddressKey,
     pub recycles: Vec<AddressValue>
 }
 
 impl AddressDispatch {
     fn alloc(&mut self, typ: AddressType, direction: Option<AddressValue>, is_add: bool) -> Address {
-        let mut index = 0;
+        let mut addr_key = AddressKey::default();
         if self.recycles.len() == 0 {
-            index = self.index;
+            addr_key = self.addr_key.clone();
             if is_add {
-                self.index += 1;
+                self.addr_key.index += 1;
             }
         } else {
-            index = self.recycles.remove(0).addr();
+            addr_key = self.recycles.remove(0).addr();
         }
         let dir = match direction {
             Some(v) => {
@@ -24,7 +25,7 @@ impl AddressDispatch {
                 AddressValue::new_invalid()
             }
         };
-        Address::new(AddressValue::new(index, typ), dir)
+        Address::new(AddressValue::new(addr_key, typ), dir)
     }
 
     pub fn alloc_static(&mut self) -> Address {
@@ -57,7 +58,7 @@ impl AddressDispatch {
 
     pub fn new() -> Self {
         Self {
-            index: 0,
+            addr_key: AddressKey::default(),
             recycles: Vec::new()
         }
     }

@@ -1,4 +1,3 @@
-use libcompile::address::AddressKey;
 use libtype::instruction::{CallPrimevalFunction, AddressValue};
 use crate::vm::{VirtualMachine, AddressControl};
 use crate::memory::{MemoryValue, Rand};
@@ -34,6 +33,7 @@ impl VirtualMachine {
          * 计算返回值
          * */
         let result = *left_value as u16 + *right_value as u16;
+        println!("{}", result);
         /*
          * 将返回值写入到内存
          * */

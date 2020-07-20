@@ -2,12 +2,11 @@ use libgrammar::grammar::Grammar;
 use libgrammar::token::{TokenValue};
 use libtype::function::{FunctionDefine};
 use libtype::primeval::{PrimevalType, PrimevalData};
-use libtype::instruction::{Instruction, AddressValue};
+use libtype::instruction::{Instruction, AddressValue, AddressType, AddressKey};
 use libcompile::compile::{ConstContext, CallFunctionContext
     , Compile, Compiler};
 use libcompile::bytecode::{Bytecode, Writer};
 use libcommon::optcode;
-use libcompile::address::AddressKey;
 use crate::memory::{stack, Rand};
 use libcommon::ptr::RefPtr;
 use crate::data::Data;
@@ -74,8 +73,8 @@ impl AddressControl for AddressValue {
      * */
     fn get_data_unchecked(&self, memory_context: &MemoryContext)
         -> RefPtr {
-        match self {
-            AddressValue::Static(a) => {
+        match self.typ_ref() {
+            AddressType::Static => {
                 /*
                  * 处理静态区
                  *  1. 通过编译器的地址找到运行时映射的地址
@@ -85,22 +84,22 @@ impl AddressControl for AddressValue {
                  * */
                 let run_addr =
                 memory_context.static_addr_mapping.get_unwrap(
-                    &AddressKey::new_without_module(*a));
+                    self.addr_ref());
                 let data = memory_context.static_stack.get_unwrap(run_addr);
                 RefPtr::from_ref::<Data>(data)
             },
-            AddressValue::Stack(a) => {
+            AddressType::Stack => {
                 /*
                  * 处理栈区
                  * */
                  let run_addr =
                  memory_context.thread_addr_mapping.get_unwrap(
-                    &AddressKey::new_without_module(*a));
+                    self.addr_ref());
                  let data = memory_context.thread_stack.get_unwrap(run_addr);
                  RefPtr::from_ref::<Data>(data)
             },
             _ => {
-                unimplemented!();
+                unimplemented!("{:?}", self.typ_ref());
             }
         }
     }
@@ -110,21 +109,19 @@ impl AddressControl for AddressValue {
      * */
     fn alloc_and_write_data(&self, data: Data
         , memory_context: &mut MemoryContext) {
-        match self {
-            AddressValue::Static(a) => {
+        match self.typ_ref() {
+            AddressType::Static => {
                 /*
                  * 1. 在静态区分配一个新的内存
                  * 2. 将返回的地址和编译期的地址进行绑定
                  * */
                 let run_addr = memory_context.static_stack.alloc(data);
-                memory_context.static_addr_mapping.bind(
-                    AddressKey::new_without_module(*a)
+                memory_context.static_addr_mapping.bind(self.addr_clone()
                     , run_addr);
             },
-            AddressValue::Stack(a) => {
+            AddressType::Stack => {
                 let run_addr = memory_context.thread_stack.alloc(data);
-                memory_context.thread_addr_mapping.bind(
-                    AddressKey::new_without_module(*a)
+                memory_context.thread_addr_mapping.bind(self.addr_clone()
                     , run_addr);
             },
             _ => {
@@ -136,11 +133,11 @@ impl AddressControl for AddressValue {
 
 impl VirtualMachine {
     fn memory_mut(&mut self, addr: &AddressValue) -> &mut dyn Rand {
-        match addr {
-            AddressValue::Static(_) => {
+        match addr.typ_ref() {
+            AddressType::Static => {
                 &mut self.memory_context.static_stack
             },
-            AddressValue::Stack(_) => {
+            AddressType::Stack => {
                 &mut self.memory_context.thread_stack
             },
             _ => {

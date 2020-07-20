@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use libtype::instruction::{AddressKey};
 
 pub struct Counter {
     count: u64
@@ -36,19 +37,19 @@ impl Counter {
  * 引用计数 (存储的都是当前作用域中拥有所有权的变量)
  * */
 pub struct RefCounter {
-    refs: HashMap<u64, Counter>
+    refs: HashMap<AddressKey, Counter>
 }
 
 impl RefCounter {
-    pub fn find(&self, r: &u64) -> Option<&Counter> {
+    pub fn find(&self, r: &AddressKey) -> Option<&Counter> {
         self.refs.get(r)
     }
 
-    pub fn find_mut(&mut self, r: &u64) -> Option<&mut Counter> {
+    pub fn find_mut(&mut self, r: &AddressKey) -> Option<&mut Counter> {
         self.refs.get_mut(r)
     }
 
-    pub fn count_alloc_panic(&mut self, r: &u64) {
+    pub fn count_alloc_panic(&mut self, r: &AddressKey) {
         match self.find_mut(r) {
             Some(v) => {
                 v.alloc();
@@ -59,7 +60,7 @@ impl RefCounter {
         }
     }
 
-    pub fn count_clear_panic(&mut self, r: &u64) {
+    pub fn count_clear_panic(&mut self, r: &AddressKey) {
         match self.find_mut(r) {
             Some(v) => {
                 v.clear();
@@ -70,21 +71,21 @@ impl RefCounter {
         }
     }
 
-    pub fn create(&mut self, r: u64) {
+    pub fn create(&mut self, r: AddressKey) {
         self.refs.insert(r, Counter::new());
     }
 
-    pub fn remove(&mut self, r: &u64) {
+    pub fn remove(&mut self, r: &AddressKey) {
         self.refs.remove(r);
     }
 
     pub fn iter_zero<F>(&mut self, mut f: F)
-        where F: FnMut(u64) {
+        where F: FnMut(AddressKey) {
         let mut rms = Vec::new();
         for (k, v) in self.refs.iter() {
             if v.is_zero() {
-                (f)(*k);
-                rms.push(*k);
+                (f)(k.clone());
+                rms.push(k.clone());
             }
         }
         for item in rms.iter() {

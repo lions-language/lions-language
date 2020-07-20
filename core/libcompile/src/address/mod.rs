@@ -1,28 +1,6 @@
-use libtype::instruction;
+use libtype::instruction::{self, AddressKey};
 use std::cmp::{PartialEq, Eq};
 use std::hash::Hash;
-
-#[derive(Clone, Debug, PartialEq, Hash, Eq)]
-pub struct AddressKey {
-    pub module_index: u64,
-    pub index: u64
-}
-
-impl AddressKey {
-    pub fn new(module_index: u64, index: u64) -> Self {
-        Self {
-            module_index: module_index,
-            index: index
-        }
-    }
-
-    pub fn new_without_module(index: u64) -> Self {
-        Self {
-            module_index: 0,
-            index: index
-        }
-    }
-}
 
 #[derive(Clone, Debug, PartialEq, Hash, Eq)]
 pub enum AddressType {
@@ -33,19 +11,25 @@ pub enum AddressType {
     Invalid
 }
 
-#[derive(Clone, Debug, PartialEq, Hash, Eq)]
+impl Default for AddressType {
+    fn default() -> Self {
+        AddressType::Invalid
+    }
+}
+
+#[derive(Clone, Debug, PartialEq, Hash, Eq, Default)]
 pub struct AddressValue {
-    addr: u64,
+    addr: AddressKey,
     typ: AddressType
 }
 
 impl AddressValue {
-    pub fn addr_ref(&self) -> &u64 {
+    pub fn addr_ref(&self) -> &AddressKey {
         &self.addr
     }
 
-    pub fn addr(&self) -> u64 {
-        self.addr
+    pub fn addr(&self) -> AddressKey {
+        self.addr.clone()
     }
 
     pub fn typ_ref(&self) -> &AddressType {
@@ -56,7 +40,7 @@ impl AddressValue {
         self.typ.clone()
     }
 
-    pub fn new(addr: u64, typ: AddressType) -> Self {
+    pub fn new(addr: AddressKey, typ: AddressType) -> Self {
         Self {
             addr: addr,
             typ: typ
@@ -65,21 +49,28 @@ impl AddressValue {
 
     pub fn new_invalid() -> Self {
         Self {
-            addr: 0,
+            addr: AddressKey::default(),
             typ: AddressType::Invalid
         }
     }
 
     pub fn to_instruction_value(&self) -> instruction::AddressValue {
-        match self.typ {
+        println!("{:?}", &self.typ);
+        match &self.typ {
             AddressType::Static => {
-                instruction::AddressValue::Static(self.addr)
+                instruction::AddressValue::new(
+                    instruction::AddressType::Static
+                    , self.addr())
             },
             AddressType::Stack => {
-                instruction::AddressValue::Stack(self.addr)
+                instruction::AddressValue::new(
+                    instruction::AddressType::Stack
+                    , self.addr())
             },
             AddressType::Calc => {
-                instruction::AddressValue::Calc(self.addr)
+                instruction::AddressValue::new(
+                    instruction::AddressType::Calc
+                    , self.addr())
             },
             _ => {
                 /*
@@ -127,28 +118,23 @@ impl Address {
         }
     }
 
-/*
-    TODO: 处理 Ref 的情况
     pub fn to_instruction_value(&self) -> instruction::AddressValue {
-        match self.typ {
-            AddressType::Static => {
-                instruction::AddressValue::Static(self.addr)
+        match &self.addr_ref().typ_ref() {
+            AddressType::Ref
+            | AddressType::Calc => {
+                self.direction_ref().to_instruction_value()
             },
-            AddressType::Stack => {
-                instruction::AddressValue::Stack(self.addr)
-            },
-            AddressType::Calc => {
-                instruction::AddressValue::Calc(self.addr)
-            },
-            _ => {
+            AddressType::Invalid => {
                 /*
                  * compile 会将所有的 Ref 都转换为实际的地址
                  * */
-                panic!("should not happend: {:?}", self.typ);
+                panic!("should not happend: {:?}", self.addr_ref().typ_ref());
+            },
+            _ => {
+                self.addr_ref().to_instruction_value()
             }
         }
     }
-*/
 
     pub fn new(addr: AddressValue, direction: AddressValue) -> Self {
         Self {

@@ -5,13 +5,14 @@ use libtypecontrol::function::FunctionControl;
 use libtype::primeval::{PrimevalType, PrimevalData};
 use libtype::module::Module;
 use libresult::*;
+use libtype::instruction::{AddressKey};
 use crate::address;
 
 #[derive(Debug)]
 pub struct ConstContext {
     pub typ: PrimevalType,
     pub data: PrimevalData,
-    pub addr: u64
+    pub addr: AddressKey
 }
 
 #[derive(Debug)]
