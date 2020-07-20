@@ -57,26 +57,11 @@ impl<F: Compile> Compiler<F> {
                 /*
                  * 为了回收地址, 需要添加到回收中
                  * */
-                context.push(addr.addr());
+                context.push(addr.addr_clone());
             },
             _ => {}
         }
-        match &addr.addr_ref().typ_ref() {
-            AddressType::Ref => {
-                /*
-                 * 如果上一个函数调用的返回值是引用, 那么需要取出存储在引用中的实际地址
-                 * */
-                self.address_dispatch.prepare_calc(addr.direction())
-            },
-            _ => {
-                /*
-                 * 进入这里的情况:
-                 *  1. 上一次不是函数调用 (写入 value_buffer 中的地址一定是解析后的实际地址)
-                 *  2. 上一次是函数调用, 但是返回的不是引用
-                 * */
-                self.address_dispatch.prepare_calc(addr.addr())
-            }
-        }
+        addr.clone()
     }
 
     pub fn operator_plus(&mut self, _value: TokenValue) -> DescResult {
@@ -158,7 +143,7 @@ impl<F: Compile> Compiler<F> {
             Type::Primeval(t) => {
                 match &t.attr {
                     TypeAttrubute::Ref => {
-                        let param_addrs = vec![left_addr.addr(), right_addr.addr()];
+                        let param_addrs = vec![left_addr.clone(), right_addr.clone()];
                         let param_index =
                             match &return_data.attr {
                             FunctionReturnDataAttr::RefParamIndex(idx) => {
@@ -171,7 +156,7 @@ impl<F: Compile> Compiler<F> {
                             }
                         };
                         let ref_addr = &param_addrs[*param_index as usize];
-                        self.address_dispatch.alloc_ref(ref_addr.clone())
+                        ref_addr.clone()
                     },
                     TypeAttrubute::Move => {
                         let param_addrs = vec![left_addr.addr(), right_addr.addr()];
@@ -203,7 +188,7 @@ impl<F: Compile> Compiler<F> {
         };
         self.cb.call_function(CallFunctionContext{
             func: func,
-            return_addr: return_addr.addr()
+            return_addr: return_addr.addr_clone()
         });
         /*
          * 回收地址

@@ -4,10 +4,8 @@ use std::hash::Hash;
 
 #[derive(Clone, Debug, PartialEq, Hash, Eq)]
 pub enum AddressType {
-    Ref,
     Static,
     Stack,
-    Calc,
     Invalid
 }
 
@@ -55,7 +53,7 @@ impl AddressValue {
     }
 
     pub fn to_instruction_value(&self) -> instruction::AddressValue {
-        println!("{:?}", &self.typ);
+        // println!("{:?}", &self.typ);
         match &self.typ {
             AddressType::Static => {
                 instruction::AddressValue::new(
@@ -67,11 +65,13 @@ impl AddressValue {
                     instruction::AddressType::Stack
                     , self.addr())
             },
+            /*
             AddressType::Calc => {
                 instruction::AddressValue::new(
                     instruction::AddressType::Calc
                     , self.addr())
             },
+            */
             _ => {
                 /*
                  * compile 会将所有的 Ref 都转换为实际的地址
@@ -82,6 +82,58 @@ impl AddressValue {
     }
 }
 
+#[derive(Clone, Debug)]
+pub struct Address {
+    addr: AddressValue
+}
+
+impl Address {
+    pub fn addr_ref(&self) -> &AddressValue {
+        &self.addr
+    }
+
+    pub fn addr_clone(&self) -> AddressValue {
+        self.addr.clone()
+    }
+
+    pub fn addr(self) -> AddressValue {
+        self.addr
+    }
+
+    pub fn new_invalid() -> Address {
+        Address {
+            addr: AddressValue::new_invalid()
+        }
+    }
+
+    /*
+    pub fn to_instruction_value(&self) -> instruction::AddressValue {
+        match &self.addr_ref().typ_ref() {
+            AddressType::Ref
+            | AddressType::Calc => {
+                self.direction_ref().to_instruction_value()
+            },
+            AddressType::Invalid => {
+                /*
+                 * compile 会将所有的 Ref 都转换为实际的地址
+                 * */
+                panic!("should not happend: {:?}", self.addr_ref().typ_ref());
+            },
+            _ => {
+                self.addr_ref().to_instruction_value()
+            }
+        }
+    }
+    */
+
+    pub fn new(addr: AddressValue) -> Self {
+        Self {
+            addr: addr
+        }
+    }
+}
+
+/*
 #[derive(Clone, Debug)]
 pub struct Address {
     /*
@@ -143,5 +195,6 @@ impl Address {
         }
     }
 }
+*/
 
 

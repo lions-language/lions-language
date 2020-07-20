@@ -37,7 +37,6 @@ pub enum AddressValue {
 pub enum AddressType {
     Static,
     Stack,
-    Calc
 }
 
 #[derive(Debug)]

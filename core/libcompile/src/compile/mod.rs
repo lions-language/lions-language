@@ -65,8 +65,8 @@ impl<F: Compile> Compiler<F> {
             function_control: FunctionControl::new(),
             value_buffer: value_buffer::ValueBuffer::new(),
             module_stack: module_stack::ModuleStack::new(module),
-            address_dispatch: address_dispatch::AddressDispatch::new(),
-            static_addr_dispatch: address_dispatch::AddressDispatch::new(),
+            address_dispatch: address_dispatch::AddressDispatch::new(0),
+            static_addr_dispatch: address_dispatch::AddressDispatch::new(0),
             ref_counter: ref_count::RefCounter::new(),
             cb: cb
         }
