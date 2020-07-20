@@ -5,10 +5,10 @@ use libtype::function::{FunctionParamData, FunctionParamDataItem
         , splice::FunctionSplice, FindFunctionContext
         , FindFunctionResult, FunctionReturnDataAttr
         , Function};
+use libtype::instruction::{AddressType, AddressValue};
 use libcommon::ptr::{RefPtr};
 use crate::compile::{Compile, Compiler, CallFunctionContext};
 use crate::address::{Address};
-use crate::address::{AddressType, AddressValue};
 use std::collections::HashSet;
 
 struct Context {
@@ -143,6 +143,10 @@ impl<F: Compile> Compiler<F> {
             Type::Primeval(t) => {
                 match &t.attr {
                     TypeAttrubute::Ref => {
+                        /*
+                         * Ref 的情况下, 此时, 虚拟机需要根据给定的地址, 找到数据,
+                         * 然后对数据进行修改
+                         * */
                         let param_addrs = vec![left_addr.clone(), right_addr.clone()];
                         let param_index =
                             match &return_data.attr {
@@ -174,7 +178,7 @@ impl<F: Compile> Compiler<F> {
                          * 下面的 alloc_stack 有问题, 不一定是 stack, 如果 type 是 heap, 需要 alloc heap
                          * */
                         let a = self.address_dispatch.alloc_stack();
-                        self.ref_counter.create(a.addr_ref().addr());
+                        self.ref_counter.create(a.addr_ref().addr_clone());
                         a
                     },
                     _ => {

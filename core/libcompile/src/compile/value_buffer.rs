@@ -56,7 +56,7 @@ impl ValueBuffer {
     pub fn push(&mut self, typ: Type) {
         self.buffer.push_back(Item {
             typ: typ,
-            addr: Address::new_invalid()
+            addr: Address::default()
         });
     }
 

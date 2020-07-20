@@ -52,7 +52,7 @@ impl<F: Writer> Compile for Bytecode<F> {
 
     fn load_variant(&mut self, addr: &address::Address) {
         self.writer.write(Instruction::LoadVariant(VariantValue::new(
-                    addr.addr_ref().to_instruction_value())));
+                    addr.addr_clone())));
     }
 
     fn call_function(&mut self, context: CallFunctionContext) {
@@ -61,7 +61,7 @@ impl<F: Writer> Compile for Bytecode<F> {
                 let instruction = Instruction::CallPrimevalFunction(
                     CallPrimevalFunction{
                         opt: def.optcode.clone(),
-                        return_addr: context.return_addr.to_instruction_value()
+                        return_addr: context.return_addr
                     }
                     );
                 self.writer.write(instruction);

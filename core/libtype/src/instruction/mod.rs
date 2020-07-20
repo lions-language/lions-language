@@ -33,13 +33,19 @@ pub enum AddressValue {
 }
 */
 
-#[derive(Debug)]
+#[derive(Debug, Clone, PartialEq, Hash, Eq)]
 pub enum AddressType {
     Static,
     Stack,
 }
 
-#[derive(Debug)]
+impl Default for AddressType {
+    fn default() -> Self {
+        AddressType::Stack
+    }
+}
+
+#[derive(Debug, Clone, Default, PartialEq, Hash, Eq)]
 pub struct AddressValue {
     typ: AddressType,
     addr: AddressKey

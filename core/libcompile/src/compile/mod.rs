@@ -5,7 +5,7 @@ use libtypecontrol::function::FunctionControl;
 use libtype::primeval::{PrimevalType, PrimevalData};
 use libtype::module::Module;
 use libresult::*;
-use libtype::instruction::{AddressKey};
+use libtype::instruction::{AddressKey, AddressValue};
 use crate::address;
 
 #[derive(Debug)]
@@ -18,7 +18,7 @@ pub struct ConstContext {
 #[derive(Debug)]
 pub struct CallFunctionContext<'a> {
     pub func: &'a Function,
-    pub return_addr: address::AddressValue
+    pub return_addr: AddressValue
 }
 
 pub trait Compile {

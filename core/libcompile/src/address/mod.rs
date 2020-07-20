@@ -1,7 +1,8 @@
-use libtype::instruction::{self, AddressKey};
+use libtype::instruction::{self, AddressKey, AddressValue};
 use std::cmp::{PartialEq, Eq};
 use std::hash::Hash;
 
+/*
 #[derive(Clone, Debug, PartialEq, Hash, Eq)]
 pub enum AddressType {
     Static,
@@ -81,8 +82,9 @@ impl AddressValue {
         }
     }
 }
+*/
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 pub struct Address {
     addr: AddressValue
 }
@@ -100,13 +102,13 @@ impl Address {
         self.addr
     }
 
+    /*
     pub fn new_invalid() -> Address {
         Address {
             addr: AddressValue::new_invalid()
         }
     }
 
-    /*
     pub fn to_instruction_value(&self) -> instruction::AddressValue {
         match &self.addr_ref().typ_ref() {
             AddressType::Ref

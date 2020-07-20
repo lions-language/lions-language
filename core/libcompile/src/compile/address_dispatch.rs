@@ -1,5 +1,5 @@
-use crate::address::{Address, AddressType, AddressValue};
-use libtype::instruction::{AddressKey};
+use crate::address::{Address};
+use libtype::instruction::{AddressKey, AddressValue, AddressType};
 
 pub struct AddressDispatch {
     pub addr_key: AddressKey,
@@ -15,7 +15,7 @@ impl AddressDispatch {
         } else {
             addr_key = self.recycles.remove(0).addr();
         }
-        Address::new(AddressValue::new(addr_key, typ))
+        Address::new(AddressValue::new(typ, addr_key))
     }
 
     pub fn alloc_static(&mut self) -> Address {
