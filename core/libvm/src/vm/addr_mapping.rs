@@ -1,4 +1,4 @@
-use libtype::instruction::AddressKey;
+use libtype::AddressKey;
 use crate::memory::MemoryValue;
 use std::collections::HashMap;
 

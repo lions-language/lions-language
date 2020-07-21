@@ -1,4 +1,4 @@
-use libtype::instruction::{AddressValue};
+use libtype::{AddressValue};
 
 #[derive(Debug)]
 pub enum Data {

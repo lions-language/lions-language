@@ -5,7 +5,7 @@ use libtypecontrol::function::FunctionControl;
 use libtype::primeval::{PrimevalType, PrimevalData};
 use libtype::module::Module;
 use libresult::*;
-use libtype::instruction::{AddressKey, AddressValue};
+use libtype::{AddressKey, AddressValue};
 use crate::address;
 
 #[derive(Debug)]

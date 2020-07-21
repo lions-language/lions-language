@@ -1,7 +1,7 @@
 use crate::compile::{ConstContext};
 use libgrammar::token::{TokenValue, TokenType
         , TokenData};
-use libtype::instruction::{AddressKey};
+use libtype::{AddressKey};
 
 impl ConstContext {
     pub fn from_token_value(token_value: TokenValue, addr: AddressKey) -> Self {

@@ -1,5 +1,5 @@
 use crate::address::{Address};
-use libtype::instruction::{AddressKey, AddressValue, AddressType};
+use libtype::{AddressKey, AddressValue, AddressType};
 
 pub struct AddressDispatch {
     pub addr_key: AddressKey,

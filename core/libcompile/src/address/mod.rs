@@ -1,4 +1,4 @@
-use libtype::instruction::{self, AddressKey, AddressValue};
+use libtype::{self, AddressKey, AddressValue};
 use std::cmp::{PartialEq, Eq};
 use std::hash::Hash;
 

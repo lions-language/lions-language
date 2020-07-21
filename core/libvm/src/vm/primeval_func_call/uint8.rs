@@ -1,4 +1,5 @@
-use libtype::instruction::{CallPrimevalFunction, AddressValue};
+use libtype::{AddressValue};
+use libtype::instruction::{CallPrimevalFunction};
 use crate::vm::{VirtualMachine, AddressControl};
 use crate::memory::{MemoryValue, Rand};
 use crate::memory::stack;

@@ -1,4 +1,5 @@
-use libtype::instruction::{VariantValue, AddressValue, AddressKey, AddressType};
+use libtype::{AddressValue, AddressKey, AddressType};
+use libtype::instruction::{VariantValue};
 use crate::vm::VirtualMachine;
 use crate::data::Data;
 

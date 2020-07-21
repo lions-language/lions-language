@@ -1,5 +1,7 @@
 use libcommon::ptr::RefPtr;
 use crate::primeval::PrimevalType;
+use std::cmp::{PartialEq, Eq};
+use std::hash::Hash;
 
 #[derive(Debug)]
 pub struct StructObject {
@@ -100,6 +102,71 @@ pub enum Type {
      * 空类型
      * */
     Empty
+}
+
+#[derive(Clone, Debug, PartialEq, Hash, Eq, Default)]
+pub struct AddressKey {
+    pub module_index: u64,
+    pub index: u64
+}
+
+impl AddressKey {
+    pub fn new(module_index: u64, index: u64) -> Self {
+        Self {
+            module_index: module_index,
+            index: index
+        }
+    }   
+
+    pub fn new_without_module(index: u64) -> Self {
+        Self {
+            module_index: 0,
+            index: index
+        }
+    }   
+}
+
+#[derive(Debug, Clone, PartialEq, Hash, Eq)]
+pub enum AddressType {
+    Static,
+    Stack,
+}
+
+impl Default for AddressType {
+    fn default() -> Self {
+        AddressType::Stack
+    }
+}
+
+#[derive(Debug, Clone, Default, PartialEq, Hash, Eq)]
+pub struct AddressValue {
+    typ: AddressType,
+    addr: AddressKey
+}
+
+impl AddressValue {
+    pub fn typ_ref(&self) -> &AddressType {
+        &self.typ
+    }
+
+    pub fn addr_ref(&self) -> &AddressKey {
+        &self.addr
+    }
+
+    pub fn addr_clone(&self) -> AddressKey {
+        self.addr.clone()
+    }
+
+    pub fn addr(self) -> AddressKey {
+        self.addr
+    }
+
+    pub fn new(typ: AddressType, addr: AddressKey) -> Self {
+        Self {
+            typ: typ,
+            addr: addr
+        }
+    }
 }
 
 pub mod function;

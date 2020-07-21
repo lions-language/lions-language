@@ -1,5 +1,5 @@
 use std::collections::HashMap;
-use libtype::instruction::{AddressKey};
+use libtype::{AddressKey};
 
 pub struct Counter {
     count: u64

@@ -5,7 +5,7 @@ use libtype::function::{FunctionParamData, FunctionParamDataItem
         , splice::FunctionSplice, FindFunctionContext
         , FindFunctionResult, FunctionReturnDataAttr
         , Function};
-use libtype::instruction::{AddressType, AddressValue};
+use libtype::{AddressType, AddressValue};
 use libcommon::ptr::{RefPtr};
 use crate::compile::{Compile, Compiler, CallFunctionContext};
 use crate::address::{Address};

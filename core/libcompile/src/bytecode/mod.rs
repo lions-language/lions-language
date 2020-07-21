@@ -4,8 +4,9 @@ use libtype::function::{FunctionDefine};
 use libtypecontrol::function::FunctionControl;
 use libtype::primeval::{PrimevalType, PrimevalData};
 use libtype::instruction::{Instruction, CallPrimevalFunction
-    , VariantValue, AddressValue, Uint8Static
+    , VariantValue, Uint8Static
     , Uint16Static, Uint32Static};
+use libtype::{AddressValue};
 use libresult::*;
 use crate::compile::{ConstContext, CallFunctionContext
     , Compile, Compiler};

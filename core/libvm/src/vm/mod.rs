@@ -2,7 +2,8 @@ use libgrammar::grammar::Grammar;
 use libgrammar::token::{TokenValue};
 use libtype::function::{FunctionDefine};
 use libtype::primeval::{PrimevalType, PrimevalData};
-use libtype::instruction::{Instruction, AddressValue, AddressType, AddressKey};
+use libtype::{AddressValue, AddressType, AddressKey};
+use libtype::instruction::{Instruction};
 use libcompile::compile::{ConstContext, CallFunctionContext
     , Compile, Compiler};
 use libcompile::bytecode::{Bytecode, Writer};
