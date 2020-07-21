@@ -1,4 +1,5 @@
 use libcommon::ptr::RefPtr;
+use libmacro::{FieldGet, FieldGetClone};
 use crate::primeval::PrimevalType;
 use std::cmp::{PartialEq, Eq};
 use std::hash::Hash;
@@ -68,28 +69,19 @@ impl TypeAttrubute {
 
 #[derive(Debug, Clone)]
 pub struct Primeval {
-    pub typ: PrimevalType,
-    pub attr: TypeAttrubute
+    pub typ: PrimevalType
 }
 
 impl Primeval {
     pub fn new(typ: PrimevalType) -> Self {
         Self{
-            typ: typ,
-            attr: TypeAttrubute::Move
-        }
-    }
-
-    pub fn new_with_attr(typ: PrimevalType, attr: TypeAttrubute) -> Self {
-        Self {
-            typ: typ,
-            attr: attr
+            typ: typ
         }
     }
 }
 
 #[derive(Debug, Clone)]
-pub enum Type {
+pub enum TypeValue {
     /*
      * 原生类型
      * */
@@ -104,6 +96,27 @@ pub enum Type {
     Empty
 }
 
+#[derive(Debug, Clone, FieldGet, FieldGetClone)]
+pub struct Type {
+    typ: TypeValue,
+    attr: TypeAttrubute
+}
+
+impl Type {
+    pub fn new(typ: TypeValue, attr: TypeAttrubute) -> Self {
+        Self {
+            typ: typ,
+            attr: attr
+        }
+    }
+}
+
+impl Default for Type {
+    fn default() -> Self {
+        Type::new(TypeValue::Empty, TypeAttrubute::Move)
+    }
+}
+
 #[derive(Clone, Debug, PartialEq, Hash, Eq, Default)]
 pub struct AddressKey {
     pub module_index: u64,
@@ -114,13 +127,6 @@ impl AddressKey {
     pub fn new(module_index: u64, index: u64) -> Self {
         Self {
             module_index: module_index,
-            index: index
-        }
-    }   
-
-    pub fn new_without_module(index: u64) -> Self {
-        Self {
-            module_index: 0,
             index: index
         }
     }   
@@ -138,29 +144,13 @@ impl Default for AddressType {
     }
 }
 
-#[derive(Debug, Clone, Default, PartialEq, Hash, Eq)]
+#[derive(Debug, Clone, Default, PartialEq, Hash, Eq, FieldGet, FieldGetClone)]
 pub struct AddressValue {
     typ: AddressType,
     addr: AddressKey
 }
 
 impl AddressValue {
-    pub fn typ_ref(&self) -> &AddressType {
-        &self.typ
-    }
-
-    pub fn addr_ref(&self) -> &AddressKey {
-        &self.addr
-    }
-
-    pub fn addr_clone(&self) -> AddressKey {
-        self.addr.clone()
-    }
-
-    pub fn addr(self) -> AddressKey {
-        self.addr
-    }
-
     pub fn new(typ: AddressType, addr: AddressKey) -> Self {
         Self {
             typ: typ,

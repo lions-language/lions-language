@@ -1,29 +1,22 @@
-use crate::{Type, StructObject};
+use crate::{Type, TypeValue, StructObject};
 
 impl Type {
     pub fn to_str(&self) -> &str {
-        match self {
-            Type::Primeval(v) => {
+        match self.typ_ref() {
+            TypeValue::Primeval(v) => {
                 v.typ.to_str()
             },
-            Type::Structure(sp) => {
+            TypeValue::Structure(sp) => {
                 sp.struct_obj_ptr.as_ref::<StructObject>().name_str()
             },
-            Type::Empty => {
+            TypeValue::Empty => {
                 consts::EMPTY_TYPE
             }
         }
     }
 
     pub fn to_attrubute_str(&self) -> &str {
-        match self {
-            Type::Primeval(v) => {
-                v.attr.to_str()
-            },
-            _ => {
-                unimplemented!();
-            }
-        }
+        self.attr_ref().to_str()
     }
 }
 

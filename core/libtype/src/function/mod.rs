@@ -59,7 +59,7 @@ impl Default for FunctionReturn {
     fn default() -> Self {
         Self {
             data: FunctionReturnData{
-                typ: Type::Empty,
+                typ: Type::default(),
                 attr: FunctionReturnDataAttr::Empty
             }
         }
