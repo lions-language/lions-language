@@ -165,9 +165,9 @@ impl<F: Compile> Compiler<F> {
                     _ => {}
                 }
                 /*
-                 * 下面的 alloc_stack 有问题, 不一定是 stack, 如果 type 是 heap, 需要 alloc heap
+                 * 根据类型, 判断是在哪里分配地址
                  * */
-                let a = self.address_dispatch.alloc_stack();
+                let a = self.address_dispatch.alloc(return_data.typ.to_address_type());
                 self.ref_counter.create(a.addr_ref().addr_clone());
                 a
             },

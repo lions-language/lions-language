@@ -96,17 +96,50 @@ pub enum TypeValue {
     Empty
 }
 
+/*
+ * 类型存储在栈上还是堆上
+ * */
+#[derive(Debug, Clone)]
+pub enum TypeAddrType {
+    Stack,
+    Heap
+}
+
 #[derive(Debug, Clone, FieldGet, FieldGetClone)]
 pub struct Type {
     typ: TypeValue,
-    attr: TypeAttrubute
+    attr: TypeAttrubute,
+    addr_typ: TypeAddrType
 }
 
 impl Type {
+    /*
+     * 创建 非 堆 类型
+     * */
     pub fn new(typ: TypeValue, attr: TypeAttrubute) -> Self {
+        Type::_new(typ, attr, TypeAddrType::Stack)
+    }
+
+    pub fn new_heap(typ: TypeValue, attr: TypeAttrubute) -> Self {
+        Type::_new(typ, attr, TypeAddrType::Heap)
+    }
+
+    pub fn to_address_type(&self) -> AddressType {
+        match &self.addr_typ {
+            TypeAddrType::Stack => {
+                AddressType::Stack
+            },
+            TypeAddrType::Heap => {
+                AddressType::Heap
+            }
+        }
+    }
+
+    fn _new(typ: TypeValue, attr: TypeAttrubute, addr_typ: TypeAddrType) -> Self {
         Self {
             typ: typ,
-            attr: attr
+            attr: attr,
+            addr_typ: addr_typ
         }
     }
 }
@@ -136,6 +169,7 @@ impl AddressKey {
 pub enum AddressType {
     Static,
     Stack,
+    Heap
 }
 
 impl Default for AddressType {

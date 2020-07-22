@@ -7,7 +7,7 @@ pub struct AddressDispatch {
 }
 
 impl AddressDispatch {
-    fn alloc(&mut self, typ: AddressType) -> Address {
+    pub fn alloc(&mut self, typ: AddressType) -> Address {
         let mut addr_key = AddressKey::default();
         if self.recycles.len() == 0 {
             addr_key = self.addr_key.clone();

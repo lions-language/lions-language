@@ -37,7 +37,7 @@ pub struct VirtualMachine {
 
 impl Writer for VirtualMachine {
     fn write(&mut self, instruction: Instruction) {
-        // println!("{:?}", &instruction);
+        println!("{:?}", &instruction);
         match instruction {
             Instruction::LoadUint8Const(v) => {
                 self.load_const_uint8(v);
