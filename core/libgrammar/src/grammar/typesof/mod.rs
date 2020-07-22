@@ -1,7 +1,7 @@
 use crate::grammar::{GrammarParser, Grammar};
 use crate::lexical::{CallbackReturnStatus, TokenVecItem};
 use crate::token::{TokenType, TokenData};
-use libtype::{Type, Primeval, Structure};
+use libtype::{Type, TypeValue, TypeAttrubute, Primeval, Structure};
 
 impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, CB> {
     fn typesof_calc_startwith_id(&mut self) -> Option<Type> {
@@ -29,7 +29,8 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         let first = self.take_next_one();
         match first.context.token_type_move() {
             TokenType::PrimevalType(t) => {
-                return Some(Type::Primeval(Primeval::new(t)));
+                return Some(Type::new(TypeValue::Primeval(Primeval::new(t))
+                            , TypeAttrubute::Move));
             },
             _ => {
                 panic!("should not happend");

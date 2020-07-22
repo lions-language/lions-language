@@ -1,4 +1,4 @@
-use libtype::{Type, Primeval, TypeAttrubute};
+use libtype::{Type, TypeValue, Primeval, TypeAttrubute};
 use libtype::primeval::{PrimevalType};
 use libtype::function::consts;
 use libtype::function::{FunctionStatement, Function
@@ -29,23 +29,23 @@ lazy_static!{
             Some(FunctionParam::new(
                 FunctionParamData::Single(
                     FunctionParamDataItem::new(
-                        Type::Primeval(Primeval::new_with_attr(
-                                PrimevalType::Uint8,
-                                TypeAttrubute::Ref))
+                        Type::new(TypeValue::Primeval(Primeval::new(
+                                PrimevalType::Uint8))
+                                , TypeAttrubute::Ref)
                         )
                     )
                 )),
             FunctionReturn::new(
                 FunctionReturnData::new_with_attr(
-                    Type::Primeval(Primeval::new_with_attr(
-                            PrimevalType::Uint32,
-                            TypeAttrubute::Move))
+                    Type::new(TypeValue::Primeval(Primeval::new(
+                            PrimevalType::Uint32))
+                            , TypeAttrubute::Move)
                     , FunctionReturnDataAttr::Create
                     ),
                 ),
-            Some(Type::Primeval(Primeval::new_with_attr(
-                        PrimevalType::Uint16,
-                        TypeAttrubute::Ref)))
+            Some(Type::new(TypeValue::Primeval(Primeval::new(
+                        PrimevalType::Uint16))
+                        , TypeAttrubute::Ref))
         ),
         func_define: FunctionDefine::Optcode(OptcodeFunctionDefine{
             optcode: OptCode::MoveUint16PlusOperatorRefUint8

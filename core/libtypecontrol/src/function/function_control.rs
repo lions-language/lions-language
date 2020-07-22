@@ -1,5 +1,5 @@
 use crate::function::{FunctionControl};
-use libtype::Type;
+use libtype::{Type, TypeValue};
 use libtype::function::{FunctionControlInterface, Function};
 use libtype::function::{FindFunctionContext, FindFunctionResult
                         , AddFunctionContext, AddFunctionResult};
@@ -20,8 +20,8 @@ impl FunctionControl {
      * 因为无法在编译期确定返回类型, 所以 使用 dyn 获取实例对象 (运行时计算类型, 编译期预留指针空间)
      * */
     fn find_instance(&mut self, typ: &Type) -> &mut dyn FunctionControlInterface {
-        match typ {
-            Type::Primeval(_) => {
+        match typ.typ_ref() {
+            TypeValue::Primeval(_) => {
                 &mut self.primeval_control
             },
             _ => {

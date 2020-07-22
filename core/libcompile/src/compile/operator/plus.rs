@@ -1,6 +1,6 @@
 use libresult::*;
 use libgrammar::token::TokenValue;
-use libtype::{Type, TypeAttrubute};
+use libtype::{Type, TypeValue, TypeAttrubute};
 use libtype::function::{FunctionParamData, FunctionParamDataItem
         , splice::FunctionSplice, FindFunctionContext
         , FindFunctionResult, FunctionReturnDataAttr
@@ -40,15 +40,7 @@ impl<F: Compile> Compiler<F> {
     fn alloc_addr_for_single_type(&mut self, typ: &Type, addr: &Address
         , context: &mut Context)
         -> Address {
-        let t = match typ {
-            Type::Primeval(t) => {
-                t
-            },
-            _ => {
-                unimplemented!();
-            }
-        };
-        match &t.attr {
+        match typ.attr_ref() {
             TypeAttrubute::Move => {
                 /*
                  * 如果是 Move, 说明将不归这里管理, 将其所有权移除
@@ -139,52 +131,45 @@ impl<F: Compile> Compiler<F> {
          * Ref: 分配一个新的引用地址, 引用中的地址, 由 return 字段决定
          * */
         let return_data = &func.func_statement.func_return.data;
-        let return_addr = match &return_data.typ {
-            Type::Primeval(t) => {
-                match &t.attr {
-                    TypeAttrubute::Ref => {
-                        /*
-                         * Ref 的情况下, 此时, 虚拟机需要根据给定的地址, 找到数据,
-                         * 然后对数据进行修改
-                         * */
-                        let param_addrs = vec![left_addr.clone(), right_addr.clone()];
-                        let param_index =
-                            match &return_data.attr {
-                            FunctionReturnDataAttr::RefParamIndex(idx) => {
-                                idx
-                            },
-                            _ => {
-                                panic!("returns a reference, 
-                                    but does not specify which input
-                                    parameter of the reference");
-                            }
-                        };
-                        let ref_addr = &param_addrs[*param_index as usize];
-                        ref_addr.clone()
-                    },
-                    TypeAttrubute::Move => {
-                        let param_addrs = vec![left_addr.addr(), right_addr.addr()];
-                        match &return_data.attr {
-                            FunctionReturnDataAttr::MoveIndex(param_index) => {
-                                let ref_addr = &param_addrs[*param_index as usize];
-                                /*
-                                 * 将移入的值移出来了, 所以 不用回收地址 (这个地址还是存在的)
-                                 * */
-                                context.remove(ref_addr);
-                            },
-                            _ => {}
-                        }
-                        /*
-                         * 下面的 alloc_stack 有问题, 不一定是 stack, 如果 type 是 heap, 需要 alloc heap
-                         * */
-                        let a = self.address_dispatch.alloc_stack();
-                        self.ref_counter.create(a.addr_ref().addr_clone());
-                        a
+        let return_addr = match return_data.typ.attr_ref() {
+            TypeAttrubute::Ref => {
+                /*
+                 * Ref 的情况下, 此时, 虚拟机需要根据给定的地址, 找到数据,
+                 * 然后对数据进行修改
+                 * */
+                let param_addrs = vec![left_addr.clone(), right_addr.clone()];
+                let param_index =
+                    match &return_data.attr {
+                    FunctionReturnDataAttr::RefParamIndex(idx) => {
+                        idx
                     },
                     _ => {
-                        unimplemented!();
+                        panic!("returns a reference, 
+                            but does not specify which input
+                            parameter of the reference");
                     }
+                };
+                let ref_addr = &param_addrs[*param_index as usize];
+                ref_addr.clone()
+            },
+            TypeAttrubute::Move => {
+                let param_addrs = vec![left_addr.addr(), right_addr.addr()];
+                match &return_data.attr {
+                    FunctionReturnDataAttr::MoveIndex(param_index) => {
+                        let ref_addr = &param_addrs[*param_index as usize];
+                        /*
+                         * 将移入的值移出来了, 所以 不用回收地址 (这个地址还是存在的)
+                         * */
+                        context.remove(ref_addr);
+                    },
+                    _ => {}
                 }
+                /*
+                 * 下面的 alloc_stack 有问题, 不一定是 stack, 如果 type 是 heap, 需要 alloc heap
+                 * */
+                let a = self.address_dispatch.alloc_stack();
+                self.ref_counter.create(a.addr_ref().addr_clone());
+                a
             },
             _ => {
                 unimplemented!();

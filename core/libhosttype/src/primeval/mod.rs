@@ -1,7 +1,7 @@
 use libcommon::function::FunctionKey;
 use libcommon::typesof::function::{FunctionObject};
 use libcommon::optcode::OptCode;
-use libtype::{Type};
+use libtype::{Type, TypeValue};
 use libtype::primeval::{PrimevalType};
 use libtype::function::{Function};
 
@@ -84,8 +84,8 @@ use crate::number::uint32;
 use crate::number::uint8;
 use crate::number::uint16;
 pub fn primeval_method(typ: &Type, func_str: &str) -> Option<&'static Function> {
-    match typ {
-        Type::Primeval(p) => {
+    match typ.typ_ref() {
+        TypeValue::Primeval(p) => {
             match &p.typ {
                 PrimevalType::Uint8 => {
                     uint8::get_method(func_str)

@@ -1,6 +1,6 @@
 use super::{PrimevalControl, primeval_method, PrimevalContext};
 use libcommon::address::FunctionAddress;
-use libtype::{Type};
+use libtype::{Type, TypeValue};
 use libtype::primeval::PrimevalType;
 use libtype::function::{FindFunctionResult
     , AddFunctionResult, FindFuncSuccess
@@ -193,8 +193,8 @@ impl PrimevalControl {
      * 结果)
      * */
     pub fn context_mut(&mut self, typ: &Type) -> &mut PrimevalContext {
-        let t = match typ {
-            Type::Primeval(p) => {
+        let t = match typ.typ_ref() {
+            TypeValue::Primeval(p) => {
                 &p.typ
             },
             _ => {
@@ -245,8 +245,8 @@ impl PrimevalControl {
     }
 
     pub fn context(&self, typ: &Type) -> &PrimevalContext {
-        let t = match typ {
-            Type::Primeval(p) => {
+        let t = match typ.typ_ref() {
+            TypeValue::Primeval(p) => {
                 &p.typ
             },
             _ => {
