@@ -7,10 +7,13 @@ use libtype::instruction::{Instruction, CallPrimevalFunction
     , VariantValue, Uint8Static
     , Uint16Static, Uint32Static};
 use libtype::{AddressValue};
+use libcommon::ptr::{RefPtr};
 use libresult::*;
 use crate::compile::{ConstContext, CallFunctionContext
     , Compile, Compiler};
 use crate::address;
+use crate::status::{CompileStatus, CompileStatusType};
+use crate::compile::define;
 
 pub trait Writer {
     fn write(&mut self, instruction: Instruction) {
@@ -18,7 +21,9 @@ pub trait Writer {
 }
 
 pub struct Bytecode<F: Writer> {
-    writer: F
+    writer: F,
+    compile_status: CompileStatus,
+    define_function_dispatch: define::Dispatch
 }
 
 impl<F: Writer> Compile for Bytecode<F> {
@@ -29,21 +34,21 @@ impl<F: Writer> Compile for Bytecode<F> {
                     addr: context.addr,
                     value: v.expect("should not happend").to_std()
                 });
-                self.writer.write(instruction);
+                self.write(instruction);
             },
             PrimevalData::Uint16(v) => {
                 let instruction = Instruction::LoadUint16Const(Uint16Static{
                     addr: context.addr,
                     value: v.expect("should not happend").to_std()
                 });
-                self.writer.write(instruction);
+                self.write(instruction);
             },
             PrimevalData::Uint32(v) => {
                 let instruction = Instruction::LoadUint32Const(Uint32Static{
                     addr: context.addr,
                     value: v.expect("should not happend").to_std()
                 });
-                self.writer.write(instruction);
+                self.write(instruction);
             },
             _ => {
                 unimplemented!();
@@ -52,7 +57,7 @@ impl<F: Writer> Compile for Bytecode<F> {
     }
 
     fn load_variant(&mut self, addr: &address::Address) {
-        self.writer.write(Instruction::LoadVariant(VariantValue::new(
+        self.write(Instruction::LoadVariant(VariantValue::new(
                     addr.addr_clone())));
     }
 
@@ -65,19 +70,40 @@ impl<F: Writer> Compile for Bytecode<F> {
                         return_addr: context.return_addr
                     }
                     );
-                self.writer.write(instruction);
+                self.write(instruction);
             },
             _ => {
                 unimplemented!();
             }
         }
     }
+    
+    fn update_compile_status(&mut self, compile_status: CompileStatus) {
+        *(&mut self.compile_status) = compile_status;
+    }
 }
 
 impl<F: Writer> Bytecode<F> {
+    fn write(&mut self, instruction: Instruction) {
+        /*
+         * 如果状态是 Define, 调用 DefineFunctionDispatch 的 write 方法
+         * 如果是 Call, 调用 self.writer.write
+         * */
+        match self.compile_status.status_mut() {
+            CompileStatusType::Define(ptr) => {
+                ptr.as_mut::<define::Item>().write(instruction);
+            },
+            CompileStatusType::Call => {
+                self.writer.write(instruction);
+            }
+        }
+    }
+
     pub fn new(writer: F) -> Self {
         Self {
-            writer: writer
+            writer: writer,
+            compile_status: CompileStatus::default(),
+            define_function_dispatch: define::Dispatch::new()
         }
     }
 }
@@ -129,9 +155,7 @@ mod test {
         let mut grammar_context = GrammarContext{
             cb: Compiler::new(
                 Module::new(String::from("main")),
-                Bytecode{
-                    writer: TestWriter{}
-                }
+                Bytecode::new(TestWriter{})
             )
         };
         let mut grammar_parser = GrammarParser::new(lexical_parser, &mut grammar_context);

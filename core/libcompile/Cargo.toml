@@ -13,3 +13,4 @@ libcommon = { path = "../libcommon" }
 libtype = { path = "../libtype" }
 libtypecontrol = { path = "../libtypecontrol" }
 libresult = { path = "../libresult" }
+libmacro = { path = "../libmacro" }

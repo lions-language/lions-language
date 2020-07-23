@@ -49,10 +49,15 @@ fn iter(input: TokenStream, f: CB) -> TokenStream {
  * */
 fn ref_move_cb(struct_ident: &Ident, field_ident: &Ident, typ: &Type) -> TokenStream {
     let ref_id = format_ident!("{}_ref", &field_ident);
+    let mut_id = format_ident!("{}_mut", &field_ident);
     let expanded = quote! {
         impl #struct_ident {
             pub fn #ref_id(&self) -> &#typ {
                 &self.#field_ident
+            }
+
+            pub fn #mut_id(&mut self) -> &mut #typ {
+                &mut self.#field_ident
             }
 
             pub fn #field_ident(self) -> #typ {

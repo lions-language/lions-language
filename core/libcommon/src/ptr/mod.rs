@@ -20,7 +20,7 @@ impl RefPtr {
         }
     }
 
-    pub fn as_mut<T>(&self) -> &T {
+    pub fn as_mut<T>(&mut self) -> &mut T {
         unsafe {
             (self.0 as *mut T).as_mut().expect("should not happend")
         }

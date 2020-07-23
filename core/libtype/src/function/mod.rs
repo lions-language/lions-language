@@ -1,6 +1,8 @@
 use super::Type;
 use libcommon::address::FunctionAddress;
 use libcommon::optcode::OptCode;
+use std::hash::Hash;
+use std::cmp::{PartialEq, Eq};
 
 /*
  * 函数返回值
@@ -209,6 +211,15 @@ pub trait FunctionControlInterface {
     fn find_function(&self, context: &FindFunctionContext) -> FindFunctionResult;
     fn add_function(&mut self, context: AddFunctionContext
         , func: Function) -> AddFunctionResult;
+}
+
+/*
+ * 在整个编译单元中唯一的 函数 key
+ * */
+#[derive(Debug, Hash, PartialEq, Eq)]
+pub struct FunctionKey {
+    package_index: u64,
+    func_name: String
 }
 
 mod function_statement;

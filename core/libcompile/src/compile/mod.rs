@@ -6,7 +6,9 @@ use libtype::primeval::{PrimevalType, PrimevalData};
 use libtype::module::Module;
 use libresult::*;
 use libtype::{AddressKey, AddressValue};
+use libcommon::ptr::{RefPtr};
 use crate::address;
+use crate::status::CompileStatus;
 
 #[derive(Debug)]
 pub struct ConstContext {
@@ -34,8 +36,7 @@ pub trait Compile {
         println!("{:?}", context);
     }
 
-    fn free(&mut self, addr: u64) {
-        println!("free: {}", addr);
+    fn update_compile_status(&mut self, compile_status: CompileStatus) {
     }
 }
 
@@ -46,6 +47,7 @@ pub struct Compiler<F: Compile> {
     address_dispatch: address_dispatch::AddressDispatch,
     static_addr_dispatch: address_dispatch::AddressDispatch,
     ref_counter: ref_count::RefCounter,
+    compile_status_dispatch: compile_status_dispatch::CompileStatusDispatch,
     cb: F
 }
 
@@ -60,6 +62,16 @@ impl<F: Compile> Grammar for Compiler<F> {
 }
 
 impl<F: Compile> Compiler<F> {
+    fn enter_function_define(&mut self, ptr: RefPtr) {
+        self.compile_status_dispatch.enter(ptr);
+        self.cb.update_compile_status(self.compile_status_dispatch.status());
+    }
+
+    fn leave_function_define(&mut self) {
+        self.compile_status_dispatch.leave();
+        self.cb.update_compile_status(self.compile_status_dispatch.status());
+    }
+
     pub fn new(module: Module, cb: F) -> Self {
         Self {
             function_control: FunctionControl::new(),
@@ -68,6 +80,7 @@ impl<F: Compile> Compiler<F> {
             address_dispatch: address_dispatch::AddressDispatch::new(0),
             static_addr_dispatch: address_dispatch::AddressDispatch::new(0),
             ref_counter: ref_count::RefCounter::new(),
+            compile_status_dispatch: compile_status_dispatch::CompileStatusDispatch::new(),
             cb: cb
         }
     }
@@ -77,6 +90,8 @@ mod module_stack;
 mod value_buffer;
 mod ref_count;
 mod address_dispatch;
+mod compile_status_dispatch;
+pub mod define;
 mod aide;
 mod context;
 mod constant;
