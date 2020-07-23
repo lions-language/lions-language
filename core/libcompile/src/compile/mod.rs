@@ -23,6 +23,11 @@ pub struct CallFunctionContext<'a> {
     pub return_addr: AddressValue
 }
 
+pub enum CompileType {
+    Runtime,
+    Compile
+}
+
 pub trait Compile {
     fn const_number(&mut self, context: ConstContext) {
         println!("{:?}", context);
@@ -91,6 +96,7 @@ mod value_buffer;
 mod ref_count;
 mod address_dispatch;
 mod compile_status_dispatch;
+mod static_dispatch;
 pub mod define;
 mod aide;
 mod context;
