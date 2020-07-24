@@ -5,7 +5,7 @@ pub enum CompileStatusType {
     /*
      * 一个引用的指针 (可能是 DefineFunction 实体对象的引用)
      * */
-    Define(RefPtr),
+    FunctionDefine(RefPtr),
     Call
 }
 

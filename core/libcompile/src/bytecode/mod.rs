@@ -90,7 +90,7 @@ impl<F: Writer> Bytecode<F> {
          * 如果是 Call, 调用 self.writer.write
          * */
         match self.compile_status.status_mut() {
-            CompileStatusType::Define(ptr) => {
+            CompileStatusType::FunctionDefine(ptr) => {
                 ptr.as_mut::<define::Item>().write(instruction);
             },
             CompileStatusType::Call => {

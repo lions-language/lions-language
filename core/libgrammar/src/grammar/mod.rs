@@ -62,6 +62,9 @@ pub trait Grammar {
          * */
         println!("named function define end");
     }
+    fn end(&mut self) {
+        println!("end");
+    }
 }
 
 enum NextToken<T: FnMut() -> CallbackReturnStatus, CB: Grammar> {
@@ -103,6 +106,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                     self.select(&p);
                 },
                 None => {
+                    self.cb().end();
                     break;
                 }
             }

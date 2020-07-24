@@ -31,7 +31,7 @@ impl CompileStatusDispatch {
              * 定义中
              * */
             CompileStatus::new(
-                CompileStatusType::Define(self.stack.back().expect("should not happend").clone()))
+                CompileStatusType::FunctionDefine(self.stack.back().expect("should not happend").clone()))
         } else {
             CompileStatus::new(
                 CompileStatusType::Call)
