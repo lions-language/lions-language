@@ -12,14 +12,15 @@ use libtype::function::format::{Format};
 
 impl FunctionControlInterface for PrimevalControl {
     fn find_function(&self, context: &FindFunctionContext) -> FindFunctionResult {
-        match primeval_method(context.typ, context.func_str) {
+        let typ = context.typ.expect("primeval must exist type");
+        match primeval_method(typ, context.func_str) {
             Some(v) => {
                 /*
                  * 可能是:
                  * 1. 重写的原生方法
                  * 2. 原生方法
                  * */
-                return self.find_method_from_override(context.typ
+                return self.find_method_from_override(typ
                     , context.module_str, context.func_str, v);
             },
             None => {
@@ -27,7 +28,7 @@ impl FunctionControlInterface for PrimevalControl {
                  * 不属于任何原生方法
                  *  => 一定不在 override_map 中, 可能在 define_map 中
                  * */
-                return self.find_method_from_define(context.typ
+                return self.find_method_from_define(typ
                     , context.module_str, context.func_str);
             }
         }
@@ -35,13 +36,14 @@ impl FunctionControlInterface for PrimevalControl {
 
     fn add_function(&mut self, context: AddFunctionContext
         , func: Function) -> AddFunctionResult {
-        match primeval_method(context.typ, &context.func_str) {
+        let typ = context.typ.expect("primeval must exist type");
+        match primeval_method(typ, &context.func_str) {
             Some(_) => {
                 /*
                  * 一定要重写原生方法
                  * 判断当前模块是否已经重写了
                  * */
-                return self.add_method_to_module_method(context.typ, context.module_str
+                return self.add_method_to_module_method(typ, context.module_str
                     , context.func_str, func);
             },
             None => {
@@ -51,20 +53,20 @@ impl FunctionControlInterface for PrimevalControl {
                  * 如果定义过, 那么说明可能是需要重写的(具体是否是重写, 还需要在
                  * 含有模块信息的集合中查找)
                  * */
-                match self.context(context.typ).define_map.find_method(
+                match self.context(typ).define_map.find_method(
                     &context.func_str) {
                     Some(_) => {
                         /*
                          * 查看当前模块是否定义
                          * */
-                        return self.add_method_to_module_method(context.typ
+                        return self.add_method_to_module_method(typ
                             , context.module_str, context.func_str, func);
                     },
                     None => {
                         /*
                          * 第一次定义 => 写入 method 集合中
                          * */
-                        self.context_mut(context.typ).define_map.insert_method(
+                        self.context_mut(typ).define_map.insert_method(
                             context.func_str, func);
                     }
                 }

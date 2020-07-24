@@ -112,6 +112,25 @@ pub struct Type {
     addr_typ: TypeAddrType
 }
 
+#[derive(Debug, Clone)]
+pub enum PackageTypeValue {
+    Primeval,
+    Crate
+}
+
+#[derive(Debug, Clone, FieldGet, FieldGetClone)]
+pub struct PackageType {
+    typ: PackageTypeValue
+}
+
+impl PackageType {
+    pub fn new(typ: PackageTypeValue) -> Self {
+        Self {
+            typ: typ
+        }
+    }
+}
+
 impl Type {
     /*
      * 创建 非 堆 类型

@@ -1,9 +1,11 @@
 use libgrammar::grammar::Grammar;
 use libgrammar::token::{TokenValue};
+use libtype::{PackageType, PackageTypeValue};
 use libtype::function::{Function};
 use libtypecontrol::function::FunctionControl;
 use libtype::primeval::{PrimevalType, PrimevalData};
 use libtype::module::Module;
+use libtype::function::{FindFunctionContext};
 use libresult::*;
 use libtype::{AddressKey, AddressValue};
 use libcommon::ptr::{RefPtr};
@@ -63,6 +65,20 @@ impl<F: Compile> Grammar for Compiler<F> {
 
     fn operator_plus(&mut self, value: TokenValue) -> DescResult {
         self.operator_plus(value)
+    }
+
+    fn end(&mut self) {
+        if self.module_stack.current().name_ref() == "main" {
+            /*
+             * 查找 main 函数的声明
+             * */
+            self.function_control.find_function(&FindFunctionContext{
+                typ: None,
+                package_typ: Some(&PackageType::new(PackageTypeValue::Crate)),
+                func_str: "main",
+                module_str: self.module_stack.current().name_ref()
+            });
+        }
     }
 }
 

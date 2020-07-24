@@ -79,7 +79,8 @@ impl<F: Compile> Compiler<F> {
          * 查找方法声明
          * */
         let func_ptr = match self.function_control.find_function(&FindFunctionContext{
-            typ: &left.typ,
+            typ: Some(&left.typ),
+            package_typ: None,
             func_str: &statement_str,
             module_str: self.module_stack.current().to_str()
         }) {
@@ -88,6 +89,9 @@ impl<F: Compile> Compiler<F> {
             },
             FindFunctionResult::Panic(desc) => {
                 return DescResult::Error(desc);
+            },
+            FindFunctionResult::NotFound => {
+                unimplemented!();
             }
         };
         let func = func_ptr.as_ref::<Function>();

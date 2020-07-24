@@ -1,4 +1,4 @@
-use super::Type;
+use super::{Type, PackageType};
 use libcommon::address::FunctionAddress;
 use libcommon::optcode::OptCode;
 use std::hash::Hash;
@@ -159,6 +159,7 @@ pub struct Function {
 #[derive(Debug)]
 pub enum FindFunctionResult<'a> {
     Success(FindFuncSuccess<'a>),
+    NotFound,
     Panic(String)
 }
 
@@ -189,8 +190,12 @@ pub enum AddFunctionResult {
  * */
 #[derive(Debug)]
 pub struct FindFunctionContext<'a> {
-    pub typ: &'a Type,
+    pub typ: Option<&'a Type>,
+    pub package_typ: Option<&'a PackageType>,
     pub func_str: &'a str,
+    /*
+     * 当前的 mod, 用于类型中方法的重载
+     * */
     pub module_str: &'a str
 }
 
@@ -202,7 +207,8 @@ pub struct AddFunctionContext<'a> {
     /*
      * 通过typ 区别应该存储在哪个对象中
      * */
-    pub typ: &'a Type,
+    pub typ: Option<&'a Type>,
+    pub package_typ: Option<&'a PackageType>,
     pub func_str: String,
     pub module_str: String
 }
