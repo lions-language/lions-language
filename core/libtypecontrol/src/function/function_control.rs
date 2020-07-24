@@ -5,6 +5,7 @@ use libtype::function::{FindFunctionContext, FindFunctionResult
                         , AddFunctionContext, AddFunctionResult};
 use libhosttype::primeval::PrimevalControl;
 use libhostfunction::control::PrimevalFuncControl;
+use libfunction::control::NotypeFunctionControl;
 
 impl FunctionControl {
     pub fn find_function(&mut self, context: &FindFunctionContext) -> FindFunctionResult {
@@ -43,8 +44,8 @@ impl FunctionControl {
                     PackageTypeValue::Primeval => {
                         &mut self.primeval_func_control
                     },
-                    PackageTypeValue::Current => {
-                        unimplemented!();
+                    _ => {
+                        &mut self.function_control
                     }
                 }
             }
@@ -54,7 +55,8 @@ impl FunctionControl {
     pub fn new() -> Self {
         Self {
             primeval_control: PrimevalControl::new(),
-            primeval_func_control: PrimevalFuncControl::new()
+            primeval_func_control: PrimevalFuncControl::new(),
+            function_control: NotypeFunctionControl::new()
         }
     }
 }

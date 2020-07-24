@@ -1,5 +1,5 @@
 [package]
-name = "libtypecontrol"
+name = "libfunction"
 version = "0.1.0"
 authors = ["lions-language <lions_language@163.com>"]
 edition = "2018"
@@ -8,6 +8,6 @@ edition = "2018"
 
 [dependencies]
 libtype = { path = "../libtype" }
-libhosttype = { path = "../libhosttype" }
-libhostfunction = { path = "../libhostfunction" }
-libfunction = { path = "../libfunction" }
+libcommon = { path = "../libcommon" }
+phf = { version = "0.7.24", features = ["macros"] }
+lazy_static = { version = "1.1.1" }
