@@ -15,7 +15,15 @@ pub struct NotypeFunctionControl {
 
 impl FunctionControlInterface for NotypeFunctionControl {
     fn is_exists(&self, context: &FindFunctionContext) -> (bool, FindFunctionHandle) {
-        unimplemented!();
+        let pt = context.package_typ.expect("must be specify package type");
+        match pt.typ_ref() {
+            PackageTypeValue::Crate => {
+                self.compile_unit_handler.is_exists(context)
+            },
+            _ => {
+                unimplemented!();
+            }
+        }
     }
 
     fn find_function<'a>(&'a self, context: &FindFunctionContext

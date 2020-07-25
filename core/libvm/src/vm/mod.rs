@@ -168,6 +168,7 @@ mod test {
     use libgrammar::lexical::CallbackReturnStatus;
     use libgrammar::grammar::GrammarContext;
     use libtype::module::Module;
+    use libcompile::compile::{FileType, InputAttribute, InputContext};
     use super::*;
 
     use std::fs;
@@ -203,7 +204,8 @@ mod test {
                 Module::new(String::from("main")),
                 Bytecode::new(
                     VirtualMachine::new()
-                )
+                ),
+                InputContext::new(InputAttribute::new(FileType::Main))
             )
         };
         let mut grammar_parser = GrammarParser::new(lexical_parser, &mut grammar_context);

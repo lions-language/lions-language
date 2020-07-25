@@ -9,6 +9,10 @@ use libhostfunction::control::PrimevalFuncControl;
 use libfunction::control::NotypeFunctionControl;
 
 impl FunctionControl {
+    pub fn is_exists(&mut self, context: &FindFunctionContext) -> (bool, FindFunctionHandle) {
+        self.find_instance(&context.typ, &context.package_typ).is_exists(context)
+    }
+
     pub fn find_function<'a>(&'a mut self, context: &FindFunctionContext
         , handle: &'a Option<FindFunctionHandle>) -> FindFunctionResult {
         self.find_instance(&context.typ, &context.package_typ).find_function(context, handle)

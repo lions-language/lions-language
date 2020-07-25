@@ -100,18 +100,8 @@ impl<F: Compile> Grammar for Compiler<F> {
         self.operator_plus(value)
     }
 
-    fn end(&mut self) {
-        if let FileType::Main = self.input_context.attr_ref().file_typ_ref() {
-            /*
-             * 查找 main 函数的声明
-             * */
-            self.function_control.find_function(&FindFunctionContext{
-                typ: None,
-                package_typ: Some(&PackageType::new(PackageTypeValue::Crate)),
-                func_str: "main",
-                module_str: self.module_stack.current().name_ref()
-            }, &None);
-        };
+    fn end(&mut self) -> DescResult {
+        self.handle_end()
     }
 }
 
@@ -152,6 +142,7 @@ mod aide;
 mod context;
 mod constant;
 mod operator;
+mod end;
 
 #[cfg(test)]
 mod test {

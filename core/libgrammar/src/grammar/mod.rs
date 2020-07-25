@@ -62,8 +62,8 @@ pub trait Grammar {
          * */
         println!("named function define end");
     }
-    fn end(&mut self) {
-        println!("end");
+    fn end(&mut self) -> DescResult {
+        unimplemented!();
     }
 }
 
@@ -106,7 +106,13 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                     self.select(&p);
                 },
                 None => {
-                    self.cb().end();
+                    match self.cb().end() {
+                        DescResult::Error(e) => {
+                            self.panic(&e);
+                        },
+                        _ => {
+                        }
+                    }
                     break;
                 }
             }
