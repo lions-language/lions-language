@@ -9,6 +9,7 @@ use libtype::function::{FindFunctionContext};
 use libresult::*;
 use libtype::{AddressKey, AddressValue};
 use libcommon::ptr::{RefPtr};
+use libmacro::{FieldGet};
 use crate::address;
 use crate::status::CompileStatus;
 
@@ -47,6 +48,37 @@ pub trait Compile {
     }
 }
 
+pub enum FileType {
+    Main
+}
+
+#[derive(FieldGet)]
+pub struct InputAttribute {
+    file_typ: FileType
+}
+
+
+impl InputAttribute {
+    pub fn new(file_typ: FileType) -> Self {
+        Self {
+            file_typ: file_typ
+        }
+    }
+}
+
+#[derive(FieldGet)]
+pub struct InputContext {
+    attr: InputAttribute
+}
+
+impl InputContext {
+    pub fn new(attr: InputAttribute) -> Self {
+        Self {
+            attr: attr
+        }
+    }
+}
+
 pub struct Compiler<F: Compile> {
     function_control: FunctionControl,
     value_buffer: value_buffer::ValueBuffer,
@@ -55,6 +87,7 @@ pub struct Compiler<F: Compile> {
     static_addr_dispatch: address_dispatch::AddressDispatch,
     ref_counter: ref_count::RefCounter,
     compile_status_dispatch: compile_status_dispatch::CompileStatusDispatch,
+    input_context: InputContext,
     cb: F
 }
 
@@ -68,7 +101,7 @@ impl<F: Compile> Grammar for Compiler<F> {
     }
 
     fn end(&mut self) {
-        if self.module_stack.current().name_ref() == "main" {
+        if let FileType::Main = self.input_context.attr_ref().file_typ_ref() {
             /*
              * 查找 main 函数的声明
              * */
@@ -78,7 +111,7 @@ impl<F: Compile> Grammar for Compiler<F> {
                 func_str: "main",
                 module_str: self.module_stack.current().name_ref()
             }, &None);
-        }
+        };
     }
 }
 
@@ -93,7 +126,7 @@ impl<F: Compile> Compiler<F> {
         self.cb.update_compile_status(self.compile_status_dispatch.status());
     }
 
-    pub fn new(module: Module, cb: F) -> Self {
+    pub fn new(module: Module, cb: F, input_context: InputContext) -> Self {
         Self {
             function_control: FunctionControl::new(),
             value_buffer: value_buffer::ValueBuffer::new(),
@@ -102,6 +135,7 @@ impl<F: Compile> Compiler<F> {
             static_addr_dispatch: address_dispatch::AddressDispatch::new(0),
             ref_counter: ref_count::RefCounter::new(),
             compile_status_dispatch: compile_status_dispatch::CompileStatusDispatch::new(),
+            input_context: input_context,
             cb: cb
         }
     }
@@ -166,7 +200,8 @@ mod test {
         });
         let mut grammar_context = GrammarContext{
             cb: Compiler::new(Module::new(String::from("main"))
-                    , TestComplie{})
+                    , TestComplie{}, InputContext::new(InputAttribute::new(
+                            FileType::Main)))
         };
         let mut grammar_parser = GrammarParser::new(lexical_parser, &mut grammar_context);
         grammar_parser.parser();

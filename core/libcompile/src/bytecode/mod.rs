@@ -116,6 +116,7 @@ mod test {
     use libgrammar::lexical::CallbackReturnStatus;
     use libgrammar::grammar::GrammarContext;
     use libtype::module::Module;
+    use crate::compile::{InputContext, InputAttribute, FileType};
     use super::*;
 
     use std::fs;
@@ -155,7 +156,8 @@ mod test {
         let mut grammar_context = GrammarContext{
             cb: Compiler::new(
                 Module::new(String::from("main")),
-                Bytecode::new(TestWriter{})
+                Bytecode::new(TestWriter{}),
+                InputContext::new(InputAttribute::new(FileType::Main))
             )
         };
         let mut grammar_parser = GrammarParser::new(lexical_parser, &mut grammar_context);
