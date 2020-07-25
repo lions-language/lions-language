@@ -7,11 +7,17 @@ use libtype::function::{FindFunctionResult
     , Function, FunctionDefine
     , FunctionControlInterface
     , FindFunctionContext
-    , AddFunctionContext};
+    , AddFunctionContext
+    , FindFunctionHandle};
 use libtype::function::format::{Format};
 
 impl FunctionControlInterface for PrimevalControl {
-    fn find_function(&self, context: &FindFunctionContext) -> FindFunctionResult {
+    fn is_exists(&self, context: &FindFunctionContext) -> (bool, FindFunctionHandle) {
+        unimplemented!();
+    }
+
+    fn find_function<'a>(&'a self, context: &FindFunctionContext
+        , handle: &'a Option<FindFunctionHandle>) -> FindFunctionResult {
         let typ = context.typ.expect("primeval must exist type");
         match primeval_method(typ, context.func_str) {
             Some(v) => {
@@ -35,7 +41,7 @@ impl FunctionControlInterface for PrimevalControl {
     }
 
     fn add_function(&mut self, context: AddFunctionContext
-        , func: Function) -> AddFunctionResult {
+        , handle: Option<FindFunctionHandle>, func: Function) -> AddFunctionResult {
         let typ = context.typ.expect("primeval must exist type");
         match primeval_method(typ, &context.func_str) {
             Some(_) => {
@@ -100,9 +106,12 @@ impl PrimevalControl {
                         FindFunctionResult::Success(FindFuncSuccess::new(func))
                     },
                     None => {
+                        /*
                         FindFunctionResult::Panic(
                             format!("module: {}, function: {} is not define"
                                 , module_str, Format::splice_type_funcstr(typ, func_str)))
+                        */
+                        FindFunctionResult::NotFound
                     }
                 }
             }

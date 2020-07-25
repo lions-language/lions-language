@@ -77,7 +77,7 @@ impl<F: Compile> Grammar for Compiler<F> {
                 package_typ: Some(&PackageType::new(PackageTypeValue::Crate)),
                 func_str: "main",
                 module_str: self.module_stack.current().name_ref()
-            });
+            }, &None);
         }
     }
 }

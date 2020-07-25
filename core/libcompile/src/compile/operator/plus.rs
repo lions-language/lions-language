@@ -83,7 +83,7 @@ impl<F: Compile> Compiler<F> {
             package_typ: None,
             func_str: &statement_str,
             module_str: self.module_stack.current().to_str()
-        }) {
+        }, &None) {
             FindFunctionResult::Success(r) => {
                 RefPtr::from_ref(r.func)
             },

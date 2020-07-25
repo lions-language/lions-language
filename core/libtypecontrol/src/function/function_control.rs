@@ -2,19 +2,21 @@ use crate::function::{FunctionControl};
 use libtype::{Type, TypeValue, PackageType, PackageTypeValue};
 use libtype::function::{FunctionControlInterface, Function};
 use libtype::function::{FindFunctionContext, FindFunctionResult
-                        , AddFunctionContext, AddFunctionResult};
+                        , AddFunctionContext, AddFunctionResult
+                        , FindFunctionHandle};
 use libhosttype::primeval::PrimevalControl;
 use libhostfunction::control::PrimevalFuncControl;
 use libfunction::control::NotypeFunctionControl;
 
 impl FunctionControl {
-    pub fn find_function(&mut self, context: &FindFunctionContext) -> FindFunctionResult {
-        self.find_instance(&context.typ, &context.package_typ).find_function(context)
+    pub fn find_function<'a>(&'a mut self, context: &FindFunctionContext
+        , handle: &'a Option<FindFunctionHandle>) -> FindFunctionResult {
+        self.find_instance(&context.typ, &context.package_typ).find_function(context, handle)
     }
 
-    pub fn add_function(&mut self, context: AddFunctionContext,
-        func: Function) -> AddFunctionResult {
-        self.find_instance(&context.typ, &context.package_typ).add_function(context, func)
+    pub fn add_function(&mut self, context: AddFunctionContext
+        , handle: Option<FindFunctionHandle>, func: Function) -> AddFunctionResult {
+        self.find_instance(&context.typ, &context.package_typ).add_function(context, handle, func)
     }
 
     /*

@@ -1,6 +1,7 @@
 use super::{Type, PackageType};
 use libcommon::address::FunctionAddress;
 use libcommon::optcode::OptCode;
+use libcommon::ptr::RefPtr;
 use std::hash::Hash;
 use std::cmp::{PartialEq, Eq};
 
@@ -213,10 +214,14 @@ pub struct AddFunctionContext<'a> {
     pub module_str: String
 }
 
+pub type FindFunctionHandle = RefPtr;
+
 pub trait FunctionControlInterface {
-    fn find_function(&self, context: &FindFunctionContext) -> FindFunctionResult;
+    fn is_exists(&self, context: &FindFunctionContext) -> (bool, FindFunctionHandle);
+    fn find_function<'a>(&'a self, context: &FindFunctionContext
+        , handle: &'a Option<FindFunctionHandle>) -> FindFunctionResult;
     fn add_function(&mut self, context: AddFunctionContext
-        , func: Function) -> AddFunctionResult;
+        , handle: Option<FindFunctionHandle>, func: Function) -> AddFunctionResult;
 }
 
 /*
