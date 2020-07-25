@@ -26,6 +26,11 @@ pub struct CallFunctionContext<'a> {
     pub return_addr: AddressValue
 }
 
+#[derive(Debug)]
+pub struct FunctionNamedStmtContext {
+    name: String
+}
+
 pub enum CompileType {
     Runtime,
     Compile
@@ -44,7 +49,7 @@ pub trait Compile {
         println!("{:?}", context);
     }
 
-    fn update_compile_status(&mut self, compile_status: CompileStatus) {
+    fn function_named_stmt(&mut self, _context: FunctionNamedStmtContext) {
     }
 }
 
@@ -103,19 +108,13 @@ impl<F: Compile> Grammar for Compiler<F> {
     fn end(&mut self) -> DescResult {
         self.handle_end()
     }
+
+    fn function_named_stmt(&mut self, value: TokenValue) {
+        self.handle_function_named_stmt(value);
+    }
 }
 
 impl<F: Compile> Compiler<F> {
-    fn enter_function_define(&mut self, ptr: RefPtr) {
-        self.compile_status_dispatch.enter(ptr);
-        self.cb.update_compile_status(self.compile_status_dispatch.status());
-    }
-
-    fn leave_function_define(&mut self) {
-        self.compile_status_dispatch.leave();
-        self.cb.update_compile_status(self.compile_status_dispatch.status());
-    }
-
     pub fn new(module: Module, cb: F, input_context: InputContext) -> Self {
         Self {
             function_control: FunctionControl::new(),
@@ -143,6 +142,7 @@ mod context;
 mod constant;
 mod operator;
 mod end;
+mod function;
 
 #[cfg(test)]
 mod test {

@@ -46,6 +46,13 @@ impl Into<u8> for DefineType {
 pub struct FunctionDefine {
 }
 
+impl FunctionDefine {
+    pub fn new() -> Self {
+        Self {
+        }
+    }
+}
+
 pub type DefineObject = RefPtr;
 
 mod function;
