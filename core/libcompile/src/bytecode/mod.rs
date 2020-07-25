@@ -1,29 +1,21 @@
-use libgrammar::grammar::Grammar;
-use libgrammar::token::{TokenValue};
 use libtype::function::{FunctionDefine};
-use libtypecontrol::function::FunctionControl;
-use libtype::primeval::{PrimevalType, PrimevalData};
+use libtype::primeval::{PrimevalData};
 use libtype::instruction::{Instruction, CallPrimevalFunction
     , VariantValue, Uint8Static
     , Uint16Static, Uint32Static};
-use libtype::{AddressValue};
-use libcommon::ptr::{RefPtr};
-use libresult::*;
 use crate::compile::{ConstContext, CallFunctionContext
-    , Compile, Compiler};
+    , Compile};
 use crate::address;
-use crate::status::{CompileStatus, CompileStatusType};
-use crate::compile::define;
+use define_stack::DefineStack;
 
 pub trait Writer {
-    fn write(&mut self, instruction: Instruction) {
+    fn write(&mut self, _: Instruction) {
     }
 }
 
 pub struct Bytecode<F: Writer> {
     writer: F,
-    compile_status: CompileStatus,
-    define_function_dispatch: define::Dispatch
+    define_stack: DefineStack
 }
 
 impl<F: Writer> Compile for Bytecode<F> {
@@ -77,36 +69,22 @@ impl<F: Writer> Compile for Bytecode<F> {
             }
         }
     }
-    
-    fn update_compile_status(&mut self, compile_status: CompileStatus) {
-        *(&mut self.compile_status) = compile_status;
-    }
 }
 
 impl<F: Writer> Bytecode<F> {
     fn write(&mut self, instruction: Instruction) {
-        /*
-         * 如果状态是 Define, 调用 DefineFunctionDispatch 的 write 方法
-         * 如果是 Call, 调用 self.writer.write
-         * */
-        match self.compile_status.status_mut() {
-            CompileStatusType::FunctionDefine(ptr) => {
-                ptr.as_mut::<define::Item>().write(instruction);
-            },
-            CompileStatusType::Call => {
-                self.writer.write(instruction);
-            }
-        }
+        self.define_stack.write(instruction);
     }
 
     pub fn new(writer: F) -> Self {
         Self {
             writer: writer,
-            compile_status: CompileStatus::default(),
-            define_function_dispatch: define::Dispatch::new()
+            define_stack: DefineStack::new()
         }
     }
 }
+
+mod define_stack;
 
 #[cfg(test)]
 mod test {
@@ -116,7 +94,7 @@ mod test {
     use libgrammar::lexical::CallbackReturnStatus;
     use libgrammar::grammar::GrammarContext;
     use libtype::module::Module;
-    use crate::compile::{InputContext, InputAttribute, FileType};
+    use crate::compile::{Compiler, InputContext, InputAttribute, FileType};
     use super::*;
 
     use std::fs;
