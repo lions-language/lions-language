@@ -4,21 +4,23 @@ use libtype::instruction::{Instruction, CallPrimevalFunction
     , VariantValue, Uint8Static
     , Uint16Static, Uint32Static};
 use crate::compile::{ConstContext, CallFunctionContext
-    , Compile};
+    , FunctionNamedStmtContext, Compile};
 use crate::address;
 use define_stack::DefineStack;
+use crate::define_dispatch::{FunctionDefineDispatch};
 
 pub trait Writer {
     fn write(&mut self, _: Instruction) {
     }
 }
 
-pub struct Bytecode<F: Writer> {
+pub struct Bytecode<'a, F: Writer> {
     writer: F,
-    define_stack: DefineStack
+    define_stack: DefineStack,
+    func_define_dispatch: &'a mut FunctionDefineDispatch
 }
 
-impl<F: Writer> Compile for Bytecode<F> {
+impl<'a, F: Writer> Compile for Bytecode<'a, F> {
     fn const_number(&mut self, context: ConstContext) {
         match context.data {
             PrimevalData::Uint8(v) => {
@@ -69,17 +71,27 @@ impl<F: Writer> Compile for Bytecode<F> {
             }
         }
     }
+
+    fn function_named_stmt(&mut self, _context: FunctionNamedStmtContext) {
+        self.define_stack.enter(self.func_define_dispatch.alloc_define());
+    }
+
+    fn function_define_end(&mut self) {
+        let ds = self.define_stack.leave();
+        self.func_define_dispatch.finish_define(ds);
+    }
 }
 
-impl<F: Writer> Bytecode<F> {
+impl<'a, F: Writer> Bytecode<'a, F> {
     fn write(&mut self, instruction: Instruction) {
         self.define_stack.write(instruction);
     }
 
-    pub fn new(writer: F) -> Self {
+    pub fn new(writer: F, func_define_dispatch: &'a mut FunctionDefineDispatch) -> Self {
         Self {
             writer: writer,
-            define_stack: DefineStack::new()
+            define_stack: DefineStack::new(),
+            func_define_dispatch: func_define_dispatch
         }
     }
 }
@@ -131,10 +143,13 @@ mod test {
                 }
             }
         });
+        let mut fdd = FunctionDefineDispatch::new();
         let mut grammar_context = GrammarContext{
             cb: Compiler::new(
                 Module::new(String::from("main")),
-                Bytecode::new(TestWriter{}),
+                Bytecode::new(
+                    TestWriter{}
+                    , &mut fdd),
                 InputContext::new(InputAttribute::new(FileType::Main))
             )
         };

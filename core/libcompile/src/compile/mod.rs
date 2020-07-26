@@ -51,6 +51,9 @@ pub trait Compile {
 
     fn function_named_stmt(&mut self, _context: FunctionNamedStmtContext) {
     }
+
+    fn function_define_end(&mut self) {
+    }
 }
 
 pub enum FileType {
@@ -111,6 +114,10 @@ impl<F: Compile> Grammar for Compiler<F> {
 
     fn function_named_stmt(&mut self, value: TokenValue) {
         self.handle_function_named_stmt(value);
+    }
+
+    fn function_define_end(&mut self, _value: TokenValue) {
+        self.handle_function_define_end();
     }
 }
 

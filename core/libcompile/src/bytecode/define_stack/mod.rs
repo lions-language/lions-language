@@ -24,9 +24,11 @@ impl DefineStack {
          * 获取队列的最后一个元素 (栈顶元素)
          * */
         let obj = self.ws.back_mut().expect("should not happend");
-        match DefineType::from(obj.typ_ref()) {
+        match DefineType::from(obj.ptr_ref().typ_ref()) {
             DefineType::Function => {
-                obj.as_mut::<FunctionDefine>().write(instruction);
+                let fd = obj.ptr_mut().as_mut::<FunctionDefine>();
+                fd.length_add(1);
+                fd.write(instruction);
             }
         }
         true

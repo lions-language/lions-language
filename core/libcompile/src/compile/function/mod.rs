@@ -15,4 +15,8 @@ impl<F: Compile> Compiler<F> {
             name: s
         });
     }
+
+    pub fn handle_function_define_end(&mut self) {
+        self.cb.function_define_end();
+    }
 }
