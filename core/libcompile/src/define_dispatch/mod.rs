@@ -1,7 +1,10 @@
 use libcommon::ptr::RefPtr;
 use libcommon::address::{FunctionAddrValue};
+use libtype::function::{FunctionStatement
+    , FunctionReturn};
 use crate::define::{DefineObject, FunctionDefine
     , DefineType};
+use crate::compile::FunctionNamedStmtContext;
 use std::collections::VecDeque;
 
 pub struct FunctionDefineDispatch {
@@ -10,8 +13,9 @@ pub struct FunctionDefineDispatch {
 }
 
 impl FunctionDefineDispatch {
-    pub fn alloc_define(&mut self) -> DefineObject {
-        let def = FunctionDefine::new(self.pos);
+    pub fn alloc_define(&mut self, context: FunctionNamedStmtContext) -> DefineObject {
+        let def = FunctionDefine::new(self.pos
+            , FunctionStatement::new(context.name(), None, FunctionReturn::default(), None));
         /*
          * 关键点: 获取插入后的元素的引用
          * */
@@ -26,14 +30,10 @@ impl FunctionDefineDispatch {
          * 暂时不考虑多线程问题, 这里的 obj 就是为了以后多线程时, 可以从中间移除元素
          * (在 FunctionDefine 中存储 索引, 移除的时候根据这个索引移除元素)
          * 现在单线程的情况下, 相当于是一个 栈, 从栈顶部移除即可
-         * 注意:
-         *  如果 is_exist_undefine 是 true, 说明 函数定义中存在没有定义的方法, 在文件编译结束后, 需要将该队列中的元素中未定义的方法全部填充
          * */
         let fd = obj.ptr_ref().as_ref::<FunctionDefine>();
-        self.pos += fd.length_clone();
-        if obj.is_exist_undefine_clone() {
-            self.processing_funcs.pop_back();
-        }
+        self.pos += fd.length_ref().clone();
+        self.processing_funcs.pop_back();
         // FunctionAddrValue::new(fd.start_pos_clone(), fd.length_clone())
     }
 

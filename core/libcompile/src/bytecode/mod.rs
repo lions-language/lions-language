@@ -8,6 +8,7 @@ use crate::compile::{ConstContext, CallFunctionContext
 use crate::address;
 use define_stack::DefineStack;
 use crate::define_dispatch::{FunctionDefineDispatch};
+use crate::bytecode::to_be_filled::function::FuncToBeFilled;
 
 pub trait Writer {
     fn write(&mut self, _: Instruction) {
@@ -17,7 +18,12 @@ pub trait Writer {
 pub struct Bytecode<'a, F: Writer> {
     writer: F,
     define_stack: DefineStack,
-    func_define_dispatch: &'a mut FunctionDefineDispatch
+    func_define_dispatch: &'a mut FunctionDefineDispatch,
+    /*
+     * 在外面维护 待填充, 方便控制在模块编译完成后执行填充
+     * 待填充的一定是: 先使用后定义
+     * */
+    func_to_be_filled: &'a mut FuncToBeFilled
 }
 
 impl<'a, F: Writer> Compile for Bytecode<'a, F> {
@@ -72,8 +78,8 @@ impl<'a, F: Writer> Compile for Bytecode<'a, F> {
         }
     }
 
-    fn function_named_stmt(&mut self, _context: FunctionNamedStmtContext) {
-        self.define_stack.enter(self.func_define_dispatch.alloc_define());
+    fn function_named_stmt(&mut self, context: FunctionNamedStmtContext) {
+        self.define_stack.enter(self.func_define_dispatch.alloc_define(context));
     }
 
     fn function_define_end(&mut self) {
@@ -87,16 +93,19 @@ impl<'a, F: Writer> Bytecode<'a, F> {
         self.define_stack.write(instruction);
     }
 
-    pub fn new(writer: F, func_define_dispatch: &'a mut FunctionDefineDispatch) -> Self {
+    pub fn new(writer: F, func_define_dispatch: &'a mut FunctionDefineDispatch
+        , func_to_be_filled: &'a mut FuncToBeFilled) -> Self {
         Self {
             writer: writer,
             define_stack: DefineStack::new(),
-            func_define_dispatch: func_define_dispatch
+            func_define_dispatch: func_define_dispatch,
+            func_to_be_filled: func_to_be_filled
         }
     }
 }
 
 mod define_stack;
+mod to_be_filled;
 
 #[cfg(test)]
 mod test {
@@ -144,12 +153,14 @@ mod test {
             }
         });
         let mut fdd = FunctionDefineDispatch::new();
+        let mut tbf = FuncToBeFilled::new();
         let mut grammar_context = GrammarContext{
             cb: Compiler::new(
                 Module::new(String::from("main")),
                 Bytecode::new(
                     TestWriter{}
-                    , &mut fdd),
+                    , &mut fdd
+                    , &mut tbf),
                 InputContext::new(InputAttribute::new(FileType::Main))
             )
         };

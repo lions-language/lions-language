@@ -8,7 +8,7 @@ use std::cmp::{PartialEq, Eq};
 /*
  * 函数返回值
  * */
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct FunctionReturn {
     pub data: FunctionReturnData
 }
@@ -21,10 +21,16 @@ pub enum FunctionReturnDataAttr {
     Empty
 }
 
+impl Default for FunctionReturnDataAttr {
+    fn default() -> Self {
+        FunctionReturnDataAttr::Empty
+    }
+}
+
 /*
  * 如果返回值是多个值, 将抽象为元组
  * */
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct FunctionReturnData {
     pub typ: Type,
     /*
@@ -54,17 +60,6 @@ impl FunctionReturn {
     pub fn new(data: FunctionReturnData) -> Self {
         Self {
             data: data
-        }
-    }
-}
-
-impl Default for FunctionReturn {
-    fn default() -> Self {
-        Self {
-            data: FunctionReturnData{
-                typ: Type::default(),
-                attr: FunctionReturnDataAttr::Empty
-            }
         }
     }
 }

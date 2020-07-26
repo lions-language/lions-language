@@ -26,7 +26,7 @@ pub struct CallFunctionContext<'a> {
     pub return_addr: AddressValue
 }
 
-#[derive(Debug)]
+#[derive(Debug, FieldGet)]
 pub struct FunctionNamedStmtContext {
     name: String
 }

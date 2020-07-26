@@ -1,5 +1,6 @@
 use libcommon::ptr::RefPtr;
 use libmacro::{FieldGet, FieldGetClone};
+use libtype::function::FunctionStatement;
 
 pub enum DefineType {
     Function
@@ -44,27 +45,22 @@ impl Into<u8> for DefineType {
     }
 }
 
-#[derive(FieldGet, FieldGetClone)]
+#[derive(FieldGet)]
 pub struct FunctionDefine {
     start_pos: usize,
-    length: usize
+    length: usize,
+    statement: FunctionStatement
 }
 
 #[derive(FieldGet, FieldGetClone)]
 pub struct DefineObject {
-    ptr: RefPtr,
-    is_exist_undefine: bool
+    ptr: RefPtr
 }
 
 impl DefineObject {
-    pub fn set_undefine(&mut self) {
-        self.is_exist_undefine = true;
-    }
-
     pub fn new(ptr: RefPtr) -> Self {
         Self {
-            ptr: ptr,
-            is_exist_undefine: false
+            ptr: ptr
         }
     }
 }
