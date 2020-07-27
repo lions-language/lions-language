@@ -2,18 +2,19 @@ use super::{Type, PackageType};
 use libcommon::address::FunctionAddress;
 use libcommon::optcode::OptCode;
 use libcommon::ptr::RefPtr;
+use libmacro::{FieldGet};
 use std::hash::Hash;
 use std::cmp::{PartialEq, Eq};
 
 /*
  * 函数返回值
  * */
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct FunctionReturn {
     pub data: FunctionReturnData
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum FunctionReturnDataAttr {
     RefParamIndex(u8),
     MoveIndex(u8),
@@ -30,7 +31,7 @@ impl Default for FunctionReturnDataAttr {
 /*
  * 如果返回值是多个值, 将抽象为元组
  * */
-#[derive(Debug, Default)]
+#[derive(Debug, Clone, Default)]
 pub struct FunctionReturnData {
     pub typ: Type,
     /*
@@ -67,17 +68,17 @@ impl FunctionReturn {
 /*
  * 函数参数
  * */
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct FunctionParam {
     pub data: FunctionParamData
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct FunctionParamDataItem {
     pub typ: Type
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum FunctionParamData {
     /*
      * 其实可以写成一个, 之所以分开, 是因为如果只有一个参数, 没必要构建一个Vec, 提高效率,
@@ -106,7 +107,7 @@ impl FunctionParamDataItem {
 /*
  * 函数声明
  * */
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct FunctionStatement {
     pub func_name: String,
     pub func_param: Option<FunctionParam>,
@@ -135,18 +136,35 @@ pub struct OptcodeFunctionDefine {
     pub optcode: OptCode
 }
 
-#[derive(Debug)]
+#[derive(Debug, FieldGet)]
 pub struct AddressFunctionDefine {
     pub addr: FunctionAddress
+}
+
+impl AddressFunctionDefine {
+    pub fn new(addr: FunctionAddress) -> Self {
+        Self {
+            addr: addr
+        }
+    }
 }
 
 /*
  * 函数
  * */
-#[derive(Debug)]
+#[derive(Debug, FieldGet)]
 pub struct Function {
     pub func_statement: FunctionStatement,
     pub func_define: FunctionDefine
+}
+
+impl Function {
+    pub fn new(statement: FunctionStatement, define: FunctionDefine) -> Self {
+        Self {
+            func_statement: statement,
+            func_define: define
+        }
+    }
 }
 
 /*

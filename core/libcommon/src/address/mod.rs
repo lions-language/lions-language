@@ -1,4 +1,4 @@
- #[derive(Debug)]
+ #[derive(Debug, Clone)]
 pub struct FunctionAddrValue {
     start_pos: usize,
     length: usize
@@ -13,7 +13,7 @@ impl FunctionAddrValue {
     }
 }
 
- #[derive(Debug)]
+ #[derive(Debug, Clone)]
 pub enum FunctionAddress {
     ReferencesDefine(FunctionAddrValue),
     Define(FunctionAddrValue)

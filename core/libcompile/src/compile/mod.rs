@@ -1,11 +1,10 @@
 use libgrammar::grammar::Grammar;
 use libgrammar::token::{TokenValue};
 use libtype::{PackageType, PackageTypeValue};
-use libtype::function::{Function};
+use libtype::function::{Function, FindFunctionContext};
 use libtypecontrol::function::FunctionControl;
 use libtype::primeval::{PrimevalType, PrimevalData};
 use libtype::module::Module;
-use libtype::function::{FindFunctionContext};
 use libresult::*;
 use libtype::{AddressKey, AddressValue};
 use libcommon::ptr::{RefPtr};
@@ -52,7 +51,8 @@ pub trait Compile {
     fn function_named_stmt(&mut self, _context: FunctionNamedStmtContext) {
     }
 
-    fn function_define_end(&mut self) {
+    fn function_define_end(&mut self) -> Function {
+        unimplemented!();
     }
 }
 

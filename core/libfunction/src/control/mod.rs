@@ -41,7 +41,15 @@ impl FunctionControlInterface for NotypeFunctionControl {
 
     fn add_function(&mut self, context: AddFunctionContext
         , handle: Option<FindFunctionHandle>, func: Function) -> AddFunctionResult {
-        unimplemented!();
+        let pt = context.package_typ.expect("must be specify package type");
+        match pt.typ_ref() {
+            PackageTypeValue::Crate => {
+                self.compile_unit_handler.add_function(context, handle, func)
+            },
+            _ => {
+                unimplemented!();
+            }
+        }
     }
 }
 

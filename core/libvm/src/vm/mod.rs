@@ -54,6 +54,8 @@ impl Writer for VirtualMachine {
             Instruction::LoadVariant(v) => {
                 self.load_variant(v);
             },
+            Instruction::CallFunction(v) => {
+            },
             _ => {
                 unimplemented!("{:?}", &instruction);
             }
@@ -169,6 +171,7 @@ mod test {
     use libgrammar::grammar::GrammarContext;
     use libtype::module::Module;
     use libcompile::compile::{FileType, InputAttribute, InputContext};
+    use libcompile::define_dispatch::FunctionDefineDispatch;
     use super::*;
 
     use std::fs;
@@ -199,11 +202,13 @@ mod test {
                 }
             }
         });
+        let mut fdd = FunctionDefineDispatch::new();
         let mut grammar_context = GrammarContext{
             cb: Compiler::new(
                 Module::new(String::from("main")),
                 Bytecode::new(
                     VirtualMachine::new()
+                    , &mut fdd
                 ),
                 InputContext::new(InputAttribute::new(FileType::Main))
             )

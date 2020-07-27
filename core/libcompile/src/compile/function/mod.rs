@@ -1,4 +1,6 @@
 use libgrammar::token::{TokenValue, TokenData};
+use libtype::function::{AddFunctionContext};
+use libtype::{PackageType, PackageTypeValue};
 use crate::compile::{Compile, Compiler, FunctionNamedStmtContext};
 
 impl<F: Compile> Compiler<F> {
@@ -17,6 +19,14 @@ impl<F: Compile> Compiler<F> {
     }
 
     pub fn handle_function_define_end(&mut self) {
-        self.cb.function_define_end();
+        let func = self.cb.function_define_end();
+        let package_typ = PackageType::new(PackageTypeValue::Crate);
+        let context = AddFunctionContext{
+            typ: None,
+            package_typ: Some(&package_typ),
+            module_str: self.module_stack.current().to_str().to_string(),
+            func_str: func.func_statement_ref().func_name.clone()
+        };
+        self.function_control.add_function(context, None, func);
     }
 }

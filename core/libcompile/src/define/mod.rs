@@ -49,7 +49,8 @@ impl Into<u8> for DefineType {
 pub struct FunctionDefine {
     start_pos: usize,
     length: usize,
-    statement: FunctionStatement
+    statement: FunctionStatement,
+    to_be_filled: to_be_filled::function::FuncToBeFilled
 }
 
 #[derive(FieldGet, FieldGetClone)]
@@ -66,3 +67,4 @@ impl DefineObject {
 }
 
 mod function;
+mod to_be_filled;

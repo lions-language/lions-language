@@ -1,7 +1,8 @@
 use libcommon::ptr::RefPtr;
-use libcommon::address::{FunctionAddrValue};
-use libtype::function::{FunctionStatement
-    , FunctionReturn};
+use libcommon::address::{FunctionAddress, FunctionAddrValue};
+use libtype::function::{self, FunctionStatement
+    , FunctionReturn, Function
+    , AddressFunctionDefine};
 use crate::define::{DefineObject, FunctionDefine
     , DefineType};
 use crate::compile::FunctionNamedStmtContext;
@@ -25,7 +26,14 @@ impl FunctionDefineDispatch {
         DefineObject::new(ptr)
     }
 
-    pub fn finish_define(&mut self, obj: DefineObject) {
+    fn to_function(&self, statement: FunctionStatement
+        , fd: &FunctionDefine, addr: FunctionAddrValue) -> Function {
+        Function::new(statement
+            , function::FunctionDefine::Address(AddressFunctionDefine::new(
+                FunctionAddress::Define(addr))))
+    }
+
+    pub fn finish_define(&mut self, obj: DefineObject) -> Function {
         /*
          * 暂时不考虑多线程问题, 这里的 obj 就是为了以后多线程时, 可以从中间移除元素
          * (在 FunctionDefine 中存储 索引, 移除的时候根据这个索引移除元素)
@@ -33,8 +41,13 @@ impl FunctionDefineDispatch {
          * */
         let fd = obj.ptr_ref().as_ref::<FunctionDefine>();
         self.pos += fd.length_ref().clone();
-        self.processing_funcs.pop_back();
-        // FunctionAddrValue::new(fd.start_pos_clone(), fd.length_clone())
+        let addr = FunctionAddrValue::new(fd.start_pos_ref().clone(), fd.length_ref().clone());
+        if fd.to_be_filled_ref().is_exist_filled() {
+            self.to_function(fd.statement_ref().clone(), fd, addr)
+        } else {
+            let item = self.processing_funcs.pop_back().expect("should not happend");
+            self.to_function(item.statement(), fd, addr)
+        }
     }
 
     pub fn new() -> Self {

@@ -49,6 +49,7 @@ pub enum TypeAttrubute {
     Move,
     Pointer,
     Ref,
+    Empty
 }
 
 impl TypeAttrubute {
@@ -62,6 +63,9 @@ impl TypeAttrubute {
             },
             TypeAttrubute::Pointer => {
                 "*"
+            },
+            TypeAttrubute::Empty => {
+                "()"
             }
         }
     }
@@ -181,7 +185,7 @@ impl AddressKey {
             module_index: module_index,
             index: index
         }
-    }   
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Hash, Eq)]
@@ -204,6 +208,10 @@ pub struct AddressValue {
 }
 
 impl AddressValue {
+    pub fn new_invalid() -> Self {
+        Self::default()
+    }
+
     pub fn new(typ: AddressType, addr: AddressKey) -> Self {
         Self {
             typ: typ,

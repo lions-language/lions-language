@@ -1,6 +1,7 @@
-use libtype::function::{FunctionDefine};
+use libtype::function::{FunctionDefine, Function};
 use libtype::primeval::{PrimevalData};
 use libtype::instruction::{Instruction, CallPrimevalFunction
+    , CallFunction
     , VariantValue, Uint8Static
     , Uint16Static, Uint32Static};
 use crate::compile::{ConstContext, CallFunctionContext
@@ -8,7 +9,6 @@ use crate::compile::{ConstContext, CallFunctionContext
 use crate::address;
 use define_stack::DefineStack;
 use crate::define_dispatch::{FunctionDefineDispatch};
-use crate::bytecode::to_be_filled::function::FuncToBeFilled;
 
 pub trait Writer {
     fn write(&mut self, _: Instruction) {
@@ -18,12 +18,7 @@ pub trait Writer {
 pub struct Bytecode<'a, F: Writer> {
     writer: F,
     define_stack: DefineStack,
-    func_define_dispatch: &'a mut FunctionDefineDispatch,
-    /*
-     * 在外面维护 待填充, 方便控制在模块编译完成后执行填充
-     * 待填充的一定是: 先使用后定义
-     * */
-    func_to_be_filled: &'a mut FuncToBeFilled
+    func_define_dispatch: &'a mut FunctionDefineDispatch
 }
 
 impl<'a, F: Writer> Compile for Bytecode<'a, F> {
@@ -72,6 +67,15 @@ impl<'a, F: Writer> Compile for Bytecode<'a, F> {
                     );
                 self.write(instruction);
             },
+            FunctionDefine::Address(addr) => {
+                let instruction = Instruction::CallFunction(
+                    CallFunction{
+                        define_addr: addr.addr_ref().clone(),
+                        return_addr: context.return_addr
+                    }
+                );
+                self.write(instruction);
+            },
             _ => {
                 unimplemented!();
             }
@@ -82,30 +86,31 @@ impl<'a, F: Writer> Compile for Bytecode<'a, F> {
         self.define_stack.enter(self.func_define_dispatch.alloc_define(context));
     }
 
-    fn function_define_end(&mut self) {
+    fn function_define_end(&mut self) -> Function {
         let ds = self.define_stack.leave();
-        self.func_define_dispatch.finish_define(ds);
+        self.func_define_dispatch.finish_define(ds)
     }
 }
 
 impl<'a, F: Writer> Bytecode<'a, F> {
     fn write(&mut self, instruction: Instruction) {
-        self.define_stack.write(instruction);
+        if self.define_stack.is_empty() {
+            self.writer.write(instruction);
+        } else {
+            self.define_stack.write(instruction);
+        }
     }
 
-    pub fn new(writer: F, func_define_dispatch: &'a mut FunctionDefineDispatch
-        , func_to_be_filled: &'a mut FuncToBeFilled) -> Self {
+    pub fn new(writer: F, func_define_dispatch: &'a mut FunctionDefineDispatch) -> Self {
         Self {
             writer: writer,
             define_stack: DefineStack::new(),
-            func_define_dispatch: func_define_dispatch,
-            func_to_be_filled: func_to_be_filled
+            func_define_dispatch: func_define_dispatch
         }
     }
 }
 
 mod define_stack;
-mod to_be_filled;
 
 #[cfg(test)]
 mod test {
@@ -153,14 +158,12 @@ mod test {
             }
         });
         let mut fdd = FunctionDefineDispatch::new();
-        let mut tbf = FuncToBeFilled::new();
         let mut grammar_context = GrammarContext{
             cb: Compiler::new(
                 Module::new(String::from("main")),
                 Bytecode::new(
                     TestWriter{}
-                    , &mut fdd
-                    , &mut tbf),
+                    , &mut fdd),
                 InputContext::new(InputAttribute::new(FileType::Main))
             )
         };

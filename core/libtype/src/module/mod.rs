@@ -1,6 +1,6 @@
-use libmacro::{FieldGet};
+use libmacro::{FieldGet, FieldGetClone};
 
-#[derive(FieldGet)]
+#[derive(FieldGet, FieldGetClone)]
 pub struct Module {
     name: String
 }

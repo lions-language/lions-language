@@ -1,7 +1,9 @@
 use libtype::{PackageType, PackageTypeValue};
-use libtype::function::{FindFunctionContext};
+use libtype::function::{FindFunctionContext, FindFunctionResult};
+use libtype::AddressValue;
 use libresult::*;
-use crate::compile::{Compile, Compiler, FileType};
+use crate::compile::{Compile, Compiler, FileType
+    , CallFunctionContext};
 
 impl<F: Compile> Compiler<F> {
     pub fn handle_end(&mut self) -> DescResult {
@@ -10,13 +12,43 @@ impl<F: Compile> Compiler<F> {
              * 查找 main 函数的声明
              * 1. main 函数必须在 main.lions 中定义, 否则报错
              * */
-            let (exists, _) = self.function_control.is_exists(&FindFunctionContext{
+            let package_typ = PackageType::new(PackageTypeValue::Crate);
+            let context = FindFunctionContext{
                 typ: None,
-                package_typ: Some(&PackageType::new(PackageTypeValue::Crate)),
+                package_typ: Some(&package_typ),
                 func_str: "main",
                 module_str: self.module_stack.current().name_ref()
-            });
-            if !exists {
+            };
+            let (exists, handle) = self.function_control.is_exists(&context);
+            if exists {
+                let h = Some(handle);
+                let func_res = self.function_control.find_function(&context, &h);
+                match func_res {
+                    FindFunctionResult::Success(r) => {
+                        match r.func.func_define_ref() {
+                            libtype::function::FunctionDefine::Address(addr) => {
+                                /*
+                                 * 函数调用
+                                 * */
+                                let call_context = CallFunctionContext {
+                                    func: &r.func,
+                                    return_addr: AddressValue::new_invalid()
+                                };
+                                self.cb.call_function(call_context);
+                            },
+                            _ => {
+                                panic!("should not happend");
+                            }
+                        }
+                    },
+                    FindFunctionResult::Panic(s) => {
+                        return DescResult::Error(s);
+                    },
+                    _ => {
+                        panic!("should not happend");
+                    }
+                }
+            } else {
                 return DescResult::Error(
                     String::from("the main function must exist in main.lions"));
             }

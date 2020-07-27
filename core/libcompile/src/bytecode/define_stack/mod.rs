@@ -16,6 +16,10 @@ impl DefineStack {
         self.ws.pop_back().expect("should not happend")
     }
 
+    pub fn is_empty(&self) -> bool {
+        self.ws.is_empty()
+    }
+
     pub fn write(&mut self, instruction: Instruction) -> bool {
         if self.ws.is_empty() {
             return false;

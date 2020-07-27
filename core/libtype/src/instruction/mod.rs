@@ -1,9 +1,16 @@
 use libcommon::optcode;
+use libcommon::address::{FunctionAddress};
 use crate::{AddressValue, AddressKey};
 
 #[derive(Debug)]
 pub struct CallPrimevalFunction {
     pub opt: optcode::OptCode,
+    pub return_addr: AddressValue
+}
+
+#[derive(Debug)]
+pub struct CallFunction {
+    pub define_addr: FunctionAddress,
     pub return_addr: AddressValue
 }
 
@@ -47,5 +54,6 @@ pub enum Instruction {
     LoadUint16Const(Uint16Static),
     LoadUint32Const(Uint32Static),
     LoadVariant(VariantValue),
-    CallPrimevalFunction(CallPrimevalFunction)
+    CallPrimevalFunction(CallPrimevalFunction),
+    CallFunction(CallFunction)
 }
