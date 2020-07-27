@@ -192,12 +192,13 @@ impl AddressKey {
 pub enum AddressType {
     Static,
     Stack,
-    Heap
+    Heap,
+    Invalid
 }
 
 impl Default for AddressType {
     fn default() -> Self {
-        AddressType::Stack
+        AddressType::Invalid
     }
 }
 

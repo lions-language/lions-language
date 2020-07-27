@@ -37,7 +37,7 @@ pub struct VirtualMachine {
 
 impl Writer for VirtualMachine {
     fn write(&mut self, instruction: Instruction) {
-        println!("{:?}", &instruction);
+        // println!("{:?}", &instruction);
         match instruction {
             Instruction::LoadUint8Const(v) => {
                 self.load_const_uint8(v);
@@ -55,6 +55,7 @@ impl Writer for VirtualMachine {
                 self.load_variant(v);
             },
             Instruction::CallFunction(v) => {
+                self.call_function(v);
             },
             _ => {
                 unimplemented!("{:?}", &instruction);
@@ -161,6 +162,7 @@ mod load_const;
 mod load_variant;
 mod primeval_func_call;
 mod addr_mapping;
+mod func_call;
 
 #[cfg(test)]
 mod test {

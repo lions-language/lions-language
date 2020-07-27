@@ -116,6 +116,10 @@ impl<F: Compile> Grammar for Compiler<F> {
         self.handle_function_named_stmt(value);
     }
 
+    fn function_define_param(&mut self, name_token: TokenValue, type_token: TokenValue) {
+        self.handle_function_define_param(name_token, type_token);
+    }
+
     fn function_define_end(&mut self, _value: TokenValue) {
         self.handle_function_define_end();
     }
