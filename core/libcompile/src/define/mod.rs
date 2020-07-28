@@ -1,6 +1,7 @@
 use libcommon::ptr::RefPtr;
 use libmacro::{FieldGet, FieldGetClone};
 use libtype::function::FunctionStatement;
+use crate::define_stream::DefineStream;
 
 pub enum DefineType {
     Function
@@ -50,7 +51,8 @@ pub struct FunctionDefine {
     start_pos: usize,
     length: usize,
     statement: FunctionStatement,
-    to_be_filled: to_be_filled::function::FuncToBeFilled
+    to_be_filled: to_be_filled::function::FuncToBeFilled,
+    define_stream: RefPtr
 }
 
 #[derive(FieldGet, FieldGetClone)]

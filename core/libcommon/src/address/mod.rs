@@ -1,4 +1,6 @@
- #[derive(Debug, Clone)]
+use libmacro::FieldGet;
+
+#[derive(Debug, Clone, FieldGet)]
 pub struct FunctionAddrValue {
     start_pos: usize,
     length: usize

@@ -6,17 +6,20 @@ use libtype::function::{self, FunctionStatement
 use crate::define::{DefineObject, FunctionDefine
     , DefineType};
 use crate::compile::FunctionNamedStmtContext;
+use crate::define_stream::{DefineStream};
 use std::collections::VecDeque;
 
-pub struct FunctionDefineDispatch {
+pub struct FunctionDefineDispatch<'a> {
     processing_funcs: VecDeque<FunctionDefine>,
-    pos: usize
+    pos: usize,
+    define_stream: &'a mut DefineStream
 }
 
-impl FunctionDefineDispatch {
+impl<'a> FunctionDefineDispatch<'a> {
     pub fn alloc_define(&mut self, context: FunctionNamedStmtContext) -> DefineObject {
         let def = FunctionDefine::new(self.pos
-            , FunctionStatement::new(context.name(), None, FunctionReturn::default(), None));
+            , FunctionStatement::new(context.name(), None, FunctionReturn::default(), None)
+            , RefPtr::from_ref(self.define_stream));
         /*
          * 关键点: 获取插入后的元素的引用
          * */
@@ -41,19 +44,27 @@ impl FunctionDefineDispatch {
          * */
         let fd = obj.ptr_ref().as_ref::<FunctionDefine>();
         self.pos += fd.length_ref().clone();
-        let addr = FunctionAddrValue::new(fd.start_pos_ref().clone(), fd.length_ref().clone());
+        let addr = FunctionAddrValue::new(
+            fd.start_pos_ref().clone(), fd.length_ref().clone());
         if fd.to_be_filled_ref().is_exist_filled() {
+            /*
+             * 存在待填充的
+             * */
             self.to_function(fd.statement_ref().clone(), fd, addr)
         } else {
+            /*
+             * 不存在待填充的
+             * */
             let item = self.processing_funcs.pop_back().expect("should not happend");
             self.to_function(item.statement(), fd, addr)
         }
     }
 
-    pub fn new() -> Self {
+    pub fn new(ds: &'a mut DefineStream) -> Self {
         Self {
             processing_funcs: VecDeque::new(),
-            pos: 0
+            pos: 0,
+            define_stream: ds
         }
     }
 }

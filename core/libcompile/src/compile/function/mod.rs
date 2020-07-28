@@ -21,7 +21,8 @@ impl<F: Compile> Compiler<F> {
     pub fn handle_function_define_param(&mut self, name_token: TokenValue
         , type_token: TokenValue) {
         /*
-         * 生成参数加载指令, 填充函数声明
+         * 1. 生成参数加载指令
+         * 2. 填充函数声明
          * */
     }
 

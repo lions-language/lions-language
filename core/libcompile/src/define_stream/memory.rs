@@ -1,0 +1,24 @@
+use libtype::instruction::Instruction;
+use std::collections::VecDeque;
+
+pub struct Memory {
+    instructions: VecDeque<Instruction>
+}
+
+impl Memory {
+    pub fn write(&mut self, instruction: Instruction) {
+        // println!("{:?}", instruction);
+        self.instructions.push_back(instruction);
+    }
+
+    pub fn get(&self, index: usize) -> Option<&Instruction> {
+        self.instructions.get(index)
+    }
+
+    pub fn new() -> Self {
+        Self {
+            instructions: VecDeque::new()
+        }
+    }
+}
+

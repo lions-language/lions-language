@@ -6,3 +6,4 @@ pub mod address;
 pub mod status;
 pub mod define;
 pub mod define_dispatch;
+pub mod define_stream;

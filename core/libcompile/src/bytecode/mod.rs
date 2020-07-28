@@ -15,13 +15,13 @@ pub trait Writer {
     }
 }
 
-pub struct Bytecode<'a, F: Writer> {
+pub struct Bytecode<'a, 'b, F: Writer> {
     writer: F,
     define_stack: DefineStack,
-    func_define_dispatch: &'a mut FunctionDefineDispatch
+    func_define_dispatch: &'a mut FunctionDefineDispatch<'b>
 }
 
-impl<'a, F: Writer> Compile for Bytecode<'a, F> {
+impl<'a, 'b, F: Writer> Compile for Bytecode<'a, 'b, F> {
     fn const_number(&mut self, context: ConstContext) {
         match context.data {
             PrimevalData::Uint8(v) => {
@@ -92,7 +92,7 @@ impl<'a, F: Writer> Compile for Bytecode<'a, F> {
     }
 }
 
-impl<'a, F: Writer> Bytecode<'a, F> {
+impl<'a, 'b, F: Writer> Bytecode<'a, 'b, F> {
     fn write(&mut self, instruction: Instruction) {
         if self.define_stack.is_empty() {
             self.writer.write(instruction);
@@ -101,7 +101,7 @@ impl<'a, F: Writer> Bytecode<'a, F> {
         }
     }
 
-    pub fn new(writer: F, func_define_dispatch: &'a mut FunctionDefineDispatch) -> Self {
+    pub fn new(writer: F, func_define_dispatch: &'a mut FunctionDefineDispatch<'b>) -> Self {
         Self {
             writer: writer,
             define_stack: DefineStack::new(),
@@ -121,6 +121,7 @@ mod test {
     use libgrammar::grammar::GrammarContext;
     use libtype::module::Module;
     use crate::compile::{Compiler, InputContext, InputAttribute, FileType};
+    use crate::define_stream::DefineStream;
     use super::*;
 
     use std::fs;
@@ -157,7 +158,8 @@ mod test {
                 }
             }
         });
-        let mut fdd = FunctionDefineDispatch::new();
+        let mut ds = DefineStream::new();
+        let mut fdd = FunctionDefineDispatch::new(&mut ds);
         let mut grammar_context = GrammarContext{
             cb: Compiler::new(
                 Module::new(String::from("main")),
