@@ -1,7 +1,7 @@
 use libgrammar::token::{TokenValue};
 use crate::compile::{Compile, Compiler, ConstContext};
 
-impl<F: Compile> Compiler<F> {
+impl<'a, F: Compile> Compiler<'a, F> {
     pub fn const_number(&mut self, value: TokenValue) {
         let tt = value.token_type_clone();
         let t = self.tokentype_to_type(tt);

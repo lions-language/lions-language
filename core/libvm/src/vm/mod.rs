@@ -7,6 +7,7 @@ use libtype::instruction::{Instruction};
 use libcompile::compile::{ConstContext, CallFunctionContext
     , Compile, Compiler};
 use libcompile::bytecode::{Bytecode, Writer};
+use libcompile::define_stream::{DefineStream};
 use libcommon::optcode;
 use crate::memory::{stack, Rand};
 use libcommon::ptr::RefPtr;
@@ -174,6 +175,7 @@ mod test {
     use libtype::module::Module;
     use libcompile::compile::{FileType, InputAttribute, InputContext};
     use libcompile::define_dispatch::FunctionDefineDispatch;
+    use libcompile::address::PackageIndex;
     use super::*;
 
     use std::fs;
@@ -204,7 +206,10 @@ mod test {
                 }
             }
         });
-        let mut fdd = FunctionDefineDispatch::new();
+        let mut ds = DefineStream::new();
+        let mut fdd = FunctionDefineDispatch::new(&mut ds);
+        let mut package_index = PackageIndex::new();
+        let mut package_str = String::from("test");
         let mut grammar_context = GrammarContext{
             cb: Compiler::new(
                 Module::new(String::from("main")),
@@ -212,7 +217,9 @@ mod test {
                     VirtualMachine::new()
                     , &mut fdd
                 ),
-                InputContext::new(InputAttribute::new(FileType::Main))
+                InputContext::new(InputAttribute::new(FileType::Main)),
+                &mut package_index,
+                &package_str
             )
         };
         let mut grammar_parser = GrammarParser::new(lexical_parser, &mut grammar_context);

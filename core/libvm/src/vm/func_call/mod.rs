@@ -1,5 +1,6 @@
 use libtype::instruction::{CallFunction};
 use libcommon::optcode::{OptCode};
+use libcompile::define_stream::{DefineStream};
 use crate::vm::VirtualMachine;
 
 impl VirtualMachine {

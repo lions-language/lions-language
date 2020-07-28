@@ -31,7 +31,7 @@ impl Context {
     }
 }
 
-impl<F: Compile> Compiler<F> {
+impl<'a, F: Compile> Compiler<'a, F> {
     /*
      * 参数:
      *  typ: 参数的类型
@@ -180,6 +180,7 @@ impl<F: Compile> Compiler<F> {
             }
         };
         self.cb.call_function(CallFunctionContext{
+            package_index: None,
             func: func,
             return_addr: return_addr.addr_clone()
         });

@@ -11,6 +11,7 @@ use libcommon::ptr::{RefPtr};
 use libmacro::{FieldGet};
 use crate::address;
 use crate::status::CompileStatus;
+use crate::address::PackageIndex;
 
 #[derive(Debug)]
 pub struct ConstContext {
@@ -21,6 +22,7 @@ pub struct ConstContext {
 
 #[derive(Debug)]
 pub struct CallFunctionContext<'a> {
+    pub package_index: Option<usize>,
     pub func: &'a Function,
     pub return_addr: AddressValue
 }
@@ -87,7 +89,7 @@ impl InputContext {
     }
 }
 
-pub struct Compiler<F: Compile> {
+pub struct Compiler<'a, F: Compile> {
     function_control: FunctionControl,
     value_buffer: value_buffer::ValueBuffer,
     module_stack: module_stack::ModuleStack,
@@ -96,10 +98,12 @@ pub struct Compiler<F: Compile> {
     ref_counter: ref_count::RefCounter,
     compile_status_dispatch: compile_status_dispatch::CompileStatusDispatch,
     input_context: InputContext,
+    package_index: &'a mut PackageIndex,
+    package_str: &'a str,
     cb: F
 }
 
-impl<F: Compile> Grammar for Compiler<F> {
+impl<'a, F: Compile> Grammar for Compiler<'a, F> {
     fn const_number(&mut self, value: TokenValue) {
 	self.const_number(value);
     }
@@ -125,8 +129,10 @@ impl<F: Compile> Grammar for Compiler<F> {
     }
 }
 
-impl<F: Compile> Compiler<F> {
-    pub fn new(module: Module, cb: F, input_context: InputContext) -> Self {
+impl<'a, F: Compile> Compiler<'a, F> {
+    pub fn new(module: Module, cb: F, input_context: InputContext
+        , package_index: &'a mut PackageIndex
+        , package_str: &'a str) -> Self {
         Self {
             function_control: FunctionControl::new(),
             value_buffer: value_buffer::ValueBuffer::new(),
@@ -136,6 +142,8 @@ impl<F: Compile> Compiler<F> {
             ref_counter: ref_count::RefCounter::new(),
             compile_status_dispatch: compile_status_dispatch::CompileStatusDispatch::new(),
             input_context: input_context,
+            package_index: package_index,
+            package_str: package_str,
             cb: cb
         }
     }
@@ -200,10 +208,14 @@ mod test {
                 }
             }
         });
+        let mut package_index = PackageIndex::new();
+        let package_str = String::from("test");
         let mut grammar_context = GrammarContext{
             cb: Compiler::new(Module::new(String::from("main"))
                     , TestComplie{}, InputContext::new(InputAttribute::new(
-                            FileType::Main)))
+                            FileType::Main))
+                    , &mut package_index
+                    , &package_str)
         };
         let mut grammar_parser = GrammarParser::new(lexical_parser, &mut grammar_context);
         grammar_parser.parser();

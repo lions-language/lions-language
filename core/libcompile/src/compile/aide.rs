@@ -2,7 +2,7 @@ use libgrammar::token::{TokenType};
 use libtype::{Type, TypeValue, Primeval, TypeAttrubute};
 use super::{Compiler, Compile};
 
-impl<F: Compile> Compiler<F> {
+impl<'a, F: Compile> Compiler<'a, F> {
     pub fn tokentype_to_type(&self, typ: TokenType) -> Type {
         match typ {
             TokenType::Const(pt) => {

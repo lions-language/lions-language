@@ -5,7 +5,7 @@ use libresult::*;
 use crate::compile::{Compile, Compiler, FileType
     , CallFunctionContext};
 
-impl<F: Compile> Compiler<F> {
+impl<'a, F: Compile> Compiler<'a, F> {
     pub fn handle_end(&mut self) -> DescResult {
         if let FileType::Main = self.input_context.attr_ref().file_typ_ref() {
             /*
@@ -31,6 +31,7 @@ impl<F: Compile> Compiler<F> {
                                  * 函数调用
                                  * */
                                 let call_context = CallFunctionContext {
+                                    package_index: Some(self.package_index.get_index(&self.package_str)),
                                     func: &r.func,
                                     return_addr: AddressValue::new_invalid()
                                 };

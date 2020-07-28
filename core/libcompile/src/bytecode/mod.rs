@@ -70,6 +70,7 @@ impl<'a, 'b, F: Writer> Compile for Bytecode<'a, 'b, F> {
             FunctionDefine::Address(addr) => {
                 let instruction = Instruction::CallFunction(
                     CallFunction{
+                        package_index: context.package_index,
                         define_addr: addr.addr_ref().clone(),
                         return_addr: context.return_addr
                     }
@@ -121,6 +122,7 @@ mod test {
     use libgrammar::grammar::GrammarContext;
     use libtype::module::Module;
     use crate::compile::{Compiler, InputContext, InputAttribute, FileType};
+    use crate::address::{PackageIndex};
     use crate::define_stream::DefineStream;
     use super::*;
 
@@ -160,13 +162,17 @@ mod test {
         });
         let mut ds = DefineStream::new();
         let mut fdd = FunctionDefineDispatch::new(&mut ds);
+        let mut package_index = PackageIndex::new();
+        let package_str = String::from("test");
         let mut grammar_context = GrammarContext{
             cb: Compiler::new(
                 Module::new(String::from("main")),
                 Bytecode::new(
                     TestWriter{}
                     , &mut fdd),
-                InputContext::new(InputAttribute::new(FileType::Main))
+                InputContext::new(InputAttribute::new(FileType::Main)),
+                &mut package_index,
+                &package_str
             )
         };
         let mut grammar_parser = GrammarParser::new(lexical_parser, &mut grammar_context);
