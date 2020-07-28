@@ -10,7 +10,7 @@ pub struct CallPrimevalFunction {
 
 #[derive(Debug)]
 pub struct CallFunction {
-    pub package_index: Option<usize>,
+    pub package_str: String,
     pub define_addr: FunctionAddress,
     pub return_addr: AddressValue
 }

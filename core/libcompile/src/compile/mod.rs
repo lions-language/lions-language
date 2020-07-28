@@ -22,7 +22,7 @@ pub struct ConstContext {
 
 #[derive(Debug)]
 pub struct CallFunctionContext<'a> {
-    pub package_index: Option<usize>,
+    pub package_str: Option<String>,
     pub func: &'a Function,
     pub return_addr: AddressValue
 }

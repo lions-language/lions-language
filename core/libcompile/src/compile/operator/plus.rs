@@ -180,7 +180,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
             }
         };
         self.cb.call_function(CallFunctionContext{
-            package_index: None,
+            package_str: None,
             func: func,
             return_addr: return_addr.addr_clone()
         });

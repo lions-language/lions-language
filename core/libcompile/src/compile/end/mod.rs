@@ -31,7 +31,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                  * 函数调用
                                  * */
                                 let call_context = CallFunctionContext {
-                                    package_index: Some(self.package_index.get_index(&self.package_str)),
+                                    package_str: Some(self.package_str.to_string()),
                                     func: &r.func,
                                     return_addr: AddressValue::new_invalid()
                                 };
