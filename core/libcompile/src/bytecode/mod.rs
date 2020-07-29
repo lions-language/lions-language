@@ -124,6 +124,7 @@ mod test {
     use crate::compile::{Compiler, InputContext, InputAttribute, FileType};
     use crate::address::{PackageIndex};
     use crate::define_stream::DefineStream;
+    use crate::static_dispatch::{StaticVariantDispatch};
     use super::*;
 
     use std::fs;
@@ -162,6 +163,7 @@ mod test {
         });
         let mut ds = DefineStream::new();
         let mut fdd = FunctionDefineDispatch::new(&mut ds);
+        let mut static_variant_dispatch = StaticVariantDispatch::new();
         let mut package_index = PackageIndex::new();
         let package_str = String::from("test");
         let mut test_writer = TestWriter{};
@@ -173,6 +175,7 @@ mod test {
                     , &mut fdd),
                 InputContext::new(InputAttribute::new(FileType::Main)),
                 &mut package_index,
+                &mut static_variant_dispatch,
                 &package_str
             )
         };

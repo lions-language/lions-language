@@ -41,7 +41,7 @@ pub struct VirtualMachine {
 
 impl VirtualMachine {
     fn execute(&mut self, instruction: Instruction) {
-        println!("{:?}", &instruction);
+        // println!("{:?}", &instruction);
         match instruction {
             Instruction::LoadUint8Const(v) => {
                 self.load_const_uint8(v);
@@ -181,6 +181,7 @@ mod test {
     use libtype::module::Module;
     use libcompile::compile::{FileType, InputAttribute, InputContext};
     use libcompile::define_dispatch::FunctionDefineDispatch;
+    use libcompile::static_dispatch::{StaticVariantDispatch};
     use libcompile::address::PackageIndex;
     use super::*;
 
@@ -216,6 +217,7 @@ mod test {
         let mut ds_ptr = RefPtr::from_ref::<DefineStream>(&ds);
         let mut fdd = FunctionDefineDispatch::new(&mut ds);
         let mut package_index = PackageIndex::new();
+        let mut static_variant_dispatch = StaticVariantDispatch::new();
         let mut package_str = String::from("test");
         let mut link = Link::new(ds_ptr);
         let mut grammar_context = GrammarContext{
@@ -227,12 +229,16 @@ mod test {
                 ),
                 InputContext::new(InputAttribute::new(FileType::Main)),
                 &mut package_index,
+                &mut static_variant_dispatch,
                 &package_str
             )
         };
         let mut grammar_parser = GrammarParser::new(lexical_parser, &mut grammar_context);
         grammar_parser.parser();
         let entrance = link.call_main_instruction().clone();
+        /*
+         * 如果存在编译后的文件, 使用 LinkDefine 的读取功能 从文件中读取后实例化 LinkDefine
+         * */
         let mut virtual_machine = VirtualMachine::new(RefPtr::from_ref::<LinkDefine>(link.link_define()));
         virtual_machine.run(entrance);
     }

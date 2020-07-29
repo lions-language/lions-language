@@ -1,6 +1,7 @@
-use crate::token::{self, Token, TokenOperType, TokenAttrubute, TokenContext};
+use crate::token::{self, Token, TokenOperType, TokenAttrubute
+    , TokenContext, TokenMethodResult, TokenValue};
 use crate::lexical::CallbackReturnStatus;
-use crate::grammar::Grammar;
+use crate::grammar::{GrammarParser, ExpressContext, Grammar};
 
 pub struct StringToken {
     context: TokenContext
@@ -14,14 +15,21 @@ lazy_static!{
 }
 
 impl StringToken {
+    fn nup<T: FnMut() -> CallbackReturnStatus, CB: Grammar>(
+        token: &Token<T, CB>, grammar: &mut GrammarParser<T, CB>
+        , express_context: &ExpressContext<T, CB>) -> TokenMethodResult {
+        let mut token_value = grammar.take_next_one().token_value();
+        grammar.grammar_context().cb.const_string(token_value);
+        TokenMethodResult::End
+    }
 }
 
 impl StringToken {
     pub fn new<T: FnMut() -> CallbackReturnStatus, CB: Grammar>(context: TokenContext) -> Token<T, CB> {
         Token{
             context: context,
-            attrubute: token::default_token_attrubute(),
-            nup: token::default_nup,
+            attrubute: &*id_token_attrubute,
+            nup: StringToken::nup,
             led: token::default_led
         }
     }

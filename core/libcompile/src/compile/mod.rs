@@ -13,6 +13,7 @@ use libmacro::{FieldGet};
 use crate::address;
 use crate::status::CompileStatus;
 use crate::address::PackageIndex;
+use crate::static_dispatch::{StaticVariantDispatch};
 
 #[derive(Debug)]
 pub struct ConstContext {
@@ -41,6 +42,10 @@ pub enum CompileType {
 pub trait Compile {
     fn const_number(&mut self, context: ConstContext) {
         println!("{:?}", context);
+    }
+
+    fn const_string(&mut self, context: ConstContext) {
+        unimplemented!();
     }
 
     fn load_variant(&mut self, addr: &address::Address) {
@@ -100,6 +105,7 @@ pub struct Compiler<'a, F: Compile> {
     compile_status_dispatch: compile_status_dispatch::CompileStatusDispatch,
     input_context: InputContext,
     package_index: &'a mut PackageIndex,
+    static_variant_dispatch: &'a mut StaticVariantDispatch,
     package_str: &'a str,
     cb: F
 }
@@ -107,6 +113,10 @@ pub struct Compiler<'a, F: Compile> {
 impl<'a, F: Compile> Grammar for Compiler<'a, F> {
     fn const_number(&mut self, value: TokenValue) {
 	self.const_number(value);
+    }
+
+    fn const_string(&mut self, value: TokenValue) {
+        self.handle_const_string(value);
     }
 
     fn operator_plus(&mut self, value: TokenValue) -> DescResult {
@@ -133,6 +143,7 @@ impl<'a, F: Compile> Grammar for Compiler<'a, F> {
 impl<'a, F: Compile> Compiler<'a, F> {
     pub fn new(module: Module, cb: F, input_context: InputContext
         , package_index: &'a mut PackageIndex
+        , static_variant_dispatch: &'a mut StaticVariantDispatch
         , package_str: &'a str) -> Self {
         Self {
             function_control: FunctionControl::new(),
@@ -144,6 +155,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
             compile_status_dispatch: compile_status_dispatch::CompileStatusDispatch::new(),
             input_context: input_context,
             package_index: package_index,
+            static_variant_dispatch: static_variant_dispatch,
             package_str: package_str,
             cb: cb
         }
@@ -155,7 +167,6 @@ mod value_buffer;
 mod ref_count;
 mod address_dispatch;
 mod compile_status_dispatch;
-mod static_dispatch;
 pub mod define;
 mod aide;
 mod context;
@@ -210,12 +221,14 @@ mod test {
             }
         });
         let mut package_index = PackageIndex::new();
+        let mut static_variant_dispatch = StaticVariantDispatch::new();
         let package_str = String::from("test");
         let mut grammar_context = GrammarContext{
             cb: Compiler::new(Module::new(String::from("main"))
                     , TestComplie{}, InputContext::new(InputAttribute::new(
                             FileType::Main))
                     , &mut package_index
+                    , &mut static_variant_dispatch
                     , &package_str)
         };
         let mut grammar_parser = GrammarParser::new(lexical_parser, &mut grammar_context);

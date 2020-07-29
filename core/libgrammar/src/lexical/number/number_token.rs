@@ -1,4 +1,5 @@
-use crate::token::{self, Token, TokenOperType, TokenAttrubute, TokenContext, TokenMethodResult, TokenValue};
+use crate::token::{self, Token, TokenOperType, TokenAttrubute
+    , TokenContext, TokenMethodResult, TokenValue};
 use crate::lexical::CallbackReturnStatus;
 use crate::grammar::{GrammarParser, ExpressContext, Grammar};
 
