@@ -1,5 +1,5 @@
 pub struct StaticVariantDispatch {
-    index: usize
+    index: u64
 }
 
 mod variant;

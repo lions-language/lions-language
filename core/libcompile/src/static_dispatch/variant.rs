@@ -2,10 +2,10 @@ use libtype::AddressKey;
 use super::StaticVariantDispatch;
 
 impl StaticVariantDispatch {
-    pub fn alloc(&mut self) -> usize {
+    pub fn alloc(&mut self) -> AddressKey {
         let index = self.index;
         self.index += 1;
-        index
+        AddressKey::new(index)
     }
 
     pub fn new() -> Self {

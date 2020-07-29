@@ -30,9 +30,9 @@ impl AddressDispatch {
         self.recycles.push(addr);
     }
 
-    pub fn new(module_index: u64) -> Self {
+    pub fn new() -> Self {
         Self {
-            addr_key: AddressKey::new(module_index, 0),
+            addr_key: AddressKey::new(0),
             recycles: Vec::new()
         }
     }

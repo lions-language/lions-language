@@ -1,6 +1,7 @@
 use crate::lexical::{CallbackReturnStatus, TokenVecItem};
 use crate::grammar::{GrammarParser, ExpressContext, Grammar};
 use libtype::primeval::{PrimevalType, PrimevalData};
+use libmacro::{FieldGet};
 
 #[derive(Debug)]
 pub enum NumberValue {
@@ -158,7 +159,7 @@ impl TokenValue {
 }
 */
 
-#[derive(Default)]
+#[derive(Default, FieldGet)]
 pub struct TokenValue {
     pub token_type: TokenType,
     pub token_data: Option<TokenData>
@@ -176,19 +177,11 @@ impl TokenValue {
         }
     }
 
-    pub fn token_type(self) -> TokenType {
-        self.token_type
-    }
-
     /*
      * 因为 TokenType 中都是枚举, 所以拷贝的消耗非常小
      * */
     pub fn token_type_clone(&self) -> TokenType {
         self.token_type.clone()
-    }
-
-    pub fn token_type_ref(&self) -> &TokenType {
-        &self.token_type
     }
 
     pub fn new(typ: TokenType, data: Option<TokenData>) -> Self {

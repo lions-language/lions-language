@@ -175,14 +175,12 @@ impl Default for Type {
 
 #[derive(Clone, Debug, PartialEq, Hash, Eq, Default)]
 pub struct AddressKey {
-    pub module_index: u64,
     pub index: u64
 }
 
 impl AddressKey {
-    pub fn new(module_index: u64, index: u64) -> Self {
+    pub fn new(index: u64) -> Self {
         Self {
-            module_index: module_index,
             index: index
         }
     }

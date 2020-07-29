@@ -8,6 +8,7 @@ edition = "2018"
 
 [dependencies]
 libcommon = { path = "../libcommon" }
+libmacro = { path = "../libmacro" }
 libhosttype = { path = "../libhosttype" }
 libtype = { path = "../libtype" }
 libresult = { path = "../libresult" }
