@@ -58,5 +58,6 @@ pub enum Instruction {
     LoadUint32Const(Uint32Static),
     LoadVariant(VariantValue),
     CallPrimevalFunction(CallPrimevalFunction),
-    CallFunction(CallFunction)
+    CallFunction(CallFunction),
+    Invalid
 }

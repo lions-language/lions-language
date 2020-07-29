@@ -1,7 +1,7 @@
 use libtype::instruction::{
     Instruction, CallFunction};
 use libcommon::ptr::RefPtr;
-use libcommon::address::FunctionAddress;
+use libcommon::address::{FunctionAddress, FunctionAddrValue};
 use libtype::package::{PackageStr};
 use libcompile::define_stream::DefineStream;
 use std::collections::VecDeque;
@@ -95,12 +95,45 @@ impl LinkDefine {
         }
     }
 
+    pub fn read(&self, addr: &FunctionAddrValue) -> DefineBlock {
+        DefineBlock {
+            link_define: self,
+            pos: addr.start_pos_ref().clone(),
+            length: addr.length_ref().clone()
+        }
+    }
+
     pub fn new(define_stream: RefPtr) -> Self {
         let length = define_stream.as_ref::<DefineStream>().length();
         Self {
             define_stream: define_stream,
             code_segment: VecDeque::with_capacity(length),
             addr: length
+        }
+    }
+}
+
+pub struct DefineBlock<'a> {
+    link_define: &'a LinkDefine,
+    pos: usize,
+    length: usize
+}
+
+impl<'a> Iterator for DefineBlock<'a> {
+    type Item = Instruction;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.pos == self.length {
+            return None;
+        }
+        match self.link_define.code_segment.get(self.pos) {
+            Some(v) => {
+                self.pos += 1;
+                Some(v.clone())
+            },
+            None => {
+                None
+            }
         }
     }
 }

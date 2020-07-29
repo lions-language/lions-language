@@ -8,6 +8,7 @@ edition = "2018"
 
 [dependencies]
 libcompile = { path = "../libcompile" }
+liblink = { path = "../liblink" }
 libgrammar = { path = "../libgrammar" }
 libtype = { path = "../libtype" }
 libcommon = { path = "../libcommon" }

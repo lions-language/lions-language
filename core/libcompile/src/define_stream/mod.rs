@@ -48,7 +48,7 @@ impl<'a> Iterator for DefineBlock<'a> {
     type Item = RefPtr;
 
     fn next(&mut self) -> Option<Self::Item> {
-        if self.pos == self.length - 1 {
+        if self.pos == self.length {
             return None;
         }
         match self.stream.memory.get(self.pos) {

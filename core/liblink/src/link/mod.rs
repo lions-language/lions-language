@@ -4,25 +4,32 @@ use libcommon::ptr::RefPtr;
 use crate::define::{LinkDefine};
 
 pub struct Link {
-    link_define: LinkDefine
+    link_define: LinkDefine,
+    call_main_instruction: Instruction
 }
 
 impl bytecode::Writer for Link {
     fn write(&mut self, instruction: Instruction) {
         // println!("{:?}", instruction);
         self.link_define.start(&instruction);
+        *&mut self.call_main_instruction = instruction;
     }
 }
 
 
 impl Link {
-    pub fn link_define(&self) -> &LinkDefine {
-        &self.link_define
+    pub fn link_define(&mut self) -> &mut LinkDefine {
+        &mut self.link_define
+    }
+
+    pub fn call_main_instruction(&self) -> &Instruction {
+        &self.call_main_instruction
     }
 
     pub fn new(define_stream: RefPtr) -> Self {
         Self {
-            link_define: LinkDefine::new(define_stream)
+            link_define: LinkDefine::new(define_stream),
+            call_main_instruction: Instruction::Invalid
         }
     }
 }

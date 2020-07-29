@@ -34,7 +34,6 @@ impl VirtualMachine {
          * 计算返回值
          * */
         let result = *left_value as u16 + *right_value as u16;
-        println!("{}", result);
         /*
          * 将返回值写入到内存
          * */

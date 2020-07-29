@@ -11,6 +11,8 @@ use libcompile::define_stream::{DefineStream};
 use libcommon::optcode;
 use crate::memory::{stack, Rand};
 use libcommon::ptr::RefPtr;
+use liblink::define::LinkDefine;
+use liblink::link::Link;
 use crate::data::Data;
 
 struct MemoryContext {
@@ -33,12 +35,13 @@ impl MemoryContext {
 
 pub struct VirtualMachine {
     calc_stack: stack::TopStack<AddressValue>,
-    memory_context: MemoryContext
+    memory_context: MemoryContext,
+    link_define: RefPtr
 }
 
-impl Writer for VirtualMachine {
-    fn write(&mut self, instruction: Instruction) {
-        // println!("{:?}", &instruction);
+impl VirtualMachine {
+    fn execute(&mut self, instruction: Instruction) {
+        println!("{:?}", &instruction);
         match instruction {
             Instruction::LoadUint8Const(v) => {
                 self.load_const_uint8(v);
@@ -61,6 +64,32 @@ impl Writer for VirtualMachine {
             _ => {
                 unimplemented!("{:?}", &instruction);
             }
+        }
+    }
+
+    fn run(&mut self, entrance: Instruction) {
+        self.execute(entrance);
+    }
+
+    fn memory_mut(&mut self, addr: &AddressValue) -> &mut dyn Rand {
+        match addr.typ_ref() {
+            AddressType::Static => {
+                &mut self.memory_context.static_stack
+            },
+            AddressType::Stack => {
+                &mut self.memory_context.thread_stack
+            },
+            _ => {
+                panic!("should not happend");
+            }
+        }
+    }
+
+    pub fn new(link_define: RefPtr) -> Self {
+        Self {
+            calc_stack: stack::TopStack::new(),
+            memory_context: MemoryContext::new(),
+            link_define: link_define
         }
     }
 }
@@ -136,29 +165,6 @@ impl AddressControl for AddressValue {
     }
 }
 
-impl VirtualMachine {
-    fn memory_mut(&mut self, addr: &AddressValue) -> &mut dyn Rand {
-        match addr.typ_ref() {
-            AddressType::Static => {
-                &mut self.memory_context.static_stack
-            },
-            AddressType::Stack => {
-                &mut self.memory_context.thread_stack
-            },
-            _ => {
-                panic!("should not happend");
-            }
-        }
-    }
-
-    pub fn new() -> Self {
-        Self {
-            calc_stack: stack::TopStack::new(),
-            memory_context: MemoryContext::new()
-        }
-    }
-}
-
 mod load_const;
 mod load_variant;
 mod primeval_func_call;
@@ -207,15 +213,16 @@ mod test {
             }
         });
         let mut ds = DefineStream::new();
+        let mut ds_ptr = RefPtr::from_ref::<DefineStream>(&ds);
         let mut fdd = FunctionDefineDispatch::new(&mut ds);
         let mut package_index = PackageIndex::new();
         let mut package_str = String::from("test");
-        let mut virtual_machine = VirtualMachine::new();
+        let mut link = Link::new(ds_ptr);
         let mut grammar_context = GrammarContext{
             cb: Compiler::new(
                 Module::new(String::from("main")),
                 Bytecode::new(
-                    &mut virtual_machine
+                    &mut link
                     , &mut fdd
                 ),
                 InputContext::new(InputAttribute::new(FileType::Main)),
@@ -225,5 +232,8 @@ mod test {
         };
         let mut grammar_parser = GrammarParser::new(lexical_parser, &mut grammar_context);
         grammar_parser.parser();
+        let entrance = link.call_main_instruction().clone();
+        let mut virtual_machine = VirtualMachine::new(RefPtr::from_ref::<LinkDefine>(link.link_define()));
+        virtual_machine.run(entrance);
     }
 }
