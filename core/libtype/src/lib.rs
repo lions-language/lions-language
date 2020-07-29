@@ -226,4 +226,5 @@ pub mod primeval;
 pub mod typ;
 pub mod module;
 pub mod instruction;
+pub mod package;
 

@@ -7,6 +7,7 @@ use libtype::primeval::{PrimevalType, PrimevalData};
 use libtype::module::Module;
 use libresult::*;
 use libtype::{AddressKey, AddressValue};
+use libtype::package::{PackageStr};
 use libcommon::ptr::{RefPtr};
 use libmacro::{FieldGet};
 use crate::address;
@@ -22,7 +23,7 @@ pub struct ConstContext {
 
 #[derive(Debug)]
 pub struct CallFunctionContext<'a> {
-    pub package_str: Option<String>,
+    pub package_str: PackageStr,
     pub func: &'a Function,
     pub return_addr: AddressValue
 }

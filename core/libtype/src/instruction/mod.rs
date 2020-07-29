@@ -1,21 +1,23 @@
 use libcommon::optcode;
 use libcommon::address::{FunctionAddress};
+use libmacro::{FieldGet};
 use crate::{AddressValue, AddressKey};
+use crate::package::PackageStr;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct CallPrimevalFunction {
     pub opt: optcode::OptCode,
     pub return_addr: AddressValue
 }
 
-#[derive(Debug)]
+#[derive(Debug, FieldGet, Clone)]
 pub struct CallFunction {
-    pub package_str: String,
+    pub package_str: PackageStr,
     pub define_addr: FunctionAddress,
     pub return_addr: AddressValue
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct VariantValue {
     pub direction: AddressValue
 }
@@ -28,19 +30,19 @@ impl VariantValue {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Uint8Static {
     pub addr: AddressKey,
     pub value: u8
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Uint16Static {
     pub addr: AddressKey,
     pub value: u16
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Uint32Static {
     pub addr: AddressKey,
     pub value: u32
@@ -49,7 +51,7 @@ pub struct Uint32Static {
 /*
  * 指令
  * */
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Instruction {
     LoadUint8Const(Uint8Static),
     LoadUint16Const(Uint16Static),

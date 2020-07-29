@@ -1,6 +1,7 @@
 use libtype::{PackageType, PackageTypeValue};
 use libtype::function::{FindFunctionContext, FindFunctionResult};
 use libtype::AddressValue;
+use libtype::package::{PackageStr};
 use libresult::*;
 use crate::compile::{Compile, Compiler, FileType
     , CallFunctionContext};
@@ -31,7 +32,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                  * 函数调用
                                  * */
                                 let call_context = CallFunctionContext {
-                                    package_str: Some(self.package_str.to_string()),
+                                    package_str: PackageStr::Itself,
                                     func: &r.func,
                                     return_addr: AddressValue::new_invalid()
                                 };

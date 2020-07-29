@@ -27,6 +27,10 @@ impl DefineStream {
         block
     }
 
+    pub fn length(&self) -> usize {
+        self.memory.length()
+    }
+
     pub fn new() -> Self {
         Self {
             memory: memory::Memory::new()

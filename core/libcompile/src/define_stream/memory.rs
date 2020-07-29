@@ -15,6 +15,10 @@ impl Memory {
         self.instructions.get(index)
     }
 
+    pub fn length(&self) -> usize {
+        self.instructions.len()
+    }
+
     pub fn new() -> Self {
         Self {
             instructions: VecDeque::new()

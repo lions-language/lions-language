@@ -6,6 +6,7 @@ use libtype::function::{FunctionParamData, FunctionParamDataItem
         , FindFunctionResult, FunctionReturnDataAttr
         , Function};
 use libtype::{AddressType, AddressValue};
+use libtype::package::{PackageStr};
 use libcommon::ptr::{RefPtr};
 use crate::compile::{Compile, Compiler, CallFunctionContext};
 use crate::address::{Address};
@@ -180,7 +181,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
             }
         };
         self.cb.call_function(CallFunctionContext{
-            package_str: None,
+            package_str: PackageStr::Empty,
             func: func,
             return_addr: return_addr.addr_clone()
         });

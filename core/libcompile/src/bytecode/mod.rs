@@ -70,7 +70,7 @@ impl<'a, 'b, F: Writer> Compile for Bytecode<'a, 'b, F> {
             FunctionDefine::Address(addr) => {
                 let instruction = Instruction::CallFunction(
                     CallFunction{
-                        package_str: context.package_str.expect("should not happend"),
+                        package_str: context.package_str,
                         define_addr: addr.addr_ref().clone(),
                         return_addr: context.return_addr
                     }
