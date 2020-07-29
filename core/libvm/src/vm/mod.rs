@@ -210,11 +210,12 @@ mod test {
         let mut fdd = FunctionDefineDispatch::new(&mut ds);
         let mut package_index = PackageIndex::new();
         let mut package_str = String::from("test");
+        let mut virtual_machine = VirtualMachine::new();
         let mut grammar_context = GrammarContext{
             cb: Compiler::new(
                 Module::new(String::from("main")),
                 Bytecode::new(
-                    VirtualMachine::new()
+                    &mut virtual_machine
                     , &mut fdd
                 ),
                 InputContext::new(InputAttribute::new(FileType::Main)),

@@ -77,11 +77,12 @@ mod test {
         let mut fdd = FunctionDefineDispatch::new(&mut ds);
         let mut package_index = PackageIndex::new();
         let package_str = String::from("test");
+        let mut link = Link::new(ds_ptr);
         let mut grammar_context = GrammarContext{
             cb: Compiler::new(
                     Module::new(String::from("main"))
                     , Bytecode::new(
-                        Link::new(ds_ptr)
+                        &mut link
                         , &mut fdd)
                     , InputContext::new(InputAttribute::new(
                             FileType::Main))

@@ -16,7 +16,7 @@ pub trait Writer {
 }
 
 pub struct Bytecode<'a, 'b, F: Writer> {
-    writer: F,
+    writer: &'a mut F,
     define_stack: DefineStack,
     func_define_dispatch: &'a mut FunctionDefineDispatch<'b>
 }
@@ -102,7 +102,7 @@ impl<'a, 'b, F: Writer> Bytecode<'a, 'b, F> {
         }
     }
 
-    pub fn new(writer: F, func_define_dispatch: &'a mut FunctionDefineDispatch<'b>) -> Self {
+    pub fn new(writer: &'a mut F, func_define_dispatch: &'a mut FunctionDefineDispatch<'b>) -> Self {
         Self {
             writer: writer,
             define_stack: DefineStack::new(),
@@ -164,11 +164,12 @@ mod test {
         let mut fdd = FunctionDefineDispatch::new(&mut ds);
         let mut package_index = PackageIndex::new();
         let package_str = String::from("test");
+        let mut test_writer = TestWriter{};
         let mut grammar_context = GrammarContext{
             cb: Compiler::new(
                 Module::new(String::from("main")),
                 Bytecode::new(
-                    TestWriter{}
+                    &mut test_writer
                     , &mut fdd),
                 InputContext::new(InputAttribute::new(FileType::Main)),
                 &mut package_index,
