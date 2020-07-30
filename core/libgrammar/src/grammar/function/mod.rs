@@ -119,6 +119,35 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                 /*
                  * { 后面是语句块 => 处理语句块
                  * */
+                self.parser_inner(|grammar, token_ptr| {
+                    let tp = match token_ptr {
+                        Some(tp) => {
+                            tp
+                        },
+                        None => {
+                            /*
+                             * 到达文件结束
+                             * 取出空白后不存在下一个token, 到达了 IO EOF, 但是期望的是 } => 语法错误
+                             * */
+                            grammar.panic("expect `}`, but arrive IO EOF");
+                            return true;
+                        }
+                    };
+                    let token = tp.as_ref::<T, CB>();
+                    /*
+                     * 如果是 } 就结束, 否则继续
+                     * */
+                    if let TokenType::RightBigParenthese = token.context_ref().token_type() {
+                        /*
+                         * 结束
+                         * */
+                        true
+                    } else {
+                        false
+                        // grammar.panic(&format!("expect `{}`, but found: {:?}", "}", token.context_ref().token_type()));
+                    }
+                });
+                /*
                 self.select_with_exprcontext(&tp, &ExpressContext::new(GrammarParser::<T, CB>::expression_end_right_big_parenthese));
                 /*
                  * 删除所有的空白
@@ -144,6 +173,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                     self.panic(&format!("expect `{}`, but found: {:?}", "}", token.context_ref().token_type()));
                     return;
                 }
+                */
             }
         }
         /*

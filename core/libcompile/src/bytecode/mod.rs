@@ -3,7 +3,8 @@ use libtype::primeval::{PrimevalData};
 use libtype::instruction::{Instruction, CallPrimevalFunction
     , CallFunction
     , VariantValue, Uint8Static
-    , Uint16Static, Uint32Static};
+    , Uint16Static, Uint32Static
+    , StringStatic};
 use crate::compile::{ConstContext, CallFunctionContext
     , FunctionNamedStmtContext, Compile};
 use crate::address;
@@ -47,6 +48,20 @@ impl<'a, 'b, F: Writer> Compile for Bytecode<'a, 'b, F> {
             },
             _ => {
                 unimplemented!();
+            }
+        }
+    }
+
+    fn const_string(&mut self, context: ConstContext) {
+        match context.data {
+            PrimevalData::Str(v) => {
+                let instruction = Instruction::LoadStringConst(StringStatic{
+                    addr: context.addr,
+                    value: v.expect("should not happend")
+                });
+            },
+            _ => {
+                panic!("should not happend");
             }
         }
     }

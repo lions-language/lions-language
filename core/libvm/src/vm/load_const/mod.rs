@@ -26,5 +26,9 @@ impl VirtualMachine {
     pub fn load_const_uint32(&mut self, value: Uint32Static) {
         load_const!(Uint32, self, value);
     }
+
+    pub fn load_const_string(&mut self, value: StringStatic) {
+        load_const!(Str, self, value);
+    }
 }
 

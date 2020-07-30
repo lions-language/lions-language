@@ -52,6 +52,9 @@ impl VirtualMachine {
             Instruction::LoadUint32Const(v) => {
                 self.load_const_uint32(v);
             },
+            Instruction::LoadStringConst(v) => {
+                self.load_const_string(v);
+            },
             Instruction::CallPrimevalFunction(v) => {
                 self.call_primeval_function(v);
             },

@@ -82,6 +82,12 @@ pub struct GrammarContext<CB>
 }
 
 pub type ExpressEndFunc<T, CB> = fn(&mut GrammarParser<T, CB>, &TokenVecItem<T, CB>) -> TokenMethodResult;
+/*
+ * return:
+ *  true: 解析结束
+ *  false: 解析继续
+ * */
+pub type ParserEndFunc<T, CB> = fn(&mut GrammarParser<T, CB>, &Option<TokenPointer>) -> bool;
 
 pub struct ExpressContext<T: FnMut() -> CallbackReturnStatus, CB: Grammar> {
     pub end_f: ExpressEndFunc<T, CB>
@@ -102,9 +108,19 @@ pub struct GrammarParser<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> {
 
 impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, CB> {
     pub fn parser(&mut self) {
+        self.parser_inner(|_, _| -> bool {
+            false
+        });
+    }
+
+    fn parser_inner(&mut self, cb: ParserEndFunc<T, CB>) {
         loop {
             // match self.lexical_parser.lookup_next_one_ptr() {
-            match self.skip_white_space_token() {
+            let tp = self.skip_white_space_token();
+            if (cb)(self, &tp) {
+                break;
+            }
+            match tp {
                 Some(p) => {
                     self.select(&p);
                 },
@@ -225,7 +241,8 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
      * 如果跳过所有的空白之后, 还有有效的 token, 将返回 Some(token), 否则返回 None
      * */
     pub fn skip_white_space_token(&mut self) -> Option<TokenPointer> {
-        loop { let tp = match self.lookup_next_one_ptr() {
+        loop {
+            let tp = match self.lookup_next_one_ptr() {
                 Some(tp) => {
                     tp
                 },

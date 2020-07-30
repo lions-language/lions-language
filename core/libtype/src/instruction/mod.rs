@@ -3,6 +3,7 @@ use libcommon::address::{FunctionAddress};
 use libmacro::{FieldGet};
 use crate::{AddressValue, AddressKey};
 use crate::package::PackageStr;
+use crate::primeval::string::Str;
 
 #[derive(Debug, Clone)]
 pub struct CallPrimevalFunction {
@@ -48,6 +49,12 @@ pub struct Uint32Static {
     pub value: u32
 }
 
+#[derive(Debug, Clone)]
+pub struct StringStatic {
+    pub addr: AddressKey,
+    pub value: Str
+}
+
 /*
  * 指令
  * */
@@ -56,6 +63,7 @@ pub enum Instruction {
     LoadUint8Const(Uint8Static),
     LoadUint16Const(Uint16Static),
     LoadUint32Const(Uint32Static),
+    LoadStringConst(StringStatic),
     LoadVariant(VariantValue),
     CallPrimevalFunction(CallPrimevalFunction),
     CallFunction(CallFunction),

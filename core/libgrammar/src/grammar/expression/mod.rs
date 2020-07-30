@@ -73,6 +73,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
      * */
     pub fn expression(&mut self, operator_bp: &u8, express_context: &ExpressContext<T, CB>, input_token_ptr: &TokenPointer) -> TokenMethodResult {
         let input_token = input_token_ptr.as_ref::<T, CB>();
+        // println!("{:?}", input_token.context_token_type());
         let nup_r = input_token.nup(self, express_context);
         match nup_r {
             TokenMethodResult::None => {
@@ -84,6 +85,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                 self.panic(&format!("expect operand, but found {:?}", input_token.context_ref().token_type()));
             },
             TokenMethodResult::StmtEnd => {
+                // println!("stmt send");
                 return nup_r;
             },
             _ => {}
