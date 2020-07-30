@@ -60,6 +60,11 @@ impl<'a> FunctionDefineDispatch<'a> {
         }
     }
 
+    /*
+     * TODO: 在 module 编译完成后, 从 FunctionDefineDispatch 中获取待填充队列
+     * 读取队列中的每一个元素, 然后填充 DefineStream 相应位置的指令
+     * */
+
     pub fn new(ds: &'a mut DefineStream) -> Self {
         Self {
             processing_funcs: VecDeque::new(),

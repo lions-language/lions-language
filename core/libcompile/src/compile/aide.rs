@@ -31,19 +31,19 @@ impl<'a, F: Compile> Compiler<'a, F> {
 }
 
 impl TokenValueExpand for TokenValue {
-    fn to_const_type(&self) -> Type {
+    fn to_type(&self) -> Type {
         match self.token_type_clone() {
             TokenType::Const(t) => {
                 Type::new(TypeValue::Primeval(Primeval::new(
                             t)), TypeAttrubute::Ref)
             },
             _ => {
-                panic!("should not happend");
+                unimplemented!();
             }
         }
     }
 
-    fn to_const_data(self) -> Data {
+    fn to_data(self) -> Data {
         match self.token_data {
             Some(data) => {
                 match data {
@@ -51,7 +51,7 @@ impl TokenValueExpand for TokenValue {
                         Data::new(DataValue::Primeval(d))
                     },
                     _ => {
-                        panic!("should not happend");
+                        unimplemented!();
                     }
                 }
             },

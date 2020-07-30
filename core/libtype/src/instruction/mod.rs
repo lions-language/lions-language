@@ -1,6 +1,6 @@
 use libcommon::optcode;
 use libcommon::address::{FunctionAddress};
-use libmacro::{FieldGet};
+use libmacro::{FieldGet, FieldGetClone};
 use crate::{AddressValue, AddressKey};
 use crate::package::PackageStr;
 use crate::primeval::string::Str;
@@ -55,6 +55,12 @@ pub struct StringStatic {
     pub value: Str
 }
 
+#[derive(Debug, Clone, FieldGet, FieldGetClone)]
+pub struct StaticVariant {
+    pub package_str: PackageStr,
+    pub addr: AddressKey
+}
+
 /*
  * 指令
  * */
@@ -65,6 +71,7 @@ pub enum Instruction {
     LoadUint32Const(Uint32Static),
     LoadStringConst(StringStatic),
     LoadVariant(VariantValue),
+    ReadStaticVariant(StaticVariant),
     CallPrimevalFunction(CallPrimevalFunction),
     CallFunction(CallFunction),
     Invalid

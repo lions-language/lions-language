@@ -16,9 +16,9 @@ use crate::address::PackageIndex;
 use crate::static_dispatch::{StaticVariantDispatch};
 
 #[derive(Debug)]
-pub struct ConstContext {
+pub struct StaticContext {
+    pub package_str: PackageStr,
     pub typ: Type,
-    pub data: Data,
     pub addr: AddressKey
 }
 
@@ -40,16 +40,16 @@ pub enum CompileType {
 }
 
 trait TokenValueExpand {
-    fn to_const_type(&self) -> Type;
-    fn to_const_data(self) -> Data;
+    fn to_type(&self) -> Type;
+    fn to_data(self) -> Data;
 }
 
 pub trait Compile {
-    fn const_number(&mut self, context: ConstContext) {
+    fn const_number(&mut self, context: StaticContext) {
         println!("{:?}", context);
     }
 
-    fn const_string(&mut self, context: ConstContext) {
+    fn const_string(&mut self, context: StaticContext) {
         unimplemented!();
     }
 
@@ -110,7 +110,7 @@ pub struct Compiler<'a, F: Compile> {
     compile_status_dispatch: compile_status_dispatch::CompileStatusDispatch,
     input_context: InputContext,
     package_index: &'a mut PackageIndex,
-    static_variant_dispatch: &'a mut StaticVariantDispatch,
+    static_variant_dispatch: &'a mut StaticVariantDispatch<'a>,
     package_str: &'a str,
     cb: F
 }
@@ -148,7 +148,7 @@ impl<'a, F: Compile> Grammar for Compiler<'a, F> {
 impl<'a, F: Compile> Compiler<'a, F> {
     pub fn new(module: Module, cb: F, input_context: InputContext
         , package_index: &'a mut PackageIndex
-        , static_variant_dispatch: &'a mut StaticVariantDispatch
+        , static_variant_dispatch: &'a mut StaticVariantDispatch<'a>
         , package_str: &'a str) -> Self {
         Self {
             function_control: FunctionControl::new(),
@@ -188,6 +188,7 @@ mod test {
     use libgrammar::lexical::CallbackReturnStatus;
     use libgrammar::grammar::GrammarContext;
     use libtype::module::Module;
+    use crate::static_stream::StaticStream;
     use super::*;
 
     use std::fs;
@@ -226,7 +227,8 @@ mod test {
             }
         });
         let mut package_index = PackageIndex::new();
-        let mut static_variant_dispatch = StaticVariantDispatch::new();
+        let mut static_stream = StaticStream::new();
+        let mut static_variant_dispatch = StaticVariantDispatch::new(&mut static_stream);
         let package_str = String::from("test");
         let mut grammar_context = GrammarContext{
             cb: Compiler::new(Module::new(String::from("main"))

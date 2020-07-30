@@ -11,7 +11,14 @@ pub struct Link {
 impl bytecode::Writer for Link {
     fn write(&mut self, instruction: Instruction) {
         // println!("{:?}", instruction);
+        /*
+         * 这里只会进一次, main入口
+         * 第一个指令一定是调用入口函数, 所以交给 define 处理
+         * */
         self.link_define.start(&instruction);
+        /*
+         * 链接静态量
+         * */
         *&mut self.call_main_instruction = instruction;
     }
 }
@@ -48,6 +55,7 @@ mod test {
     use libcompile::bytecode::{self, Bytecode};
     use libcompile::define_stream::{DefineStream};
     use libcompile::define_dispatch::{FunctionDefineDispatch};
+    use libcompile::static_dispatch::{StaticVariantDispatch};
     use super::*;
 
     use std::fs;
@@ -83,6 +91,7 @@ mod test {
         let ds_ptr = RefPtr::from_ref::<DefineStream>(&ds);
         let mut fdd = FunctionDefineDispatch::new(&mut ds);
         let mut package_index = PackageIndex::new();
+        let mut static_variant_dispatch = StaticVariantDispatch::new();
         let package_str = String::from("test");
         let mut link = Link::new(ds_ptr);
         let mut grammar_context = GrammarContext{
@@ -94,6 +103,7 @@ mod test {
                     , InputContext::new(InputAttribute::new(
                             FileType::Main))
                     , &mut package_index
+                    , &mut static_variant_dispatch
                     , &package_str)
         };
         let mut grammar_parser = GrammarParser::new(lexical_parser, &mut grammar_context);

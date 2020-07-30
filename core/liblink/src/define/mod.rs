@@ -3,7 +3,7 @@ use libtype::instruction::{
 use libcommon::ptr::RefPtr;
 use libcommon::address::{FunctionAddress, FunctionAddrValue};
 use libtype::package::{PackageStr};
-use libcompile::define_stream::DefineStream;
+use libcompile::define_stream::{self, DefineStream};
 use std::collections::VecDeque;
 
 /*
@@ -17,16 +17,19 @@ use std::collections::VecDeque;
 pub struct LinkDefine {
     define_stream: RefPtr,
     code_segment: VecDeque<Instruction>,
-    addr: usize
+    /*
+     * 第三方包的起始地址
+     * */
+    addr: usize,
+    index: usize
 }
 
 impl LinkDefine {
     pub fn start(&mut self, instruction: &Instruction) {
-        let mut index = 0;
-        self.execute(instruction, true, &mut index);
+        self.execute(instruction, true);
     }
 
-    fn call_itself_func(&mut self, call_context: &CallFunction, index: &mut usize) {
+    pub fn call_itself_func(&mut self, call_context: &CallFunction) {
         /*
          * 语法点:
          * let mut ds = self.define_stream.clone();
@@ -48,11 +51,11 @@ impl LinkDefine {
         };
         let define_block = ds.read(address_value);
         for instruction in define_block {
-            self.execute(instruction.as_ref::<Instruction>(), false, index);
+            self.execute(instruction.as_ref::<Instruction>(), false);
         }
     }
 
-    fn execute(&mut self, instruction: &Instruction, is_first: bool, index: &mut usize) {
+    fn execute(&mut self, instruction: &Instruction, is_first: bool) {
         match instruction {
             Instruction::CallFunction(value) => {
                 let ps = value.package_str_ref();
@@ -61,7 +64,7 @@ impl LinkDefine {
                         /*
                          * 从 define_stream 中查找
                          * */
-                        self.call_itself_func(&value, index);
+                        self.call_itself_func(&value);
                     },
                     PackageStr::Third(_) => {
                         /*
@@ -75,12 +78,17 @@ impl LinkDefine {
                     }
                 }
             },
+            Instruction::ReadStaticVariant(value) => {
+                /*
+                 * 从 static_stream 中查找
+                 * */
+            },
             _ => {
             }
         }
         if !is_first {
             self.code_segment.push_back(instruction.clone());
-            *index += 1;
+            self.index += 1;
             /*
             match self.code_segment.get_mut(*index) {
                 Some(v) => {
@@ -108,7 +116,8 @@ impl LinkDefine {
         Self {
             define_stream: define_stream,
             code_segment: VecDeque::with_capacity(length),
-            addr: length
+            addr: length,
+            index: 0
         }
     }
 }

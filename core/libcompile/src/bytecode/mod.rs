@@ -5,8 +5,8 @@ use libtype::instruction::{Instruction, CallPrimevalFunction
     , CallFunction
     , VariantValue, Uint8Static
     , Uint16Static, Uint32Static
-    , StringStatic};
-use crate::compile::{ConstContext, CallFunctionContext
+    , StringStatic, StaticVariant};
+use crate::compile::{StaticContext, CallFunctionContext
     , FunctionNamedStmtContext, Compile};
 use crate::address;
 use define_stack::DefineStack;
@@ -24,7 +24,8 @@ pub struct Bytecode<'a, 'b, F: Writer> {
 }
 
 impl<'a, 'b, F: Writer> Compile for Bytecode<'a, 'b, F> {
-    fn const_number(&mut self, context: ConstContext) {
+    fn const_number(&mut self, context: StaticContext) {
+        /*
         match context.data.value() {
             DataValue::Primeval(pri) => {
                 match pri {
@@ -58,9 +59,16 @@ impl<'a, 'b, F: Writer> Compile for Bytecode<'a, 'b, F> {
                 unimplemented!();
             }
         }
+        */
     }
 
-    fn const_string(&mut self, context: ConstContext) {
+    fn const_string(&mut self, context: StaticContext) {
+        let instruction = Instruction::ReadStaticVariant(StaticVariant{
+            package_str: context.package_str,
+            addr: context.addr
+        });
+        self.write(instruction);
+        /*
         match context.data.value() {
             DataValue::Primeval(pri) => {
                 match pri {
@@ -80,6 +88,7 @@ impl<'a, 'b, F: Writer> Compile for Bytecode<'a, 'b, F> {
                 unimplemented!();
             }
         }
+        */
     }
 
     fn load_variant(&mut self, addr: &address::Address) {
@@ -156,6 +165,7 @@ mod test {
     use crate::address::{PackageIndex};
     use crate::define_stream::DefineStream;
     use crate::static_dispatch::{StaticVariantDispatch};
+    use crate::static_stream::{StaticStream};
     use super::*;
 
     use std::fs;
@@ -194,7 +204,8 @@ mod test {
         });
         let mut ds = DefineStream::new();
         let mut fdd = FunctionDefineDispatch::new(&mut ds);
-        let mut static_variant_dispatch = StaticVariantDispatch::new();
+        let mut static_stream = StaticStream::new();
+        let mut static_variant_dispatch = StaticVariantDispatch::new(&mut static_stream);
         let mut package_index = PackageIndex::new();
         let package_str = String::from("test");
         let mut test_writer = TestWriter{};
