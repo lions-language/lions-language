@@ -1,5 +1,6 @@
 use libtype::function::{FunctionDefine, Function};
 use libtype::primeval::{PrimevalData};
+use libtype::DataValue;
 use libtype::instruction::{Instruction, CallPrimevalFunction
     , CallFunction
     , VariantValue, Uint8Static
@@ -24,27 +25,34 @@ pub struct Bytecode<'a, 'b, F: Writer> {
 
 impl<'a, 'b, F: Writer> Compile for Bytecode<'a, 'b, F> {
     fn const_number(&mut self, context: ConstContext) {
-        match context.data {
-            PrimevalData::Uint8(v) => {
-                let instruction = Instruction::LoadUint8Const(Uint8Static{
-                    addr: context.addr,
-                    value: v.expect("should not happend").to_std()
-                });
-                self.write(instruction);
-            },
-            PrimevalData::Uint16(v) => {
-                let instruction = Instruction::LoadUint16Const(Uint16Static{
-                    addr: context.addr,
-                    value: v.expect("should not happend").to_std()
-                });
-                self.write(instruction);
-            },
-            PrimevalData::Uint32(v) => {
-                let instruction = Instruction::LoadUint32Const(Uint32Static{
-                    addr: context.addr,
-                    value: v.expect("should not happend").to_std()
-                });
-                self.write(instruction);
+        match context.data.value() {
+            DataValue::Primeval(pri) => {
+                match pri {
+                    PrimevalData::Uint8(v) => {
+                        let instruction = Instruction::LoadUint8Const(Uint8Static{
+                            addr: context.addr,
+                            value: v.expect("should not happend").to_std()
+                        });
+                        self.write(instruction);
+                    },
+                    PrimevalData::Uint16(v) => {
+                        let instruction = Instruction::LoadUint16Const(Uint16Static{
+                            addr: context.addr,
+                            value: v.expect("should not happend").to_std()
+                        });
+                        self.write(instruction);
+                    },
+                    PrimevalData::Uint32(v) => {
+                        let instruction = Instruction::LoadUint32Const(Uint32Static{
+                            addr: context.addr,
+                            value: v.expect("should not happend").to_std()
+                        });
+                        self.write(instruction);
+                    },
+                    _ => {
+                        unimplemented!();
+                    }
+                }
             },
             _ => {
                 unimplemented!();
@@ -53,15 +61,23 @@ impl<'a, 'b, F: Writer> Compile for Bytecode<'a, 'b, F> {
     }
 
     fn const_string(&mut self, context: ConstContext) {
-        match context.data {
-            PrimevalData::Str(v) => {
-                let instruction = Instruction::LoadStringConst(StringStatic{
-                    addr: context.addr,
-                    value: v.expect("should not happend")
-                });
+        match context.data.value() {
+            DataValue::Primeval(pri) => {
+                match pri {
+                    PrimevalData::Str(v) => {
+                        let instruction = Instruction::LoadStringConst(StringStatic{
+                            addr: context.addr,
+                            value: v.expect("should not happend")
+                        });
+                        self.write(instruction);
+                    },
+                    _ => {
+                        panic!("should not happend");
+                    }
+                }
             },
             _ => {
-                panic!("should not happend");
+                unimplemented!();
             }
         }
     }

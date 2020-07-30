@@ -1,6 +1,6 @@
 use libgrammar::grammar::Grammar;
 use libgrammar::token::{TokenValue};
-use libtype::{PackageType, PackageTypeValue};
+use libtype::{Type, Data, PackageType, PackageTypeValue};
 use libtype::function::{Function, FindFunctionContext};
 use libtypecontrol::function::FunctionControl;
 use libtype::primeval::{PrimevalType, PrimevalData};
@@ -17,8 +17,8 @@ use crate::static_dispatch::{StaticVariantDispatch};
 
 #[derive(Debug)]
 pub struct ConstContext {
-    pub typ: PrimevalType,
-    pub data: PrimevalData,
+    pub typ: Type,
+    pub data: Data,
     pub addr: AddressKey
 }
 
@@ -37,6 +37,11 @@ pub struct FunctionNamedStmtContext {
 pub enum CompileType {
     Runtime,
     Compile
+}
+
+trait TokenValueExpand {
+    fn to_const_type(&self) -> Type;
+    fn to_const_data(self) -> Data;
 }
 
 pub trait Compile {

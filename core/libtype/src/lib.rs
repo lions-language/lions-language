@@ -1,6 +1,7 @@
 use libcommon::ptr::RefPtr;
 use libmacro::{FieldGet, FieldGetClone};
-use crate::primeval::PrimevalType;
+use crate::primeval::{PrimevalType, PrimevalData};
+use crate::structure::{StructureData};
 use std::cmp::{PartialEq, Eq};
 use std::hash::Hash;
 
@@ -116,6 +117,32 @@ pub struct Type {
     addr_typ: TypeAddrType
 }
 
+#[derive(Debug)]
+pub enum DataValue {
+    Primeval(PrimevalData),
+    Structure(StructureData),
+    Empty
+}
+
+#[derive(Debug, FieldGet)]
+pub struct Data {
+    value: DataValue
+}
+
+impl Data {
+    pub fn new_empty() -> Self {
+        Self {
+            value: DataValue::Empty
+        }
+    }
+
+    pub fn new(value: DataValue) -> Self {
+        Self {
+            value: value
+        }
+    }
+}
+
 #[derive(Debug, Clone)]
 pub enum PackageTypeValue {
     Primeval,
@@ -225,4 +252,5 @@ pub mod typ;
 pub mod module;
 pub mod instruction;
 pub mod package;
+pub mod structure;
 

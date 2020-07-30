@@ -1,6 +1,8 @@
-use libgrammar::token::{TokenType, TokenValue};
-use libtype::{Type, TypeValue, Primeval, TypeAttrubute};
-use super::{Compiler, Compile};
+use libgrammar::token::{TokenType, TokenValue, TokenData};
+use libtype::{Type, Data, TypeValue
+    , Primeval, TypeAttrubute
+    , DataValue};
+use super::{Compiler, Compile, TokenValueExpand};
 
 impl<'a, F: Compile> Compiler<'a, F> {
     pub fn tokentype_to_type(&self, typ: TokenType) -> Type {
@@ -23,6 +25,38 @@ impl<'a, F: Compile> Compiler<'a, F> {
             },
             _ => {
                 panic!("should not happend");
+            }
+        }
+    }
+}
+
+impl TokenValueExpand for TokenValue {
+    fn to_const_type(&self) -> Type {
+        match self.token_type_clone() {
+            TokenType::Const(t) => {
+                Type::new(TypeValue::Primeval(Primeval::new(
+                            t)), TypeAttrubute::Ref)
+            },
+            _ => {
+                panic!("should not happend");
+            }
+        }
+    }
+
+    fn to_const_data(self) -> Data {
+        match self.token_data {
+            Some(data) => {
+                match data {
+                    TokenData::Const(d) => {
+                        Data::new(DataValue::Primeval(d))
+                    },
+                    _ => {
+                        panic!("should not happend");
+                    }
+                }
+            },
+            None => {
+                Data::new_empty()
             }
         }
     }
