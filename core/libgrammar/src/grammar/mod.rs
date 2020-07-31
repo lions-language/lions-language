@@ -70,6 +70,11 @@ pub trait Grammar {
     }
 }
 
+pub enum AfterIdProcess {
+    FunctionCall,
+    Id
+}
+
 enum NextToken<T: FnMut() -> CallbackReturnStatus, CB: Grammar> {
     True(TokenVecItem<T, CB>),
     False(TokenPointer),
@@ -147,6 +152,15 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
             },
             TokenType::Function => {
                 self.function_process();
+            },
+            TokenType::Id => {
+                match self.id_process() {
+                    AfterIdProcess::Id => {
+                        self.expression_process(token, express_context);
+                    },
+                    _ => {
+                    }
+                }
             },
             _ => {
                 self.expression_process(token, express_context);
@@ -292,7 +306,11 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
     }
 
     pub fn skip_next_one(&mut self) {
-        self.lexical_parser.skip_next_one()
+        self.lexical_parser.skip_next_one();
+    }
+
+    pub fn skip_next_n(&mut self, n: usize) {
+        self.lexical_parser.skip_next_n(n);
     }
 
     pub fn lookup_next_one_ptr(&mut self) -> Option<TokenPointer> {
@@ -311,8 +329,8 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         self.lexical_parser.set_backtrack_point();
     }
 
-    pub fn restore_from_backtrack_point(&mut self) {
-        self.lexical_parser.restore_from_backtrack_point();
+    pub fn restore_from_backtrack_point(&mut self) -> usize {
+        self.lexical_parser.restore_from_backtrack_point()
     }
 
     pub fn backtrack_n(&mut self, n: usize) {
@@ -338,6 +356,8 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
 
 mod expression;
 mod function;
+mod id;
+mod funccall;
 mod token_extend;
 mod annotate;
 mod typesof;

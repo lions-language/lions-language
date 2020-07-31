@@ -240,11 +240,12 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
         self.backtrack_point = self.index;
     }
 
-    pub fn restore_from_backtrack_point(&mut self) {
+    pub fn restore_from_backtrack_point(&mut self) -> usize {
         /*
          * 从设置的回溯点恢复
          * */
         self.index = self.backtrack_point;
+        self.index - self.backtrack_point
     }
 
     pub fn backtrack_n(&mut self, n: usize) {

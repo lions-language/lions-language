@@ -2,8 +2,41 @@ use super::{GrammarParser, ExpressContext, Grammar};
 use crate::lexical::{CallbackReturnStatus, TokenPointer, TokenVecItem};
 use crate::token::{TokenType, TokenMethodResult, TokenOperType};
 
+macro_rules! expression_check_end {
+    ($self:ident, $express_context:ident) => {
+        {
+            let mut next_tp = match $self.lexical_parser.lookup_next_one_ptr() {
+                Some(tp) => {
+                    tp
+                },
+                None => {
+                    /*
+                     * 操作数之后是 EOF => 结束
+                     * */
+                    return TokenMethodResult::StmtEnd;
+                }
+            };
+            let mut next_token = next_tp.as_ref::<T, CB>();
+            let cb_r = ($express_context.end_f)($self, next_token);
+            match cb_r {
+                TokenMethodResult::StmtEnd
+                | TokenMethodResult::ParentheseEnd => {
+                    /*
+                     * 语句结束 或者 是 () 内的结束
+                     * */
+                    return cb_r;
+                },
+                _ => {
+                }
+            }
+            (next_tp, next_token)
+        }
+    }
+}
+
 impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, CB> {
-    pub fn expression_end_normal(grammar: &mut GrammarParser<T, CB>, token: &TokenVecItem<T, CB>) -> TokenMethodResult {
+    pub fn expression_end_normal(grammar: &mut GrammarParser<T, CB>
+        , token: &TokenVecItem<T, CB>) -> TokenMethodResult {
         // println!("normal end ... ");
         match token.context_ref().token_type() {
             TokenType::Semicolon
@@ -27,7 +60,9 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         TokenMethodResult::Continue
     }
 
-    pub fn expression_end_right_big_parenthese(grammar: &mut GrammarParser<T, CB>, token: &TokenVecItem<T, CB>) -> TokenMethodResult {
+    pub fn expression_end_right_big_parenthese(
+        grammar: &mut GrammarParser<T, CB>
+        , token: &TokenVecItem<T, CB>) -> TokenMethodResult {
         match token.context_ref().token_type() {
             TokenType::RightBigParenthese => {
                 return TokenMethodResult::StmtEnd;
@@ -38,8 +73,24 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         TokenMethodResult::Continue
     }
 
+    pub fn expression_end_param_list(
+        grammar: &mut GrammarParser<T, CB>
+        , token: &TokenVecItem<T, CB>) -> TokenMethodResult {
+        match token.context_ref().token_type() {
+            TokenType::RightParenthese
+                | TokenType::Comma => {
+                grammar.skip_next_one();
+                return TokenMethodResult::StmtEnd;
+            },
+            _ => {
+            }
+        }
+        TokenMethodResult::Continue
+    }
+
     pub fn expression_process_default_exprcontext(&mut self, token: &TokenPointer) {
-        self.expression(&0, &ExpressContext::new(GrammarParser::<T, CB>::expression_end_normal), token);
+        self.expression(&0, &ExpressContext::new(
+                GrammarParser::<T, CB>::expression_end_normal), token);
     }
 
     pub fn expression_process(&mut self, token: &TokenPointer, express_context: &ExpressContext<T, CB>) {
@@ -72,6 +123,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
      * 4. 提供一个函数指针, 用于判断是否结束 (不需要捕获周边环境, 所以使用函数指针, 提高性能)
      * */
     pub fn expression(&mut self, operator_bp: &u8, express_context: &ExpressContext<T, CB>, input_token_ptr: &TokenPointer) -> TokenMethodResult {
+        // expression_check_end!(self, express_context);
         let input_token = input_token_ptr.as_ref::<T, CB>();
         // println!("{:?}", input_token.context_token_type());
         let nup_r = input_token.nup(self, express_context);
@@ -90,6 +142,8 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
             },
             _ => {}
         }
+        let (mut next_tp, mut next_token) = expression_check_end!(self, express_context);
+        /*
         let mut next_tp = match self.lexical_parser.lookup_next_one_ptr() {
             Some(tp) => {
                 tp
@@ -118,6 +172,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
             _ => {
             }
         }
+        */
         // println!("{}", next_token.context.token_type.format());
         /*
          * 如果到达这里, 说明 next_token 是操作符
