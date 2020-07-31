@@ -12,6 +12,10 @@ impl StaticStream {
         self.datas.push_back(data);
     }
 
+    pub fn length(&self) -> usize {
+        self.datas.len()
+    }
+
     pub fn new() -> Self {
         Self {
             datas: VecDeque::new()

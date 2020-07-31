@@ -4,7 +4,7 @@ use libtype::function::{FunctionDefine};
 use libtype::primeval::{PrimevalType, PrimevalData};
 use libtype::{AddressValue, AddressType, AddressKey};
 use libtype::instruction::{Instruction};
-use libcompile::compile::{ConstContext, CallFunctionContext
+use libcompile::compile::{StaticContext, CallFunctionContext
     , Compile, Compiler};
 use libcompile::bytecode::{Bytecode, Writer};
 use libcompile::define_stream::{DefineStream};
@@ -185,6 +185,7 @@ mod test {
     use libcompile::compile::{FileType, InputAttribute, InputContext};
     use libcompile::define_dispatch::FunctionDefineDispatch;
     use libcompile::static_dispatch::{StaticVariantDispatch};
+    use libcompile::static_stream::{StaticStream};
     use libcompile::address::PackageIndex;
     use super::*;
 
@@ -217,12 +218,16 @@ mod test {
             }
         });
         let mut ds = DefineStream::new();
+        let mut ss = StaticStream::new();
         let mut ds_ptr = RefPtr::from_ref::<DefineStream>(&ds);
+        let mut ss_ptr = RefPtr::from_ref::<StaticStream>(&ss);
         let mut fdd = FunctionDefineDispatch::new(&mut ds);
         let mut package_index = PackageIndex::new();
-        let mut static_variant_dispatch = StaticVariantDispatch::new();
+        let mut static_variant_dispatch = StaticVariantDispatch::new(
+            &mut ss);
         let mut package_str = String::from("test");
-        let mut link = Link::new(ds_ptr);
+        let mut link = Link::new(ds_ptr
+            , ss_ptr);
         let mut grammar_context = GrammarContext{
             cb: Compiler::new(
                 Module::new(String::from("main")),

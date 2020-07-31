@@ -33,9 +33,11 @@ impl Link {
         &self.call_main_instruction
     }
 
-    pub fn new(define_stream: RefPtr) -> Self {
+    pub fn new(define_stream: RefPtr
+        , static_stream: RefPtr) -> Self {
         Self {
-            link_define: LinkDefine::new(define_stream),
+            link_define: LinkDefine::new(define_stream
+                             , static_stream),
             call_main_instruction: Instruction::Invalid
         }
     }
@@ -56,6 +58,7 @@ mod test {
     use libcompile::define_stream::{DefineStream};
     use libcompile::define_dispatch::{FunctionDefineDispatch};
     use libcompile::static_dispatch::{StaticVariantDispatch};
+    use libcompile::static_stream::{StaticStream};
     use super::*;
 
     use std::fs;
@@ -88,12 +91,16 @@ mod test {
             }
         });
         let mut ds = DefineStream::new();
+        let mut ss = StaticStream::new();
         let ds_ptr = RefPtr::from_ref::<DefineStream>(&ds);
+        let ss_ptr = RefPtr::from_ref::<StaticStream>(&ss);
         let mut fdd = FunctionDefineDispatch::new(&mut ds);
         let mut package_index = PackageIndex::new();
-        let mut static_variant_dispatch = StaticVariantDispatch::new();
+        let mut static_variant_dispatch = StaticVariantDispatch::new(
+            &mut ss);
         let package_str = String::from("test");
-        let mut link = Link::new(ds_ptr);
+        let mut link = Link::new(ds_ptr
+            , ss_ptr);
         let mut grammar_context = GrammarContext{
             cb: Compiler::new(
                     Module::new(String::from("main"))

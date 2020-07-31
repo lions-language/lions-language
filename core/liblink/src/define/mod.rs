@@ -3,8 +3,9 @@ use libtype::instruction::{
 use libcommon::ptr::RefPtr;
 use libcommon::address::{FunctionAddress, FunctionAddrValue};
 use libtype::package::{PackageStr};
-use libcompile::define_stream::{self, DefineStream};
+use libcompile::define_stream::{DefineStream};
 use std::collections::VecDeque;
+use crate::statics::LinkStatic;
 
 /*
  * 链接定义
@@ -16,12 +17,12 @@ use std::collections::VecDeque;
 
 pub struct LinkDefine {
     define_stream: RefPtr,
+    link_static: LinkStatic,
     code_segment: VecDeque<Instruction>,
     /*
-     * 第三方包的起始地址
+     * 第三方包的起始地址, 当前包的地址不用改变
      * */
-    addr: usize,
-    index: usize
+    other_addr: usize
 }
 
 impl LinkDefine {
@@ -82,13 +83,13 @@ impl LinkDefine {
                 /*
                  * 从 static_stream 中查找
                  * */
+                self.link_static.process(instruction);
             },
             _ => {
             }
         }
         if !is_first {
             self.code_segment.push_back(instruction.clone());
-            self.index += 1;
             /*
             match self.code_segment.get_mut(*index) {
                 Some(v) => {
@@ -103,32 +104,33 @@ impl LinkDefine {
         }
     }
 
-    pub fn read(&self, addr: &FunctionAddrValue) -> DefineBlock {
-        DefineBlock {
+    pub fn read(&self, addr: &FunctionAddrValue) -> LinkDefineBlock {
+        LinkDefineBlock {
             link_define: self,
             pos: addr.start_pos_ref().clone(),
             length: addr.length_ref().clone()
         }
     }
 
-    pub fn new(define_stream: RefPtr) -> Self {
+    pub fn new(define_stream: RefPtr
+        , static_stream: RefPtr) -> Self {
         let length = define_stream.as_ref::<DefineStream>().length();
         Self {
             define_stream: define_stream,
+            link_static: LinkStatic::new(static_stream),
             code_segment: VecDeque::with_capacity(length),
-            addr: length,
-            index: 0
+            other_addr: length,
         }
     }
 }
 
-pub struct DefineBlock<'a> {
+pub struct LinkDefineBlock<'a> {
     link_define: &'a LinkDefine,
     pos: usize,
     length: usize
 }
 
-impl<'a> Iterator for DefineBlock<'a> {
+impl<'a> Iterator for LinkDefineBlock<'a> {
     type Item = Instruction;
 
     fn next(&mut self) -> Option<Self::Item> {
