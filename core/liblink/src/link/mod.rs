@@ -2,6 +2,7 @@ use libcompile::bytecode::{self};
 use libtype::instruction::{Instruction};
 use libcommon::ptr::RefPtr;
 use crate::define::{LinkDefine};
+use crate::statics::{LinkStatic};
 
 pub struct Link {
     link_define: LinkDefine,
@@ -27,6 +28,10 @@ impl bytecode::Writer for Link {
 impl Link {
     pub fn link_define(&mut self) -> &mut LinkDefine {
         &mut self.link_define
+    }
+
+    pub fn link_static(&mut self) -> &mut LinkStatic {
+        self.link_define.link_static()
     }
 
     pub fn call_main_instruction(&self) -> &Instruction {

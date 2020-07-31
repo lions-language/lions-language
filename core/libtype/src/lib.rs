@@ -200,7 +200,7 @@ impl Default for Type {
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Hash, Eq, Default)]
+#[derive(Clone, Debug, PartialEq, Hash, Eq, Default, FieldGet, FieldGetClone)]
 pub struct AddressKey {
     pub index: u64
 }

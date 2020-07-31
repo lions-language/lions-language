@@ -27,7 +27,12 @@ pub struct LinkDefine {
 
 impl LinkDefine {
     pub fn start(&mut self, instruction: &Instruction) {
+        self.link_static.start();
         self.execute(instruction, true);
+    }
+
+    pub fn link_static(&mut self) -> &mut LinkStatic {
+        &mut self.link_static
     }
 
     pub fn call_itself_func(&mut self, call_context: &CallFunction) {
@@ -79,7 +84,7 @@ impl LinkDefine {
                     }
                 }
             },
-            Instruction::ReadStaticVariant(value) => {
+            Instruction::ReadStaticVariant(_) => {
                 /*
                  * 从 static_stream 中查找
                  * */

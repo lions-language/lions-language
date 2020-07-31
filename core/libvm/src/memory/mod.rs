@@ -1,4 +1,4 @@
-use crate::data::Data;
+use libtype::Data;
 
 #[derive(Clone)]
 pub struct MemoryValue(usize);

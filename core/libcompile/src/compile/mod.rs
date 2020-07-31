@@ -1,17 +1,14 @@
 use libgrammar::grammar::Grammar;
 use libgrammar::token::{TokenValue};
-use libtype::{Type, Data, PackageType, PackageTypeValue};
-use libtype::function::{Function, FindFunctionContext};
+use libtype::{Type, Data};
+use libtype::function::{Function};
 use libtypecontrol::function::FunctionControl;
-use libtype::primeval::{PrimevalType, PrimevalData};
 use libtype::module::Module;
 use libresult::*;
 use libtype::{AddressKey, AddressValue};
 use libtype::package::{PackageStr};
-use libcommon::ptr::{RefPtr};
 use libmacro::{FieldGet};
 use crate::address;
-use crate::status::CompileStatus;
 use crate::address::PackageIndex;
 use crate::static_dispatch::{StaticVariantDispatch};
 
@@ -49,7 +46,7 @@ pub trait Compile {
         println!("{:?}", context);
     }
 
-    fn const_string(&mut self, context: StaticContext) {
+    fn const_string(&mut self, _context: StaticContext) {
         unimplemented!();
     }
 

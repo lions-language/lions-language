@@ -1,4 +1,4 @@
-use crate::data::Data;
+use libtype::Data;
 use std::collections::VecDeque;
 
 pub struct RandStack {

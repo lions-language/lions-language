@@ -12,8 +12,9 @@ use libcommon::optcode;
 use crate::memory::{stack, Rand};
 use libcommon::ptr::RefPtr;
 use liblink::define::LinkDefine;
+use liblink::statics::LinkStatic;
 use liblink::link::Link;
-use crate::data::Data;
+use libtype::Data;
 
 struct MemoryContext {
     static_stack: stack::RandStack,
@@ -36,7 +37,8 @@ impl MemoryContext {
 pub struct VirtualMachine {
     calc_stack: stack::TopStack<AddressValue>,
     memory_context: MemoryContext,
-    link_define: RefPtr
+    link_define: RefPtr,
+    link_static: RefPtr
 }
 
 impl VirtualMachine {
@@ -64,6 +66,9 @@ impl VirtualMachine {
             Instruction::CallFunction(v) => {
                 self.call_function(v);
             },
+            Instruction::ReadStaticVariant(v) => {
+                self.read_static_variant(v);
+            },
             _ => {
                 unimplemented!("{:?}", &instruction);
             }
@@ -88,17 +93,20 @@ impl VirtualMachine {
         }
     }
 
-    pub fn new(link_define: RefPtr) -> Self {
+    pub fn new(link_define: RefPtr
+        , link_static: RefPtr) -> Self {
         Self {
             calc_stack: stack::TopStack::new(),
             memory_context: MemoryContext::new(),
-            link_define: link_define
+            link_define: link_define,
+            link_static: link_static
         }
     }
 }
 
 trait AddressControl {
-    fn get_data_unchecked(&self, memory_context: &MemoryContext)
+    fn get_data_unchecked(&self, memory_context: &MemoryContext
+        , link_static: &RefPtr)
         -> RefPtr;
     fn alloc_and_write_data(&self, data: Data
         , memory_context: &mut MemoryContext);
@@ -108,7 +116,8 @@ impl AddressControl for AddressValue {
     /*
      * 获取编译期地址对应的数据
      * */
-    fn get_data_unchecked(&self, memory_context: &MemoryContext)
+    fn get_data_unchecked(&self, memory_context: &MemoryContext
+        , link_static: &RefPtr)
         -> RefPtr {
         match self.typ_ref() {
             AddressType::Static => {
@@ -119,10 +128,7 @@ impl AddressControl for AddressValue {
                  *  3. 因为避开 rust 编译器的借用检查(这里我们可以保证数据的准确性)
                  *      需要将引用转换为指针
                  * */
-                let run_addr =
-                memory_context.static_addr_mapping.get_unwrap(
-                    self.addr_ref());
-                let data = memory_context.static_stack.get_unwrap(run_addr);
+                let data = link_static.as_ref::<LinkStatic>().read_uncheck(self.addr_ref());
                 RefPtr::from_ref::<Data>(data)
             },
             AddressType::Stack => {
@@ -247,7 +253,9 @@ mod test {
         /*
          * 如果存在编译后的文件, 使用 LinkDefine 的读取功能 从文件中读取后实例化 LinkDefine
          * */
-        let mut virtual_machine = VirtualMachine::new(RefPtr::from_ref::<LinkDefine>(link.link_define()));
+        let mut virtual_machine = VirtualMachine::new(
+            RefPtr::from_ref::<LinkDefine>(link.link_define())
+            , RefPtr::from_ref::<LinkStatic>(link.link_static()));
         virtual_machine.run(entrance);
     }
 }

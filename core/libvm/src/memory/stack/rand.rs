@@ -1,6 +1,6 @@
+use libtype::Data;
 use crate::memory::{Rand, MemoryValue};
 use super::RandStack;
-use crate::data::Data;
 use std::collections::VecDeque;
 
 impl Rand for RandStack {

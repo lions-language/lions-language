@@ -2,7 +2,7 @@ use libcompile::static_stream::{StaticStream};
 use libcommon::ptr::RefPtr;
 use libtype::instruction::Instruction;
 use libtype::package::PackageStr;
-use libtype::Data;
+use libtype::{Data, AddressKey};
 use std::collections::VecDeque;
 
 pub struct LinkStatic {
@@ -37,21 +37,31 @@ impl LinkStatic {
         }
     }
 
-    pub fn new(mut static_stream: RefPtr) -> Self {
-        let length = static_stream.as_ref::<StaticStream>().length();
+    pub fn start(&mut self) {
+        /*
+         * 编译结束后进入这里
+         *  1. 将编译得到的静态区域拷贝过来
+         * */
+        let length = self.static_stream.as_ref::<StaticStream>().length();
+        self.other_addr = length;
+        let mut static_area = VecDeque::with_capacity(length);
+        static_area.append(self.static_stream.as_mut::<StaticStream>().datas_mut());
+        *&mut self.static_area = static_area;
+    }
+
+    pub fn new(static_stream: RefPtr) -> Self {
         /*
          * 将本包的静态区拷贝到总的静态区
          * */
-        let mut static_area = VecDeque::with_capacity(length);
-        static_area.append(static_stream.as_mut::<StaticStream>().datas_mut());
         Self {
             static_stream: static_stream,
-            static_area: VecDeque::with_capacity(length),
-            other_addr: length
+            static_area: VecDeque::new(),
+            other_addr: 0
         }
     }
 
-    pub fn read_uncheck(&self, addr: usize) -> &Data {
-        self.static_area.get(addr).expect("addr is not exist")
+    pub fn read_uncheck(&self, addr: &AddressKey) -> &Data {
+        let index = addr.index_clone() as usize;
+        self.static_area.get(index).expect(&format!("addr is not exist, index: {}", index))
     }
 }

@@ -25,6 +25,11 @@ pub struct Bytecode<'a, 'b, F: Writer> {
 
 impl<'a, 'b, F: Writer> Compile for Bytecode<'a, 'b, F> {
     fn const_number(&mut self, context: StaticContext) {
+        let instruction = Instruction::ReadStaticVariant(StaticVariant{
+            package_str: context.package_str,
+            addr: context.addr
+        });
+        self.write(instruction);
         /*
         match context.data.value() {
             DataValue::Primeval(pri) => {
