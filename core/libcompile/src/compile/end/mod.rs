@@ -34,6 +34,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                 let call_context = CallFunctionContext {
                                     package_str: PackageStr::Itself,
                                     func: &r.func,
+                                    param_addrs: None,
                                     return_addr: AddressValue::new_invalid()
                                 };
                                 self.cb.call_function(call_context);

@@ -4,29 +4,35 @@ use libtype::{AddressValue
     , AddressType};
 use crate::address::{Address};
 use crate::compile::{Compile, Compiler
-    , StaticContext, TokenValueExpand};
+    , LoadStackContext, TokenValueExpand};
 
 impl<'a, F: Compile> Compiler<'a, F> {
     pub fn const_number(&mut self, value: TokenValue) {
         /*
          * TokenType 转换为 Type
          * */
+        /*
+         * TODO: Type 中无法知道是 Move / Ref / Ptr ...
+         *  1. 将 Type 中的 TypeAttrubute 去掉
+         *  2. 将 这些属性放在 Param (函数参数) 中
+         * */
         let typ = value.to_type().clone();
         /*
-         * 在静态区分配一个地址, 并将数据写入到静态区
+         * 在栈上分配一个地址
          * */
-        let addr = self.static_variant_dispatch.alloc(value.to_data());
+        let addr = self.address_dispatch.alloc(AddressType::Stack);
+        let addr_key = addr.addr_ref().addr_clone();
         /*
          * 将地址写入到编译期的计算栈中, 为之后的运算做准备
          * */
         self.value_buffer.push_with_addr(typ.clone()
-            , Address::new(AddressValue::new(AddressType::Static, addr.clone())));
+            , addr);
         /*
          * 生成读取静态量的指令, 虚拟机接收到这个指令后, 将地址写入到计算栈中
          * */
-        let const_context = StaticContext::from_token_value(
-            PackageStr::Itself, typ, addr);
-        self.cb.const_string(const_context);
+        let context = LoadStackContext::new(
+            addr_key, value.to_data());
+        self.cb.load_stack(context);
     }
 }
 

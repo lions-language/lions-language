@@ -1,4 +1,4 @@
-use super::{Type, PackageType};
+use super::{Type, PackageType, TypeAttrubute};
 use libcommon::address::FunctionAddress;
 use libcommon::optcode::OptCode;
 use libcommon::ptr::RefPtr;
@@ -31,7 +31,7 @@ impl Default for FunctionReturnDataAttr {
 /*
  * 如果返回值是多个值, 将抽象为元组
  * */
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone, Default, FieldGet)]
 pub struct FunctionReturnData {
     pub typ: Type,
     /*
@@ -70,7 +70,8 @@ impl FunctionReturn {
  * */
 #[derive(Debug, Clone)]
 pub struct FunctionParam {
-    pub data: FunctionParamData
+    pub data: FunctionParamData,
+    pub attr: TypeAttrubute
 }
 
 #[derive(Debug, Clone)]
@@ -89,9 +90,11 @@ pub enum FunctionParamData {
 }
 
 impl FunctionParam {
-    pub fn new(data: FunctionParamData) -> Self {
+    pub fn new(data: FunctionParamData
+        , attr: TypeAttrubute) -> Self {
         Self {
-            data: data
+            data: data,
+            attr: attr
         }
     }
 }

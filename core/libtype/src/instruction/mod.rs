@@ -8,6 +8,7 @@ use crate::primeval::string::Str;
 #[derive(Debug, Clone)]
 pub struct CallPrimevalFunction {
     pub opt: optcode::OptCode,
+    pub param_addrs: Option<Vec<AddressKey>>,
     pub return_addr: AddressValue
 }
 
@@ -58,7 +59,8 @@ pub struct StringStatic {
 #[derive(Debug, Clone, FieldGet, FieldGetClone)]
 pub struct StaticVariant {
     pub package_str: PackageStr,
-    pub addr: AddressKey
+    pub addr: AddressKey,
+    pub static_addr: AddressKey
 }
 
 /*

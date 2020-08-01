@@ -15,14 +15,21 @@ use crate::static_dispatch::{StaticVariantDispatch};
 #[derive(Debug)]
 pub struct StaticContext {
     pub package_str: PackageStr,
-    pub typ: Type,
-    pub addr: AddressKey
+    pub addr: AddressKey,
+    pub static_addr: AddressKey
+}
+
+#[derive(Debug, FieldGet)]
+pub struct LoadStackContext {
+    addr: AddressKey,
+    data: Data
 }
 
 #[derive(Debug)]
 pub struct CallFunctionContext<'a> {
     pub package_str: PackageStr,
     pub func: &'a Function,
+    pub param_addrs: Option<Vec<AddressKey>>,
     pub return_addr: AddressValue
 }
 
@@ -48,6 +55,9 @@ pub trait Compile {
 
     fn const_string(&mut self, _context: StaticContext) {
         unimplemented!();
+    }
+
+    fn load_stack(&mut self, context: LoadStackContext) {
     }
 
     fn load_variant(&mut self, addr: &address::Address) {

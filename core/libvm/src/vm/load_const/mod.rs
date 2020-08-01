@@ -37,6 +37,8 @@ impl VirtualMachine {
     pub fn read_static_variant(&mut self, value: StaticVariant) {
         /*
          * 加载到计算栈中
+         * TODO
+         *  1. 将给定的地址绑定到静态区域
          * */
         self.calc_stack.push(AddressValue::new(
                 AddressType::Static, value.addr_clone()));

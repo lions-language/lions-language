@@ -31,7 +31,8 @@ lazy_static!{
                                 PrimevalType::Uint32))
                                 , TypeAttrubute::Ref)
                         )
-                    )
+                    ),
+                    TypeAttrubute::Move
                 )),
             FunctionReturn::new(
                 FunctionReturnData::new_with_attr(
@@ -59,7 +60,8 @@ lazy_static!{
                                 PrimevalType::Uint8))
                                 , TypeAttrubute::Ref)
                         )
-                    )
+                    ),
+                    TypeAttrubute::Move
                 )),
             FunctionReturn::new(
                 FunctionReturnData::new_with_attr(

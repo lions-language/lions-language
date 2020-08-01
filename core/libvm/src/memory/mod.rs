@@ -1,7 +1,15 @@
 use libtype::Data;
 
 #[derive(Clone)]
-pub struct MemoryValue(usize);
+pub enum MemoryValueAddr {
+    Stack(usize),
+    Static(usize)
+}
+
+#[derive(Clone)]
+pub struct MemoryValue {
+    addr: MemoryValueAddr,
+}
 
 impl MemoryValue {
     pub fn get_ref(&self) -> &usize {

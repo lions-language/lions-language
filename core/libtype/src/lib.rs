@@ -174,6 +174,10 @@ impl Type {
         Type::_new(typ, attr, TypeAddrType::Heap)
     }
 
+    pub fn set_type_attribute(&mut self, attr: TypeAttrubute) {
+        *&mut self.attr = attr;
+    }
+
     pub fn to_address_type(&self) -> AddressType {
         match &self.addr_typ {
             TypeAddrType::Stack => {
@@ -234,6 +238,13 @@ pub struct AddressValue {
 }
 
 impl AddressValue {
+    pub fn is_invalid(&self) -> bool {
+        if let AddressType::Invalid = self.typ_ref() {
+            return true;
+        };
+        false
+    }
+
     pub fn new_invalid() -> Self {
         Self::default()
     }

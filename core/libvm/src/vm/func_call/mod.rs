@@ -24,6 +24,9 @@ impl VirtualMachine {
                 unimplemented!();
             }
         }
+        /*
+         * TODO: 为返回值分配内存
+         * */
     }
 }
 

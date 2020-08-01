@@ -1,11 +1,11 @@
 use libresult::*;
 use libgrammar::token::TokenValue;
-use libtype::{Type, TypeValue, TypeAttrubute};
+use libtype::{Type, TypeAttrubute};
 use libtype::function::{FunctionParamData, FunctionParamDataItem
         , splice::FunctionSplice, FindFunctionContext
         , FindFunctionResult, FunctionReturnDataAttr
         , Function};
-use libtype::{AddressType, AddressValue};
+use libtype::{AddressType, AddressValue, TypeValue};
 use libtype::package::{PackageStr};
 use libcommon::ptr::{RefPtr};
 use crate::compile::{Compile, Compiler, CallFunctionContext};
@@ -69,6 +69,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
          * */
         let right = self.value_buffer.take_top();
         let left = self.value_buffer.take_top();
+        let right_addr_key = right.addr_ref().addr_key_clone();
+        let left_addr_key = left.addr_ref().addr_key_clone();
         /*
          * 构建 函数参数
          * + 号运算一定只有一个参数
@@ -136,53 +138,65 @@ impl<'a, F: Compile> Compiler<'a, F> {
          * Ref: 分配一个新的引用地址, 引用中的地址, 由 return 字段决定
          * */
         let return_data = &func.func_statement.func_return.data;
-        let return_addr = match return_data.typ.attr_ref() {
-            TypeAttrubute::Ref => {
+        let return_addr = match return_data.typ_ref().typ_ref() {
+            TypeValue::Empty => {
                 /*
-                 * Ref 的情况下, 此时, 虚拟机需要根据给定的地址, 找到数据,
-                 * 然后对数据进行修改
+                 * 如果返回值是空的, 那么就没有必要分配内存
+                 * (不过对于 plus 操作, 一定是要有返回值的, 不会到达这里)
                  * */
-                let param_addrs = vec![left_addr.clone(), right_addr.clone()];
-                let param_index =
-                    match &return_data.attr {
-                    FunctionReturnDataAttr::RefParamIndex(idx) => {
-                        idx
-                    },
-                    _ => {
-                        panic!("returns a reference, 
-                            but does not specify which input
-                            parameter of the reference");
-                    }
-                };
-                let ref_addr = &param_addrs[*param_index as usize];
-                ref_addr.clone()
-            },
-            TypeAttrubute::Move => {
-                let param_addrs = vec![left_addr.addr(), right_addr.addr()];
-                match &return_data.attr {
-                    FunctionReturnDataAttr::MoveIndex(param_index) => {
-                        let ref_addr = &param_addrs[*param_index as usize];
-                        /*
-                         * 将移入的值移出来了, 所以 不用回收地址 (这个地址还是存在的)
-                         * */
-                        context.remove(ref_addr);
-                    },
-                    _ => {}
-                }
-                /*
-                 * 根据类型, 判断是在哪里分配地址
-                 * */
-                let a = self.address_dispatch.alloc(return_data.typ.to_address_type());
-                self.ref_counter.create(a.addr_ref().addr_clone());
-                a
+                Address::new(AddressValue::new_invalid())
             },
             _ => {
-                unimplemented!();
+                match return_data.typ.attr_ref() {
+                    TypeAttrubute::Ref => {
+                        /*
+                         * Ref 的情况下, 此时, 虚拟机需要根据给定的地址, 找到数据,
+                         * 然后对数据进行修改
+                         * */
+                        let param_addrs = vec![left_addr.clone(), right_addr.clone()];
+                        let param_index =
+                            match &return_data.attr {
+                            FunctionReturnDataAttr::RefParamIndex(idx) => {
+                                idx
+                            },
+                            _ => {
+                                panic!("returns a reference, 
+                                    but does not specify which input
+                                    parameter of the reference");
+                            }
+                        };
+                        let ref_addr = &param_addrs[*param_index as usize];
+                        ref_addr.clone()
+                    },
+                    TypeAttrubute::Move => {
+                        let param_addrs = vec![left_addr.addr(), right_addr.addr()];
+                        match &return_data.attr {
+                            FunctionReturnDataAttr::MoveIndex(param_index) => {
+                                let ref_addr = &param_addrs[*param_index as usize];
+                                /*
+                                 * 将移入的值移出来了, 所以 不用回收地址 (这个地址还是存在的)
+                                 * */
+                                context.remove(ref_addr);
+                            },
+                            _ => {}
+                        }
+                        /*
+                         * 根据类型, 判断是在哪里分配地址
+                         * */
+                        let a = self.address_dispatch.alloc(return_data.typ.to_address_type());
+                        self.ref_counter.create(a.addr_ref().addr_clone());
+                        a
+                    },
+                    _ => {
+                        unimplemented!();
+                    }
+                }
             }
         };
         self.cb.call_function(CallFunctionContext{
             package_str: PackageStr::Empty,
-            func: func,
+            func: &func,
+            param_addrs: Some(vec![left_addr_key, right_addr_key]),
             return_addr: return_addr.addr_clone()
         });
         /*
@@ -195,9 +209,11 @@ impl<'a, F: Compile> Compiler<'a, F> {
         /*
          * 获取返回类型, 将其写入到队列中
          * */
-        self.value_buffer.push_with_addr(
-            func.func_statement.func_return.data.typ.clone()
-            , return_addr);
+        if !return_addr.is_invalid() {
+            self.value_buffer.push_with_addr(
+                return_data.typ.clone()
+                , return_addr);
+        }
         DescResult::Success
     }
 }

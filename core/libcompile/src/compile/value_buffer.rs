@@ -1,7 +1,9 @@
 use libtype::Type;
+use libmacro::{FieldGet};
 use crate::address::{Address};
 use std::collections::{VecDeque};
 
+#[derive(FieldGet)]
 pub struct Item {
     pub typ: Type,
     pub addr: Address

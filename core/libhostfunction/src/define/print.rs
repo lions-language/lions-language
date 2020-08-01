@@ -10,8 +10,8 @@ use libtype::function::{FunctionStatement, Function
 use libcommon::optcode::{OptCode};
 
 lazy_static!{
-    /*  
-     * &uint8 + &uint8 -> uint16
+    /*
+     * println
      * */
     pub static ref PRINTLN: Function = Function{
         func_statement: FunctionStatement::new(
@@ -23,7 +23,8 @@ lazy_static!{
                                 PrimevalType::Uint8))
                                 , TypeAttrubute::Ref)
                         )
-                    )
+                    ),
+                    TypeAttrubute::Ref
                 )),
             FunctionReturn::new(
                 FunctionReturnData::new_with_attr(
