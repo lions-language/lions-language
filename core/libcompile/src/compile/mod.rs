@@ -15,7 +15,7 @@ use crate::static_dispatch::{StaticVariantDispatch};
 #[derive(Debug)]
 pub struct StaticContext {
     pub package_str: PackageStr,
-    pub addr: AddressKey,
+    pub addr: AddressValue,
     pub static_addr: AddressKey
 }
 

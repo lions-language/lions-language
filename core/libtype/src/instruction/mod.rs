@@ -59,7 +59,7 @@ pub struct StringStatic {
 #[derive(Debug, Clone, FieldGet, FieldGetClone)]
 pub struct StaticVariant {
     pub package_str: PackageStr,
-    pub addr: AddressKey,
+    pub addr: AddressValue,
     pub static_addr: AddressKey
 }
 

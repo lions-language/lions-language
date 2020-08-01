@@ -17,8 +17,8 @@ use liblink::link::Link;
 use libtype::Data;
 
 struct MemoryContext {
-    static_stack: stack::RandStack,
-    thread_stack: stack::RandStack,
+    static_stack: stack::RandStack<usize>,
+    thread_stack: stack::RandStack<Data>,
     static_addr_mapping: addr_mapping::AddressMapping,
     thread_addr_mapping: addr_mapping::AddressMapping
 }
@@ -79,7 +79,8 @@ impl VirtualMachine {
         self.execute(entrance);
     }
 
-    fn memory_mut(&mut self, addr: &AddressValue) -> &mut dyn Rand {
+    /*
+    fn memory_mut(&mut self, addr: &AddressValue) -> &mut dyn Rand<> {
         match addr.typ_ref() {
             AddressType::Static => {
                 &mut self.memory_context.static_stack
@@ -92,6 +93,7 @@ impl VirtualMachine {
             }
         }
     }
+    */
 
     pub fn new(link_define: RefPtr
         , link_static: RefPtr) -> Self {
@@ -109,6 +111,8 @@ trait AddressControl {
         , link_static: &RefPtr)
         -> RefPtr;
     fn alloc_and_write_data(&self, data: Data
+        , memory_context: &mut MemoryContext);
+    fn alloc_and_write_static(&self, addr: usize
         , memory_context: &mut MemoryContext);
 }
 
@@ -153,18 +157,23 @@ impl AddressControl for AddressValue {
     fn alloc_and_write_data(&self, data: Data
         , memory_context: &mut MemoryContext) {
         match self.typ_ref() {
-            AddressType::Static => {
-                /*
-                 * 1. 在静态区分配一个新的内存
-                 * 2. 将返回的地址和编译期的地址进行绑定
-                 * */
-                let run_addr = memory_context.static_stack.alloc(data);
-                memory_context.static_addr_mapping.bind(self.addr_clone()
-                    , run_addr);
-            },
             AddressType::Stack => {
                 let run_addr = memory_context.thread_stack.alloc(data);
                 memory_context.thread_addr_mapping.bind(self.addr_clone()
+                    , run_addr);
+            },
+            _ => {
+                unimplemented!();
+            }
+        }
+    }
+
+    fn alloc_and_write_static(&self, addr: usize
+        , memory_context: &mut MemoryContext) {
+        match self.typ_ref() {
+            AddressType::Static => {
+                let run_addr = memory_context.static_stack.alloc(addr);
+                memory_context.static_addr_mapping.bind(self.addr_clone()
                     , run_addr);
             },
             _ => {

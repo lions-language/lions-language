@@ -3,8 +3,8 @@ use crate::memory::{Rand, MemoryValue};
 use super::RandStack;
 use std::collections::VecDeque;
 
-impl Rand for RandStack {
-    fn alloc(&mut self, data: Data) -> MemoryValue {
+impl<T> Rand<T> for RandStack<T> {
+    fn alloc(&mut self, data: T) -> MemoryValue {
         if self.recycles.is_empty() {
             /*
              * 没有被回收的地址 => 创建一个新的地址
@@ -20,11 +20,11 @@ impl Rand for RandStack {
         }
     }
 
-    fn get_unwrap(&self, index: &MemoryValue) -> &Data {
+    fn get_unwrap(&self, index: &MemoryValue) -> &T {
         self.datas.get(index.get()).unwrap()
     }
 
-    fn get_mut_unwrap(&mut self, index: &MemoryValue) -> &mut Data {
+    fn get_mut_unwrap(&mut self, index: &MemoryValue) -> &mut T {
         self.datas.get_mut(index.get()).unwrap()
     }
 
@@ -45,7 +45,7 @@ impl Rand for RandStack {
     }
 }
 
-impl RandStack {
+impl<T> RandStack<T> {
     pub fn with_capacity(cap: usize) -> Self {
         Self {
             datas: VecDeque::with_capacity(cap),

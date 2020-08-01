@@ -1,8 +1,8 @@
 use libtype::Data;
 use std::collections::VecDeque;
 
-pub struct RandStack {
-    datas: VecDeque<Data>,
+pub struct RandStack<T> {
+    datas: VecDeque<T>,
     recycles: Vec<usize>
 }
 

@@ -1,15 +1,7 @@
 use libtype::Data;
 
 #[derive(Clone)]
-pub enum MemoryValueAddr {
-    Stack(usize),
-    Static(usize)
-}
-
-#[derive(Clone)]
-pub struct MemoryValue {
-    addr: MemoryValueAddr,
-}
+pub struct MemoryValue(usize);
 
 impl MemoryValue {
     pub fn get_ref(&self) -> &usize {
@@ -25,11 +17,11 @@ impl MemoryValue {
     }
 }
 
-pub trait Rand {
-    fn alloc(&mut self, _: Data) -> MemoryValue;
+pub trait Rand<T> {
+    fn alloc(&mut self, _: T) -> MemoryValue;
     fn free(&mut self, _: MemoryValue);
-    fn get_unwrap(&self, index: &MemoryValue) -> &Data;
-    fn get_mut_unwrap(&mut self, index: &MemoryValue) -> &mut Data;
+    fn get_unwrap(&self, index: &MemoryValue) -> &T;
+    fn get_mut_unwrap(&mut self, index: &MemoryValue) -> &mut T;
 }
 
 pub mod stack;

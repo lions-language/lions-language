@@ -19,7 +19,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
         /*
          * 在当前作用域中分配一个地址, 提供给虚拟机进行绑定
          * */
-        let addr = self.address_dispatch.alloc(AddressType::Stack);
+        let addr = self.address_dispatch.alloc(AddressType::Static);
         /*
          * 将地址写入到编译期的计算栈中, 为之后的运算做准备
          * */
@@ -29,7 +29,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
          * 生成读取静态量的指令, 虚拟机接收到这个指令后, 在当前作用域中建立一个绑定关系
          * */
         let const_context = StaticContext::from_token_value(
-            PackageStr::Itself, addr.addr_key(), static_addr);
+            PackageStr::Itself, addr.addr(), static_addr);
         self.cb.const_string(const_context);
     }
 }
