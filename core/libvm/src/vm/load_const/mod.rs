@@ -36,9 +36,7 @@ impl VirtualMachine {
 
     pub fn read_static_variant(&mut self, mut value: StaticVariant) {
         /*
-         * 加载到计算栈中
-         * TODO
-         *  1. 将给定的地址绑定到静态区域
+         * 将给定的地址绑定到静态区域
          * */
         let addr = value.static_addr_ref().index_ref().clone() as usize;
         value.addr_mut().alloc_and_write_static(

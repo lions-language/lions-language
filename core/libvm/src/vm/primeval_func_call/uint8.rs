@@ -3,6 +3,7 @@ use libtype::primeval::{PrimevalData};
 use libtype::primeval::number::
     {uint8::Uint8, uint16::Uint16};
 use libtype::instruction::{CallPrimevalFunction};
+use libtype::function::{CallFunctionParamAddr};
 use crate::vm::{VirtualMachine, AddressControl};
 use crate::memory::{MemoryValue, Rand};
 use crate::memory::stack;
@@ -12,18 +13,34 @@ impl VirtualMachine {
     pub fn ref_uint8_plus_operator_ref_uint8(&mut self, value: CallPrimevalFunction) {
         /*
          * 加载参数
-         * TODO
-         * 1. value.param_addrs 中存储的是上一个作用域中的地址索引
-         *  需要从上一个作用域中的找到实际地址
+         *  在进入这里的时候, 当前作用域中的映射集合中已经存在了参数的映射
+         *  所以, 直接用 索引0访问查找第一个参数的数据, 以此类推
+         * 注意:
+         *  与自定义函数不同, 这里不需要为函数调用开辟新的作用域, 因为原生函数调用是 "死代码"
          * */
-        let left_compile_addr = self.calc_stack.pop_uncheck();
-        let right_compile_addr = self.calc_stack.pop_uncheck();
+        let param_addrs = value.param_addrs.expect("should not happend");
+        let left_param_compile_addr = match param_addrs.get(0).expect("should not happend") {
+            CallFunctionParamAddr::Fixed(p) => {
+                p
+            },
+            _ => {
+                panic!("should not happend");
+            }
+        };
+        let right_param_compile_addr = match param_addrs.get(1).expect("should not happend") {
+            CallFunctionParamAddr::Fixed(p) => {
+                p
+            },
+            _ => {
+                panic!("should not happend");
+            }
+        };
         /*
          * 获取数据
          * */
-        let left_value = left_compile_addr.get_data_unchecked(&self.memory_context
+        let left_value = left_param_compile_addr.get_data_unchecked(&self.memory_context
             , &self.link_static);
-        let right_value = right_compile_addr.get_data_unchecked(&self.memory_context
+        let right_value = right_param_compile_addr.get_data_unchecked(&self.memory_context
             , &self.link_static);
         let left_value = extract_data_ref!(left_value, Uint8);
         let right_value = extract_data_ref!(right_value, Uint8);

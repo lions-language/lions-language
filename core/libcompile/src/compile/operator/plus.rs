@@ -4,7 +4,7 @@ use libtype::{Type, TypeAttrubute};
 use libtype::function::{FunctionParamData, FunctionParamDataItem
         , splice::FunctionSplice, FindFunctionContext
         , FindFunctionResult, FunctionReturnDataAttr
-        , Function};
+        , Function, CallFunctionParamAddr};
 use libtype::{AddressType, AddressValue, TypeValue};
 use libtype::package::{PackageStr};
 use libcommon::ptr::{RefPtr};
@@ -196,7 +196,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
         self.cb.call_function(CallFunctionContext{
             package_str: PackageStr::Empty,
             func: &func,
-            param_addrs: Some(vec![left_addr_key, right_addr_key]),
+            param_addrs: Some(vec![CallFunctionParamAddr::Fixed(left_addr_key)
+                , CallFunctionParamAddr::Fixed(right_addr_key)]),
             return_addr: return_addr.addr_clone()
         });
         /*

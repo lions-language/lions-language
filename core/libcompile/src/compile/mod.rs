@@ -1,7 +1,7 @@
 use libgrammar::grammar::Grammar;
 use libgrammar::token::{TokenValue};
 use libtype::{Type, Data};
-use libtype::function::{Function};
+use libtype::function::{Function, CallFunctionParamAddr};
 use libtypecontrol::function::FunctionControl;
 use libtype::module::Module;
 use libresult::*;
@@ -29,7 +29,7 @@ pub struct LoadStackContext {
 pub struct CallFunctionContext<'a> {
     pub package_str: PackageStr,
     pub func: &'a Function,
-    pub param_addrs: Option<Vec<AddressKey>>,
+    pub param_addrs: Option<Vec<CallFunctionParamAddr>>,
     pub return_addr: AddressValue
 }
 

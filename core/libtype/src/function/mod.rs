@@ -5,6 +5,7 @@ use libcommon::ptr::RefPtr;
 use libmacro::{FieldGet};
 use std::hash::Hash;
 use std::cmp::{PartialEq, Eq};
+use crate::AddressKey;
 
 /*
  * 函数返回值
@@ -247,6 +248,15 @@ pub trait FunctionControlInterface {
 pub struct FunctionKey {
     package_index: u64,
     func_name: String
+}
+
+#[derive(Debug, Clone)]
+pub enum CallFunctionParamAddr {
+    /*
+     * 固定参数
+     * */
+    Fixed(AddressKey),
+    Lengthen
 }
 
 mod function_statement;
