@@ -5,7 +5,7 @@ use libcommon::ptr::RefPtr;
 use libmacro::{FieldGet};
 use std::hash::Hash;
 use std::cmp::{PartialEq, Eq};
-use crate::AddressKey;
+use crate::{AddressKey, AddressValue};
 
 /*
  * 函数返回值
@@ -255,7 +255,7 @@ pub enum CallFunctionParamAddr {
     /*
      * 固定参数
      * */
-    Fixed(AddressKey),
+    Fixed(AddressValue),
     Lengthen
 }
 

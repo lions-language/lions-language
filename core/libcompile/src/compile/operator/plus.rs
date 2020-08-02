@@ -69,8 +69,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
          * */
         let right = self.scope_context.take_top_from_value_buffer();
         let left = self.scope_context.take_top_from_value_buffer();
-        let right_addr_key = right.addr_ref().addr_key_clone();
-        let left_addr_key = left.addr_ref().addr_key_clone();
+        let right_addr_key = right.addr_ref().addr_ref().clone();
+        let left_addr_key = left.addr_ref().addr_ref().clone();
         /*
          * 构建 函数参数
          * + 号运算一定只有一个参数

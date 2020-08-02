@@ -181,6 +181,7 @@ mod load_variant;
 mod primeval_func_call;
 mod addr_mapping;
 mod func_call;
+mod thread_context;
 
 #[cfg(test)]
 mod test {
