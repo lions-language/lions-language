@@ -46,7 +46,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 /*
                  * 如果是 Move, 说明将不归这里管理, 将其所有权移除
                  * */
-                self.ref_counter.remove(addr.addr_ref().addr_ref());
+                self.scope_context.ref_counter_remove(addr.addr_ref().addr_ref());
                 /*
                  * 为了回收地址, 需要添加到回收中
                  * */
@@ -67,8 +67,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
         /*
          * 取出前两个token, 查找第一个函数的 plus 方法
          * */
-        let right = self.value_buffer.take_top();
-        let left = self.value_buffer.take_top();
+        let right = self.scope_context.take_top_from_value_buffer();
+        let left = self.scope_context.take_top_from_value_buffer();
         let right_addr_key = right.addr_ref().addr_key_clone();
         let left_addr_key = left.addr_ref().addr_key_clone();
         /*
@@ -183,8 +183,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
                         /*
                          * 根据类型, 判断是在哪里分配地址
                          * */
-                        let a = self.address_dispatch.alloc(return_data.typ.to_address_type());
-                        self.ref_counter.create(a.addr_ref().addr_clone());
+                        let a = self.scope_context.alloc_address(return_data.typ.to_address_type());
+                        self.scope_context.ref_counter_create(a.addr_ref().addr_clone());
                         a
                     },
                     _ => {
@@ -204,14 +204,14 @@ impl<'a, F: Compile> Compiler<'a, F> {
          * 回收地址
          * */
         for addr in context.recycle_addrs.iter() {
-            self.address_dispatch.recycle_addr(addr.clone());
+            self.scope_context.recycle_address(addr.clone());
             // println!("free: {:?}", addr);
         }
         /*
          * 获取返回类型, 将其写入到队列中
          * */
         if !return_addr.is_invalid() {
-            self.value_buffer.push_with_addr(
+            self.scope_context.push_with_addr_to_value_buffer(
                 return_data.typ.clone()
                 , return_addr);
         }

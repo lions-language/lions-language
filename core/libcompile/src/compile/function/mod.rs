@@ -26,6 +26,10 @@ impl<'a, F: Compile> Compiler<'a, F> {
          * */
     }
 
+    pub fn handle_function_define_start(&mut self) {
+        self.scope_context.enter();
+    }
+
     pub fn handle_function_define_end(&mut self) {
         let func = self.cb.function_define_end();
         let package_typ = PackageType::new(PackageTypeValue::Crate);
@@ -36,5 +40,6 @@ impl<'a, F: Compile> Compiler<'a, F> {
             func_str: func.func_statement_ref().func_name.clone()
         };
         self.function_control.add_function(context, None, func);
+        self.scope_context.leave();
     }
 }

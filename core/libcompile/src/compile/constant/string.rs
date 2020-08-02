@@ -19,11 +19,11 @@ impl<'a, F: Compile> Compiler<'a, F> {
         /*
          * 在当前作用域中分配一个地址, 提供给虚拟机进行绑定
          * */
-        let addr = self.address_dispatch.alloc(AddressType::Static);
+        let addr = self.scope_context.alloc_address(AddressType::Static);
         /*
          * 将地址写入到编译期的计算栈中, 为之后的运算做准备
          * */
-        self.value_buffer.push_with_addr(typ.clone()
+        self.scope_context.push_with_addr_to_value_buffer(typ.clone()
             , Address::new(AddressValue::new(AddressType::Static, static_addr.clone())));
         /*
          * 生成读取静态量的指令, 虚拟机接收到这个指令后, 在当前作用域中建立一个绑定关系

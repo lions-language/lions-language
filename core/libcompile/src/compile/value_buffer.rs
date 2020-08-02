@@ -4,17 +4,17 @@ use crate::address::{Address};
 use std::collections::{VecDeque};
 
 #[derive(FieldGet)]
-pub struct Item {
+pub struct ValueBuferrItem {
     pub typ: Type,
     pub addr: Address
 }
 
 pub struct ValueBuffer {
-    buffer: VecDeque<Item>
+    buffer: VecDeque<ValueBuferrItem>
 }
 
 impl ValueBuffer {
-    pub fn top_n_with_panic(&self, n: usize) -> &Item {
+    pub fn top_n_with_panic(&self, n: usize) -> &ValueBuferrItem {
         /*
          * 获取 top 往前数的 第n个值
          * 如果找不到就抛出异常
@@ -29,7 +29,7 @@ impl ValueBuffer {
         }
     }
 
-    pub fn top_n(&self, n: usize) -> Option<&Item> {
+    pub fn top_n(&self, n: usize) -> Option<&ValueBuferrItem> {
         if self.buffer.len() < n {
             return None;
         }
@@ -37,7 +37,7 @@ impl ValueBuffer {
         self.buffer.get(index)
     }
 
-    pub fn take_top(&mut self) -> Item {
+    pub fn take_top(&mut self) -> ValueBuferrItem {
         match self.buffer.pop_back() {
             Some(t) => {
                 t
@@ -49,14 +49,14 @@ impl ValueBuffer {
     }
 
     pub fn push_with_addr(&mut self, typ: Type, addr: Address) {
-        self.buffer.push_back(Item {
+        self.buffer.push_back(ValueBuferrItem {
             typ: typ,
             addr: addr
         });
     }
     
     pub fn push(&mut self, typ: Type) {
-        self.buffer.push_back(Item {
+        self.buffer.push_back(ValueBuferrItem {
             typ: typ,
             addr: Address::default()
         });

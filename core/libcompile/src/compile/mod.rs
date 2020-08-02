@@ -11,6 +11,7 @@ use libmacro::{FieldGet};
 use crate::address;
 use crate::address::PackageIndex;
 use crate::static_dispatch::{StaticVariantDispatch};
+use scope::context::ScopeContext;
 
 #[derive(Debug)]
 pub struct StaticContext {
@@ -57,7 +58,7 @@ pub trait Compile {
         unimplemented!();
     }
 
-    fn load_stack(&mut self, context: LoadStackContext) {
+    fn load_stack(&mut self, _context: LoadStackContext) {
     }
 
     fn load_variant(&mut self, addr: &address::Address) {
@@ -109,12 +110,8 @@ impl InputContext {
 
 pub struct Compiler<'a, F: Compile> {
     function_control: FunctionControl,
-    value_buffer: value_buffer::ValueBuffer,
     module_stack: module_stack::ModuleStack,
-    address_dispatch: address_dispatch::AddressDispatch,
-    static_addr_dispatch: address_dispatch::AddressDispatch,
-    ref_counter: ref_count::RefCounter,
-    compile_status_dispatch: compile_status_dispatch::CompileStatusDispatch,
+    scope_context: ScopeContext,
     input_context: InputContext,
     package_index: &'a mut PackageIndex,
     static_variant_dispatch: &'a mut StaticVariantDispatch<'a>,
@@ -143,6 +140,10 @@ impl<'a, F: Compile> Grammar for Compiler<'a, F> {
         self.handle_function_named_stmt(value);
     }
 
+    fn function_define_start(&mut self, _value: TokenValue) {
+        self.handle_function_define_start();
+    }
+
     fn function_define_param(&mut self, name_token: TokenValue, type_token: TokenValue) {
         self.handle_function_define_param(name_token, type_token);
     }
@@ -159,12 +160,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
         , package_str: &'a str) -> Self {
         Self {
             function_control: FunctionControl::new(),
-            value_buffer: value_buffer::ValueBuffer::new(),
             module_stack: module_stack::ModuleStack::new(module),
-            address_dispatch: address_dispatch::AddressDispatch::new(),
-            static_addr_dispatch: address_dispatch::AddressDispatch::new(),
-            ref_counter: ref_count::RefCounter::new(),
-            compile_status_dispatch: compile_status_dispatch::CompileStatusDispatch::new(),
+            scope_context: ScopeContext::new(),
             input_context: input_context,
             package_index: package_index,
             static_variant_dispatch: static_variant_dispatch,
@@ -186,6 +183,7 @@ mod constant;
 mod operator;
 mod end;
 mod function;
+mod scope;
 
 #[cfg(test)]
 mod test {
