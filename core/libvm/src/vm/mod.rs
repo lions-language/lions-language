@@ -59,6 +59,9 @@ impl VirtualMachine {
             Instruction::LoadStringConst(v) => {
                 self.load_const_string(v);
             },
+            Instruction::LoadStack(v) => {
+                self.load_stack(v);
+            },
             Instruction::CallPrimevalFunction(v) => {
                 self.call_primeval_function(v);
             },
@@ -183,6 +186,7 @@ impl AddressControl for AddressValue {
 
 mod load_const;
 mod load_variant;
+mod load_stack;
 mod primeval_func_call;
 mod addr_mapping;
 mod func_call;

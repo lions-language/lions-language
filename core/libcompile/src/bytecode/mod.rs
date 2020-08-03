@@ -5,9 +5,11 @@ use libtype::instruction::{Instruction, CallPrimevalFunction
     , CallFunction
     , VariantValue, Uint8Static
     , Uint16Static, Uint32Static
-    , StringStatic, StaticVariant};
+    , StringStatic, StaticVariant
+    , LoadStack};
 use crate::compile::{StaticContext, CallFunctionContext
-    , FunctionNamedStmtContext, Compile};
+    , FunctionNamedStmtContext, Compile
+    , LoadStackContext};
 use crate::address;
 use define_stack::DefineStack;
 use crate::define_dispatch::{FunctionDefineDispatch};
@@ -97,6 +99,12 @@ impl<'a, 'b, F: Writer> Compile for Bytecode<'a, 'b, F> {
         }
         */
     }
+    
+    fn load_stack(&mut self, context: LoadStackContext) {
+        let (addr, data) = context.fields_move();
+        self.write(Instruction::LoadStack(LoadStack::new(
+                    addr, data)));
+    }
 
     fn load_variant(&mut self, addr: &address::Address) {
         self.write(Instruction::LoadVariant(VariantValue::new(
@@ -129,6 +137,9 @@ impl<'a, 'b, F: Writer> Compile for Bytecode<'a, 'b, F> {
                 unimplemented!();
             }
         }
+    }
+
+    fn function_define_start(&mut self) {
     }
 
     fn function_named_stmt(&mut self, context: FunctionNamedStmtContext) {

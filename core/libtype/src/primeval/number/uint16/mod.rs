@@ -1,6 +1,6 @@
 use libmacro::NumberToStd;
 
-#[derive(Debug, NumberToStd)]
+#[derive(Debug, Clone, NumberToStd)]
 pub struct Uint16 {
     pub value: u16
 }

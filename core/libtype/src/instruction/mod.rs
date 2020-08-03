@@ -1,8 +1,9 @@
 use libcommon::optcode;
 use libcommon::address::{FunctionAddress};
-use libmacro::{FieldGet, FieldGetClone};
+use libmacro::{FieldGet, FieldGetClone
+    , NewWithAll, FieldGetMove};
 use crate::function::{CallFunctionParamAddr};
-use crate::{AddressValue, AddressKey};
+use crate::{AddressValue, AddressKey, Data};
 use crate::package::PackageStr;
 use crate::primeval::string::Str;
 
@@ -64,6 +65,13 @@ pub struct StaticVariant {
     pub static_addr: AddressKey
 }
 
+#[derive(Debug, Clone, FieldGet, NewWithAll
+    , FieldGetMove)]
+pub struct LoadStack {
+    addr: AddressValue,
+    data: Data
+}
+
 /*
  * 指令
  * */
@@ -73,6 +81,7 @@ pub enum Instruction {
     LoadUint16Const(Uint16Static),
     LoadUint32Const(Uint32Static),
     LoadStringConst(StringStatic),
+    LoadStack(LoadStack),
     LoadVariant(VariantValue),
     ReadStaticVariant(StaticVariant),
     CallPrimevalFunction(CallPrimevalFunction),

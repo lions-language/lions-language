@@ -7,7 +7,7 @@ use libtype::module::Module;
 use libresult::*;
 use libtype::{AddressKey, AddressValue};
 use libtype::package::{PackageStr};
-use libmacro::{FieldGet};
+use libmacro::{FieldGet, FieldGetMove, NewWithAll};
 use crate::address;
 use crate::address::PackageIndex;
 use crate::static_dispatch::{StaticVariantDispatch};
@@ -20,9 +20,10 @@ pub struct StaticContext {
     pub static_addr: AddressKey
 }
 
-#[derive(Debug, FieldGet)]
+#[derive(Debug, FieldGet, NewWithAll
+    , FieldGetMove)]
 pub struct LoadStackContext {
-    addr: AddressKey,
+    addr: AddressValue,
     data: Data
 }
 
@@ -59,6 +60,7 @@ pub trait Compile {
     }
 
     fn load_stack(&mut self, _context: LoadStackContext) {
+        unimplemented!();
     }
 
     fn load_variant(&mut self, addr: &address::Address) {
@@ -73,7 +75,7 @@ pub trait Compile {
     }
     
     fn function_define_start(&mut self) {
-        // unimplemented!();
+        unimplemented!();
     }
 
     fn function_define_end(&mut self) -> Function {

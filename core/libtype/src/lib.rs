@@ -1,5 +1,6 @@
 use libcommon::ptr::RefPtr;
-use libmacro::{FieldGet, FieldGetClone};
+use libmacro::{FieldGet, FieldGetClone
+    , FieldGetMove};
 use crate::primeval::{PrimevalType, PrimevalData};
 use crate::structure::{StructureData};
 use std::cmp::{PartialEq, Eq};
@@ -117,14 +118,14 @@ pub struct Type {
     addr_typ: TypeAddrType
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum DataValue {
     Primeval(PrimevalData),
     Structure(StructureData),
     Empty
 }
 
-#[derive(Debug, FieldGet)]
+#[derive(Debug, Clone, FieldGet)]
 pub struct Data {
     value: DataValue
 }
@@ -231,7 +232,9 @@ impl Default for AddressType {
     }
 }
 
-#[derive(Debug, Clone, Default, PartialEq, Hash, Eq, FieldGet, FieldGetClone)]
+#[derive(Debug, Clone, Default, PartialEq
+    , Hash, Eq, FieldGet, FieldGetClone
+    , FieldGetMove)]
 pub struct AddressValue {
     typ: AddressType,
     addr: AddressKey

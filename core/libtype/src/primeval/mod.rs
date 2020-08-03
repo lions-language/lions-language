@@ -25,7 +25,7 @@ pub enum PrimevalType {
     Str
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum PrimevalData {
     Uint8(Option<Uint8>),
     Uint16(Option<Uint16>),

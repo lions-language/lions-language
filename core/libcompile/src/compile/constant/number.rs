@@ -21,17 +21,16 @@ impl<'a, F: Compile> Compiler<'a, F> {
          * 在栈上分配一个地址
          * */
         let addr = self.scope_context.alloc_address(AddressType::Stack);
-        let addr_key = addr.addr_ref().addr_clone();
         /*
          * 将地址写入到编译期的计算栈中, 为之后的运算做准备
          * */
         self.scope_context.push_with_addr_to_value_buffer(typ.clone()
-            , addr);
+            , addr.clone());
         /*
          * 生成读取静态量的指令, 虚拟机接收到这个指令后, 将地址写入到计算栈中
          * */
         let context = LoadStackContext::new(
-            addr_key, value.to_data());
+            addr.addr(), value.to_data());
         self.cb.load_stack(context);
     }
 }
