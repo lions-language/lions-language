@@ -55,5 +55,15 @@ pub fn field_get_clone(input: TokenStream) -> TokenStream {
     field::get::clone(input)
 }
 
+#[proc_macro_derive(FieldGetMove)]
+pub fn field_get_move(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    TokenStream::from(field::get_move::get_move(proc_macro2::TokenStream::from(input)))
+}
+
+#[proc_macro_derive(NewWithAll)]
+pub fn new_with_all(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    TokenStream::from(field::new::new_with_all(proc_macro2::TokenStream::from(input)))
+}
+
 mod field;
 

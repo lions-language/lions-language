@@ -1,6 +1,6 @@
-use libmacro::{FieldGet, FieldGetClone};
+use libmacro::{FieldGet, FieldGetClone, FieldGetMove};
 
-#[derive(FieldGet, FieldGetClone)]
+#[derive(FieldGet, FieldGetClone, FieldGetMove)]
 struct Test {
     f1: String,
     f2: u64
@@ -21,5 +21,7 @@ pub fn test() {
     let f2_ref = t.f2_ref();
     let f1_clone = t.f1_clone();
     println!("f1_ref: {}, f1_clone: {}, f2_ref: {}", f1_ref, f1_clone, f2_ref);
+    let (f1, f2) = t.fields_move();
+    println!("f1: {}, f2: {}", f1, f2);
 }
 
