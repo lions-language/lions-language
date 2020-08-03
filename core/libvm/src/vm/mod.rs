@@ -9,12 +9,13 @@ use libcompile::compile::{StaticContext, CallFunctionContext
 use libcompile::bytecode::{Bytecode, Writer};
 use libcompile::define_stream::{DefineStream};
 use libcommon::optcode;
-use crate::memory::{stack, Rand};
 use libcommon::ptr::RefPtr;
 use liblink::define::LinkDefine;
 use liblink::statics::LinkStatic;
 use liblink::link::Link;
 use libtype::Data;
+use crate::memory::{stack, Rand};
+use crate::vm::thread_context::context::ThreadContext;
 
 struct MemoryContext {
     static_stack: stack::RandStack<usize>,
@@ -36,7 +37,8 @@ impl MemoryContext {
 
 pub struct VirtualMachine {
     calc_stack: stack::TopStack<AddressValue>,
-    memory_context: MemoryContext,
+    // memory_context: MemoryContext,
+    thread_context: ThreadContext,
     link_define: RefPtr,
     link_static: RefPtr
 }
@@ -99,7 +101,8 @@ impl VirtualMachine {
         , link_static: RefPtr) -> Self {
         Self {
             calc_stack: stack::TopStack::new(),
-            memory_context: MemoryContext::new(),
+            // memory_context: MemoryContext::new(),
+            thread_context: ThreadContext::new_with_first(),
             link_define: link_define,
             link_static: link_static
         }
@@ -116,6 +119,7 @@ trait AddressControl {
         , memory_context: &mut MemoryContext);
 }
 
+/*
 impl AddressControl for AddressValue {
     /*
      * 获取编译期地址对应的数据
@@ -175,6 +179,7 @@ impl AddressControl for AddressValue {
             , run_addr);
     }
 }
+*/
 
 mod load_const;
 mod load_variant;

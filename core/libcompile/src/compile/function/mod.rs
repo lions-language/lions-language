@@ -28,6 +28,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
 
     pub fn handle_function_define_start(&mut self) {
         self.scope_context.enter();
+        self.cb.function_define_start();
     }
 
     pub fn handle_function_define_end(&mut self) {

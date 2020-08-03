@@ -71,6 +71,10 @@ pub trait Compile {
 
     fn function_named_stmt(&mut self, _context: FunctionNamedStmtContext) {
     }
+    
+    fn function_define_start(&mut self) {
+        // unimplemented!();
+    }
 
     fn function_define_end(&mut self) -> Function {
         unimplemented!();

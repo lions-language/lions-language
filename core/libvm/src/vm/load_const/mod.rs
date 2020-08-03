@@ -38,9 +38,9 @@ impl VirtualMachine {
         /*
          * 将给定的地址绑定到静态区域
          * */
-        let addr = value.static_addr_ref().index_ref().clone() as usize;
-        value.addr_ref().alloc_and_write_static(addr
-            , &mut self.memory_context);
+        self.thread_context.current_mut_unchecked()
+            .alloc_and_write_static(value.addr_ref()
+                , value.static_addr_clone());
     }
 }
 

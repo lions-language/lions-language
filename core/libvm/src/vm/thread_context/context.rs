@@ -13,6 +13,14 @@ impl ThreadContext {
     pub fn leave(&mut self) {
         self.scopes.pop_back();
     }
+
+    pub fn enter_thread_scope(&mut self) {
+        self.current_mut_unchecked().scope_context_mut().enter();
+    }
+
+    pub fn leave_thread_scope(&mut self) {
+        self.current_mut_unchecked().scope_context_mut().leave();
+    }
     
     pub fn current_mut_unchecked(&mut self) -> &mut ThreadScope {
         self.scopes.back_mut().expect("should not happend")
@@ -20,6 +28,18 @@ impl ThreadContext {
 
     pub fn current_unchecked(&self) -> &ThreadScope {
         self.scopes.back().expect("should not happend")
+    }
+
+    pub fn new_with_first() -> Self {
+        ThreadContext::new_with_scope(ThreadScope::new())
+    }
+
+    pub fn new_with_scope(scope: ThreadScope) -> Self {
+        let mut scopes = VecDeque::new();
+        scopes.push_back(scope);
+        Self {
+            scopes: scopes
+        }
     }
 
     pub fn new() -> Self {

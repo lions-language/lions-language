@@ -53,5 +53,5 @@ impl ThreadScope {
     }
 }
 
-mod context;
-mod scope;
+pub mod context;
+pub mod scope;

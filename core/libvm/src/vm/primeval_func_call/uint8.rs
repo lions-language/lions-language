@@ -38,10 +38,10 @@ impl VirtualMachine {
         /*
          * 获取数据
          * */
-        let left_value = left_param_compile_addr.get_data_unchecked(&self.memory_context
-            , &self.link_static);
-        let right_value = right_param_compile_addr.get_data_unchecked(&self.memory_context
-            , &self.link_static);
+        let left_value = self.thread_context.current_unchecked().get_data_unchecked(
+            &left_param_compile_addr, &self.link_static);
+        let right_value = self.thread_context.current_unchecked().get_data_unchecked(
+            &right_param_compile_addr, &self.link_static);
         let left_value = extract_data_ref!(left_value, Uint8);
         let right_value = extract_data_ref!(right_value, Uint8);
         /*
@@ -59,11 +59,11 @@ impl VirtualMachine {
         /*
          * 返回值有效 => 将返回值写入到内存
          * */
-        value.return_addr.alloc_and_write_data(
-            Data::new(DataValue::Primeval(
+        self.thread_context.current_mut_unchecked().alloc_and_write_data(
+            &value.return_addr
+            , Data::new(DataValue::Primeval(
                     PrimevalData::Uint16(
-                        Some(Uint16::new(result)))))
-            , &mut self.memory_context);
+                        Some(Uint16::new(result))))));
     }
 }
 
