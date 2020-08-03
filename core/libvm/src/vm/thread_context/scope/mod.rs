@@ -27,7 +27,7 @@ impl Scope {
                  * */
                 let static_addr = self.addr_mapping.get_unwrap(addr.addr_ref());
                 let data = link_static.as_ref::<LinkStatic>().read_uncheck(
-                    &AddressKey::new(static_addr.get() as u64));
+                    static_addr.get_ref());
                 RefPtr::from_ref::<Data>(data)
             },
             AddressType::Stack => {
@@ -71,7 +71,7 @@ impl Scope {
          * 将给定的编译期地址与静态区的地址进行绑定
          * */
         self.addr_mapping.bind(addr.addr_clone()
-            , MemoryValue::new(static_addr.index_clone() as usize));
+            , MemoryValue::new(static_addr));
     }
 
     pub fn new() -> Self {

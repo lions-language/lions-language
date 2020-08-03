@@ -1,18 +1,22 @@
-use libtype::Data;
+use libtype::{Data, AddressKey};
 
 #[derive(Clone)]
-pub struct MemoryValue(usize);
+pub struct MemoryValue(AddressKey);
 
 impl MemoryValue {
-    pub fn get_ref(&self) -> &usize {
+    pub fn get_ref(&self) -> &AddressKey {
         &self.0
     }
 
-    pub fn get(&self) -> usize {
-        self.0
+    pub fn get_clone(&self) -> AddressKey {
+        self.0.clone()
     }
 
-    pub fn new(v: usize) -> Self {
+    pub fn get_single_clone(&self) -> usize {
+        self.0.index_ref().clone() as usize
+    }
+
+    pub fn new(v: AddressKey) -> Self {
         Self(v)
     }
 }
