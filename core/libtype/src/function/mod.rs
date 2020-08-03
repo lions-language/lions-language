@@ -76,8 +76,19 @@ pub struct FunctionParam {
 }
 
 #[derive(Debug, Clone)]
+pub enum FunctionParamAddrAttr {
+    /*
+     * Move / Ref / Ptr
+     * */
+    Move,
+    Ref,
+    Ptr
+}
+
+#[derive(Debug, Clone, FieldGet)]
 pub struct FunctionParamDataItem {
-    pub typ: Type
+    pub typ: Type,
+    pub addr_attr: FunctionParamAddrAttr
 }
 
 #[derive(Debug, Clone)]
@@ -103,7 +114,8 @@ impl FunctionParam {
 impl FunctionParamDataItem {
     pub fn new(typ: Type) -> Self {
         Self {
-            typ: typ
+            typ: typ,
+            addr_attr: FunctionParamAddrAttr::Move
         }
     }
 }

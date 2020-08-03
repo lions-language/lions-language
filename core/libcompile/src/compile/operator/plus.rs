@@ -69,8 +69,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
          * */
         let right = self.scope_context.take_top_from_value_buffer();
         let left = self.scope_context.take_top_from_value_buffer();
-        let right_addr_key = right.addr_ref().addr_ref().clone();
-        let left_addr_key = left.addr_ref().addr_ref().clone();
+        let right_addr_value = right.addr_ref().addr_ref().clone();
+        let left_addr_value = left.addr_ref().addr_ref().clone();
         /*
          * 构建 函数参数
          * + 号运算一定只有一个参数
@@ -196,8 +196,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
         self.cb.call_function(CallFunctionContext{
             package_str: PackageStr::Empty,
             func: &func,
-            param_addrs: Some(vec![CallFunctionParamAddr::Fixed(left_addr_key)
-                , CallFunctionParamAddr::Fixed(right_addr_key)]),
+            param_addrs: Some(vec![CallFunctionParamAddr::Fixed(left_addr_value)
+                , CallFunctionParamAddr::Fixed(right_addr_value)]),
             return_addr: return_addr.addr_clone()
         });
         /*

@@ -33,41 +33,6 @@ impl<'a, 'b, F: Writer> Compile for Bytecode<'a, 'b, F> {
             static_addr: context.static_addr
         });
         self.write(instruction);
-        /*
-        match context.data.value() {
-            DataValue::Primeval(pri) => {
-                match pri {
-                    PrimevalData::Uint8(v) => {
-                        let instruction = Instruction::LoadUint8Const(Uint8Static{
-                            addr: context.addr,
-                            value: v.expect("should not happend").to_std()
-                        });
-                        self.write(instruction);
-                    },
-                    PrimevalData::Uint16(v) => {
-                        let instruction = Instruction::LoadUint16Const(Uint16Static{
-                            addr: context.addr,
-                            value: v.expect("should not happend").to_std()
-                        });
-                        self.write(instruction);
-                    },
-                    PrimevalData::Uint32(v) => {
-                        let instruction = Instruction::LoadUint32Const(Uint32Static{
-                            addr: context.addr,
-                            value: v.expect("should not happend").to_std()
-                        });
-                        self.write(instruction);
-                    },
-                    _ => {
-                        unimplemented!();
-                    }
-                }
-            },
-            _ => {
-                unimplemented!();
-            }
-        }
-        */
     }
 
     fn const_string(&mut self, context: StaticContext) {
@@ -77,27 +42,6 @@ impl<'a, 'b, F: Writer> Compile for Bytecode<'a, 'b, F> {
             static_addr: context.static_addr
         });
         self.write(instruction);
-        /*
-        match context.data.value() {
-            DataValue::Primeval(pri) => {
-                match pri {
-                    PrimevalData::Str(v) => {
-                        let instruction = Instruction::LoadStringConst(StringStatic{
-                            addr: context.addr,
-                            value: v.expect("should not happend")
-                        });
-                        self.write(instruction);
-                    },
-                    _ => {
-                        panic!("should not happend");
-                    }
-                }
-            },
-            _ => {
-                unimplemented!();
-            }
-        }
-        */
     }
     
     fn load_stack(&mut self, context: LoadStackContext) {

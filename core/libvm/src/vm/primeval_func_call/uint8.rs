@@ -49,7 +49,7 @@ impl VirtualMachine {
          * */
         let result = left_value as u16 +
             right_value as u16;
-        println!("{}", result);
+        println!("result: {}", result);
         /*
          * 检测返回值是否有效
          * */
