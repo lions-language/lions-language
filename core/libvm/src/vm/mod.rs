@@ -112,7 +112,7 @@ trait AddressControl {
         -> RefPtr;
     fn alloc_and_write_data(&self, data: Data
         , memory_context: &mut MemoryContext);
-    fn alloc_and_write_static(&self, addr: usize
+    fn alloc_and_write_static(&self, static_addr: usize
         , memory_context: &mut MemoryContext);
 }
 
@@ -168,9 +168,9 @@ impl AddressControl for AddressValue {
         }
     }
 
-    fn alloc_and_write_static(&self, addr: usize
+    fn alloc_and_write_static(&self, static_addr: usize
         , memory_context: &mut MemoryContext) {
-        let run_addr = memory_context.static_stack.alloc(addr);
+        let run_addr = memory_context.static_stack.alloc(static_addr);
         memory_context.static_addr_mapping.bind(self.addr_clone()
             , run_addr);
     }

@@ -1,18 +1,82 @@
+use libtype::{AddressValue, AddressType
+    , AddressKey, Data};
+use libcommon::ptr::RefPtr;
+use liblink::statics::LinkStatic;
 use crate::memory::stack::RandStack;
 use crate::vm::addr_mapping::{AddressMapping};
+use crate::vm::thread_context::{ThreadMemory};
+use crate::memory::{Rand, MemoryValue};
 
 pub struct Scope {
-    static_stack: RandStack<usize>,
-    static_addr_mapping: AddressMapping,
-    stack_addr_mapping: AddressMapping
+    addr_mapping: AddressMapping
 }
 
 impl Scope {
+    pub fn get_data_unchecked(&self, addr: &AddressValue
+        , link_static: &RefPtr, memory: &ThreadMemory)
+        -> RefPtr {
+        /*
+         * 根据编译期的地址获取数据
+         * */
+        match addr.typ_ref() {
+            AddressType::Static => {
+                /*
+                 * 数据存储在静态区域中
+                 *  1. 获取绑定的实际地址
+                 *  2. 根据实际地址, 在静态区查找数据
+                 * */
+                let static_addr = self.addr_mapping.get_unwrap(addr.addr_ref());
+                let data = link_static.as_ref::<LinkStatic>().read_uncheck(
+                    &AddressKey::new(static_addr.get() as u64));
+                RefPtr::from_ref::<Data>(data)
+            },
+            AddressType::Stack => {
+                /*
+                 * 数据存储在栈区中
+                 *  1. 获取绑定的实际地址
+                 *  2. 根据实际地址, 在栈区中查找数据
+                 * */
+                let stack_addr = self.addr_mapping.get_unwrap(addr.addr_ref());
+                let data = memory.stack_data_ref().get_unwrap(stack_addr);
+                RefPtr::from_ref::<Data>(data)
+            },
+            _ => {
+                unimplemented!("{:?}", addr.typ_ref());
+            }
+        }
+    }
+
+    pub fn alloc_and_write_data(&mut self, addr: &AddressValue
+        , data: Data, mut memory: RefPtr) {
+        let memory = memory.as_mut::<ThreadMemory>();
+        match addr.typ_ref() {
+            AddressType::Stack => {
+                /*
+                 * 1. 在栈区分配一个空间, 并将数据存入
+                 * 2. 将编译期的地址和实际的地址进行绑定
+                 * */
+                let stack_addr = memory.stack_data.alloc(data);
+                self.addr_mapping.bind(addr.addr_clone()
+                    , stack_addr);
+            },
+            _ => {
+                unimplemented!();
+            }
+        }
+    }
+
+    pub fn alloc_and_write_static(&mut self, addr: &AddressValue
+        , static_addr: AddressKey) {
+        /*
+         * 将给定的编译期地址与静态区的地址进行绑定
+         * */
+        self.addr_mapping.bind(addr.addr_clone()
+            , MemoryValue::new(static_addr.index_clone() as usize));
+    }
+
     pub fn new() -> Self {
         Self {
-            static_stack: RandStack::<usize>::new(),
-            static_addr_mapping: AddressMapping::new(),
-            stack_addr_mapping: AddressMapping::new()
+            addr_mapping: AddressMapping::new()
         }
     }
 }

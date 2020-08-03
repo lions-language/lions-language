@@ -14,11 +14,11 @@ impl ScopeContext {
         self.scopes.pop_back();
     }
     
-    pub fn current_mut_unckecked(&mut self) -> &mut Scope {
+    pub fn current_mut_unchecked(&mut self) -> &mut Scope {
         self.scopes.back_mut().expect("should not happend")
     }
 
-    pub fn current_unckecked(&self) -> &Scope {
+    pub fn current_unchecked(&self) -> &Scope {
         self.scopes.back().expect("should not happend")
     }
 
