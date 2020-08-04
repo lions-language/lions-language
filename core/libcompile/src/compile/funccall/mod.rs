@@ -1,7 +1,8 @@
 use libtype::{PackageType, PackageTypeValue
     , TypeAttrubute, TypeValue
     , Type};
-use libtype::function::{FindFunctionContext, FindFunctionResult};
+use libtype::function::{FindFunctionContext, FindFunctionResult
+    , FunctionDefine};
 use libtype::AddressValue;
 use libtype::package::{PackageStr};
 use libgrammar::token::{TokenValue, TokenData};
@@ -43,10 +44,10 @@ impl<'a, F: Compile> Compiler<'a, F> {
             match func_res {
                 FindFunctionResult::Success(r) => {
                     match r.func.func_define_ref() {
-                        libtype::function::FunctionDefine::Optcode(code) => {
+                        FunctionDefine::Optcode(code) => {
                         },
-                        _ => {
-                            panic!("should not happend");
+                        FunctionDefine::Address(_) => {
+                            unimplemented!();
                         }
                     }
                 },

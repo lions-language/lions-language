@@ -149,7 +149,11 @@ pub enum FunctionDefine {
 
 #[derive(Debug)]
 pub struct OptcodeFunctionDefine {
-    pub optcode: OptCode
+    pub optcode: OptCode,
+    /*
+     * 预处理
+     * */
+    // pub prepare: Option<>
 }
 
 #[derive(Debug, FieldGet)]
