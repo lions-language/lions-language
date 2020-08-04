@@ -157,6 +157,10 @@ impl<'a, F: Compile> Grammar for Compiler<'a, F> {
     fn function_define_end(&mut self, _value: TokenValue) {
         self.handle_function_define_end();
     }
+
+    fn call_function(&mut self, param_len: usize, names: Vec<TokenValue>) -> DescResult {
+        self.handle_call_function(param_len, names)
+    }
 }
 
 impl<'a, F: Compile> Compiler<'a, F> {
@@ -190,6 +194,7 @@ mod operator;
 mod end;
 mod function;
 mod scope;
+mod funccall;
 
 #[cfg(test)]
 mod test {

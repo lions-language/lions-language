@@ -146,8 +146,8 @@ impl Data {
 
 #[derive(Debug, Clone)]
 pub enum PackageTypeValue {
-    Primeval,
-    Crate
+    Crate,
+    Unknown
 }
 
 #[derive(Debug, Clone, FieldGet, FieldGetClone)]

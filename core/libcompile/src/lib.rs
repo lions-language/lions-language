@@ -1,5 +1,8 @@
 #![feature(entry_insert)]
 
+#[macro_use(extract_token_data)]
+extern crate libgrammar;
+
 pub mod compile;
 pub mod bytecode;
 pub mod address;

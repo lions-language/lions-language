@@ -79,7 +79,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         match token.context_ref().token_type() {
             TokenType::RightParenthese
                 | TokenType::Comma => {
-                grammar.skip_next_one();
+                // grammar.skip_next_one();
                 return TokenMethodResult::StmtEnd;
             },
             _ => {
@@ -142,8 +142,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
             },
             _ => {}
         }
-        let (mut next_tp, mut next_token) = expression_check_end!(self, express_context);
-        /*
+        // let (mut next_tp, mut next_token) = expression_check_end!(self, express_context);
         let mut next_tp = match self.lexical_parser.lookup_next_one_ptr() {
             Some(tp) => {
                 tp
@@ -172,6 +171,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
             _ => {
             }
         }
+        /*
         */
         // println!("{}", next_token.context.token_type.format());
         /*

@@ -65,6 +65,10 @@ pub trait Grammar {
          * */
         println!("named function define end");
     }
+    fn call_function(&mut self, param_len: usize, names: Vec<TokenValue>)
+        -> DescResult {
+        unimplemented!();
+    }
     fn end(&mut self) -> DescResult {
         unimplemented!();
     }

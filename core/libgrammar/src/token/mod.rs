@@ -303,3 +303,16 @@ impl NoOperateToken {
     }
 }
 
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    #[ignore]
+    fn extract_token_data_test() {
+        let td = TokenData::Id(String::from("hello"));
+        let v = extract_token_data!(td, Id);
+        println!("{}", v);
+    }
+}
+
