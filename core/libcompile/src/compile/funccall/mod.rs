@@ -2,7 +2,8 @@ use libtype::{PackageType, PackageTypeValue
     , TypeAttrubute, TypeValue
     , Type};
 use libtype::function::{FindFunctionContext, FindFunctionResult
-    , FunctionDefine};
+    , FunctionDefine, OptcodeFunctionDefinePrepareFn
+    , OptcodeFunctionDefine};
 use libtype::AddressValue;
 use libtype::package::{PackageStr};
 use libgrammar::token::{TokenValue, TokenData};
@@ -11,6 +12,13 @@ use crate::compile::{Compile, Compiler, FileType
     , CallFunctionContext};
 
 impl<'a, F: Compile> Compiler<'a, F> {
+    pub fn handle_call_function_optcode(&mut self, param_len: usize
+        , obj: &OptcodeFunctionDefine) -> DescResult {
+        if let Some(f) = obj.prepare_fn_ref() {
+        };
+        DescResult::Success
+    }
+
     pub fn handle_call_function(&mut self, param_len: usize
         , mut names: Vec<TokenValue>) -> DescResult {
         /*
@@ -44,7 +52,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
             match func_res {
                 FindFunctionResult::Success(r) => {
                     match r.func.func_define_ref() {
-                        FunctionDefine::Optcode(code) => {
+                        FunctionDefine::Optcode(obj) => {
+                            return self.handle_call_function_optcode(param_len, obj);
                         },
                         FunctionDefine::Address(_) => {
                             unimplemented!();

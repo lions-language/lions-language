@@ -9,3 +9,4 @@ edition = "2018"
 libcommon = { path = "../libcommon" }
 phf = { version = "0.7.24", features = ["macros"] }
 libmacro = { path = "../libmacro" }
+libresult = { path = "../libresult" }

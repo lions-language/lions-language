@@ -3,6 +3,7 @@ use libcommon::address::FunctionAddress;
 use libcommon::optcode::OptCode;
 use libcommon::ptr::RefPtr;
 use libmacro::{FieldGet};
+use libresult::DescResult;
 use std::hash::Hash;
 use std::cmp::{PartialEq, Eq};
 use crate::{AddressKey, AddressValue};
@@ -147,13 +148,15 @@ pub enum FunctionDefine {
     Address(AddressFunctionDefine)
 }
 
-#[derive(Debug)]
+type OptcodeFunctionDefinePrepareFn = fn(ptr: RefPtr) -> DescResult;
+
+#[derive(Debug, FieldGet)]
 pub struct OptcodeFunctionDefine {
     pub optcode: OptCode,
     /*
      * 预处理
      * */
-    // pub prepare: Option<>
+    pub prepare_fn: Option<OptcodeFunctionDefinePrepareFn>
 }
 
 #[derive(Debug, FieldGet)]
