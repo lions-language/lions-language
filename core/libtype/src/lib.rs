@@ -99,7 +99,21 @@ pub enum TypeValue {
     /*
      * 空类型
      * */
+    Any,
     Empty
+}
+
+impl TypeValue {
+    pub fn is_any(&self) -> bool {
+        match self {
+            TypeValue::Any => {
+                true
+            },
+            _ => {
+                false
+            }
+        }
+    }
 }
 
 /*

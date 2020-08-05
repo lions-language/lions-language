@@ -9,6 +9,9 @@ impl Type {
             TypeValue::Structure(sp) => {
                 sp.struct_obj_ptr.as_ref::<StructObject>().name_str()
             },
+            TypeValue::Any => {
+                consts::ANY_TYPE
+            },
             TypeValue::Empty => {
                 consts::EMPTY_TYPE
             }

@@ -4,9 +4,10 @@ use libcommon::optcode::OptCode;
 use libcommon::ptr::RefPtr;
 use libmacro::{FieldGet};
 use libresult::DescResult;
+use crate::{AddressKey, AddressValue};
 use std::hash::Hash;
 use std::cmp::{PartialEq, Eq};
-use crate::{AddressKey, AddressValue};
+use std::collections::VecDeque;
 
 /*
  * 函数返回值
@@ -300,7 +301,7 @@ pub enum CallFunctionParamAddr {
      * 固定参数
      * */
     Fixed(AddressValue),
-    Lengthen
+    Lengthen(VecDeque<AddressValue>)
 }
 
 mod function_statement;

@@ -18,7 +18,7 @@ lazy_static!{
             String::from(consts::PRIMEVAL_FUNCTION_PRINTLN),
             Some(FunctionParam::new(
                 FunctionParamData::Single(
-                    FunctionParamDataItem::new(
+                    FunctionParamDataItem::new_lengthen(
                         Type::new(TypeValue::Primeval(Primeval::new(
                                 PrimevalType::Str))
                                 , TypeAttrubute::Ref)

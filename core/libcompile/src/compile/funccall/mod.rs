@@ -4,17 +4,37 @@ use libtype::{PackageType, PackageTypeValue
 use libtype::function::{FindFunctionContext, FindFunctionResult
     , FunctionDefine, FunctionParamData
     , OptcodeFunctionDefine, FunctionParamLengthenAttr
-    , CallFunctionParamAddr};
+    , CallFunctionParamAddr, Function};
 use libtype::AddressValue;
 use libtype::package::{PackageStr};
 use libgrammar::token::{TokenValue, TokenData};
 use libgrammar::grammar::{CallFuncScopeContext};
 use libresult::*;
+use libcommon::ptr::RefPtr;
 use crate::compile::{Compile, Compiler, FileType
     , CallFunctionContext};
 use crate::address::Address;
+use std::collections::VecDeque;
 
 impl<'a, F: Compile> Compiler<'a, F> {
+    pub fn binary_type_match(&self, input_typ: &TypeValue, expect_typ: &TypeValue)
+        -> (bool, DescResult) {
+        if !expect_typ.is_any() {
+            /*
+             * 不是 any 的情况下才需要判断类型
+             * */
+            if input_typ != expect_typ {
+                /*
+                 * 类型不匹配 => 报错
+                 * */
+                return (false, DescResult::Error(format!(
+                "expect type: {:?}, but found type: {:?}"
+                , input_typ, expect_typ)));
+            }
+        }
+        (true, DescResult::Success)
+    }
+
     pub fn handle_call_function(&mut self, scope_context: CallFuncScopeContext
         , name: TokenValue, param_len: usize) -> DescResult {
         /*
@@ -37,9 +57,9 @@ impl<'a, F: Compile> Compiler<'a, F> {
         if exists {
             let h = Some(handle);
             let func_res = self.function_control.find_function(&find_func_context, &h);
-            let func = match func_res {
+            let func_ptr = match func_res {
                 FindFunctionResult::Success(r) => {
-                    r.func
+                    RefPtr::from_ref(r.func)
                 },
                 FindFunctionResult::Panic(s) => {
                     return DescResult::Error(s);
@@ -48,6 +68,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                     panic!("should not happend");
                 }
             };
+            let func = func_ptr.as_ref::<Function>();
             let func_statement = func.func_statement_ref();
             let return_data = &func_statement.func_return.data;
             let return_addr = match return_data.typ_ref().typ_ref() {
@@ -69,6 +90,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                      * */
                     match fp.data_ref() {
                         FunctionParamData::Single(item) => {
+                            let item_typ = item.typ_ref().typ_ref();
                             /*
                              * 只有一个参数, 判断该参数是不是变长参数
                              * */
@@ -77,23 +99,33 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                     /*
                                      * 函数需要一个变长的参数
                                      * 将 param_len 个参数从 value_buffer 中取出
+                                     *  1. 因为只有一个参数,
+                                     *     所以调用时候所有的参数都是这个可变参数的值
                                      * */
-                                    unimplemented!();
+                                    let mut params_addr = VecDeque::with_capacity(param_len);
+                                    for _ in 0..param_len {
+                                        let value = self.scope_context.take_top_from_value_buffer();
+                                        let (b, e) = self.binary_type_match(
+                                            value.typ_ref().typ_ref(), item_typ);
+                                        if !b {
+                                            return e;
+                                        }
+                                        params_addr.push_front(
+                                        value.addr().addr());
+                                    }
+                                    Some(vec![CallFunctionParamAddr::Lengthen(params_addr)])
                                 },
                                 FunctionParamLengthenAttr::Fixed => {
                                     /*
                                      * 判断参数的类型是否和函数声明的一致
                                      * */
                                     let value = self.scope_context.take_top_from_value_buffer();
-                                    let value_typ = value.typ_ref().typ_ref();
-                                    let item_typ = item.typ_ref().typ_ref();
-                                    if value_typ != item_typ {
-                                        /*
-                                         * 类型不匹配 => 报错
-                                         * */
-                                        return DescResult::Error(format!(
-                                        "expect type: {:?}, but found type: {:?}"
-                                        , item_typ, value_typ));
+                                    if !item_typ.is_any() {
+                                        let (b, e) = self.binary_type_match(
+                                            value.typ_ref().typ_ref(), item_typ);
+                                        if !b {
+                                            return e;
+                                        }
                                     }
                                     /*
                                      * 参数正确 => 构建参数地址列表
