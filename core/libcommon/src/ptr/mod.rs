@@ -1,4 +1,6 @@
-#[derive(Debug, Clone)]
+use std::cmp::{PartialEq, Eq};
+
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct RefPtr{
     ptr: usize,
     typ: u8

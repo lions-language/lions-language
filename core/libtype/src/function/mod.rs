@@ -70,7 +70,7 @@ impl FunctionReturn {
 /*
  * 函数参数
  * */
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, FieldGet)]
 pub struct FunctionParam {
     pub data: FunctionParamData,
     pub attr: TypeAttrubute
@@ -86,10 +86,26 @@ pub enum FunctionParamAddrAttr {
     Ptr
 }
 
+#[derive(Debug, Clone)]
+pub enum FunctionParamLengthenAttr {
+    /*
+     * 变长参数
+     * */
+    Lengthen,
+    /*
+     * 固定参数
+     * */
+    Fixed
+}
+
 #[derive(Debug, Clone, FieldGet)]
 pub struct FunctionParamDataItem {
     pub typ: Type,
-    pub addr_attr: FunctionParamAddrAttr
+    pub addr_attr: FunctionParamAddrAttr,
+    /*
+     * 是否是变长参数
+     * */
+    pub lengthen_attr: FunctionParamLengthenAttr
 }
 
 #[derive(Debug, Clone)]
@@ -116,7 +132,16 @@ impl FunctionParamDataItem {
     pub fn new(typ: Type) -> Self {
         Self {
             typ: typ,
-            addr_attr: FunctionParamAddrAttr::Move
+            addr_attr: FunctionParamAddrAttr::Move,
+            lengthen_attr: FunctionParamLengthenAttr::Fixed
+        }
+    }
+
+    pub fn new_lengthen(typ: Type) -> Self {
+        Self {
+            typ: typ,
+            addr_attr: FunctionParamAddrAttr::Move,
+            lengthen_attr: FunctionParamLengthenAttr::Lengthen
         }
     }
 }
@@ -124,7 +149,7 @@ impl FunctionParamDataItem {
 /*
  * 函数声明
  * */
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, FieldGet)]
 pub struct FunctionStatement {
     pub func_name: String,
     pub func_param: Option<FunctionParam>,
@@ -156,7 +181,7 @@ pub struct OptcodeFunctionDefine {
     /*
      * 预处理
      * */
-    pub prepare_fn: Option<OptcodeFunctionDefinePrepareFn>
+    // pub prepare_fn: Option<OptcodeFunctionDefinePrepareFn>
 }
 
 #[derive(Debug, FieldGet)]

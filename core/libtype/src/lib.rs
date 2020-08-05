@@ -17,7 +17,7 @@ impl StructObject {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Structure {
     /*
      * 因为每一个结构的类型信息在整个系统中只有一份, 所以这里将结构的内存指针存储下来
@@ -73,7 +73,7 @@ impl TypeAttrubute {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Primeval {
     pub typ: PrimevalType
 }
@@ -86,7 +86,7 @@ impl Primeval {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum TypeValue {
     /*
      * 原生类型
@@ -169,6 +169,10 @@ impl Type {
      * */
     pub fn new(typ: TypeValue, attr: TypeAttrubute) -> Self {
         Type::_new(typ, attr, TypeAddrType::Stack)
+    }
+
+    pub fn new_without_attr(typ: TypeValue) -> Self {
+        Type::new(typ, TypeAttrubute::Empty)
     }
 
     pub fn new_heap(typ: TypeValue, attr: TypeAttrubute) -> Self {

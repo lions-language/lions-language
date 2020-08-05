@@ -4,5 +4,6 @@ pub enum OptCode {
     RefUint8PlusOperatorRefUint16,
     MoveUint16PlusOperatorRefUint8,
     RefUint32PlusOperatorRefUint32,
-    MoveUint32PlusOperatorRefUint8
+    MoveUint32PlusOperatorRefUint8,
+    Println
 }

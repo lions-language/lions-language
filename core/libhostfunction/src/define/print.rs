@@ -15,31 +15,25 @@ lazy_static!{
      * */
     pub static ref PRINTLN: Function = Function{
         func_statement: FunctionStatement::new(
-            String::from(consts::OPERATOR_FUNCTION_NAME),
+            String::from(consts::PRIMEVAL_FUNCTION_PRINTLN),
             Some(FunctionParam::new(
                 FunctionParamData::Single(
                     FunctionParamDataItem::new(
                         Type::new(TypeValue::Primeval(Primeval::new(
-                                PrimevalType::Uint8))
+                                PrimevalType::Str))
                                 , TypeAttrubute::Ref)
                         )
                     ),
                     TypeAttrubute::Ref
                 )),
             FunctionReturn::new(
-                FunctionReturnData::new_with_attr(
-                    Type::new(TypeValue::Primeval(Primeval::new(
-                            PrimevalType::Uint16))
-                            , TypeAttrubute::Move)
-                    , FunctionReturnDataAttr::Create
-                    ),
+                FunctionReturnData::new(
+                    Type::new_without_attr(TypeValue::Empty)),
                 ),
-            Some(Type::new(TypeValue::Primeval(Primeval::new(
-                        PrimevalType::Uint8))
-                        , TypeAttrubute::Ref))
+            None
         ),
         func_define: FunctionDefine::Optcode(OptcodeFunctionDefine{
-            optcode: OptCode::RefUint8PlusOperatorRefUint8
+            optcode: OptCode::Println
         })
     };
 }

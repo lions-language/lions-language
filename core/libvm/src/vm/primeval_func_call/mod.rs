@@ -26,11 +26,35 @@ macro_rules! extract_data_ref {
     }};
 }
 
+macro_rules! extract_primeval_str_ref {
+    ($data_ptr:expr, $typ:ident) => {{
+        let data = $data_ptr.as_ref::<Data>();
+        match data.value_ref() {
+            DataValue::Primeval(d) => {
+                match &d {
+                    PrimevalData::Str(v) => {
+                        v.as_ref().expect("should not happend").extract_utf8_ref()
+                    },
+                    _ => {
+                        unimplemented!();
+                    }
+                }
+            },
+            _ => {
+                unimplemented!();
+            }
+        }
+    }};
+}
+
 impl VirtualMachine {
     pub fn call_primeval_function(&mut self, value: CallPrimevalFunction) {
         match &value.opt {
             OptCode::RefUint8PlusOperatorRefUint8 => {
                 self.ref_uint8_plus_operator_ref_uint8(value);
+            },
+            OptCode::Println => {
+                self.handle_println(value);
             },
             _ => {
                 unimplemented!("{:?}", &value.opt);
@@ -40,4 +64,5 @@ impl VirtualMachine {
 }
 
 mod uint8;
+mod print;
 
