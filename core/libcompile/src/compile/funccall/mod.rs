@@ -4,7 +4,7 @@ use libtype::{PackageType, PackageTypeValue
 use libtype::function::{FindFunctionContext, FindFunctionResult
     , FunctionDefine, FunctionParamData
     , OptcodeFunctionDefine, FunctionParamLengthenAttr
-    , CallFunctionParamAddr, Function};
+    , CallFunctionParamAddr, Function, splice::FunctionSplice};
 use libtype::AddressValue;
 use libtype::package::{PackageStr};
 use libgrammar::token::{TokenValue, TokenData};
@@ -12,24 +12,67 @@ use libgrammar::grammar::{CallFuncScopeContext};
 use libresult::*;
 use libcommon::ptr::RefPtr;
 use crate::compile::{Compile, Compiler, FileType
-    , CallFunctionContext};
+    , CallFunctionContext, value_buffer::ValueBufferItem};
 use crate::address::Address;
 use std::collections::VecDeque;
 
 impl<'a, F: Compile> Compiler<'a, F> {
-    pub fn binary_type_match(&self, input_typ: &TypeValue, expect_typ: &TypeValue)
+    pub fn binary_type_match(&mut self, input_value: ValueBufferItem, expect_typ: &Type)
         -> (bool, DescResult) {
-        if !expect_typ.is_any() {
+        let input_typ = input_value.typ_ref();
+        let et = expect_typ.typ_ref();
+        let it = input_typ.typ_ref();
+        if !et.is_any() {
             /*
              * 不是 any 的情况下才需要判断类型
              * */
-            if input_typ != expect_typ {
+            if it != et {
                 /*
-                 * 类型不匹配 => 报错
+                 * 类型不匹配
+                 *  1. 查找需要转换的函数是否存在
+                 *      比如说: expect_typ 是 string 类型, 那么查找 input_typ 中是否存在 to_string
+                 *      方法
                  * */
-                return (false, DescResult::Error(format!(
-                "expect type: {:?}, but found type: {:?}"
-                , input_typ, expect_typ)));
+                /*
+                 * 拼接 期望的方法名
+                 * */
+                let expect_func_str = FunctionSplice::get_to_type_by_type(expect_typ);
+                /*
+                 * 查找方法
+                 * */
+                let find_func_context = FindFunctionContext {
+                    typ: Some(input_typ),
+                    package_typ: input_value.package_type_ref().as_ref(),
+                    func_str: &expect_func_str,
+                    module_str: self.module_stack.current().name_ref()
+                };
+                let (exists, handle) = self.function_control.is_exists(&find_func_context);
+                if !exists {
+                    return (false, DescResult::Error(format!(
+                    "expect type: {:?}, but found type: {:?}, and not find func: {} in {:?}"
+                    , et, it, expect_func_str, it)));
+                }
+                /*
+                 * 方法存在 => 调用方法
+                 * */
+                let h = Some(handle);
+                let func_res = self.function_control.find_function(&find_func_context, &h);
+                let func_ptr = match func_res {
+                    FindFunctionResult::Success(r) => {
+                        RefPtr::from_ref(r.func)
+                    },
+                    _ => {
+                        panic!("should not happend");
+                    }
+                };
+                let func = func_ptr.as_ref::<Function>();
+                let call_context = CallFunctionContext {
+                    package_str: input_value.package_str(),
+                    func: &func,
+                    param_addrs: param_addrs,
+                    return_addr: return_addr.addr()
+                };
+                self.cb.call_function(call_context);
             }
         }
         (true, DescResult::Success)
@@ -44,12 +87,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
         let func_str = extract_token_data!(name_data, Id);
         let find_func_context = FindFunctionContext {
             typ: scope_context.typ_ref().as_ref(),
-            package_typ: if let PackageTypeValue::Unknown =
-                scope_context.package_type_ref().typ_ref() {
-                None
-            } else {
-                Some(scope_context.package_type_ref())
-            },
+            package_typ: scope_context.package_type_ref().as_ref(),
             func_str: &func_str,
             module_str: self.module_stack.current().name_ref()
         };
@@ -90,7 +128,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                      * */
                     match fp.data_ref() {
                         FunctionParamData::Single(item) => {
-                            let item_typ = item.typ_ref().typ_ref();
+                            let item_typ = item.typ_ref();
                             /*
                              * 只有一个参数, 判断该参数是不是变长参数
                              * */
@@ -105,13 +143,14 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                     let mut params_addr = VecDeque::with_capacity(param_len);
                                     for _ in 0..param_len {
                                         let value = self.scope_context.take_top_from_value_buffer();
+                                        let value_addr = value.addr_ref().addr_clone();
                                         let (b, e) = self.binary_type_match(
-                                            value.typ_ref().typ_ref(), item_typ);
+                                            value, item_typ);
                                         if !b {
                                             return e;
                                         }
                                         params_addr.push_front(
-                                        value.addr().addr());
+                                        value_addr);
                                     }
                                     Some(vec![CallFunctionParamAddr::Lengthen(params_addr)])
                                 },
@@ -120,17 +159,16 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                      * 判断参数的类型是否和函数声明的一致
                                      * */
                                     let value = self.scope_context.take_top_from_value_buffer();
-                                    if !item_typ.is_any() {
-                                        let (b, e) = self.binary_type_match(
-                                            value.typ_ref().typ_ref(), item_typ);
-                                        if !b {
-                                            return e;
-                                        }
+                                    let value_addr = value.addr_ref().addr_clone();
+                                    let (b, e) = self.binary_type_match(
+                                        value, item_typ);
+                                    if !b {
+                                        return e;
                                     }
                                     /*
                                      * 参数正确 => 构建参数地址列表
                                      * */
-                                    Some(vec![CallFunctionParamAddr::Fixed(value.addr().addr())])
+                                    Some(vec![CallFunctionParamAddr::Fixed(value_addr)])
                                 }
                             }
                         },

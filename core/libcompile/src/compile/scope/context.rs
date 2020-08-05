@@ -2,7 +2,7 @@ use libtype::{AddressType, AddressValue
     , AddressKey, Type};
 use super::Scope;
 use crate::address::Address;
-use crate::compile::value_buffer::{ValueBuferrItem};
+use crate::compile::value_buffer::{ValueBufferItem};
 use std::collections::VecDeque;
 
 pub struct ScopeContext {
@@ -45,15 +45,15 @@ impl ScopeContext {
         self.current_mut_unckecked().ref_counter_remove(r);
     }
 
-    pub fn top_n_with_panic_from_value_buffer(&self, n: usize) -> &ValueBuferrItem {
+    pub fn top_n_with_panic_from_value_buffer(&self, n: usize) -> &ValueBufferItem {
         self.current_unckecked().top_n_with_panic_from_value_buffer(n)
     }
 
-    pub fn top_n_from_value_buffer(&self, n: usize) -> Option<&ValueBuferrItem> {
+    pub fn top_n_from_value_buffer(&self, n: usize) -> Option<&ValueBufferItem> {
         self.current_unckecked().top_n_from_value_buffer(n)
     }
 
-    pub fn take_top_from_value_buffer(&mut self) -> ValueBuferrItem {
+    pub fn take_top_from_value_buffer(&mut self) -> ValueBufferItem {
         self.current_mut_unckecked().take_top_from_value_buffer()
     }
 

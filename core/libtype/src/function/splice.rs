@@ -4,6 +4,17 @@ use crate::function::{FunctionParamData, FunctionReturnData};
 pub struct FunctionSplice;
 
 impl FunctionSplice {
+    pub fn get_to_type_by_str(src: &str) -> String {
+        /*
+         * 获取 to_#type 格式的 func_str
+         * */
+        format!("to_{}", src)
+    }
+
+    pub fn get_to_type_by_type(typ: &Type) -> String {
+        FunctionSplice::get_to_type_by_str(typ.to_str())
+    }
+
     pub fn get_function_without_return_string_by_type(
         func_name: &str, func_param: &Option<&FunctionParamData>
         , typ: &Option<&Type>) -> String {

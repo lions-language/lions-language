@@ -1,20 +1,24 @@
-use libtype::Type;
+use libtype::{Type, PackageType
+    , PackageTypeValue};
+use libtype::package::{PackageStr};
 use libmacro::{FieldGet};
 use crate::address::{Address};
 use std::collections::{VecDeque};
 
 #[derive(FieldGet)]
-pub struct ValueBuferrItem {
+pub struct ValueBufferItem {
     pub typ: Type,
-    pub addr: Address
+    pub addr: Address,
+    pub package_type: Option<PackageType>,
+    pub package_str: PackageStr
 }
 
 pub struct ValueBuffer {
-    buffer: VecDeque<ValueBuferrItem>
+    buffer: VecDeque<ValueBufferItem>
 }
 
 impl ValueBuffer {
-    pub fn top_n_with_panic(&self, n: usize) -> &ValueBuferrItem {
+    pub fn top_n_with_panic(&self, n: usize) -> &ValueBufferItem {
         /*
          * 获取 top 往前数的 第n个值
          * 如果找不到就抛出异常
@@ -29,7 +33,7 @@ impl ValueBuffer {
         }
     }
 
-    pub fn top_n(&self, n: usize) -> Option<&ValueBuferrItem> {
+    pub fn top_n(&self, n: usize) -> Option<&ValueBufferItem> {
         if self.buffer.len() < n {
             return None;
         }
@@ -37,7 +41,7 @@ impl ValueBuffer {
         self.buffer.get(index)
     }
 
-    pub fn take_top(&mut self) -> ValueBuferrItem {
+    pub fn take_top(&mut self) -> ValueBufferItem {
         match self.buffer.pop_back() {
             Some(t) => {
                 t
@@ -49,17 +53,16 @@ impl ValueBuffer {
     }
 
     pub fn push_with_addr(&mut self, typ: Type, addr: Address) {
-        self.buffer.push_back(ValueBuferrItem {
+        self.buffer.push_back(ValueBufferItem {
             typ: typ,
-            addr: addr
+            addr: addr,
+            package_type: None,
+            package_str: PackageStr::Empty
         });
     }
     
     pub fn push(&mut self, typ: Type) {
-        self.buffer.push_back(ValueBuferrItem {
-            typ: typ,
-            addr: Address::default()
-        });
+        self.push_with_addr(typ, Address::default());
     }
 
     pub fn new() -> Self {

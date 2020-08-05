@@ -2,7 +2,7 @@ use libtype::{AddressType, AddressValue, AddressKey
     , Type};
 use crate::compile::address_dispatch::AddressDispatch;
 use crate::compile::ref_count::RefCounter;
-use crate::compile::value_buffer::{ValueBuffer, ValueBuferrItem};
+use crate::compile::value_buffer::{ValueBuffer, ValueBufferItem};
 use crate::address::{Address};
 
 pub struct Scope {
@@ -28,15 +28,15 @@ impl Scope {
         self.ref_counter.remove(r);
     }
 
-    fn top_n_with_panic_from_value_buffer(&self, n: usize) -> &ValueBuferrItem {
+    fn top_n_with_panic_from_value_buffer(&self, n: usize) -> &ValueBufferItem {
         self.value_buffer.top_n_with_panic(n)
     }
 
-    fn top_n_from_value_buffer(&self, n: usize) -> Option<&ValueBuferrItem> {
+    fn top_n_from_value_buffer(&self, n: usize) -> Option<&ValueBufferItem> {
         self.value_buffer.top_n(n)
     }
 
-    fn take_top_from_value_buffer(&mut self) -> ValueBuferrItem {
+    fn take_top_from_value_buffer(&mut self) -> ValueBufferItem {
         self.value_buffer.take_top()
     }
 

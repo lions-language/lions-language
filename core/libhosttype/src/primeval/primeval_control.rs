@@ -13,11 +13,22 @@ use libtype::function::format::{Format};
 
 impl FunctionControlInterface for PrimevalControl {
     fn is_exists(&self, context: &FindFunctionContext) -> (bool, FindFunctionHandle) {
-        unimplemented!();
+        match self.find_function(context, &None) {
+            FindFunctionResult::Success(f) => {
+                (true, FindFunctionHandle::from_ref(f.func))
+            },
+            _ => {
+                (false, FindFunctionHandle::new_null())
+            }
+        }
     }
 
     fn find_function<'a>(&'a self, context: &FindFunctionContext
         , handle: &'a Option<FindFunctionHandle>) -> FindFunctionResult {
+        if let Some(h) = handle {
+            return FindFunctionResult::Success(FindFuncSuccess::new(
+                    h.as_ref::<Function>()))
+        };
         let typ = context.typ.expect("primeval must exist type");
         match primeval_method(typ, context.func_str) {
             Some(v) => {

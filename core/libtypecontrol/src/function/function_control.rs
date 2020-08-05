@@ -58,6 +58,9 @@ impl FunctionControl {
                             &mut self.function_control
                         },
                         _ => {
+                            /*
+                             * 如果是第三方包中的方法, 从第三方包中查找函数
+                             * */
                             unimplemented!();
                         }
                     }
