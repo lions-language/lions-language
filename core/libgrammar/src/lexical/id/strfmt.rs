@@ -94,7 +94,7 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
                 /*
                  * double_quotes_process_content 中会跳过第一个 "
                  * */
-                vecu8_content = parser.double_quotes_process_content();
+                vecu8_content = parser.double_quotes_process_vecu8();
             }
         }, |parser| {
             parser.panic("expect \" after <, but arrive IO EOF");

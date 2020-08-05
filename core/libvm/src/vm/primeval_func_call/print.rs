@@ -1,7 +1,7 @@
 use libtype::instruction::{CallPrimevalFunction};
 use libtype::function::{CallFunctionParamAddr};
 use libtype::{Data, DataValue};
-use libtype::primeval::{PrimevalData};
+use libtype::primeval::{PrimevalData, string::StrValue};
 use crate::vm::VirtualMachine;
 
 impl VirtualMachine {
@@ -20,8 +20,29 @@ impl VirtualMachine {
          * */
         let param_value = self.thread_context.current_unchecked().get_data_unchecked(
             &param_compile_addr, &self.link_static);
-        let param_value = extract_primeval_str_ref!(param_value, Str);
-        println!("{:?}", param_value);
+        let data = param_value.as_ref::<Data>();
+        match data.value_ref() {
+            DataValue::Primeval(d) => {
+                match &d {
+                    PrimevalData::Str(v) => {
+                        match v.as_ref().expect("should not happend").value_ref() {
+                            StrValue::Utf8(v) => {
+                                println!("{}", v);
+                            },
+                            StrValue::VecU8(v) => {
+                                println!("{:?}", v);
+                            }
+                        }
+                    },
+                    _ => {
+                        unimplemented!();
+                    }
+                }
+            },
+            _ => {
+                unimplemented!();
+            }
+        }
     }
 }
 

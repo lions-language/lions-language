@@ -26,7 +26,7 @@ macro_rules! extract_data_ref {
     }};
 }
 
-macro_rules! extract_primeval_str_ref {
+macro_rules! extract_primeval_utf8_str_ref {
     ($data_ptr:expr, $typ:ident) => {{
         let data = $data_ptr.as_ref::<Data>();
         match data.value_ref() {
