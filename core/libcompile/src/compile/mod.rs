@@ -1,4 +1,4 @@
-use libgrammar::grammar::Grammar;
+use libgrammar::grammar::{Grammar, CallFuncScopeContext};
 use libgrammar::token::{TokenValue};
 use libtype::{Type, Data};
 use libtype::function::{Function, CallFunctionParamAddr};
@@ -158,8 +158,9 @@ impl<'a, F: Compile> Grammar for Compiler<'a, F> {
         self.handle_function_define_end();
     }
 
-    fn call_function(&mut self, param_len: usize, names: Vec<TokenValue>) -> DescResult {
-        self.handle_call_function(param_len, names)
+    fn call_function(&mut self, scope_context: CallFuncScopeContext
+        , name: TokenValue, param_len: usize) -> DescResult {
+        self.handle_call_function(scope_context, name, param_len)
     }
 }
 

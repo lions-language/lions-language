@@ -8,36 +8,27 @@ use libtype::function::{FindFunctionContext, FindFunctionResult
 use libtype::AddressValue;
 use libtype::package::{PackageStr};
 use libgrammar::token::{TokenValue, TokenData};
+use libgrammar::grammar::{CallFuncScopeContext};
 use libresult::*;
 use crate::compile::{Compile, Compiler, FileType
     , CallFunctionContext};
 use crate::address::Address;
 
 impl<'a, F: Compile> Compiler<'a, F> {
-    pub fn handle_call_function(&mut self, param_len: usize
-        , mut names: Vec<TokenValue>) -> DescResult {
+    pub fn handle_call_function(&mut self, scope_context: CallFuncScopeContext
+        , name: TokenValue, param_len: usize) -> DescResult {
         /*
          * 1. 查找函数声明
          * */
-        let mut package_type = PackageType::new(PackageTypeValue::Unknown);
-        let mut package_str = PackageStr::Empty;
-        let mut typ = None;
-        if names.len() == 1 {
-            /*
-             * 直接是函数名, 没有前缀
-             * */
-            package_type = PackageType::new(PackageTypeValue::Crate);
-            package_str = PackageStr::Itself;
-        }
-        let last = names.pop().expect("should not happend");
-        let last_data = last.token_data().expect("should not happend");
-        let func_str = extract_token_data!(last_data, Id);
+        let name_data = name.token_data().expect("should not happend");
+        let func_str = extract_token_data!(name_data, Id);
         let find_func_context = FindFunctionContext {
-            typ: typ,
-            package_typ: if let PackageTypeValue::Unknown = package_type.typ_ref() {
+            typ: scope_context.typ_ref().as_ref(),
+            package_typ: if let PackageTypeValue::Unknown =
+                scope_context.package_type_ref().typ_ref() {
                 None
             } else {
-                Some(&package_type)
+                Some(scope_context.package_type_ref())
             },
             func_str: &func_str,
             module_str: self.module_stack.current().name_ref()
@@ -84,6 +75,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                             match item.lengthen_attr_ref() {
                                 FunctionParamLengthenAttr::Lengthen => {
                                     /*
+                                     * 函数需要一个变长的参数
                                      * 将 param_len 个参数从 value_buffer 中取出
                                      * */
                                     unimplemented!();
@@ -120,7 +112,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 }
             };
             let call_context = CallFunctionContext {
-                package_str: package_str,
+                package_str: scope_context.package_str(),
                 func: &func,
                 param_addrs: param_addrs,
                 return_addr: return_addr.addr()

@@ -1,4 +1,7 @@
-use super::{GrammarParser, Grammar, AfterIdProcess};
+use libtype::{PackageType, PackageTypeValue};
+use libtype::package::{PackageStr};
+use super::{GrammarParser, Grammar, AfterIdProcess
+    , CallFuncScopeContext};
 use crate::lexical::{CallbackReturnStatus};
 use crate::token::{TokenType};
 
@@ -7,6 +10,11 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         /*
          * 1. 判断是否是函数调用
          * */
+        let scope_context = CallFuncScopeContext{
+            package_type: PackageType::new(PackageTypeValue::Crate),
+            package_str: PackageStr::Itself,
+            typ: None
+        };
         self.set_backtrack_point();
         self.virtual_skip_next_one();
         match self.virtual_skip_white_space_token() {
@@ -15,7 +23,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                 match token.context_token_type() {
                     TokenType::LeftParenthese => {
                         let bl = self.restore_from_backtrack_point();
-                        self.funccall_process(bl);
+                        self.funccall_process(bl, scope_context);
                         return AfterIdProcess::FunctionCall;
                     },
                     _ => {

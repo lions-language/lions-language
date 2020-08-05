@@ -1,7 +1,16 @@
 use crate::lexical::{LexicalParser, CallbackReturnStatus, TokenVecItem, TokenPointer};
 use crate::token::{TokenType, TokenValue, TokenMethodResult};
-use libtype::{Type};
+use libtype::{Type, PackageType};
 use libresult::*;
+use libtype::package::PackageStr;
+use libmacro::{FieldGet};
+
+#[derive(FieldGet)]
+pub struct CallFuncScopeContext {
+    package_type: PackageType,
+    package_str: PackageStr,
+    typ: Option<Type>
+}
 
 pub trait Grammar {
     // type IdUse;
@@ -65,7 +74,8 @@ pub trait Grammar {
          * */
         println!("named function define end");
     }
-    fn call_function(&mut self, param_len: usize, names: Vec<TokenValue>)
+    fn call_function(&mut self, _context: CallFuncScopeContext, _name: TokenValue
+        , _param_len: usize)
         -> DescResult {
         unimplemented!();
     }

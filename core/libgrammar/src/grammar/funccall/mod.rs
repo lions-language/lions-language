@@ -1,18 +1,19 @@
 use libresult::*;
 use super::{Grammar, GrammarParser
-    , ExpressContext};
+    , ExpressContext, CallFuncScopeContext};
 use crate::lexical::{CallbackReturnStatus
     , TokenVecItem};
 use crate::token::{TokenMethodResult
     , TokenType};
 
 impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, CB> {
-    pub fn funccall_process(&mut self, backtrack_len: usize) {
+    pub fn funccall_process(&mut self, backtrack_len: usize
+        , scope_context: CallFuncScopeContext) {
         /*
          * 获取名称
          * */
         let token = self.take_next_one();
-        let mut names = vec![token.token_value()];
+        let mut name = token.token_value();
         /*
          * 因为在之前的 virtual lookup 的时候已经判断了到达这里一定是函数调用
          * 为了效率, 这里不再依次判断, 应该直接跳过, 直到 `(` 之后的 token
@@ -74,7 +75,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                 // println!("param len: {}", param_len);
             }
         }
-        if let DescResult::Error(s) = self.cb().call_function(param_len, names) {
+        if let DescResult::Error(s) = self.cb().call_function(scope_context, name, param_len) {
             self.panic(&s);
         };
     }
