@@ -46,7 +46,7 @@ impl<'a, 'b, F: Writer> Compile for Bytecode<'a, 'b, F> {
     
     fn load_stack(&mut self, context: LoadStackContext) {
         let (addr, data) = context.fields_move();
-        self.write(Instruction::LoadStack(LoadStack::new(
+        self.write(Instruction::LoadStack(LoadStack::new_with_all(
                     addr, data)));
     }
 

@@ -60,7 +60,7 @@ pub fn new_with_all(input: TokenStream) -> TokenStream {
     }
     let expanded = quote! {
         impl #ident {
-            pub fn new(#ts) -> Self {
+            pub fn new_with_all(#ts) -> Self {
                 Self {
                     #fs
                 }

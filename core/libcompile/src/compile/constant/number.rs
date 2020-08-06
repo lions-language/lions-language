@@ -29,7 +29,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
         /*
          * 生成读取静态量的指令, 虚拟机接收到这个指令后, 将地址写入到计算栈中
          * */
-        let context = LoadStackContext::new(
+        let context = LoadStackContext::new_with_all(
             addr.addr(), value.to_data());
         self.cb.load_stack(context);
     }

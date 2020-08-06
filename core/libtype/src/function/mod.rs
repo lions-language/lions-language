@@ -2,7 +2,7 @@ use super::{Type, PackageType, TypeAttrubute};
 use libcommon::address::FunctionAddress;
 use libcommon::optcode::OptCode;
 use libcommon::ptr::RefPtr;
-use libmacro::{FieldGet};
+use libmacro::{FieldGet, NewWithAll};
 use libresult::DescResult;
 use crate::{AddressKey, AddressValue};
 use std::hash::Hash;
@@ -99,14 +99,18 @@ pub enum FunctionParamLengthenAttr {
     Fixed
 }
 
-#[derive(Debug, Clone, FieldGet)]
+#[derive(Debug, Clone, FieldGet, NewWithAll)]
 pub struct FunctionParamDataItem {
     pub typ: Type,
     pub addr_attr: FunctionParamAddrAttr,
     /*
      * 是否是变长参数
      * */
-    pub lengthen_attr: FunctionParamLengthenAttr
+    pub lengthen_attr: FunctionParamLengthenAttr,
+    /*
+     * 该字段决定: 当函数调用时, 如果传入的参数和要求的参数类型不匹配, 是否自动调用 to_#type 方法
+     * */
+    pub is_auto_call_totype: bool
 }
 
 #[derive(Debug, Clone)]
@@ -131,19 +135,25 @@ impl FunctionParam {
 
 impl FunctionParamDataItem {
     pub fn new(typ: Type) -> Self {
-        Self {
-            typ: typ,
-            addr_attr: FunctionParamAddrAttr::Move,
-            lengthen_attr: FunctionParamLengthenAttr::Fixed
-        }
+        FunctionParamDataItem::new_with_all(typ
+            , FunctionParamAddrAttr::Move
+            , FunctionParamLengthenAttr::Fixed
+            , false)
     }
 
     pub fn new_lengthen(typ: Type) -> Self {
-        Self {
-            typ: typ,
-            addr_attr: FunctionParamAddrAttr::Move,
-            lengthen_attr: FunctionParamLengthenAttr::Lengthen
-        }
+        FunctionParamDataItem::new_with_all(typ
+            , FunctionParamAddrAttr::Move
+            , FunctionParamLengthenAttr::Lengthen
+            , false)
+    }
+
+    pub fn new_lengthen_auto_call_totype(typ: Type
+        , is_auto_call_totype: bool) -> Self {
+        FunctionParamDataItem::new_with_all(typ
+            , FunctionParamAddrAttr::Move
+            , FunctionParamLengthenAttr::Lengthen
+            , is_auto_call_totype)
     }
 }
 
