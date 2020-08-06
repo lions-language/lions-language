@@ -44,7 +44,7 @@ impl TokenValueExpand for TokenValue {
         match self.token_type_clone() {
             TokenType::Const(t) => {
                 Type::new(TypeValue::Primeval(Primeval::new(
-                            t)), TypeAttrubute::Ref)
+                            t)), TypeAttrubute::Ref/*TODO*/)
             },
             _ => {
                 unimplemented!();

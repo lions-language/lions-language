@@ -19,6 +19,7 @@ lazy_static!{
         phf_map! {
             "&uint8:+(&uint8)" => 0,
             "&uint8:+(&uint16)" => 1,
+            "&uint8:to_str()" => 2
         }
     };
     /*
@@ -85,11 +86,35 @@ lazy_static!{
             optcode: OptCode::RefUint8PlusOperatorRefUint16
         })
     };
+    /*
+     * &uint8 to_str -> String
+     * */
+    static ref REF_UINT8_TO_STR_FUNCTION: Function = Function{
+        func_statement: FunctionStatement::new(
+            String::from(consts::TO_STR_FUNCTION_NAME),
+            None,
+            FunctionReturn::new(
+                FunctionReturnData::new_with_attr(
+                    Type::new(TypeValue::Primeval(Primeval::new(
+                            PrimevalType::Str))
+                            , TypeAttrubute::Move)
+                    , FunctionReturnDataAttr::Create
+                    )
+                ),
+            Some(Type::new(TypeValue::Primeval(Primeval::new(
+                        PrimevalType::Uint8))
+                        , TypeAttrubute::Ref))
+        ),
+        func_define: FunctionDefine::Optcode(OptcodeFunctionDefine{
+            optcode: OptCode::RefUint8ToStr
+        })
+    };
 
     static ref UINT8_FUNCTION_VEC: Vec<&'static Function> = {
         let mut v = Vec::with_capacity(UINT8_METHOD.len());
         v.push(&*REF_UINT8_PLUS_OPERATOR_REF_UINT8_FUNCTION);
         v.push(&*REF_UINT8_PLUS_OPERATOR_REF_UINT16_FUNCTION);
+        v.push(&*REF_UINT8_TO_STR_FUNCTION);
         v
     };
 }
