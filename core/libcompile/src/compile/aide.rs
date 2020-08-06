@@ -2,7 +2,8 @@ use libgrammar::token::{TokenType, TokenValue, TokenData};
 use libtype::{Type, Data, TypeValue
     , Primeval, TypeAttrubute
     , DataValue};
-use super::{Compiler, Compile, TokenValueExpand};
+use super::{Compiler, Compile, TokenValueExpand
+    , CallFunctionContext};
 
 impl<'a, F: Compile> Compiler<'a, F> {
     pub fn tokentype_to_type(&self, typ: TokenType) -> Type {
@@ -27,6 +28,14 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 panic!("should not happend");
             }
         }
+    }
+
+    pub fn call_function_and_ctrl_scope(&mut self, context: CallFunctionContext) {
+        // self.scope_context.enter();
+        self.cb.enter_scope();
+        self.cb.call_function(context);
+        // self.scope_context.leave();
+        self.cb.leave_scope();
     }
 }
 

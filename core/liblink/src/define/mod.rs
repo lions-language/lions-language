@@ -62,6 +62,7 @@ impl LinkDefine {
     }
 
     fn execute(&mut self, instruction: &Instruction, is_first: bool) {
+        // println!("{:?}", instruction);
         match instruction {
             Instruction::CallFunction(value) => {
                 let ps = value.package_str_ref();

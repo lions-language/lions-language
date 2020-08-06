@@ -94,6 +94,16 @@ impl<'a, 'b, F: Writer> Compile for Bytecode<'a, 'b, F> {
         let ds = self.define_stack.leave();
         self.func_define_dispatch.finish_define(ds)
     }
+
+    fn enter_scope(&mut self) {
+        // println!("xxxxxxx");
+        self.write(Instruction::EnterScope);
+    }
+
+    fn leave_scope(&mut self) {
+        // println!("yyyyyyyyy");
+        self.write(Instruction::LeaveScope);
+    }
 }
 
 impl<'a, 'b, F: Writer> Bytecode<'a, 'b, F> {

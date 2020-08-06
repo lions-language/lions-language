@@ -81,6 +81,14 @@ pub trait Compile {
     fn function_define_end(&mut self) -> Function {
         unimplemented!();
     }
+
+    fn enter_scope(&mut self) {
+        unimplemented!();
+    }
+
+    fn leave_scope(&mut self) {
+        unimplemented!();
+    }
 }
 
 pub enum FileType {

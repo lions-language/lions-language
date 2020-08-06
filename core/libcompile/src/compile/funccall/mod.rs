@@ -123,7 +123,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                     param_addrs: Some(param_addrs),
                     return_addr: return_addr.addr()
                 };
-                self.cb.call_function(call_context);
+                self.call_function_and_ctrl_scope(call_context);
             }
         }
         (true, DescResult::Success)
@@ -240,7 +240,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 param_addrs: param_addrs,
                 return_addr: return_addr.addr()
             };
-            self.cb.call_function(call_context);
+            self.call_function_and_ctrl_scope(call_context);
         } else {
             return DescResult::Error(
                 String::from("the main function must exist in main.lions"));

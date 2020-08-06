@@ -22,6 +22,17 @@ impl ScopeContext {
         self.scopes.back().expect("should not happend")
     }
 
+    pub fn last_unchecked(&self) -> &Scope {
+        /*
+         * 获取前一个作用域
+         * */
+        self.scopes.get(self.scopes.len() - 2).expect("should not happend")
+    }
+
+    pub fn last_mut_unchecked(&mut self) -> &mut Scope {
+        self.scopes.get_mut(self.scopes.len() - 2).expect("should not happend")
+    }
+
     pub fn new() -> Self {
         Self {
             scopes: VecDeque::new()

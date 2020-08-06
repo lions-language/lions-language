@@ -65,6 +65,14 @@ impl ScopeContext {
         self.current_mut_unckecked().push_to_value_buffer(typ)
     }
 
+    pub fn new_with_first() -> Self {
+        let mut scopes = VecDeque::new();
+        scopes.push_back(Scope::new());
+        Self {
+            scopes: scopes
+        }
+    }
+
     pub fn new() -> Self {
         Self {
             scopes: VecDeque::new()

@@ -193,7 +193,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 }
             }
         };
-        self.cb.call_function(CallFunctionContext{
+        self.call_function_and_ctrl_scope(CallFunctionContext{
             package_str: PackageStr::Empty,
             func: &func,
             param_addrs: Some(vec![CallFunctionParamAddr::Fixed(left_addr_value)

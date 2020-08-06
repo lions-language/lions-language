@@ -38,9 +38,9 @@ impl VirtualMachine {
         /*
          * 获取数据
          * */
-        let left_value = self.thread_context.current_unchecked().get_data_unchecked(
+        let left_value = self.thread_context.current_unchecked().get_last_data_unchecked(
             &left_param_compile_addr, &self.link_static);
-        let right_value = self.thread_context.current_unchecked().get_data_unchecked(
+        let right_value = self.thread_context.current_unchecked().get_last_data_unchecked(
             &right_param_compile_addr, &self.link_static);
         let left_value = extract_data_ref!(left_value, Uint8);
         let right_value = extract_data_ref!(right_value, Uint8);

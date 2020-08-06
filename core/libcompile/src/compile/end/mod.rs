@@ -1,7 +1,9 @@
 use libtype::{PackageType, PackageTypeValue};
-use libtype::function::{FindFunctionContext, FindFunctionResult};
+use libtype::function::{FindFunctionContext, FindFunctionResult
+    , Function};
 use libtype::AddressValue;
 use libtype::package::{PackageStr};
+use libcommon::ptr::{RefPtr};
 use libresult::*;
 use crate::compile::{Compile, Compiler, FileType
     , CallFunctionContext};
@@ -24,28 +26,30 @@ impl<'a, F: Compile> Compiler<'a, F> {
             if exists {
                 let h = Some(handle);
                 let func_res = self.function_control.find_function(&context, &h);
-                match func_res {
+                let func_ptr = match func_res {
                     FindFunctionResult::Success(r) => {
-                        match r.func.func_define_ref() {
-                            libtype::function::FunctionDefine::Address(addr) => {
-                                /*
-                                 * 函数调用
-                                 * */
-                                let call_context = CallFunctionContext {
-                                    package_str: PackageStr::Itself,
-                                    func: &r.func,
-                                    param_addrs: None,
-                                    return_addr: AddressValue::new_invalid()
-                                };
-                                self.cb.call_function(call_context);
-                            },
-                            _ => {
-                                panic!("should not happend");
-                            }
-                        }
+                        RefPtr::from_ref(r.func)
                     },
                     FindFunctionResult::Panic(s) => {
                         return DescResult::Error(s);
+                    },
+                    _ => {
+                        panic!("should not happend");
+                    }
+                };
+                let func = func_ptr.as_ref::<Function>();
+                match func.func_define_ref() {
+                    libtype::function::FunctionDefine::Address(addr) => {
+                        /*
+                         * 函数调用
+                         * */
+                        let call_context = CallFunctionContext {
+                            package_str: PackageStr::Itself,
+                            func: &func,
+                            param_addrs: None,
+                            return_addr: AddressValue::new_invalid()
+                        };
+                        self.cb.call_function(call_context);
                     },
                     _ => {
                         panic!("should not happend");

@@ -45,6 +45,26 @@ impl ThreadScope {
             addr, static_addr);
     }
 
+    pub fn get_last_data_unchecked(&self, addr: &AddressValue
+        , link_static: &RefPtr)
+        -> RefPtr {
+        self.scope_context.last_unchecked().get_data_unchecked(
+            addr, link_static, &self.memory)
+    }
+
+    pub fn alloc_and_write_last_data(&mut self, addr: &AddressValue
+        , data: Data) {
+        let memory = RefPtr::from_ref::<ThreadMemory>(&self.memory);
+        self.scope_context.last_mut_unchecked().alloc_and_write_data(
+            addr, data, memory);
+    }
+
+    pub fn alloc_and_write_last_static(&mut self, addr: &AddressValue
+        , static_addr: AddressKey) {
+        self.scope_context.last_mut_unchecked().alloc_and_write_static(
+            addr, static_addr);
+    }
+
     pub fn new() -> Self {
         Self {
             scope_context: ScopeContext::new(),

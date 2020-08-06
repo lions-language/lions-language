@@ -86,5 +86,7 @@ pub enum Instruction {
     ReadStaticVariant(StaticVariant),
     CallPrimevalFunction(CallPrimevalFunction),
     CallFunction(CallFunction),
+    EnterScope,
+    LeaveScope,
     Invalid
 }

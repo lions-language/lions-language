@@ -74,6 +74,12 @@ impl VirtualMachine {
             Instruction::ReadStaticVariant(v) => {
                 self.read_static_variant(v);
             },
+            Instruction::EnterScope => {
+                self.thread_context.enter_thread_scope();
+            },
+            Instruction::LeaveScope => {
+                self.thread_context.leave_thread_scope();
+            },
             _ => {
                 unimplemented!("{:?}", &instruction);
             }
@@ -81,7 +87,14 @@ impl VirtualMachine {
     }
 
     fn run(&mut self, entrance: Instruction) {
+        // println!("{:?}", entrance);
+        /*
+         * main 函数被调用的时候, 编译期不会生成 enter scope 指令
+         * 所以这里需要手动进入
+         * */
+        self.thread_context.enter_thread_scope();
         self.execute(entrance);
+        self.thread_context.leave_thread_scope();
     }
 
     /*
@@ -211,7 +224,7 @@ mod test {
     use std::io::Read;
 
     #[test]
-    fn grammar_parser_test() {
+    fn virtual_machine_test() {
         let file = String::from("main.lions");
         let mut f = match fs::File::open(&file) {
             Ok(f) => f,

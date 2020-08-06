@@ -15,7 +15,7 @@ impl VirtualMachine {
         /*
          * 创建作用域
          * */
-        self.thread_context.enter_thread_scope();
+        // self.thread_context.enter_thread_scope();
         let ld = self.link_define.clone();
         let ld = ld.as_ref::<LinkDefine>();
         match value.define_addr_ref() {
@@ -35,7 +35,7 @@ impl VirtualMachine {
         /*
          * 离开作用域
          * */
-        self.thread_context.leave_thread_scope();
+        // self.thread_context.leave_thread_scope();
     }
 }
 
