@@ -75,7 +75,7 @@ pub trait Compile {
     }
     
     fn function_define_start(&mut self) {
-        unimplemented!();
+        println!("function define start");
     }
 
     fn function_define_end(&mut self) -> Function {

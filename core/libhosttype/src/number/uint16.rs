@@ -15,9 +15,11 @@ use phf::phf_map;
  * 静态映射
  * */
 lazy_static!{
-    static ref UINT8_METHOD: phf::Map<&'static str, u32> = {
+    static ref UINT16_METHOD: phf::Map<&'static str, u32> = {
         phf_map! {
             "uint16:+(&uint8)" => 0,
+            "&uint16:to_str()" => 1,
+            "uint16:to_str()" => 2,
         }
     };
     /*
@@ -52,16 +54,64 @@ lazy_static!{
             optcode: OptCode::MoveUint16PlusOperatorRefUint8
         })
     };
+    /*
+     * &uint16 to_str -> String
+     * */
+    static ref REF_UINT16_TO_STR_FUNCTION: Function = Function{
+        func_statement: FunctionStatement::new(
+            String::from(consts::TO_STR_FUNCTION_NAME),
+            None,
+            FunctionReturn::new(
+                FunctionReturnData::new_with_attr(
+                    Type::new(TypeValue::Primeval(Primeval::new(
+                            PrimevalType::Str))
+                            , TypeAttrubute::Move)
+                    , FunctionReturnDataAttr::Create
+                    )
+                ),
+            Some(Type::new(TypeValue::Primeval(Primeval::new(
+                        PrimevalType::Uint16))
+                        , TypeAttrubute::Ref))
+        ),
+        func_define: FunctionDefine::Optcode(OptcodeFunctionDefine{
+            optcode: OptCode::RefUint16ToStr
+        })
+    };
+    /*
+     * uint16 to_str -> String
+     * */
+    static ref MOVE_UINT16_TO_STR_FUNCTION: Function = Function{
+        func_statement: FunctionStatement::new(
+            String::from(consts::TO_STR_FUNCTION_NAME),
+            None,
+            FunctionReturn::new(
+                FunctionReturnData::new_with_attr(
+                    Type::new(TypeValue::Primeval(Primeval::new(
+                            PrimevalType::Str))
+                            , TypeAttrubute::Move)
+                    , FunctionReturnDataAttr::Create
+                    )
+                ),
+            Some(Type::new(TypeValue::Primeval(Primeval::new(
+                        PrimevalType::Uint16))
+                        , TypeAttrubute::Move))
+        ),
+        func_define: FunctionDefine::Optcode(OptcodeFunctionDefine{
+            optcode: OptCode::MoveUint16ToStr
+        })
+    };
 
-    static ref UINT8_FUNCTION_VEC: Vec<&'static Function> = {
-        let mut v = Vec::with_capacity(UINT8_METHOD.len());
+    static ref UINT16_FUNCTION_VEC: Vec<&'static Function> = {
+        let mut v = Vec::with_capacity(UINT16_METHOD.len());
         v.push(&*MOVE_UINT16_PLUS_OPERATOR_REF_UINT8_FUNCTION);
+        v.push(&*REF_UINT16_TO_STR_FUNCTION);
+        v.push(&*MOVE_UINT16_TO_STR_FUNCTION);
         v
     };
 }
 
 pub fn get_method(func_str: &str) -> Option<&'static Function> {
-    let index = match UINT8_METHOD.get(func_str) {
+    let index = match UINT16_METHOD.get(func_str) {
         Some(index) => {
             index
         },
@@ -69,10 +119,10 @@ pub fn get_method(func_str: &str) -> Option<&'static Function> {
             return None;
         }
     };  
-    if *index > UINT8_FUNCTION_VEC.len() as u32 {
+    if *index > UINT16_FUNCTION_VEC.len() as u32 {
         return None;
     }   
-    match UINT8_FUNCTION_VEC.get(*index as usize) {
+    match UINT16_FUNCTION_VEC.get(*index as usize) {
         Some(v) => {
             Some(v)
         },
