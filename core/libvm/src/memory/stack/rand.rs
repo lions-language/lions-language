@@ -2,6 +2,7 @@ use libtype::{Data, AddressKey};
 use crate::memory::{Rand, MemoryValue};
 use super::RandStack;
 use std::collections::VecDeque;
+use std::fmt::Debug;
 
 impl<T> Rand<T> for RandStack<T> {
     fn alloc(&mut self, data: T) -> MemoryValue {
@@ -45,7 +46,19 @@ impl<T> Rand<T> for RandStack<T> {
     }
 }
 
-impl<T> RandStack<T> {
+impl<T: Debug> RandStack<T> {
+    pub fn print_datas(&self) {
+        for data in self.datas.iter() {
+            println!("{:?}", data);
+        }
+    }
+
+    pub fn print_recycles(&self) {
+        for recycle in self.recycles.iter() {
+            println!("{}", recycle);
+        }
+    }
+
     pub fn with_capacity(cap: usize) -> Self {
         Self {
             datas: VecDeque::with_capacity(cap),

@@ -50,7 +50,7 @@ impl VirtualMachine {
          * */
         let result = left_value as u16 +
             right_value as u16;
-        println!("result: {}", result);
+        // println!("result: {}", result);
         /*
          * 检测返回值是否有效
          * */
@@ -102,6 +102,7 @@ impl VirtualMachine {
             , Data::new(DataValue::Primeval(
                     PrimevalData::Str(
                         Some(Str::new(StrValue::Utf8(result)))))));
+        self.thread_context.current_unchecked().print_stack_datas();
     }
 }
 

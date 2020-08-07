@@ -65,6 +65,18 @@ impl ThreadScope {
             addr, static_addr);
     }
 
+    pub fn print_stack_datas(&self) {
+        println!("**************** stack data ******************");
+        self.memory.stack_data.print_datas();
+        println!("**********************************************");
+    }
+
+    pub fn print_recycles(&self) {
+        println!("**************** recycles ******************");
+        self.memory.stack_data.print_recycles();
+        println!("********************************************");
+    }
+
     pub fn new() -> Self {
         Self {
             scope_context: ScopeContext::new(),
