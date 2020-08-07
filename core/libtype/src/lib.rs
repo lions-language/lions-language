@@ -250,6 +250,11 @@ impl Default for AddressType {
     }
 }
 
+pub enum AddressNodeType {
+    Branches,
+    Leaf
+}
+
 #[derive(Debug, Clone, Default, PartialEq
     , Hash, Eq, FieldGet, FieldGetClone
     , FieldGetMove)]
