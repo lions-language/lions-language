@@ -20,7 +20,7 @@ use std::collections::VecDeque;
 impl<'a, F: Compile> Compiler<'a, F> {
     pub fn binary_type_match(&mut self, input_value: ValueBufferItem, expect_typ: &Type
         , is_auto_call_totype: bool)
-        -> (bool, DescResult) {
+        -> Result<AddressValue, DescResult> {
         let input_typ = input_value.typ_ref();
         let et = expect_typ.typ_ref();
         let it = input_typ.typ_ref();
@@ -38,7 +38,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                  *      方法
                  * */
                 if !is_auto_call_totype {
-                    return (false, DescResult::Error(format!(
+                    return Err(DescResult::Error(format!(
                     "expect type: {:?}, but found type: {:?}"
                     , et, it)));
                 }
@@ -46,7 +46,9 @@ impl<'a, F: Compile> Compiler<'a, F> {
                  * 需要自动调用 to_#type 方法
                  * 1. 拼接 期望的方法名
                  * */
-                let expect_func_str = FunctionSplice::get_to_type_by_type(expect_typ);
+                let func_name = FunctionSplice::get_to_type_by_type(expect_typ);
+                let expect_func_str = FunctionSplice::get_function_without_return_string_by_type(
+                    &func_name, &None, &Some(input_typ));
                 /*
                  * 查找方法
                  * */
@@ -58,7 +60,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 };
                 let (exists, handle) = self.function_control.is_exists(&find_func_context);
                 if !exists {
-                    return (false, DescResult::Error(format!(
+                    return Err(DescResult::Error(format!(
                     "expect type: {:?}, but found type: {:?}, and not find func: {} in {:?}"
                     , et, it, expect_func_str, it)));
                 }
@@ -121,12 +123,19 @@ impl<'a, F: Compile> Compiler<'a, F> {
                     package_str: input_value.package_str(),
                     func: &func,
                     param_addrs: Some(param_addrs),
-                    return_addr: return_addr.addr()
+                    return_addr: return_addr.addr_clone()
                 };
                 self.call_function_and_ctrl_scope(call_context);
+                /*
+                 * 因为地址被修改, 所以返回修改后的地址 (调用 to_#type 后的 return 地址)
+                 * */
+                return Ok(return_addr.addr());
             }
         }
-        (true, DescResult::Success)
+        /*
+         * 返回输入的地址
+         * */
+        Ok(input_value.addr().addr())
     }
 
     pub fn handle_call_function(&mut self, call_scope_context: CallFuncScopeContext
@@ -194,13 +203,17 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                     let mut params_addr = VecDeque::with_capacity(param_len);
                                     for _ in 0..param_len {
                                         let value = self.scope_context.take_top_from_value_buffer();
-                                        let value_addr = value.addr_ref().addr_clone();
-                                        let (b, e) = self.binary_type_match(
+                                        // let value_addr = value.addr_ref().addr_clone();
+                                        let value_addr = match self.binary_type_match(
                                             value, item_typ
-                                            , *item.is_auto_call_totype_ref());
-                                        if !b {
-                                            return e;
-                                        }
+                                            , *item.is_auto_call_totype_ref()) {
+                                            Ok(addr) => {
+                                                addr
+                                            },
+                                            Err(e) => {
+                                                return e;
+                                            }
+                                        };
                                         params_addr.push_front(
                                         value_addr);
                                     }
@@ -211,13 +224,17 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                      * 判断参数的类型是否和函数声明的一致
                                      * */
                                     let value = self.scope_context.take_top_from_value_buffer();
-                                    let value_addr = value.addr_ref().addr_clone();
-                                    let (b, e) = self.binary_type_match(
+                                    // let value_addr = value.addr_ref().addr_clone();
+                                    let value_addr = match self.binary_type_match(
                                         value, item_typ
-                                        , *item.is_auto_call_totype_ref());
-                                    if !b {
-                                        return e;
-                                    }
+                                        , *item.is_auto_call_totype_ref()) {
+                                        Ok(addr) => {
+                                            addr
+                                        },
+                                        Err(e) => {
+                                            return e;
+                                        }
+                                    };
                                     /*
                                      * 参数正确 => 构建参数地址列表
                                      * */

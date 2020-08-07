@@ -56,6 +56,9 @@ impl VirtualMachine {
             OptCode::Println => {
                 self.handle_println(value);
             },
+            OptCode::RefUint8ToStr => {
+                self.ref_uint8_to_str(value);
+            },
             _ => {
                 unimplemented!("{:?}", &value.opt);
             }

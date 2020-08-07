@@ -2,6 +2,7 @@ use libtype::{Data, DataValue};
 use libtype::primeval::{PrimevalData};
 use libtype::primeval::number::
     {uint8::Uint8, uint16::Uint16};
+use libtype::primeval::string::{Str, StrValue};
 use libtype::instruction::{CallPrimevalFunction};
 use libtype::function::{CallFunctionParamAddr};
 use crate::vm::{VirtualMachine, AddressControl};
@@ -59,11 +60,48 @@ impl VirtualMachine {
         /*
          * 返回值有效 => 将返回值写入到内存
          * */
-        self.thread_context.current_mut_unchecked().alloc_and_write_data(
+        self.thread_context.current_mut_unchecked().alloc_and_write_last_data(
             &value.return_addr
             , Data::new(DataValue::Primeval(
                     PrimevalData::Uint16(
                         Some(Uint16::new(result))))));
+    }
+
+    pub fn ref_uint8_to_str(&mut self, value: CallPrimevalFunction) {
+        let param_addrs = value.param_addrs.expect("should not happend");
+        let param_compile_addr = match param_addrs.get(0).expect("should not happend") {
+            CallFunctionParamAddr::Fixed(p) => {
+                p
+            },
+            _ => {
+                panic!("should not happend");
+            }
+        };
+        /*
+         * 获取数据
+         * */
+        let param_value = self.thread_context.current_unchecked().get_last_data_unchecked(
+            &param_compile_addr, &self.link_static);
+        let param_value = extract_data_ref!(param_value, Uint8);
+        /*
+         * 计算返回值
+         * */
+        let result = param_value.to_string();
+        /*
+         * 检测返回值是否有效
+         * */
+        if value.return_addr.is_invalid() {
+            return;
+        }
+        /*
+         * 返回值有效 => 将返回值写入到内存
+         * 注意: 返回值一定要写入到前一个作用域中
+         * */
+        self.thread_context.current_mut_unchecked().alloc_and_write_last_data(
+            &value.return_addr
+            , Data::new(DataValue::Primeval(
+                    PrimevalData::Str(
+                        Some(Str::new(StrValue::Utf8(result)))))));
     }
 }
 

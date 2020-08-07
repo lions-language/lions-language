@@ -15,6 +15,7 @@ impl AddressDispatch {
         } else {
             addr_key = self.recycles.remove(0).addr();
         }
+        // println!("{:?}", &addr_key);
         Address::new(AddressValue::new(typ, addr_key))
     }
 
