@@ -22,15 +22,23 @@ impl ScopeContext {
         self.scopes.back().expect("should not happend")
     }
 
-    pub fn last_unchecked(&self) -> &Scope {
+    pub fn last_one_unchecked(&self) -> &Scope {
         /*
          * 获取前一个作用域
          * */
-        self.scopes.get(self.scopes.len() - 2).expect("should not happend")
+        self.last_n_unchecked(1)
     }
 
-    pub fn last_mut_unchecked(&mut self) -> &mut Scope {
-        self.scopes.get_mut(self.scopes.len() - 2).expect("should not happend")
+    pub fn last_one_mut_unchecked(&mut self) -> &mut Scope {
+        self.last_n_mut_unchecked(1)
+    }
+
+    pub fn last_n_unchecked(&self, n: usize) -> &Scope {
+        self.scopes.get(self.scopes.len() - 1 - n).expect("should not happend")
+    }
+
+    pub fn last_n_mut_unchecked(&mut self, n: usize) -> &mut Scope {
+        self.scopes.get_mut(self.scopes.len() - 1 - n).expect("should not happend")
     }
 
     pub fn new() -> Self {

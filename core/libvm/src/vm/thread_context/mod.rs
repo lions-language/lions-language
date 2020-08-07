@@ -45,24 +45,46 @@ impl ThreadScope {
             addr, static_addr);
     }
 
-    pub fn get_last_data_unchecked(&self, addr: &AddressValue
+    /*
+     * last n
+     * */
+    pub fn get_last_n_data_unchecked(&self, addr: &AddressValue, n: usize
         , link_static: &RefPtr)
         -> RefPtr {
-        self.scope_context.last_unchecked().get_data_unchecked(
+        self.scope_context.last_n_unchecked(n).get_data_unchecked(
             addr, link_static, &self.memory)
     }
 
-    pub fn alloc_and_write_last_data(&mut self, addr: &AddressValue
-        , data: Data) {
+    pub fn alloc_and_write_last_n_data(&mut self, addr: &AddressValue
+        , n: usize, data: Data) {
         let memory = RefPtr::from_ref::<ThreadMemory>(&self.memory);
-        self.scope_context.last_mut_unchecked().alloc_and_write_data(
+        self.scope_context.last_n_mut_unchecked(n).alloc_and_write_data(
             addr, data, memory);
     }
 
-    pub fn alloc_and_write_last_static(&mut self, addr: &AddressValue
-        , static_addr: AddressKey) {
-        self.scope_context.last_mut_unchecked().alloc_and_write_static(
+    pub fn alloc_and_write_last_n_static(&mut self, addr: &AddressValue
+        , n: usize, static_addr: AddressKey) {
+        self.scope_context.last_n_mut_unchecked(n).alloc_and_write_static(
             addr, static_addr);
+    }
+
+    pub fn alloc_and_write_last_one_data(&mut self, addr: &AddressValue
+        , data: Data) {
+        self.alloc_and_write_last_n_data(addr, 1, data);
+    }
+
+    /*
+     * lats one
+     * */
+    pub fn get_last_one_data_unchecked(&self, addr: &AddressValue
+        , link_static: &RefPtr)
+        -> RefPtr {
+        self.get_last_n_data_unchecked(addr, 1, link_static)
+    }
+
+    pub fn alloc_and_write_last_one_static(&mut self, addr: &AddressValue
+        , static_addr: AddressKey) {
+        self.alloc_and_write_last_n_static(addr, 1, static_addr);
     }
 
     pub fn print_stack_datas(&self) {

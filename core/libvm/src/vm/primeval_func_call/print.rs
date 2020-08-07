@@ -21,7 +21,7 @@ impl VirtualMachine {
          * */
         let mut stdout = io::stdout();
         for (index, param_compile_addr) in param_compile_addrs.iter().enumerate() {
-            let param_value = self.thread_context.current_unchecked().get_last_data_unchecked(
+            let param_value = self.thread_context.current_unchecked().get_last_one_data_unchecked(
                 &param_compile_addr, &self.link_static);
             let data = param_value.as_ref::<Data>();
             if index > 0 {

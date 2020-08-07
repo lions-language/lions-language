@@ -39,9 +39,9 @@ impl VirtualMachine {
         /*
          * 获取数据
          * */
-        let left_value = self.thread_context.current_unchecked().get_last_data_unchecked(
+        let left_value = self.thread_context.current_unchecked().get_last_one_data_unchecked(
             &left_param_compile_addr, &self.link_static);
-        let right_value = self.thread_context.current_unchecked().get_last_data_unchecked(
+        let right_value = self.thread_context.current_unchecked().get_last_one_data_unchecked(
             &right_param_compile_addr, &self.link_static);
         let left_value = extract_data_ref!(left_value, Uint8);
         let right_value = extract_data_ref!(right_value, Uint8);
@@ -60,7 +60,7 @@ impl VirtualMachine {
         /*
          * 返回值有效 => 将返回值写入到内存
          * */
-        self.thread_context.current_mut_unchecked().alloc_and_write_last_data(
+        self.thread_context.current_mut_unchecked().alloc_and_write_last_one_data(
             &value.return_addr
             , Data::new(DataValue::Primeval(
                     PrimevalData::Uint16(
@@ -80,7 +80,7 @@ impl VirtualMachine {
         /*
          * 获取数据
          * */
-        let param_value = self.thread_context.current_unchecked().get_last_data_unchecked(
+        let param_value = self.thread_context.current_unchecked().get_last_one_data_unchecked(
             &param_compile_addr, &self.link_static);
         let param_value = extract_data_ref!(param_value, Uint8);
         /*
@@ -97,7 +97,7 @@ impl VirtualMachine {
          * 返回值有效 => 将返回值写入到内存
          * 注意: 返回值一定要写入到前一个作用域中
          * */
-        self.thread_context.current_mut_unchecked().alloc_and_write_last_data(
+        self.thread_context.current_mut_unchecked().alloc_and_write_last_one_data(
             &value.return_addr
             , Data::new(DataValue::Primeval(
                     PrimevalData::Str(
