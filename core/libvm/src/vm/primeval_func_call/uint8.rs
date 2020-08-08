@@ -43,8 +43,8 @@ impl VirtualMachine {
             &left_param_compile_addr, &self.link_static);
         let right_value = self.thread_context.current_unchecked().get_last_one_data_unchecked(
             &right_param_compile_addr, &self.link_static);
-        let left_value = extract_data_ref!(left_value, Uint8);
-        let right_value = extract_data_ref!(right_value, Uint8);
+        let left_value = extract_primeval_number_ref!(left_value, Uint8);
+        let right_value = extract_primeval_number_ref!(right_value, Uint8);
         /*
          * 计算返回值
          * */
@@ -82,7 +82,7 @@ impl VirtualMachine {
          * */
         let param_value = self.thread_context.current_unchecked().get_last_one_data_unchecked(
             &param_compile_addr, &self.link_static);
-        let param_value = extract_data_ref!(param_value, Uint8);
+        let param_value = extract_primeval_number_ref!(param_value, Uint8);
         /*
          * 计算返回值
          * */

@@ -3,20 +3,21 @@ use libtype::{AddressKey, AddressValue, AddressType};
 
 pub struct AddressDispatch {
     pub addr_key: AddressKey,
-    pub recycles: Vec<AddressValue>
+    pub recycles: Vec<AddressValue>,
+    index: u64
 }
 
 impl AddressDispatch {
     pub fn alloc(&mut self, typ: AddressType) -> Address {
-        let mut addr_key = AddressKey::default();
         if self.recycles.len() == 0 {
-            addr_key = self.addr_key.clone();
-            self.addr_key.index += 1;
+            let addr_key = AddressKey::new(self.index);
+            self.index += 1;
+            Address::new(AddressValue::new(typ, addr_key))
         } else {
-            addr_key = self.recycles.remove(0).addr();
+            let addr_key = self.recycles.remove(0).addr();
+            Address::new(AddressValue::new(typ, addr_key))
         }
         // println!("{:?}", &addr_key);
-        Address::new(AddressValue::new(typ, addr_key))
     }
 
     pub fn alloc_static(&mut self) -> Address {
@@ -34,7 +35,8 @@ impl AddressDispatch {
     pub fn new() -> Self {
         Self {
             addr_key: AddressKey::new(0),
-            recycles: Vec::new()
+            recycles: Vec::new(),
+            index: 0
         }
     }
 }

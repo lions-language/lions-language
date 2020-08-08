@@ -2,49 +2,28 @@ use libtype::instruction::{CallPrimevalFunction};
 use libcommon::optcode::{OptCode};
 use crate::vm::VirtualMachine;
 
-macro_rules! extract_data_ref {
+/*
+ * TODO: 使用宏循环, 提供一个变长参数, 得到嵌套的类型
+ * */
+macro_rules! extract_primeval_number_ref {
     ($data_ptr:expr, $typ:ident) => {{
         let data = $data_ptr.as_ref::<Data>();
         match data.value_ref() {
             DataValue::Primeval(d) => {
                 match &d {
-                    PrimevalData::Uint8(v) => {
+                    PrimevalData::$typ(v) => {
                         /*
                          * clone: 数值拷贝 (可以忽略效率)
                          * */
                         v.as_ref().expect("should not happend").to_std_ref().clone()
                     },
                     _ => {
-                        unimplemented!();
+                        unimplemented!("extract primeval data: {:?}", data.value_ref());
                     }
                 }
             },
             _ => {
-                unimplemented!();
-            }
-        }
-    }};
-}
-
-macro_rules! extract_primeval_uint16_ref {
-    ($data_ptr:expr, $typ:ident) => {{
-        let data = $data_ptr.as_ref::<Data>();
-        match data.value_ref() {
-            DataValue::Primeval(d) => {
-                match &d {
-                    PrimevalData::Uint16(v) => {
-                        /*
-                         * clone: 数值拷贝 (可以忽略效率)
-                         * */
-                        v.as_ref().expect("should not happend").to_std_ref().clone()
-                    },
-                    _ => {
-                        unimplemented!();
-                    }
-                }
-            },
-            _ => {
-                unimplemented!();
+                panic!("expect extract primevate data, but meet {:?}", data.value_ref());
             }
         }
     }};
