@@ -8,7 +8,8 @@ use libtype::function::{FunctionParamData, FunctionParamDataItem
 use libtype::{AddressType, AddressValue, TypeValue};
 use libtype::package::{PackageStr};
 use libcommon::ptr::{RefPtr};
-use crate::compile::{Compile, Compiler, CallFunctionContext};
+use crate::compile::{Compile, Compiler, CallFunctionContext
+    , AddressValueExpand};
 use crate::address::{Address};
 use std::collections::HashSet;
 
@@ -69,8 +70,11 @@ impl<'a, F: Compile> Compiler<'a, F> {
          * */
         let right = self.scope_context.take_top_from_value_buffer();
         let left = self.scope_context.take_top_from_value_buffer();
-        let right_addr_value = right.addr_ref().addr_ref().clone();
-        let left_addr_value = left.addr_ref().addr_ref().clone();
+        /*
+         * 1. 将地址中的 scope 值加1, 因为进行函数调用的时候, 会进入一个新的作用域
+         * */
+        let left_addr_value = left.addr_ref().addr_ref().clone_with_scope_plus(1);
+        let right_addr_value = right.addr_ref().addr_ref().clone_with_scope_plus(1);
         /*
          * 构建 函数参数
          * + 号运算一定只有一个参数
@@ -137,8 +141,9 @@ impl<'a, F: Compile> Compiler<'a, F> {
          * Move: 分配一个新的变量地址, 虚拟机将函数计算后的值与该地址绑定
          * Ref: 分配一个新的引用地址, 引用中的地址, 由 return 字段决定
          * */
+        let mut scope: Option<usize> = None;
         let return_data = &func.func_statement.func_return.data;
-        let return_addr = match return_data.typ_ref().typ_ref() {
+        let mut return_addr = match return_data.typ_ref().typ_ref() {
             TypeValue::Empty => {
                 /*
                  * 如果返回值是空的, 那么就没有必要分配内存
@@ -182,8 +187,13 @@ impl<'a, F: Compile> Compiler<'a, F> {
                         }
                         /*
                          * 根据类型, 判断是在哪里分配地址
+                         * note:
+                         *  因为该地址需要让虚拟机在分配内存后进行绑定,
+                         *  而应该绑定到函数调用的上一个作用域中
+                         *  => 所以这里的作用域应该要加1
                          * */
-                        let a = self.scope_context.alloc_address(return_data.typ.to_address_type());
+                        scope = Some(1);
+                        let a = self.scope_context.alloc_address(return_data.typ.to_address_type(), 1);
                         self.scope_context.ref_counter_create(a.addr_ref().addr_clone());
                         a
                     },
@@ -200,6 +210,16 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 , CallFunctionParamAddr::Fixed(right_addr_value)]),
             return_addr: return_addr.addr_clone()
         });
+        /*
+         * 函数调用结束后, 如果之前为 scope 加过1, 需要将返回值地址中的 scope 减掉
+         * */
+        match scope {
+            Some(n) => {
+                return_addr.addr_mut().addr_mut_with_scope_minus(n);
+            },
+            None => {
+            }
+        };
         /*
          * 回收地址
          * */

@@ -8,24 +8,26 @@ pub struct AddressDispatch {
 }
 
 impl AddressDispatch {
-    pub fn alloc(&mut self, typ: AddressType) -> Address {
+    pub fn alloc(&mut self, typ: AddressType
+        , scope: usize) -> Address {
         if self.recycles.len() == 0 {
-            let addr_key = AddressKey::new(self.index);
+            let addr_key = AddressKey::new_with_scope(self.index, scope);
             self.index += 1;
             Address::new(AddressValue::new(typ, addr_key))
         } else {
-            let addr_key = self.recycles.remove(0).addr();
+            let mut addr_key = self.recycles.remove(0).addr();
+            *addr_key.scope_mut() = scope;
             Address::new(AddressValue::new(typ, addr_key))
         }
         // println!("{:?}", &addr_key);
     }
 
-    pub fn alloc_static(&mut self) -> Address {
-        self.alloc(AddressType::Static)
+    pub fn alloc_static(&mut self, scope: usize) -> Address {
+        self.alloc(AddressType::Static, scope)
     }
 
-    pub fn alloc_stack(&mut self) -> Address {
-        self.alloc(AddressType::Stack)
+    pub fn alloc_stack(&mut self, scope: usize) -> Address {
+        self.alloc(AddressType::Stack, scope)
     }
 
     pub fn recycle_addr(&mut self, addr: AddressValue) {

@@ -13,7 +13,8 @@ use libgrammar::grammar::{CallFuncScopeContext};
 use libresult::*;
 use libcommon::ptr::RefPtr;
 use crate::compile::{Compile, Compiler, FileType
-    , CallFunctionContext, value_buffer::ValueBufferItem};
+    , CallFunctionContext, value_buffer::ValueBufferItem
+    , AddressValueExpand};
 use crate::address::Address;
 use std::collections::VecDeque;
 
@@ -78,9 +79,14 @@ impl<'a, F: Compile> Compiler<'a, F> {
                     }
                 };
                 let func = func_ptr.as_ref::<Function>();
-                let param_addrs = vec![CallFunctionParamAddr::Fixed(input_value.addr_ref().addr_clone())];
+                /*
+                 * 将参数地址中的 scope 加1, 告诉虚拟机要从上一个作用域中查找
+                 * */
+                let param_addrs = vec![CallFunctionParamAddr::Fixed(
+                    input_value.addr_ref().addr_ref().clone_with_scope_plus(1))];
                 let func_statement = func.func_statement_ref();
                 let return_data = &func_statement.func_return.data;
+                let mut scope: Option<usize> = None;
                 let return_addr = match return_data.typ_ref().typ_ref() {
                     TypeValue::Empty => {
                         /*
@@ -104,9 +110,12 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                 }
                                 /*
                                  * 根据类型, 判断是在哪里分配地址
+                                 *  返回值地址中的 scope 需要分配为1,
+                                 *  因为返回值需要绑定到前一个作用域中
                                  * */
+                                scope = Some(1);
                                 let a = self.scope_context.alloc_address(
-                                    return_data.typ.to_address_type());
+                                    return_data.typ.to_address_type(), 1);
                                 self.scope_context.ref_counter_create(a.addr_ref().addr_clone());
                                 a
                             },
@@ -128,8 +137,16 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 self.call_function_and_ctrl_scope(call_context);
                 /*
                  * 因为地址被修改, 所以返回修改后的地址 (调用 to_#type 后的 return 地址)
+                 *  作用域结束之后, 如果之前修改过scope, 需要减掉
                  * */
-                return Ok(return_addr.addr());
+                match scope {
+                    Some(n) => {
+                        return Ok(return_addr.addr().addr_with_scope_minus(n));
+                    },
+                    None => {
+                        return Ok(return_addr.addr());
+                    }
+                }
             }
         }
         /*
@@ -214,8 +231,12 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                                 return e;
                                             }
                                         };
+                                        /*
+                                         * 将参数地址中的 scope 加1,
+                                         * 告诉虚拟机要从上一个作用域中查找
+                                         * */
                                         params_addr.push_front(
-                                        value_addr);
+                                        value_addr.clone_with_scope_plus(1));
                                     }
                                     Some(vec![CallFunctionParamAddr::Lengthen(params_addr)])
                                 },
@@ -238,7 +259,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                     /*
                                      * 参数正确 => 构建参数地址列表
                                      * */
-                                    Some(vec![CallFunctionParamAddr::Fixed(value_addr)])
+                                    Some(vec![CallFunctionParamAddr::Fixed(
+                                            value_addr.clone_with_scope_plus(1))])
                                 }
                             }
                         },

@@ -28,23 +28,42 @@ impl ThreadScope {
     pub fn get_data_unchecked(&self, addr: &AddressValue
         , link_static: &RefPtr)
         -> RefPtr {
+        /*
+         * 获取作用域
+         * */
+        let scope = addr.scope_clone();
+        self.scope_context.last_n_unchecked(scope).get_data_unchecked(
+            addr, link_static, &self.memory)
+        /*
         self.scope_context.current_unchecked().get_data_unchecked(
             addr, link_static, &self.memory)
+        */
     }
 
     pub fn alloc_and_write_data(&mut self, addr: &AddressValue
         , data: Data) {
         let memory = RefPtr::from_ref::<ThreadMemory>(&self.memory);
+        let scope = addr.scope_clone();
+        self.scope_context.last_n_mut_unchecked(scope).alloc_and_write_data(
+            addr, data, memory);
+        /*
         self.scope_context.current_mut_unchecked().alloc_and_write_data(
             addr, data, memory);
+        */
     }
 
     pub fn alloc_and_write_static(&mut self, addr: &AddressValue
         , static_addr: AddressKey) {
+        let scope = addr.scope_clone();
+        self.scope_context.last_n_mut_unchecked(scope).alloc_and_write_static(
+            addr, static_addr);
+        /*
         self.scope_context.current_mut_unchecked().alloc_and_write_static(
             addr, static_addr);
+        */
     }
 
+    /*
     /*
      * last n
      * */
@@ -86,6 +105,7 @@ impl ThreadScope {
         , static_addr: AddressKey) {
         self.alloc_and_write_last_n_static(addr, 1, static_addr);
     }
+    */
 
     pub fn print_stack_datas(&self) {
         println!("**************** stack data ******************");

@@ -1,6 +1,6 @@
 use libtype::{Data, AddressKey};
 
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct MemoryValue(AddressKey);
 
 impl MemoryValue {

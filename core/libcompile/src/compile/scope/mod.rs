@@ -12,8 +12,8 @@ pub struct Scope {
 }
 
 impl Scope {
-    fn alloc_address(&mut self, addr_typ: AddressType) -> Address {
-        self.address_dispatch.alloc(addr_typ)
+    fn alloc_address(&mut self, addr_typ: AddressType, scope: usize) -> Address {
+        self.address_dispatch.alloc(addr_typ, scope)
     }
 
     fn recycle_address(&mut self, addr: AddressValue) {

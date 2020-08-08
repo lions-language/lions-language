@@ -1,6 +1,6 @@
 use libcommon::ptr::RefPtr;
 use libmacro::{FieldGet, FieldGetClone
-    , FieldGetMove};
+    , FieldGetMove, NewWithAll};
 use crate::primeval::{PrimevalType, PrimevalData};
 use crate::structure::{StructureData};
 use std::cmp::{PartialEq, Eq};
@@ -223,16 +223,20 @@ impl Default for Type {
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Hash, Eq, Default, FieldGet, FieldGetClone)]
+#[derive(Clone, Debug, PartialEq, Hash, Eq, Default, FieldGet, FieldGetClone
+    , NewWithAll)]
 pub struct AddressKey {
-    pub index: u64
+    index: u64,
+    scope: usize
 }
 
 impl AddressKey {
     pub fn new(index: u64) -> Self {
-        Self {
-            index: index
-        }
+        AddressKey::new_with_all(index, 0)
+    }
+
+    pub fn new_with_scope(index: u64, scope: usize) -> Self {
+        AddressKey::new_with_all(index, scope)
     }
 }
 
@@ -264,6 +268,14 @@ pub struct AddressValue {
 }
 
 impl AddressValue {
+    pub fn scope_ref(&self) -> &usize {
+        self.addr_ref().scope_ref()
+    }
+
+    pub fn scope_clone(&self) -> usize {
+        self.addr_ref().scope_ref().clone()
+    }
+
     pub fn is_invalid(&self) -> bool {
         if let AddressType::Invalid = self.typ_ref() {
             return true;

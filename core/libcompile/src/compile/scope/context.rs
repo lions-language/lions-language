@@ -18,11 +18,12 @@ impl ScopeContext {
         self.scopes.pop_back();
     }
 
-    pub fn alloc_address(&mut self, addr_typ: AddressType) -> Address {
+    pub fn alloc_address(&mut self, addr_typ: AddressType
+        , scope: usize) -> Address {
         /*
          * 即使是最外层的函数进入的时候也一定需要调用 enter, 所以栈中一定存在元素
          * */
-        self.current_mut_unckecked().alloc_address(addr_typ)
+        self.current_mut_unckecked().alloc_address(addr_typ, scope)
     }
 
     pub fn recycle_address(&mut self, addr: AddressValue) {

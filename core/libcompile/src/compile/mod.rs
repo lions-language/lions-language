@@ -50,6 +50,14 @@ trait TokenValueExpand {
     fn to_data(self) -> Data;
 }
 
+trait AddressValueExpand {
+    fn add_scope(&mut self, n: usize);
+    fn clone_with_scope_plus(&self, n: usize) -> AddressValue;
+    fn clone_with_scope_minus(&self, n: usize) -> AddressValue;
+    fn addr_with_scope_minus(self, n: usize) -> AddressValue;
+    fn addr_mut_with_scope_minus(&mut self, n: usize);
+}
+
 pub trait Compile {
     fn const_number(&mut self, context: StaticContext) {
         println!("{:?}", context);

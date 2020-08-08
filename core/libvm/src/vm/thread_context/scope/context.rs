@@ -34,11 +34,14 @@ impl ScopeContext {
     }
 
     pub fn last_n_unchecked(&self, n: usize) -> &Scope {
-        self.scopes.get(self.scopes.len() - 1 - n).expect("should not happend")
+        let index = self.scopes.len() - 1 - n;
+        self.scopes.get(index).expect(&format!("len: {}, index: {}", self.scopes.len(), index))
     }
 
     pub fn last_n_mut_unchecked(&mut self, n: usize) -> &mut Scope {
-        self.scopes.get_mut(self.scopes.len() - 1 - n).expect("should not happend")
+        let len = self.scopes.len();
+        let index = len - 1 - n;
+        self.scopes.get_mut(index).expect(&format!("len: {}, index: {}", len, index))
     }
 
     pub fn new() -> Self {

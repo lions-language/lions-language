@@ -3,16 +3,17 @@ use crate::memory::MemoryValue;
 use std::collections::HashMap;
 
 pub struct AddressMapping {
-    maps: HashMap<AddressKey, MemoryValue>
+    maps: HashMap<u64, MemoryValue>
 }
 
 impl AddressMapping {
     pub fn bind(&mut self, key: AddressKey, value: MemoryValue) {
-        self.maps.insert(key, value);
+        self.maps.insert(key.index(), value);
     }
 
     pub fn get_unwrap(&self, key: &AddressKey) -> &MemoryValue {
-        self.maps.get(key).unwrap()
+        self.maps.get(key.index_ref()).expect(&format!("address key: {:?}, maps: {:?}"
+                , key, &self.maps))
     }
 
     pub fn new() -> Self {

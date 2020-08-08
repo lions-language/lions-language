@@ -1,9 +1,9 @@
 use libgrammar::token::{TokenType, TokenValue, TokenData};
 use libtype::{Type, Data, TypeValue
     , Primeval, TypeAttrubute
-    , DataValue};
+    , DataValue, AddressValue};
 use super::{Compiler, Compile, TokenValueExpand
-    , CallFunctionContext};
+    , CallFunctionContext, AddressValueExpand};
 
 impl<'a, F: Compile> Compiler<'a, F> {
     pub fn tokentype_to_type(&self, typ: TokenType) -> Type {
@@ -68,5 +68,36 @@ impl TokenValueExpand for TokenValue {
                 Data::new_empty()
             }
         }
+    }
+}
+
+impl AddressValueExpand for AddressValue {
+    fn add_scope(&mut self, n: usize) {
+        /*
+         * 对 address key 中的 scope 加值
+         * */
+        let addr = self.addr_mut();
+        *addr.scope_mut() += n;
+    }
+
+    fn clone_with_scope_plus(&self, n: usize) -> AddressValue {
+        let mut value = self.clone();
+        *value.addr_mut().scope_mut() += n;
+        value
+    }
+
+    fn clone_with_scope_minus(&self, n: usize) -> AddressValue {
+        let mut value = self.clone();
+        *value.addr_mut().scope_mut() -= n;
+        value
+    }
+
+    fn addr_with_scope_minus(mut self, n: usize) -> AddressValue {
+        *self.addr_mut().scope_mut() -= n;
+        self
+    }
+
+    fn addr_mut_with_scope_minus(&mut self, n: usize) {
+        *self.addr_mut().scope_mut() -= n;
     }
 }
