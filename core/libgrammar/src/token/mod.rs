@@ -40,6 +40,10 @@ pub enum TokenType {
     ElseIf,
     // func
     Function,
+    // let
+    Let,
+    // var
+    Var,
     // (
     LeftParenthese,
     // )

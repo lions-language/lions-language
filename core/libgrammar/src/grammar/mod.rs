@@ -77,10 +77,19 @@ pub trait Grammar {
     fn call_function(&mut self, _context: CallFuncScopeContext, _name: TokenValue
         , _param_len: usize)
         -> DescResult {
-        unimplemented!();
+        DescResult::Success
+    }
+    fn var_stmt_start(&mut self, _token: TokenValue) {
+        println!("var stmt start");
+    }
+    fn var_stmt_equal(&mut self) {
+        println!("var stmt equal");
+    }
+    fn var_stmt_end(&mut self) {
+        println!("var stmt end");
     }
     fn end(&mut self) -> DescResult {
-        unimplemented!();
+        DescResult::Success
     }
 }
 
@@ -167,6 +176,9 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
             TokenType::Function => {
                 self.function_process();
             },
+            TokenType::Var => {
+                self.var_process();
+            },
             TokenType::Id => {
                 match self.id_process() {
                     AfterIdProcess::Id => {
@@ -183,7 +195,8 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
     }
 
     fn select(&mut self, token: &TokenPointer) {
-        self.select_with_exprcontext(token, &ExpressContext::new(GrammarParser::<T, CB>::expression_end_normal));
+        self.select_with_exprcontext(token
+            , &ExpressContext::new(GrammarParser::<T, CB>::expression_end_normal));
     }
 
     fn token_is_white_space(&self, token: &TokenVecItem<T, CB>) -> bool {
@@ -375,6 +388,7 @@ mod funccall;
 mod token_extend;
 mod annotate;
 mod typesof;
+mod process_var;
 
 #[cfg(test)]
 mod test {

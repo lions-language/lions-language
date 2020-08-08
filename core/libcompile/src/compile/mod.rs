@@ -178,6 +178,18 @@ impl<'a, F: Compile> Grammar for Compiler<'a, F> {
         , name: TokenValue, param_len: usize) -> DescResult {
         self.handle_call_function(scope_context, name, param_len)
     }
+
+    fn var_stmt_start(&mut self, id_token: TokenValue) {
+        self.handle_var_stmt_start(id_token);
+    }
+
+    fn var_stmt_equal(&mut self) {
+        self.handle_var_stmt_equal();
+    }
+
+    fn var_stmt_end(&mut self) {
+        self.handle_var_stmt_end();
+    }
 }
 
 impl<'a, F: Compile> Compiler<'a, F> {
@@ -212,6 +224,7 @@ mod end;
 mod function;
 mod scope;
 mod funccall;
+mod process_var;
 
 #[cfg(test)]
 mod test {
