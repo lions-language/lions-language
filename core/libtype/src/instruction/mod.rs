@@ -21,7 +21,8 @@ pub struct CallFunction {
     pub return_addr: AddressValue
 }
 
-#[derive(Debug, FieldGet, Clone, NewWithAll)]
+#[derive(Debug, FieldGet, Clone, NewWithAll
+    , FieldGetMove)]
 pub struct VariantDefine {
     pub dst_addr: AddressValue,
     pub src_addr: AddressValue

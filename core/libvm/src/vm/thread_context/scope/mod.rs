@@ -46,6 +46,10 @@ impl Scope {
         }
     }
 
+    pub fn get_data_addr_unchecked(&self, addr: &AddressValue) -> &MemoryValue {
+        self.addr_mapping.get_unwrap(addr.addr_ref())
+    }
+
     pub fn alloc_and_write_data(&mut self, addr: &AddressValue
         , data: Data, mut memory: RefPtr) {
         let memory = memory.as_mut::<ThreadMemory>();
@@ -72,6 +76,20 @@ impl Scope {
          * */
         self.addr_mapping.bind(addr.addr_clone()
             , MemoryValue::new(static_addr));
+    }
+
+    pub fn add_bind(&mut self, addr: AddressKey
+        , src_addr: AddressKey) {
+        self.addr_mapping.bind(addr
+            , MemoryValue::new(src_addr));
+    }
+
+    pub fn remove_bind(&mut self, addr: AddressKey) {
+        self.addr_mapping.remove(addr);
+    }
+
+    pub fn print_addr_mapping(&self) {
+        self.addr_mapping.print();
     }
 
     pub fn new() -> Self {

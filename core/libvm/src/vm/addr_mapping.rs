@@ -11,9 +11,17 @@ impl AddressMapping {
         self.maps.insert(key.index(), value);
     }
 
+    pub fn remove(&mut self, key: AddressKey) {
+        self.maps.remove(key.index_ref());
+    }
+
     pub fn get_unwrap(&self, key: &AddressKey) -> &MemoryValue {
         self.maps.get(key.index_ref()).expect(&format!("address key: {:?}, maps: {:?}"
                 , key, &self.maps))
+    }
+
+    pub fn print(&self) {
+        println!("{:?}", &self.maps);
     }
 
     pub fn new() -> Self {

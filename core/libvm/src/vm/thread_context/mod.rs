@@ -4,6 +4,7 @@ use libmacro::{FieldGet};
 use libcommon::ptr::RefPtr;
 use scope::context::{ScopeContext};
 use crate::memory::stack::RandStack;
+use crate::memory::{Rand, MemoryValue};
 
 #[derive(FieldGet)]
 pub struct ThreadMemory {
@@ -40,6 +41,11 @@ impl ThreadScope {
         */
     }
 
+    pub fn get_data_addr_unchecked(&self, addr: &AddressValue) -> &MemoryValue {
+        let scope = addr.scope_clone();
+        self.scope_context.last_n_unchecked(scope).get_data_addr_unchecked(addr)
+    }
+
     pub fn alloc_and_write_data(&mut self, addr: &AddressValue
         , data: Data) {
         let memory = RefPtr::from_ref::<ThreadMemory>(&self.memory);
@@ -61,6 +67,25 @@ impl ThreadScope {
         self.scope_context.current_mut_unchecked().alloc_and_write_static(
             addr, static_addr);
         */
+    }
+
+    pub fn add_bind(&mut self, addr: AddressKey
+        , src_addr: AddressKey) {
+        let scope = addr.scope_clone();
+        self.scope_context.last_n_mut_unchecked(scope).add_bind(
+            addr, src_addr);
+    }
+
+    pub fn remove_bind(&mut self, addr: AddressKey) {
+        let scope = addr.scope_clone();
+        self.scope_context.last_n_mut_unchecked(scope).remove_bind(addr);
+    }
+
+    pub fn print_addr_mapping(&mut self, addr: AddressKey) {
+        let scope = addr.scope_clone();
+        println!("**************** scope: {} addr mapping ******************", scope);
+        self.scope_context.last_n_mut_unchecked(scope).print_addr_mapping();
+        println!("**********************************************************");
     }
 
     /*

@@ -96,7 +96,7 @@ impl<'a, 'b, F: Writer> Compile for Bytecode<'a, 'b, F> {
     }
 
     fn variant_define(&mut self, context: VariantDefineContext) {
-        println!("{:?}", &context);
+        // println!("{:?}", &context);
         let (dst_addr, src_addr) = context.fields_move();
         self.write(Instruction::VariantDefine(VariantDefine::new_with_all(
                     dst_addr, src_addr)));
