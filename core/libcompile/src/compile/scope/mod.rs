@@ -8,6 +8,7 @@ use crate::address::{Address};
 pub struct Scope {
     address_dispatch: AddressDispatch,
     ref_counter: RefCounter,
+    vars: vars::Variants,
     value_buffer: ValueBuffer
 }
 
@@ -48,13 +49,23 @@ impl Scope {
         self.value_buffer.push(typ)
     }
 
+    fn add_variant(&mut self, name: String, var: vars::Variant) {
+        self.vars.add(name, var);
+    }
+
+    fn remove_variant(&mut self, name: &String) {
+        self.vars.remove(name);
+    }
+
     pub fn new() -> Self {
         Self {
             address_dispatch: AddressDispatch::new(),
             ref_counter: RefCounter::new(),
+            vars: vars::Variants::new(),
             value_buffer: ValueBuffer::new()
         }
     }
 }
 
 pub mod context;
+pub mod vars;

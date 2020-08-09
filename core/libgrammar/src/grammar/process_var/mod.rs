@@ -1,9 +1,11 @@
-use super::{GrammarParser, Grammar, NextToken, ExpressContext};
+use super::{GrammarParser, Grammar, NextToken, ExpressContext
+    , VarStmtContext};
 use crate::lexical::{CallbackReturnStatus, TokenVecItem, TokenPointer};
 use crate::token::{TokenType, TokenValue};
 
 impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, CB> {
     pub fn var_process(&mut self) {
+        let mut context = VarStmtContext::default();
         /*
          * 跳过 var 关键字
          * */
@@ -18,7 +20,8 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
          * 那么获取 var 后面的 id token
          * */
         let id_token = self.take_next_one();
-        self.cb().var_stmt_start(id_token.token_value());
+        context.id_token = id_token.token_value();
+        self.cb().var_stmt_start();
         /*
          * 跳过空白, 并查看下一个 token
          * */
@@ -30,7 +33,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                 /*
                  * var a [EOF]
                  * */
-                self.cb().var_stmt_end();
+                self.cb().var_stmt_end(context);
                 return;
             }
         };
@@ -40,32 +43,33 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         let next = next.as_ref::<T, CB>();
         match next.context_token_type() {
             TokenType::Colon => {
-                self.var_process_after_colon();
+                self.var_process_after_colon(&mut context);
             },
             TokenType::Equal => {
-                self.var_process_after_equal();
+                self.var_process_after_equal(&mut context);
             },
             _ => {
                 /*
                  * var a
                  * xxx
                  * */
-                self.cb().var_stmt_end();
+                self.cb().var_stmt_end(context);
+                return;
             }
         }
-        self.cb().var_stmt_end();
+        self.cb().var_stmt_end(context);
     }
 
-    pub fn var_process_after_colon(&mut self) {
+    pub fn var_process_after_colon(&mut self, context: &mut VarStmtContext) {
         unimplemented!();
     }
 
-    pub fn var_process_after_equal(&mut self) {
+    pub fn var_process_after_equal(&mut self, context: &mut VarStmtContext) {
+        context.is_exist_equal = true;
         /*
          * 跳过 `=`
          * */
         self.skip_next_one();
-        self.cb().var_stmt_equal();
         /*
          * 处理表达式
          * */

@@ -1,4 +1,5 @@
-use libgrammar::grammar::{Grammar, CallFuncScopeContext};
+use libgrammar::grammar::{Grammar, CallFuncScopeContext
+    , VarStmtContext};
 use libgrammar::token::{TokenValue};
 use libtype::{Type, Data};
 use libtype::function::{Function, CallFunctionParamAddr};
@@ -25,6 +26,13 @@ pub struct StaticContext {
 pub struct LoadStackContext {
     addr: AddressValue,
     data: Data
+}
+
+#[derive(Debug, FieldGet, NewWithAll
+    , FieldGetMove)]
+pub struct VariantDefineContext {
+    pub dst_addr: AddressValue,
+    pub src_addr: AddressValue
 }
 
 #[derive(Debug)]
@@ -87,6 +95,10 @@ pub trait Compile {
     }
 
     fn function_define_end(&mut self) -> Function {
+        unimplemented!();
+    }
+
+    fn variant_define(&mut self, context: VariantDefineContext) {
         unimplemented!();
     }
 
@@ -179,16 +191,12 @@ impl<'a, F: Compile> Grammar for Compiler<'a, F> {
         self.handle_call_function(scope_context, name, param_len)
     }
 
-    fn var_stmt_start(&mut self, id_token: TokenValue) {
-        self.handle_var_stmt_start(id_token);
+    fn var_stmt_start(&mut self) {
+        self.handle_var_stmt_start();
     }
 
-    fn var_stmt_equal(&mut self) {
-        self.handle_var_stmt_equal();
-    }
-
-    fn var_stmt_end(&mut self) {
-        self.handle_var_stmt_end();
+    fn var_stmt_end(&mut self, context: VarStmtContext) {
+        self.handle_var_stmt_end(context);
     }
 }
 

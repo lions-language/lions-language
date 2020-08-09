@@ -277,9 +277,17 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 package_str: call_scope_context.package_str(),
                 func: &func,
                 param_addrs: param_addrs,
-                return_addr: return_addr.addr()
+                return_addr: return_addr.addr_clone()
             };
             self.call_function_and_ctrl_scope(call_context);
+            /*
+             * 获取返回类型, 将其写入到队列中
+             * */
+            if !return_addr.is_invalid() {
+                self.scope_context.push_with_addr_to_value_buffer(
+                    return_data.typ.clone()
+                    , return_addr);
+            }
         } else {
             return DescResult::Error(
                 String::from("the main function must exist in main.lions"));

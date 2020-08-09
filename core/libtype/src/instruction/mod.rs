@@ -21,6 +21,12 @@ pub struct CallFunction {
     pub return_addr: AddressValue
 }
 
+#[derive(Debug, FieldGet, Clone, NewWithAll)]
+pub struct VariantDefine {
+    pub dst_addr: AddressValue,
+    pub src_addr: AddressValue
+}
+
 #[derive(Debug, Clone)]
 pub struct VariantValue {
     pub direction: AddressValue
@@ -86,6 +92,7 @@ pub enum Instruction {
     ReadStaticVariant(StaticVariant),
     CallPrimevalFunction(CallPrimevalFunction),
     CallFunction(CallFunction),
+    VariantDefine(VariantDefine),
     EnterScope,
     LeaveScope,
     Invalid

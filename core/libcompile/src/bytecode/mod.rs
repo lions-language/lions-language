@@ -6,10 +6,10 @@ use libtype::instruction::{Instruction, CallPrimevalFunction
     , VariantValue, Uint8Static
     , Uint16Static, Uint32Static
     , StringStatic, StaticVariant
-    , LoadStack};
+    , LoadStack, VariantDefine};
 use crate::compile::{StaticContext, CallFunctionContext
     , FunctionNamedStmtContext, Compile
-    , LoadStackContext};
+    , LoadStackContext, VariantDefineContext};
 use crate::address;
 use define_stack::DefineStack;
 use crate::define_dispatch::{FunctionDefineDispatch};
@@ -93,6 +93,13 @@ impl<'a, 'b, F: Writer> Compile for Bytecode<'a, 'b, F> {
     fn function_define_end(&mut self) -> Function {
         let ds = self.define_stack.leave();
         self.func_define_dispatch.finish_define(ds)
+    }
+
+    fn variant_define(&mut self, context: VariantDefineContext) {
+        println!("{:?}", &context);
+        let (dst_addr, src_addr) = context.fields_move();
+        self.write(Instruction::VariantDefine(VariantDefine::new_with_all(
+                    dst_addr, src_addr)));
     }
 
     fn enter_scope(&mut self) {

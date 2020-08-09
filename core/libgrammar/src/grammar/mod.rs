@@ -12,6 +12,21 @@ pub struct CallFuncScopeContext {
     typ: Option<Type>
 }
 
+#[derive(FieldGet)]
+pub struct VarStmtContext {
+    id_token: TokenValue,
+    is_exist_equal: bool
+}
+
+impl Default for VarStmtContext {
+    fn default() -> Self {
+        Self {
+            id_token: TokenValue::default(),
+            is_exist_equal: false
+        }
+    }
+}
+
 pub trait Grammar {
     // type IdUse;
     
@@ -79,13 +94,10 @@ pub trait Grammar {
         -> DescResult {
         DescResult::Success
     }
-    fn var_stmt_start(&mut self, _token: TokenValue) {
+    fn var_stmt_start(&mut self) {
         println!("var stmt start");
     }
-    fn var_stmt_equal(&mut self) {
-        println!("var stmt equal");
-    }
-    fn var_stmt_end(&mut self) {
+    fn var_stmt_end(&mut self, _context: VarStmtContext) {
         println!("var stmt end");
     }
     fn end(&mut self) -> DescResult {

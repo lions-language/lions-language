@@ -2,15 +2,22 @@ use libtype::{Type, PackageType
     , PackageTypeValue};
 use libtype::package::{PackageStr};
 use libmacro::{FieldGet};
+use libcommon::ptr::RefPtr;
 use crate::address::{Address};
 use std::collections::{VecDeque};
+
+pub enum ValueBufferItemContext {
+    Variant(RefPtr),
+    Null
+}
 
 #[derive(FieldGet)]
 pub struct ValueBufferItem {
     pub typ: Type,
     pub addr: Address,
     pub package_type: Option<PackageType>,
-    pub package_str: PackageStr
+    pub package_str: PackageStr,
+    pub context: ValueBufferItemContext
 }
 
 pub struct ValueBuffer {
@@ -57,7 +64,19 @@ impl ValueBuffer {
             typ: typ,
             addr: addr,
             package_type: None,
-            package_str: PackageStr::Empty
+            package_str: PackageStr::Empty,
+            context: ValueBufferItemContext::Null
+        });
+    }
+
+    pub fn push_with_addr_context(&mut self, typ: Type, addr: Address
+        , context: ValueBufferItemContext) {
+        self.buffer.push_back(ValueBufferItem {
+            typ: typ,
+            addr: addr,
+            package_type: None,
+            package_str: PackageStr::Empty,
+            context: context
         });
     }
     

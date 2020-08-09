@@ -1,6 +1,7 @@
 use libtype::{AddressType, AddressValue
     , AddressKey, Type};
 use super::Scope;
+use super::{vars::Variant};
 use crate::address::Address;
 use crate::compile::value_buffer::{ValueBufferItem};
 use std::collections::VecDeque;
@@ -64,6 +65,19 @@ impl ScopeContext {
 
     pub fn push_to_value_buffer(&mut self, typ: Type) {
         self.current_mut_unckecked().push_to_value_buffer(typ)
+    }
+
+    pub fn add_variant(&mut self, name: String, var: Variant) {
+        self.current_mut_unckecked().add_variant(name, var);
+    }
+
+    pub fn remove_variant_unchecked(&mut self, scope: usize, name: &String) {
+        self.get_back_mut_n_unchecked(scope).remove_variant(name);
+    }
+
+    fn get_back_mut_n_unchecked(&mut self, n: usize) -> &mut Scope {
+        let len = self.scopes.len();
+        self.scopes.get_mut(len - 1 - n).expect(&format!("len: {}, n: {}", len, n))
     }
 
     pub fn new_with_first() -> Self {

@@ -71,6 +71,9 @@ impl VirtualMachine {
             Instruction::CallFunction(v) => {
                 self.call_function(v);
             },
+            Instruction::VariantDefine(v) => {
+                self.variant_define(v);
+            },
             Instruction::ReadStaticVariant(v) => {
                 self.read_static_variant(v);
             },
@@ -204,6 +207,7 @@ mod primeval_func_call;
 mod addr_mapping;
 mod func_call;
 mod thread_context;
+mod variant_define;
 
 #[cfg(test)]
 mod test {
