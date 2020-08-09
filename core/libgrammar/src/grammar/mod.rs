@@ -3,7 +3,7 @@ use crate::token::{TokenType, TokenValue, TokenMethodResult};
 use libtype::{Type, PackageType};
 use libresult::*;
 use libtype::package::PackageStr;
-use libmacro::{FieldGet};
+use libmacro::{FieldGet, NewWithAll};
 
 #[derive(FieldGet)]
 pub struct CallFuncScopeContext {
@@ -27,6 +27,15 @@ impl Default for VarStmtContext {
     }
 }
 
+pub enum LoadVariantContextValue {
+    Single(TokenValue)
+}
+
+#[derive(FieldGet, NewWithAll)]
+pub struct LoadVariantContext {
+    value: LoadVariantContextValue
+}
+
 pub trait Grammar {
     // type IdUse;
     
@@ -35,6 +44,8 @@ pub trait Grammar {
     }
     fn const_string(&mut self, value: TokenValue) {
         value.print_token_type(None);
+    }
+    fn load_variant(&mut self, _context: LoadVariantContext) {
     }
     fn annotate(&mut self, _value: TokenValue) {
         println!("multi annotate");
