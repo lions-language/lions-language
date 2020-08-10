@@ -50,11 +50,6 @@ impl<'a, 'b, F: Writer> Compile for Bytecode<'a, 'b, F> {
                     addr, data)));
     }
 
-    fn load_variant(&mut self, addr: &address::Address) {
-        self.write(Instruction::LoadVariant(VariantValue::new(
-                    addr.addr_clone())));
-    }
-
     fn call_function(&mut self, context: CallFunctionContext) {
         match &context.func.func_define {
             FunctionDefine::Optcode(def) => {

@@ -1,3 +1,4 @@
+use libresult::DescResult;
 use crate::grammar::{GrammarParser
     , ExpressContext, Grammar
     , LoadVariantContext, LoadVariantContextValue};
@@ -33,8 +34,14 @@ impl IdToken {
                          * 后面不是 : 也不是 . 号 => id
                          * */
                         let context = LoadVariantContext::new_with_all(
-                            LoadVariantContextValue::Single(token_value));
-                        grammar.grammar_context().cb.load_variant(context);
+                            token_value, None);
+                        match grammar.grammar_context().cb.load_variant(context) {
+                            DescResult::Error(e) => {
+                                grammar.panic(&e);
+                            },
+                            _ => {
+                            }
+                        }
                     }
                 }
             },
@@ -43,7 +50,7 @@ impl IdToken {
                  * id 后面是 EOF => id
                  * */
                 let context = LoadVariantContext::new_with_all(
-                    LoadVariantContextValue::Single(token_value));
+                    token_value, None);
                 grammar.grammar_context().cb.load_variant(context);
             }
         }

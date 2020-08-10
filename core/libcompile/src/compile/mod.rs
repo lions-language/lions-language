@@ -1,5 +1,5 @@
 use libgrammar::grammar::{Grammar, CallFuncScopeContext
-    , VarStmtContext};
+    , VarStmtContext, LoadVariantContext as GrammarLoadVariantContext};
 use libgrammar::token::{TokenValue};
 use libtype::{Type, Data};
 use libtype::function::{Function, CallFunctionParamAddr};
@@ -48,6 +48,10 @@ pub struct FunctionNamedStmtContext {
     name: String
 }
 
+#[derive(Debug, FieldGet)]
+pub struct LoadVariantContext {
+}
+
 pub enum CompileType {
     Runtime,
     Compile
@@ -79,8 +83,8 @@ pub trait Compile {
         unimplemented!();
     }
 
-    fn load_variant(&mut self, addr: &address::Address) {
-        println!("{:?}", addr);
+    fn load_variant(&mut self, _context: LoadVariantContext) {
+        println!("load variant");
     }
 
     fn call_function(&mut self, context: CallFunctionContext) {
@@ -162,6 +166,10 @@ impl<'a, F: Compile> Grammar for Compiler<'a, F> {
         self.handle_const_string(value);
     }
 
+    fn load_variant(&mut self, context: GrammarLoadVariantContext) -> DescResult {
+        self.handle_load_variant(context)
+    }
+
     fn operator_plus(&mut self, value: TokenValue) -> DescResult {
         self.operator_plus(value)
     }
@@ -233,6 +241,7 @@ mod function;
 mod scope;
 mod funccall;
 mod process_var;
+mod variant;
 
 #[cfg(test)]
 mod test {

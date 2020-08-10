@@ -1,10 +1,12 @@
-use libmacro::{NewWithAll};
+use libmacro::{FieldGet, NewWithAll};
+use libtype::{Type};
 use crate::address::Address;
 use std::collections::HashMap;
 
-#[derive(NewWithAll)]
+#[derive(FieldGet, NewWithAll)]
 pub struct Variant {
-    addr: Address
+    addr: Address,
+    typ: Type
 }
 
 pub struct Variants {
@@ -20,6 +22,22 @@ impl Variants {
 
     pub fn remove(&mut self, name: &String) {
         self.vars.remove(name);
+    }
+
+    pub fn get(&self, name: &str) -> Option<&Variant> {
+        self.vars.get(name)
+    }
+
+    pub fn get_with_key(&self, name: &str) -> Option<(&String, &Variant)> {
+        self.vars.get_key_value(name)
+    }
+
+    pub fn get_mut(&mut self, name: &str) -> Option<&mut Variant> {
+        self.vars.get_mut(name)
+    }
+
+    pub fn len(&self) -> usize {
+        self.vars.len()
     }
 
     pub fn new() -> Self {

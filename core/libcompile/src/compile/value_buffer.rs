@@ -6,12 +6,13 @@ use libcommon::ptr::RefPtr;
 use crate::address::{Address};
 use std::collections::{VecDeque};
 
+#[derive(Debug)]
 pub enum ValueBufferItemContext {
     Variant(RefPtr),
     Null
 }
 
-#[derive(FieldGet)]
+#[derive(Debug, FieldGet)]
 pub struct ValueBufferItem {
     pub typ: Type,
     pub addr: Address,

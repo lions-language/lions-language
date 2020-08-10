@@ -1,13 +1,20 @@
 use libtype::{AddressType, AddressValue
     , AddressKey, Type};
+use libcommon::ptr::{RefPtr};
 use super::Scope;
 use super::{vars::Variant};
 use crate::address::Address;
-use crate::compile::value_buffer::{ValueBufferItem};
+use crate::compile::value_buffer::{
+    ValueBufferItem, ValueBufferItemContext};
 use std::collections::VecDeque;
 
 pub struct ScopeContext {
     scopes: VecDeque<Scope>
+}
+
+pub struct FindVariantResult {
+    scope: usize,
+    addr: Address
 }
 
 impl ScopeContext {
@@ -63,6 +70,13 @@ impl ScopeContext {
         self.current_mut_unckecked().push_with_addr_to_value_buffer(typ, addr)
     }
 
+    pub fn push_with_addr_context_to_value_buffer(&mut self
+        , typ: Type, addr: Address
+        , context: ValueBufferItemContext) {
+        self.current_mut_unckecked().push_with_addr_context_to_value_buffer(
+            typ, addr, context)
+    }
+
     pub fn push_to_value_buffer(&mut self, typ: Type) {
         self.current_mut_unckecked().push_to_value_buffer(typ)
     }
@@ -78,6 +92,65 @@ impl ScopeContext {
     fn get_back_mut_n_unchecked(&mut self, n: usize) -> &mut Scope {
         let len = self.scopes.len();
         self.scopes.get_mut(len - 1 - n).expect(&format!("len: {}, n: {}", len, n))
+    }
+
+    /*
+     * 查找变量
+     * */
+    pub fn find_variant(&mut self, name: &str) -> Option<(&String, Variant)> {
+        /*
+         * 从最后一个向前查找(因为最后一个就是当前作用域), 直到为空
+         * */
+        let mut index = self.scopes.len() - 1;
+        let mut scope = 0;
+        let value = match self.find_variant_inner(name, &mut scope, &mut index) {
+            Some(v) => {
+                v
+            },
+            None => {
+                return None;
+            }
+        };
+        /*
+         * 修改 AddressKey 中的 scope 值
+         * */
+        let (name, var) = value;
+        let mut var_addr = var.addr_ref().clone();
+        *var_addr.addr_mut().addr_mut().scope_mut() = scope;
+        Some((name, Variant::new_with_all(var_addr, var.typ_ref().clone())))
+    }
+
+    fn find_variant_inner(&self, name: &str, scope: &mut usize
+        , index: &mut usize) -> Option<(&String, &Variant)> {
+        match self.scopes.get(*index) {
+            Some(sc) => {
+                match sc.get_variant_with_key(name) {
+                    Some(var) => {
+                        /*
+                         * 找到 => 递归结束
+                         * */
+                        return Some(var);
+                    },
+                    None => {
+                        /*
+                         * 未找到 => 继续向上
+                         * */
+                        if *index == 0 {
+                            return None;
+                        }
+                        *index -= 1;
+                        *scope += 1;
+                        self.find_variant_inner(name, scope, index)
+                    }
+                }
+            },
+            None => {
+                /*
+                 * 到达最上层, 但是还是没找到
+                 * */
+                return None;
+            }
+        }
     }
 
     pub fn new_with_first() -> Self {

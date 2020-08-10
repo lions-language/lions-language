@@ -96,11 +96,15 @@ pub enum TypeValue {
      * 结构体类型
      * */
     Structure(Structure),
+    Any,
     /*
      * 空类型
      * */
-    Any,
-    Empty
+    Empty,
+    /*
+     * null 类型
+     * */
+    Null
 }
 
 impl TypeValue {
@@ -191,6 +195,14 @@ impl Type {
 
     pub fn new_heap(typ: TypeValue, attr: TypeAttrubute) -> Self {
         Type::_new(typ, attr, TypeAddrType::Heap)
+    }
+
+    pub fn new_empty() -> Self {
+        Type::_new(TypeValue::Empty, TypeAttrubute::Empty, TypeAddrType::Stack)
+    }
+
+    pub fn new_null() -> Self {
+        Type::_new(TypeValue::Null, TypeAttrubute::Empty, TypeAddrType::Stack)
     }
 
     pub fn set_type_attribute(&mut self, attr: TypeAttrubute) {

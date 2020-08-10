@@ -14,6 +14,9 @@ impl Type {
             },
             TypeValue::Empty => {
                 consts::EMPTY_TYPE
+            },
+            TypeValue::Null => {
+                consts::NULL_TYPE
             }
         }
     }

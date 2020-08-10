@@ -2,7 +2,8 @@ use libtype::{AddressType, AddressValue, AddressKey
     , Type};
 use crate::compile::address_dispatch::AddressDispatch;
 use crate::compile::ref_count::RefCounter;
-use crate::compile::value_buffer::{ValueBuffer, ValueBufferItem};
+use crate::compile::value_buffer::{ValueBuffer
+    , ValueBufferItem, ValueBufferItemContext};
 use crate::address::{Address};
 
 pub struct Scope {
@@ -45,6 +46,11 @@ impl Scope {
         self.value_buffer.push_with_addr(typ, addr)
     }
 
+    fn push_with_addr_context_to_value_buffer(&mut self, typ: Type, addr: Address
+        , context: ValueBufferItemContext) {
+        self.value_buffer.push_with_addr_context(typ, addr, context)
+    }
+
     fn push_to_value_buffer(&mut self, typ: Type) {
         self.value_buffer.push(typ)
     }
@@ -55,6 +61,18 @@ impl Scope {
 
     fn remove_variant(&mut self, name: &String) {
         self.vars.remove(name);
+    }
+
+    fn get_variant(&self, name: &str) -> Option<&vars::Variant> {
+        self.vars.get(name)
+    }
+
+    fn get_variant_with_key(&self, name: &str) -> Option<(&String, &vars::Variant)> {
+        self.vars.get_with_key(name)
+    }
+
+    fn get_variant_mut(&mut self, name: &str) -> Option<&mut vars::Variant> {
+        self.vars.get_mut(name)
     }
 
     pub fn new() -> Self {
