@@ -2,7 +2,7 @@ use libgrammar::token::{TokenValue, TokenData};
 use libtype::function::{AddFunctionContext};
 use libtype::{PackageType, PackageTypeValue
     , AddressType, AddressValue
-    , Type};
+    , Type, TypeAttrubute};
 use libgrammar::grammar::{VarStmtContext};
 use crate::address::Address;
 use crate::compile::{Compile, Compiler, VariantDefineContext};
@@ -34,15 +34,17 @@ impl<'a, F: Compile> Compiler<'a, F> {
             let value = self.scope_context.take_top_from_value_buffer();
             // println!("{:?}", &value);
             typ = value.typ_ref().clone();
-            match value.context_ref() {
-                ValueBufferItemContext::Variant(v) => {
-                    let var_name = v.as_ref::<String>();
-                    self.scope_context.remove_variant_unchecked(
-                        value.addr_ref().addr_ref().addr_ref().scope_clone()
-                        , var_name);
-                },
-                _ => {}
-            }
+            if let TypeAttrubute::Move = typ.attr_ref() {
+                match value.context_ref() {
+                    ValueBufferItemContext::Variant(v) => {
+                        let var_name = v.as_ref::<String>();
+                        self.scope_context.remove_variant_unchecked(
+                            value.addr_ref().addr_ref().addr_ref().scope_clone()
+                            , var_name);
+                    },
+                    _ => {}
+                }
+            };
             src_addr = value.addr().addr();
         }
         /*

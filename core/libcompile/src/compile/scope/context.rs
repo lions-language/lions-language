@@ -116,7 +116,8 @@ impl ScopeContext {
          * */
         let (name, var) = value;
         let mut var_addr = var.addr_ref().clone();
-        *var_addr.addr_mut().addr_mut().scope_mut() = scope;
+        *var_addr.addr_mut().addr_mut().scope_mut() += scope;
+        // println!("--- {}, {}", var_addr.addr_mut().addr_mut().scope_ref(), scope);
         Some((name, Variant::new_with_all(var_addr, var.typ_ref().clone())))
     }
 
