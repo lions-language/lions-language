@@ -115,14 +115,15 @@ pub trait Grammar {
     fn var_stmt_end(&mut self, _context: VarStmtContext) {
         println!("var stmt end");
     }
+    fn anonymous_block_start(&mut self) {
+        println!("anonymous block start");
+    }
+    fn anonymous_block_end(&mut self) {
+        println!("anonymous block end");
+    }
     fn end(&mut self) -> DescResult {
         DescResult::Success
     }
-}
-
-pub enum AfterIdProcess {
-    FunctionCall,
-    Id
 }
 
 enum NextToken<T: FnMut() -> CallbackReturnStatus, CB: Grammar> {
@@ -407,6 +408,7 @@ mod token_extend;
 mod annotate;
 mod typesof;
 mod process_var;
+mod block;
 
 #[cfg(test)]
 mod test {

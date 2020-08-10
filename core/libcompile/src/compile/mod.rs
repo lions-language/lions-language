@@ -206,6 +206,14 @@ impl<'a, F: Compile> Grammar for Compiler<'a, F> {
     fn var_stmt_end(&mut self, context: VarStmtContext) {
         self.handle_var_stmt_end(context);
     }
+
+    fn anonymous_block_start(&mut self) {
+        self.process_anonymous_block_start();
+    }
+
+    fn anonymous_block_end(&mut self) {
+        self.process_anonymous_block_end();
+    }
 }
 
 impl<'a, F: Compile> Compiler<'a, F> {
@@ -242,6 +250,7 @@ mod scope;
 mod funccall;
 mod process_var;
 mod variant;
+mod block;
 
 #[cfg(test)]
 mod test {

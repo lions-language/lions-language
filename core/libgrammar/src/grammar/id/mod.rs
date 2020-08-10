@@ -1,7 +1,7 @@
 use libtype::{PackageType, PackageTypeValue};
 use libtype::package::{PackageStr};
 use libresult::DescResult;
-use super::{GrammarParser, Grammar, AfterIdProcess
+use super::{GrammarParser, Grammar
     , CallFuncScopeContext, LoadVariantContext};
 use crate::lexical::{CallbackReturnStatus};
 use crate::token::{TokenType};
