@@ -22,38 +22,7 @@ impl IdToken {
     fn nup<T: FnMut() -> CallbackReturnStatus, CB: Grammar>(
         token: &Token<T, CB>, grammar: &mut GrammarParser<T, CB>
         , express_context: &ExpressContext<T, CB>) -> TokenMethodResult {
-        let mut token_value = grammar.take_next_one().token_value();
-        match grammar.skip_white_space_token() {
-            Some(tp) => {
-                let next = tp.as_ref::<T, CB>();
-                match next.context_token_type() {
-                    TokenType::Colon => {
-                    },
-                    _ => {
-                        /*
-                         * 后面不是 : 也不是 . 号 => id
-                         * */
-                        let context = LoadVariantContext::new_with_all(
-                            token_value, None);
-                        match grammar.grammar_context().cb.load_variant(context) {
-                            DescResult::Error(e) => {
-                                grammar.panic(&e);
-                            },
-                            _ => {
-                            }
-                        }
-                    }
-                }
-            },
-            None => {
-                /*
-                 * id 后面是 EOF => id
-                 * */
-                let context = LoadVariantContext::new_with_all(
-                    token_value, None);
-                grammar.grammar_context().cb.load_variant(context);
-            }
-        }
+        grammar.id_process();
         TokenMethodResult::End
     }
 }

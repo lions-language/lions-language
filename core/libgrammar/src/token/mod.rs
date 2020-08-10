@@ -66,6 +66,8 @@ pub enum TokenType {
     Colon,
     // ,
     Comma,
+    // .
+    Point,
     // 注释
     Annotate,
     Id,

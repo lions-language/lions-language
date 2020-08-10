@@ -206,15 +206,6 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
             TokenType::Var => {
                 self.var_process();
             },
-            TokenType::Id => {
-                match self.id_process() {
-                    AfterIdProcess::Id => {
-                        self.expression_process(token, express_context);
-                    },
-                    _ => {
-                    }
-                }
-            },
             _ => {
                 self.expression_process(token, express_context);
             }

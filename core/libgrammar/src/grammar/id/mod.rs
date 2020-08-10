@@ -1,12 +1,26 @@
 use libtype::{PackageType, PackageTypeValue};
 use libtype::package::{PackageStr};
+use libresult::DescResult;
 use super::{GrammarParser, Grammar, AfterIdProcess
-    , CallFuncScopeContext};
+    , CallFuncScopeContext, LoadVariantContext};
 use crate::lexical::{CallbackReturnStatus};
 use crate::token::{TokenType};
 
 impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, CB> {
-    pub fn id_process(&mut self) -> AfterIdProcess {
+    pub fn id_process_id(&mut self) {
+        let mut token_value = self.take_next_one().token_value();
+        let context = LoadVariantContext::new_with_all(
+            token_value, None);
+        match self.grammar_context().cb.load_variant(context) {
+            DescResult::Error(e) => {
+                self.panic(&e);
+            },
+            _ => {
+            }
+        }
+    }
+
+    pub fn id_process(&mut self) {
         /*
          * 1. 判断是否是函数调用
          * */
@@ -24,10 +38,15 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                     TokenType::LeftParenthese => {
                         let bl = self.restore_from_backtrack_point();
                         self.funccall_process(bl, scope_context);
-                        return AfterIdProcess::FunctionCall;
+                        return;
+                    },
+                    TokenType::Point => {
+                        unimplemented!();
                     },
                     _ => {
-                        unimplemented!();
+                        self.restore_from_backtrack_point();
+                        self.id_process_id();
+                        return;
                     }
                 }
             },
@@ -37,7 +56,8 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                  *  => 处理 id token
                  * */
                 self.restore_from_backtrack_point();
-                return AfterIdProcess::Id;
+                self.id_process_id();
+                return;
             }
         }
     }
