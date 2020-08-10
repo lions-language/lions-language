@@ -15,8 +15,7 @@ impl VirtualMachine {
         /*
          * 加载参数
          *  在进入这里的时候, 当前作用域中的映射集合中已经存在了参数的映射
-         *  所以, 直接用 索引0访问查找第一个参数的数据, 以此类推
-         * 注意:
+         *  所以, 直接用 索引0访问查找第一个参数的数据, 以此类推 注意:
          *  与自定义函数不同, 这里不需要为函数调用开辟新的作用域, 因为原生函数调用是 "死代码"
          * */
         let param_addrs = value.param_addrs.expect("should not happend");
@@ -102,7 +101,7 @@ impl VirtualMachine {
             , Data::new(DataValue::Primeval(
                     PrimevalData::Str(
                         Some(Str::new(StrValue::Utf8(result)))))));
-        self.thread_context.current_unchecked().print_stack_datas();
+        // self.thread_context.current_unchecked().print_stack_datas();
     }
 }
 
