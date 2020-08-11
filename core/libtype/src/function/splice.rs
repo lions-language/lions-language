@@ -1,4 +1,4 @@
-use crate::Type;
+use crate::{Type, TypeAttrubute};
 use crate::function::{FunctionParamData, FunctionReturnData};
 
 pub struct FunctionSplice;
@@ -39,7 +39,8 @@ impl FunctionSplice {
          * */
         match typ {
             Some(t) => {
-                s.push_str(t.to_attrubute_str());
+                // s.push_str(t.to_attrubute_str());
+                // s.push_str(typ_attr.to_str());
                 s.push_str(t.to_str());
                 s.push(':');
             },
@@ -58,7 +59,8 @@ impl FunctionSplice {
             Some(param) => {
                 match param {
                     FunctionParamData::Single(p) => {
-                        s.push_str(p.typ.to_attrubute_str());
+                        // s.push_str(p.typ.to_attrubute_str());
+                        s.push_str(p.typ_attr.to_str());
                         s.push_str(p.typ.to_str());
                     },
                     FunctionParamData::Multi(ps) => {
@@ -66,7 +68,8 @@ impl FunctionSplice {
                             if i > 0 {
                                 s.push(',');
                             }
-                            s.push_str(p.typ.to_attrubute_str());
+                            // s.push_str(p.typ.to_attrubute_str());
+                            s.push_str(p.typ_attr.to_str());
                             s.push_str(p.typ.to_str());
                         }
                     }
@@ -82,7 +85,8 @@ impl FunctionSplice {
         match func_return {
             Some(ret) => {
                 s.push_str("->");
-                s.push_str(ret.typ.to_attrubute_str());
+                // s.push_str(ret.typ.to_attrubute_str());
+                s.push_str(ret.typ.to_str());
                 s.push_str(ret.typ.to_str());
             },
             None => {

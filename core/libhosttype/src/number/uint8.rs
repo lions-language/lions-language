@@ -17,9 +17,9 @@ use phf::phf_map;
 lazy_static!{
     static ref UINT8_METHOD: phf::Map<&'static str, u32> = {
         phf_map! {
-            "&uint8:+(&uint8)" => 0,
-            "&uint8:+(&uint16)" => 1,
-            "&uint8:to_str()" => 2
+            "uint8:+(&uint8,&uint8)" => 0,
+            "uint8:+(&uint8,&uint16)" => 1,
+            "uint8:to_str(&uint8)" => 2
         }
     };
     /*
@@ -33,7 +33,7 @@ lazy_static!{
                     FunctionParamDataItem::new(
                         Type::new(TypeValue::Primeval(Primeval::new(
                                 PrimevalType::Uint8))
-                                , TypeAttrubute::Ref)
+                                TypeAttrubute::Ref)
                         )
                     ),
                     TypeAttrubute::Move

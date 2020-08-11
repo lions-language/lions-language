@@ -37,6 +37,7 @@ impl Default for FunctionReturnDataAttr {
 #[derive(Debug, Clone, Default, FieldGet)]
 pub struct FunctionReturnData {
     pub typ: Type,
+    pub typ_attr: TypeAttrubute,
     /*
      * 如果是引用类型, 需要指定引用的是哪个输入参数
      * */
@@ -45,16 +46,19 @@ pub struct FunctionReturnData {
 
 impl FunctionReturnData {
     pub fn new_with_attr(typ: Type,
+        typ_attr: TypeAttrubute,
         attr: FunctionReturnDataAttr) -> Self {
         Self {
             typ: typ,
+            typ_attr: typ_attr,
             attr: attr
         }
     }
 
-    pub fn new(typ: Type) -> Self {
+    pub fn new(typ: Type, typ_attr: TypeAttrubute) -> Self {
         Self {
             typ: typ,
+            typ_attr: typ_attr,
             attr: FunctionReturnDataAttr::Empty
         }
     }
@@ -102,6 +106,7 @@ pub enum FunctionParamLengthenAttr {
 #[derive(Debug, Clone, FieldGet, NewWithAll)]
 pub struct FunctionParamDataItem {
     pub typ: Type,
+    pub typ_attr: TypeAttrubute,
     pub addr_attr: FunctionParamAddrAttr,
     /*
      * 是否是变长参数
@@ -134,23 +139,27 @@ impl FunctionParam {
 }
 
 impl FunctionParamDataItem {
-    pub fn new(typ: Type) -> Self {
+    pub fn new(typ: Type, typ_attr: TypeAttrubute) -> Self {
         FunctionParamDataItem::new_with_all(typ
+            , typ_attr
             , FunctionParamAddrAttr::Move
             , FunctionParamLengthenAttr::Fixed
             , false)
     }
 
-    pub fn new_lengthen(typ: Type) -> Self {
+    pub fn new_lengthen(typ: Type, typ_attr: TypeAttrubute) -> Self {
         FunctionParamDataItem::new_with_all(typ
+            , typ_attr
             , FunctionParamAddrAttr::Move
             , FunctionParamLengthenAttr::Lengthen
             , false)
     }
 
     pub fn new_lengthen_auto_call_totype(typ: Type
+        , typ_attr: TypeAttrubute
         , is_auto_call_totype: bool) -> Self {
         FunctionParamDataItem::new_with_all(typ
+            , typ_attr
             , FunctionParamAddrAttr::Move
             , FunctionParamLengthenAttr::Lengthen
             , is_auto_call_totype)
