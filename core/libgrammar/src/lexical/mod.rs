@@ -409,6 +409,7 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
             ';' => self.semicolon_process(),
             ':' => self.colon_process(),
             ',' => self.comma_process(),
+            '&' => self.and_process(),
             ' ' => self.space(),
             _ => {
                 if self.is_id_start(c) {
@@ -492,6 +493,8 @@ mod semicolon;
 mod whitespace;
 mod colon;
 mod comma;
+mod and;
+mod annotate;
 
 #[cfg(test)]
 mod test {

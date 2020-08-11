@@ -68,6 +68,8 @@ pub enum TokenType {
     Comma,
     // .
     Point,
+    // &
+    And,
     // 注释
     Annotate,
     Id,

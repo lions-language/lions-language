@@ -52,7 +52,7 @@ pub trait Grammar {
         DescResult::Success
     }
     fn annotate(&mut self, _value: TokenValue) {
-        println!("multi annotate");
+        println!("annotate");
     }
     fn operator_plus(&mut self, value: TokenValue) -> DescResult {
         value.print_token_type(None);
@@ -197,6 +197,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
     fn select_with_exprcontext(&mut self, token: &TokenPointer, express_context: &ExpressContext<T, CB>) {
         match token.as_ref::<T, CB>().context_ref().token_type() {
             TokenType::If => {
+                unimplemented!();
             },
             TokenType::Annotate => {
                 self.annotate_process();
@@ -425,6 +426,7 @@ mod test {
     }
 
     #[test]
+    // #[ignore]
     fn grammar_parser_test() {
         let mut file = String::from("main.lions");
         let mut f = match fs::File::open(&file) {
