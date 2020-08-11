@@ -1,16 +1,18 @@
-use libtype::{PackageType, PackageTypeValue};
+use libtype::{PackageType, PackageTypeValue
+    , TypeAttrubute};
 use libtype::package::{PackageStr};
 use libresult::DescResult;
 use super::{GrammarParser, Grammar
-    , CallFuncScopeContext, LoadVariantContext};
+    , CallFuncScopeContext, LoadVariantContext
+    , DescContext};
 use crate::lexical::{CallbackReturnStatus};
 use crate::token::{TokenType};
 
 impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, CB> {
-    pub fn id_process_id(&mut self) {
+    pub fn id_process_id(&mut self, desc_ctx: DescContext) {
         let mut token_value = self.take_next_one().token_value();
         let context = LoadVariantContext::new_with_all(
-            token_value, None);
+            token_value, None, desc_ctx.typ_attr);
         match self.grammar_context().cb.load_variant(context) {
             DescResult::Error(e) => {
                 self.panic(&e);
@@ -20,7 +22,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         }
     }
 
-    pub fn id_process(&mut self) {
+    pub fn id_process(&mut self, desc_ctx: DescContext) {
         /*
          * 1. 判断是否是函数调用
          * */
@@ -45,7 +47,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                     },
                     _ => {
                         self.restore_from_backtrack_point();
-                        self.id_process_id();
+                        self.id_process_id(desc_ctx);
                         return;
                     }
                 }
@@ -56,7 +58,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                  *  => 处理 id token
                  * */
                 self.restore_from_backtrack_point();
-                self.id_process_id();
+                self.id_process_id(desc_ctx);
                 return;
             }
         }

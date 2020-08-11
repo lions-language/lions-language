@@ -1,7 +1,9 @@
 use libresult::DescResult;
+use libtype::{TypeAttrubute};
 use crate::grammar::{GrammarParser
     , ExpressContext, Grammar
-    , LoadVariantContext, LoadVariantContextValue};
+    , LoadVariantContext, LoadVariantContextValue
+    , DescContext};
 use crate::token::TokenMethodResult;
 use crate::token::{self, Token, TokenOperType, TokenAttrubute, TokenContext
     , TokenType};
@@ -22,7 +24,8 @@ impl IdToken {
     fn nup<T: FnMut() -> CallbackReturnStatus, CB: Grammar>(
         token: &Token<T, CB>, grammar: &mut GrammarParser<T, CB>
         , express_context: &ExpressContext<T, CB>) -> TokenMethodResult {
-        grammar.id_process();
+        grammar.id_process(DescContext::new(
+                TypeAttrubute::default()));
         TokenMethodResult::End
     }
 }

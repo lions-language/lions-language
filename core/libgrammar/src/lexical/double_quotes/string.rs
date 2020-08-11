@@ -1,7 +1,9 @@
+use libtype::{TypeAttrubute};
 use crate::token::{self, Token, TokenOperType, TokenAttrubute
     , TokenContext, TokenMethodResult, TokenValue};
 use crate::lexical::CallbackReturnStatus;
-use crate::grammar::{GrammarParser, ExpressContext, Grammar};
+use crate::grammar::{GrammarParser, ExpressContext, Grammar
+    , DescContext};
 
 pub struct StringToken {
     context: TokenContext
@@ -18,8 +20,8 @@ impl StringToken {
     fn nup<T: FnMut() -> CallbackReturnStatus, CB: Grammar>(
         token: &Token<T, CB>, grammar: &mut GrammarParser<T, CB>
         , express_context: &ExpressContext<T, CB>) -> TokenMethodResult {
-        let mut token_value = grammar.take_next_one().token_value();
-        grammar.grammar_context().cb.const_string(token_value);
+        grammar.string_process(DescContext::new(
+                TypeAttrubute::Move));
         TokenMethodResult::End
     }
 }

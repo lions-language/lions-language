@@ -73,6 +73,12 @@ impl TypeAttrubute {
     }
 }
 
+impl Default for TypeAttrubute {
+    fn default() -> Self {
+        TypeAttrubute::Move
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Primeval {
     pub typ: PrimevalType

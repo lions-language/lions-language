@@ -1,7 +1,8 @@
 use crate::lexical::{CallbackReturnStatus, TokenVecItem};
 use crate::grammar::{GrammarParser, ExpressContext, Grammar};
 use libtype::primeval::{PrimevalType, PrimevalData};
-use libmacro::{FieldGet};
+use libtype::{TypeAttrubute};
+use libmacro::{FieldGet, NewWithAll};
 
 #[derive(Debug)]
 pub enum NumberValue {
@@ -167,7 +168,7 @@ impl TokenValue {
 }
 */
 
-#[derive(Default, FieldGet)]
+#[derive(Default, FieldGet, NewWithAll)]
 pub struct TokenValue {
     pub token_type: TokenType,
     pub token_data: Option<TokenData>
@@ -193,10 +194,7 @@ impl TokenValue {
     }
 
     pub fn new(typ: TokenType, data: Option<TokenData>) -> Self {
-        Self {
-            token_type: typ,
-            token_data: data
-        }
+        TokenValue::new_with_all(typ, data)
     }
 }
 

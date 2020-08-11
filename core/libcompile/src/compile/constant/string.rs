@@ -1,4 +1,5 @@
 use libgrammar::token::{TokenValue};
+use libgrammar::grammar::{ConstStringContext};
 use libtype::{AddressValue, AddressType};
 use libtype::package::PackageStr;
 use crate::compile::{Compile, Compiler, StaticContext
@@ -6,7 +7,8 @@ use crate::compile::{Compile, Compiler, StaticContext
 use crate::address::Address;
 
 impl<'a, F: Compile> Compiler<'a, F> {
-    pub fn handle_const_string(&mut self, value: TokenValue) {
+    pub fn handle_const_string(&mut self, context: ConstStringContext) {
+        let (value, typ_attr) = context.fields_move();
         /*
          * TokenType 转换为 Type
          * */

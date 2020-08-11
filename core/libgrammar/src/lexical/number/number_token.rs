@@ -1,7 +1,9 @@
+use libtype::{TypeAttrubute};
 use crate::token::{self, Token, TokenOperType, TokenAttrubute
     , TokenContext, TokenMethodResult, TokenValue};
 use crate::lexical::CallbackReturnStatus;
-use crate::grammar::{GrammarParser, ExpressContext, Grammar};
+use crate::grammar::{GrammarParser, ExpressContext, Grammar
+    , DescContext};
 
 pub struct NumberToken {
 }
@@ -15,8 +17,8 @@ lazy_static!{
 
 impl NumberToken {
     fn nup<T: FnMut() -> CallbackReturnStatus, CB: Grammar>(token: &Token<T, CB>, grammar: &mut GrammarParser<T, CB>, express_context: &ExpressContext<T, CB>) -> TokenMethodResult {
-        let mut token_value = grammar.take_next_one().token_value();
-        grammar.grammar_context().cb.const_number(token_value);
+        grammar.number_process(DescContext::new(
+                TypeAttrubute::default()));
         TokenMethodResult::End
     }
 }

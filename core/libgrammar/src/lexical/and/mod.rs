@@ -15,7 +15,7 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
                     unimplemented!();
                 },
                 _ => {
-                    // 除法运算符
+                    // &
                     parser.and_single();
                 }
             }

@@ -1,5 +1,6 @@
 use libgrammar::grammar::{Grammar, CallFuncScopeContext
-    , VarStmtContext, LoadVariantContext as GrammarLoadVariantContext};
+    , VarStmtContext, LoadVariantContext as GrammarLoadVariantContext
+    , ConstNumberContext, ConstStringContext};
 use libgrammar::token::{TokenValue};
 use libtype::{Type, Data};
 use libtype::function::{Function, CallFunctionParamAddr};
@@ -158,12 +159,12 @@ pub struct Compiler<'a, F: Compile> {
 }
 
 impl<'a, F: Compile> Grammar for Compiler<'a, F> {
-    fn const_number(&mut self, value: TokenValue) {
-	self.const_number(value);
+    fn const_number(&mut self, context: ConstNumberContext) {
+	self.const_number(context);
     }
 
-    fn const_string(&mut self, value: TokenValue) {
-        self.handle_const_string(value);
+    fn const_string(&mut self, context: ConstStringContext) {
+        self.handle_const_string(context);
     }
 
     fn load_variant(&mut self, context: GrammarLoadVariantContext) -> DescResult {

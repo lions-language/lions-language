@@ -11,7 +11,7 @@ impl AndToken {
     fn nup<T: FnMut() -> CallbackReturnStatus, CB: Grammar>(
         token: &Token<T, CB>, grammar: &mut GrammarParser<T, CB>
         , express_context: &ExpressContext<T, CB>) -> TokenMethodResult {
-        unimplemented!();
+        grammar.and_process();
         TokenMethodResult::End
     }
 }

@@ -1,6 +1,6 @@
 use crate::lexical::{LexicalParser, CallbackReturnStatus, TokenVecItem, TokenPointer};
 use crate::token::{TokenType, TokenValue, TokenMethodResult};
-use libtype::{Type, PackageType};
+use libtype::{Type, PackageType, TypeAttrubute};
 use libresult::*;
 use libtype::package::PackageStr;
 use libmacro::{FieldGet, NewWithAll
@@ -35,17 +35,41 @@ pub enum LoadVariantContextValue {
 #[derive(FieldGet, NewWithAll, FieldGetMove)]
 pub struct LoadVariantContext {
     first: TokenValue,
-    other: Option<Vec<TokenValue>>
+    other: Option<Vec<TokenValue>>,
+    typ_attr: TypeAttrubute
+}
+
+#[derive(Debug, FieldGet, NewWithAll, FieldGetMove)]
+pub struct DescContext {
+    typ_attr: TypeAttrubute
+}
+
+impl DescContext {
+    pub fn new(typ_attr: TypeAttrubute) -> Self {
+        DescContext::new_with_all(typ_attr)
+    }
+}
+
+#[derive(FieldGet, NewWithAll, FieldGetMove)]
+pub struct ConstNumberContext {
+    value: TokenValue,
+    typ_attr: TypeAttrubute
+}
+
+#[derive(FieldGet, NewWithAll, FieldGetMove)]
+pub struct ConstStringContext {
+    value: TokenValue,
+    typ_attr: TypeAttrubute
 }
 
 pub trait Grammar {
     // type IdUse;
     
-    fn const_number(&mut self, value: TokenValue) {
-        value.print_token_type(None);
+    fn const_number(&mut self, context: ConstNumberContext) {
+        context.value.print_token_type(None);
     }
-    fn const_string(&mut self, value: TokenValue) {
-        value.print_token_type(None);
+    fn const_string(&mut self, context: ConstStringContext) {
+        context.value.print_token_type(None);
     }
     fn load_variant(&mut self, _context: LoadVariantContext) -> DescResult {
         println!("load variant");
@@ -410,6 +434,9 @@ mod annotate;
 mod typesof;
 mod process_var;
 mod block;
+mod and;
+mod number;
+mod string;
 
 #[cfg(test)]
 mod test {
