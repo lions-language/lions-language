@@ -33,10 +33,10 @@ lazy_static!{
                     FunctionParamDataItem::new(
                         Type::new(TypeValue::Primeval(Primeval::new(
                                 PrimevalType::Uint8))
-                                TypeAttrubute::Ref)
+                                , TypeAttrubute::Ref)
+                        , TypeAttrubute::Ref
                         )
-                    ),
-                    TypeAttrubute::Move
+                    )
                 )),
             FunctionReturn::new(
                 FunctionReturnData::new_with_attr(
@@ -44,6 +44,7 @@ lazy_static!{
                             PrimevalType::Uint16))
                             , TypeAttrubute::Move)
                     , FunctionReturnDataAttr::Create
+                    , TypeAttrubute::Move
                     ),
                 ),
             Some(Type::new(TypeValue::Primeval(Primeval::new(
@@ -67,8 +68,7 @@ lazy_static!{
                                 PrimevalType::Uint16))
                                 , TypeAttrubute::Ref)
                         )
-                    ),
-                    TypeAttrubute::Move
+                    )
                 )),
             FunctionReturn::new(
                 FunctionReturnData::new_with_attr(

@@ -77,8 +77,7 @@ impl FunctionReturn {
  * */
 #[derive(Debug, Clone, FieldGet)]
 pub struct FunctionParam {
-    pub data: FunctionParamData,
-    pub attr: TypeAttrubute
+    pub data: FunctionParamData
 }
 
 #[derive(Debug, Clone)]
@@ -129,11 +128,9 @@ pub enum FunctionParamData {
 }
 
 impl FunctionParam {
-    pub fn new(data: FunctionParamData
-        , attr: TypeAttrubute) -> Self {
+    pub fn new(data: FunctionParamData) -> Self {
         Self {
-            data: data,
-            attr: attr
+            data: data
         }
     }
 }
