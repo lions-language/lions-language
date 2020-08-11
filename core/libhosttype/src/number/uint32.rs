@@ -17,34 +17,39 @@ use phf::phf_map;
 lazy_static!{
     static ref UINT32_METHOD: phf::Map<&'static str, u32> = {
         phf_map! {
-            "&uint32:+(&uint32)" => 0,
-            "uint32:+(&uint8)" => 1
+            "uint32:+(&uint32,&uint32)" => 0,
+            "uint32:+(uint32,&uint8)" => 1
         }
     };
     static ref REF_UINT32_PLUS_OPERATOR_REF_UINT32_FUNCTION: Function = Function{
         func_statement: FunctionStatement::new(
             String::from(consts::OPERATOR_FUNCTION_NAME),
             Some(FunctionParam::new(
-                FunctionParamData::Single(
-                    FunctionParamDataItem::new(
-                        Type::new(TypeValue::Primeval(Primeval::new(
-                                PrimevalType::Uint32))
-                                , TypeAttrubute::Ref)
-                        )
-                    ),
-                    TypeAttrubute::Move
+                FunctionParamData::Multi(
+                    vec![FunctionParamDataItem::new(
+                        Type::new_without_attr(
+                            TypeValue::Primeval(Primeval::new(
+                                PrimevalType::Uint32)))
+                        , TypeAttrubute::Ref
+                    ), FunctionParamDataItem::new(
+                        Type::new_without_attr(
+                            TypeValue::Primeval(Primeval::new(
+                                PrimevalType::Uint32)))
+                        , TypeAttrubute::Ref
+                    )]),
                 )),
             FunctionReturn::new(
                 FunctionReturnData::new_with_attr(
-                    Type::new(TypeValue::Primeval(Primeval::new(
-                            PrimevalType::Uint32))
-                            , TypeAttrubute::Move)
+                    Type::new_without_attr(
+                        TypeValue::Primeval(Primeval::new(
+                            PrimevalType::Uint32)))
+                        , TypeAttrubute::Move
                         , FunctionReturnDataAttr::Create
                     )
                 ),
-            Some(Type::new(TypeValue::Primeval(Primeval::new(
-                        PrimevalType::Uint32))
-                        , TypeAttrubute::Ref))
+            Some(Type::new_without_attr(
+                TypeValue::Primeval(Primeval::new(
+                        PrimevalType::Uint32))))
         ),
         func_define: FunctionDefine::Optcode(OptcodeFunctionDefine{
             optcode: OptCode::RefUint32PlusOperatorRefUint32
@@ -54,26 +59,31 @@ lazy_static!{
         func_statement: FunctionStatement::new(
             String::from(consts::OPERATOR_FUNCTION_NAME),
             Some(FunctionParam::new(
-                FunctionParamData::Single(
-                    FunctionParamDataItem::new(
-                        Type::new(TypeValue::Primeval(Primeval::new(
-                                PrimevalType::Uint8))
-                                , TypeAttrubute::Ref)
-                        )
-                    ),
-                    TypeAttrubute::Move
+                FunctionParamData::Multi(
+                    vec![FunctionParamDataItem::new(
+                        Type::new_without_attr(
+                            TypeValue::Primeval(Primeval::new(
+                                PrimevalType::Uint32)))
+                        , TypeAttrubute::Move
+                    ), FunctionParamDataItem::new(
+                        Type::new_without_attr(
+                            TypeValue::Primeval(Primeval::new(
+                                PrimevalType::Uint8)))
+                        , TypeAttrubute::Ref
+                    )]),
                 )),
             FunctionReturn::new(
                 FunctionReturnData::new_with_attr(
-                    Type::new(TypeValue::Primeval(Primeval::new(
-                            PrimevalType::Uint64))
-                            , TypeAttrubute::Move)
+                    Type::new_without_attr(
+                        TypeValue::Primeval(Primeval::new(
+                            PrimevalType::Uint64)))
+                        , TypeAttrubute::Move
                         , FunctionReturnDataAttr::Create
                     )
                 ),
-            Some(Type::new(TypeValue::Primeval(Primeval::new(
-                        PrimevalType::Uint32))
-                        , TypeAttrubute::Move))
+            Some(Type::new_without_attr(
+                TypeValue::Primeval(Primeval::new(
+                        PrimevalType::Uint32))))
         ),
         func_define: FunctionDefine::Optcode(OptcodeFunctionDefine{
             optcode: OptCode::MoveUint32PlusOperatorRefUint8

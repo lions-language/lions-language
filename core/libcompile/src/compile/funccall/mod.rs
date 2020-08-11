@@ -5,7 +5,7 @@ use libtype::function::{FindFunctionContext, FindFunctionResult
     , FunctionDefine, FunctionParamData
     , OptcodeFunctionDefine, FunctionParamLengthenAttr
     , CallFunctionParamAddr, Function, splice::FunctionSplice
-    , FunctionReturnDataAttr};
+    , FunctionReturnDataAttr, FunctionParamDataItem};
 use libtype::AddressValue;
 use libtype::package::{PackageStr};
 use libgrammar::token::{TokenValue, TokenData};
@@ -48,8 +48,10 @@ impl<'a, F: Compile> Compiler<'a, F> {
                  * 1. 拼接 期望的方法名
                  * */
                 let func_name = FunctionSplice::get_to_type_by_type(expect_typ);
+                let param = FunctionParamData::Single(FunctionParamDataItem::new(
+                    input_typ.clone(), input_value.typ_attr_ref().clone()));
                 let expect_func_str = FunctionSplice::get_function_without_return_string_by_type(
-                    &func_name, &None, &Some(input_typ));
+                    &func_name, &Some(&param), &Some(input_typ));
                 /*
                  * 查找方法
                  * */

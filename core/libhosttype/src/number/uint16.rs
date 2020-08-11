@@ -17,9 +17,9 @@ use phf::phf_map;
 lazy_static!{
     static ref UINT16_METHOD: phf::Map<&'static str, u32> = {
         phf_map! {
-            "uint16:+(&uint8)" => 0,
-            "&uint16:to_str()" => 1,
-            "uint16:to_str()" => 2,
+            "uint16:+(uint16,&uint8)" => 0,
+            "uint16:to_str(&uint16)" => 1,
+            "uint16:to_str(uint16)" => 2,
         }
     };
     /*
@@ -29,26 +29,31 @@ lazy_static!{
         func_statement: FunctionStatement::new(
             String::from(consts::OPERATOR_FUNCTION_NAME),
             Some(FunctionParam::new(
-                FunctionParamData::Single(
-                    FunctionParamDataItem::new(
-                        Type::new(TypeValue::Primeval(Primeval::new(
-                                PrimevalType::Uint8))
-                                , TypeAttrubute::Ref)
-                        )
-                    ),
-                    TypeAttrubute::Move
+                FunctionParamData::Multi(
+                    vec![FunctionParamDataItem::new(
+                        Type::new_without_attr(
+                            TypeValue::Primeval(Primeval::new(
+                                PrimevalType::Uint16)))
+                        , TypeAttrubute::Move
+                    ), FunctionParamDataItem::new(
+                        Type::new_without_attr(
+                            TypeValue::Primeval(Primeval::new(
+                                PrimevalType::Uint8)))
+                        , TypeAttrubute::Ref
+                    )]),
                 )),
             FunctionReturn::new(
                 FunctionReturnData::new_with_attr(
-                    Type::new(TypeValue::Primeval(Primeval::new(
-                            PrimevalType::Uint32))
-                            , TypeAttrubute::Move)
+                    Type::new_without_attr(
+                        TypeValue::Primeval(Primeval::new(
+                            PrimevalType::Uint32)))
+                    , TypeAttrubute::Move
                     , FunctionReturnDataAttr::Create
                     ),
                 ),
-            Some(Type::new(TypeValue::Primeval(Primeval::new(
-                        PrimevalType::Uint16))
-                        , TypeAttrubute::Ref))
+            Some(Type::new_without_attr(
+                TypeValue::Primeval(Primeval::new(
+                        PrimevalType::Uint16))))
         ),
         func_define: FunctionDefine::Optcode(OptcodeFunctionDefine{
             optcode: OptCode::MoveUint16PlusOperatorRefUint8
@@ -60,12 +65,21 @@ lazy_static!{
     static ref REF_UINT16_TO_STR_FUNCTION: Function = Function{
         func_statement: FunctionStatement::new(
             String::from(consts::TO_STR_FUNCTION_NAME),
-            None,
+            Some(FunctionParam::new(
+                FunctionParamData::Single(
+                    FunctionParamDataItem::new(
+                        Type::new_without_attr(
+                            TypeValue::Primeval(Primeval::new(
+                                PrimevalType::Uint16)))
+                        , TypeAttrubute::Ref
+                    ))
+                )),
             FunctionReturn::new(
                 FunctionReturnData::new_with_attr(
                     Type::new(TypeValue::Primeval(Primeval::new(
                             PrimevalType::Str))
                             , TypeAttrubute::Move)
+                    , TypeAttrubute::Move
                     , FunctionReturnDataAttr::Create
                     )
                 ),
@@ -83,12 +97,21 @@ lazy_static!{
     static ref MOVE_UINT16_TO_STR_FUNCTION: Function = Function{
         func_statement: FunctionStatement::new(
             String::from(consts::TO_STR_FUNCTION_NAME),
-            None,
+            Some(FunctionParam::new(
+                FunctionParamData::Single(
+                    FunctionParamDataItem::new(
+                        Type::new_without_attr(
+                            TypeValue::Primeval(Primeval::new(
+                                PrimevalType::Uint16)))
+                        , TypeAttrubute::Move
+                    ))
+                )),
             FunctionReturn::new(
                 FunctionReturnData::new_with_attr(
                     Type::new(TypeValue::Primeval(Primeval::new(
                             PrimevalType::Str))
                             , TypeAttrubute::Move)
+                    , TypeAttrubute::Move
                     , FunctionReturnDataAttr::Create
                     )
                 ),

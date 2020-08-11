@@ -19,17 +19,17 @@ lazy_static!{
             Some(FunctionParam::new(
                 FunctionParamData::Single(
                     FunctionParamDataItem::new_lengthen_auto_call_totype(
-                        Type::new(TypeValue::Primeval(Primeval::new(
-                                PrimevalType::Str))
-                                , TypeAttrubute::Ref)
+                        Type::new_without_attr(TypeValue::Primeval(Primeval::new(
+                                PrimevalType::Str)))
+                        , TypeAttrubute::Ref
                         , true
                         )
                     ),
-                    TypeAttrubute::Ref
                 )),
             FunctionReturn::new(
                 FunctionReturnData::new(
-                    Type::new_without_attr(TypeValue::Empty)),
+                    Type::new_without_attr(TypeValue::Empty)
+                    , TypeAttrubute::Empty),
                 ),
             None
         ),

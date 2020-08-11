@@ -79,7 +79,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
          * 构建 函数参数
          * + 号运算一定只有一个参数
          * */
-        let param = FunctionParamData::Single(FunctionParamDataItem::new(right.typ));
+        let param = FunctionParamData::Single(FunctionParamDataItem::new(
+            right.typ, right.typ_attr));
         let statement_str = FunctionSplice::get_function_without_return_string_by_type(
             consts::OPERATOR_FUNCTION_NAME, &Some(&param), &Some(&left.typ));
         /*

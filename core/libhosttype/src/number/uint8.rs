@@ -29,27 +29,31 @@ lazy_static!{
         func_statement: FunctionStatement::new(
             String::from(consts::OPERATOR_FUNCTION_NAME),
             Some(FunctionParam::new(
-                FunctionParamData::Single(
-                    FunctionParamDataItem::new(
-                        Type::new(TypeValue::Primeval(Primeval::new(
-                                PrimevalType::Uint8))
-                                , TypeAttrubute::Ref)
+                FunctionParamData::Multi(
+                    vec![FunctionParamDataItem::new(
+                        Type::new_without_attr(
+                            TypeValue::Primeval(Primeval::new(
+                                PrimevalType::Uint8)))
                         , TypeAttrubute::Ref
-                        )
-                    )
+                    ), FunctionParamDataItem::new(
+                        Type::new_without_attr(
+                            TypeValue::Primeval(Primeval::new(
+                                PrimevalType::Uint8)))
+                        , TypeAttrubute::Ref
+                    )])
                 )),
             FunctionReturn::new(
                 FunctionReturnData::new_with_attr(
-                    Type::new(TypeValue::Primeval(Primeval::new(
-                            PrimevalType::Uint16))
-                            , TypeAttrubute::Move)
-                    , FunctionReturnDataAttr::Create
+                    Type::new_without_attr(
+                        TypeValue::Primeval(Primeval::new(
+                            PrimevalType::Uint16)))
                     , TypeAttrubute::Move
+                    , FunctionReturnDataAttr::Create
                     ),
                 ),
-            Some(Type::new(TypeValue::Primeval(Primeval::new(
-                        PrimevalType::Uint8))
-                        , TypeAttrubute::Ref))
+            Some(Type::new_without_attr(
+                TypeValue::Primeval(Primeval::new(
+                        PrimevalType::Uint8))))
         ),
         func_define: FunctionDefine::Optcode(OptcodeFunctionDefine{
             optcode: OptCode::RefUint8PlusOperatorRefUint8
@@ -62,25 +66,29 @@ lazy_static!{
         func_statement: FunctionStatement::new(
             String::from(consts::OPERATOR_FUNCTION_NAME),
             Some(FunctionParam::new(
-                FunctionParamData::Single(
-                    FunctionParamDataItem::new(
-                        Type::new(TypeValue::Primeval(Primeval::new(
-                                PrimevalType::Uint16))
-                                , TypeAttrubute::Ref)
-                        )
-                    )
+                FunctionParamData::Multi(
+                    vec![FunctionParamDataItem::new(
+                        Type::new_without_attr(
+                            TypeValue::Primeval(Primeval::new(
+                                PrimevalType::Uint8)))
+                        , TypeAttrubute::Ref
+                    ), FunctionParamDataItem::new(
+                        Type::new_without_attr(TypeValue::Primeval(Primeval::new(
+                                PrimevalType::Uint16)))
+                        , TypeAttrubute::Ref
+                    )])
                 )),
             FunctionReturn::new(
                 FunctionReturnData::new_with_attr(
-                    Type::new(TypeValue::Primeval(Primeval::new(
-                            PrimevalType::Uint16))
-                            , TypeAttrubute::Move)
+                    Type::new_without_attr(
+                        TypeValue::Primeval(Primeval::new(
+                            PrimevalType::Uint16)))
+                    , TypeAttrubute::Move
                     , FunctionReturnDataAttr::Create
                     )
                 ),
-            Some(Type::new(TypeValue::Primeval(Primeval::new(
-                        PrimevalType::Uint8))
-                        , TypeAttrubute::Ref))
+            Some(Type::new_without_attr(TypeValue::Primeval(Primeval::new(
+                        PrimevalType::Uint8))))
         ),
         func_define: FunctionDefine::Optcode(OptcodeFunctionDefine{
             optcode: OptCode::RefUint8PlusOperatorRefUint16
@@ -92,18 +100,26 @@ lazy_static!{
     static ref REF_UINT8_TO_STR_FUNCTION: Function = Function{
         func_statement: FunctionStatement::new(
             String::from(consts::TO_STR_FUNCTION_NAME),
-            None,
+            Some(FunctionParam::new(
+                FunctionParamData::Single(
+                    FunctionParamDataItem::new(
+                        Type::new_without_attr(
+                            TypeValue::Primeval(Primeval::new(
+                                PrimevalType::Uint8)))
+                        , TypeAttrubute::Ref
+                    ))
+                )),
             FunctionReturn::new(
                 FunctionReturnData::new_with_attr(
-                    Type::new(TypeValue::Primeval(Primeval::new(
-                            PrimevalType::Str))
-                            , TypeAttrubute::Move)
+                    Type::new_without_attr(
+                        TypeValue::Primeval(Primeval::new(
+                            PrimevalType::Str)))
+                    , TypeAttrubute::Move
                     , FunctionReturnDataAttr::Create
                     )
                 ),
-            Some(Type::new(TypeValue::Primeval(Primeval::new(
-                        PrimevalType::Uint8))
-                        , TypeAttrubute::Ref))
+            Some(Type::new_without_attr(TypeValue::Primeval(Primeval::new(
+                        PrimevalType::Uint8))))
         ),
         func_define: FunctionDefine::Optcode(OptcodeFunctionDefine{
             optcode: OptCode::RefUint8ToStr
