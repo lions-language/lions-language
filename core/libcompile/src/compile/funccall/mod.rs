@@ -77,7 +77,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                         RefPtr::from_ref(r.func)
                     },
                     _ => {
-                        panic!("should not happend");
+                        panic!("should not happend: find function error");
                     }
                 };
                 let func = func_ptr.as_ref::<Function>();
@@ -98,7 +98,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                         Address::new(AddressValue::new_invalid())
                     },
                     _ => {
-                        match return_data.typ.attr_ref() {
+                        match return_data.typ_attr_ref() {
                             TypeAttrubute::Move => {
                                 match &return_data.attr {
                                     FunctionReturnDataAttr::Create => {
@@ -107,7 +107,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                          * */
                                     },
                                     _ => {
-                                        panic!("should not happend")
+                                        panic!("should not happend: FunctionReturnDataAttr not Create")
                                     }
                                 }
                                 /*
@@ -125,7 +125,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                 /*
                                  * to_#type 方法一定返回的是一个 Move, 所以这里不会到达
                                  * */
-                                panic!("should not happend")
+                                panic!("should not happend: TypeAttrubute not Move")
                             }
                         }
                     }
