@@ -1,5 +1,5 @@
 use libtype::{Type, PackageType
-    , PackageTypeValue};
+    , PackageTypeValue, TypeAttrubute};
 use libtype::package::{PackageStr};
 use libmacro::{FieldGet};
 use libcommon::ptr::RefPtr;
@@ -16,6 +16,7 @@ pub enum ValueBufferItemContext {
 pub struct ValueBufferItem {
     pub typ: Type,
     pub addr: Address,
+    pub typ_attr: TypeAttrubute,
     pub package_type: Option<PackageType>,
     pub package_str: PackageStr,
     pub context: ValueBufferItemContext
@@ -64,6 +65,19 @@ impl ValueBuffer {
         self.buffer.push_back(ValueBufferItem {
             typ: typ,
             addr: addr,
+            typ_attr: TypeAttrubute::Move,
+            package_type: None,
+            package_str: PackageStr::Empty,
+            context: ValueBufferItemContext::Null
+        });
+    }
+
+    pub fn push_with_addr_typattr(&mut self, typ: Type, addr: Address
+        , typ_attr: TypeAttrubute) {
+        self.buffer.push_back(ValueBufferItem {
+            typ: typ,
+            addr: addr,
+            typ_attr: typ_attr,
             package_type: None,
             package_str: PackageStr::Empty,
             context: ValueBufferItemContext::Null
@@ -75,6 +89,19 @@ impl ValueBuffer {
         self.buffer.push_back(ValueBufferItem {
             typ: typ,
             addr: addr,
+            typ_attr: TypeAttrubute::Move,
+            package_type: None,
+            package_str: PackageStr::Empty,
+            context: context
+        });
+    }
+
+    pub fn push_with_addr_context_typattr(&mut self, typ: Type, addr: Address
+        , context: ValueBufferItemContext, typ_attr: TypeAttrubute) {
+        self.buffer.push_back(ValueBufferItem {
+            typ: typ,
+            addr: addr,
+            typ_attr: typ_attr,
             package_type: None,
             package_str: PackageStr::Empty,
             context: context

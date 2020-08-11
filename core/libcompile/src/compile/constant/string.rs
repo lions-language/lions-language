@@ -25,8 +25,9 @@ impl<'a, F: Compile> Compiler<'a, F> {
         /*
          * 将地址写入到编译期的计算栈中, 为之后的运算做准备
          * */
-        self.scope_context.push_with_addr_to_value_buffer(typ.clone()
-            , Address::new(AddressValue::new(AddressType::Static, static_addr.clone())));
+        self.scope_context.push_with_addr_typattr_to_value_buffer(typ.clone()
+            , Address::new(AddressValue::new(AddressType::Static, static_addr.clone()))
+            , typ_attr);
         /*
          * 生成读取静态量的指令, 虚拟机接收到这个指令后, 在当前作用域中建立一个绑定关系
          * */

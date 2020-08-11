@@ -1,5 +1,5 @@
 use libtype::{AddressType, AddressValue, AddressKey
-    , Type};
+    , Type, TypeAttrubute};
 use crate::compile::address_dispatch::AddressDispatch;
 use crate::compile::ref_count::RefCounter;
 use crate::compile::value_buffer::{ValueBuffer
@@ -43,12 +43,24 @@ impl Scope {
     }
 
     fn push_with_addr_to_value_buffer(&mut self, typ: Type, addr: Address) {
-        self.value_buffer.push_with_addr(typ, addr)
+        self.value_buffer.push_with_addr(typ, addr);
+    }
+
+    fn push_with_addr_typattr_to_value_buffer(&mut self, typ: Type, addr: Address
+        , typ_attr: TypeAttrubute) {
+        self.value_buffer.push_with_addr_typattr(typ, addr, typ_attr);
     }
 
     fn push_with_addr_context_to_value_buffer(&mut self, typ: Type, addr: Address
         , context: ValueBufferItemContext) {
-        self.value_buffer.push_with_addr_context(typ, addr, context)
+        self.value_buffer.push_with_addr_context(typ, addr, context);
+    }
+
+    fn push_with_addr_context_typattr_to_value_buffer(&mut self, typ: Type
+        , addr: Address, context: ValueBufferItemContext
+        , typ_attr: TypeAttrubute) {
+        self.value_buffer.push_with_addr_context_typattr(typ
+            , addr, context, typ_attr);
     }
 
     fn push_to_value_buffer(&mut self, typ: Type) {

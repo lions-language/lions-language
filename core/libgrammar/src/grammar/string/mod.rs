@@ -13,7 +13,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         let token_value = self.take_next_one().token_value();
         self.cb().const_string(ConstStringContext{
             value: token_value,
-            typ_attr: TypeAttrubute::Move
+            typ_attr: desc_ctx.typ_attr()
         });
     }
 }

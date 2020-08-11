@@ -24,6 +24,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
             , Id);
         let mut src_addr = AddressValue::new_invalid();
         let mut typ = Type::new_null();
+        let mut typ_attr = TypeAttrubute::default();
         if is_exist_equal {
             /*
              * 存在 `=` (赋予初始值)
@@ -34,7 +35,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
             let value = self.scope_context.take_top_from_value_buffer();
             // println!("{:?}", &value);
             typ = value.typ_ref().clone();
-            if let TypeAttrubute::Move = typ.attr_ref() {
+            typ_attr = value.typ_attr_ref().clone();
+            if let TypeAttrubute::Move = typ_attr {
                 match value.context_ref() {
                     ValueBufferItemContext::Variant(v) => {
                         let var_name = v.as_ref::<String>();
@@ -53,7 +55,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
          * */
         self.scope_context.add_variant(name
             , Variant::new_with_all(
-                Address::new(src_addr), typ));
+                Address::new(src_addr), typ, typ_attr));
         /*
         let addr = self.scope_context.alloc_address(AddressType::Stack, 0);
         self.cb.variant_define(VariantDefineContext::new_with_all(

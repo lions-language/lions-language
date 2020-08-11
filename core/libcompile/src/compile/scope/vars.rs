@@ -1,12 +1,13 @@
-use libmacro::{FieldGet, NewWithAll};
-use libtype::{Type};
+use libmacro::{FieldGet, FieldGetMove, NewWithAll};
+use libtype::{Type, TypeAttrubute};
 use crate::address::Address;
 use std::collections::HashMap;
 
-#[derive(FieldGet, NewWithAll)]
+#[derive(FieldGet, FieldGetMove, NewWithAll)]
 pub struct Variant {
     addr: Address,
-    typ: Type
+    typ: Type,
+    typ_attr: TypeAttrubute
 }
 
 pub struct Variants {

@@ -1,5 +1,5 @@
 use libtype::{AddressType, AddressValue
-    , AddressKey, Type};
+    , AddressKey, Type, TypeAttrubute};
 use libcommon::ptr::{RefPtr};
 use super::Scope;
 use super::{vars::Variant};
@@ -70,11 +70,25 @@ impl ScopeContext {
         self.current_mut_unckecked().push_with_addr_to_value_buffer(typ, addr)
     }
 
+    pub fn push_with_addr_typattr_to_value_buffer(&mut self, typ: Type, addr: Address
+        , typ_attr: TypeAttrubute) {
+        self.current_mut_unckecked().push_with_addr_typattr_to_value_buffer(
+            typ, addr, typ_attr)
+    }
+
     pub fn push_with_addr_context_to_value_buffer(&mut self
         , typ: Type, addr: Address
         , context: ValueBufferItemContext) {
         self.current_mut_unckecked().push_with_addr_context_to_value_buffer(
             typ, addr, context)
+    }
+
+    pub fn push_with_addr_context_typattr_to_value_buffer(&mut self
+        , typ: Type, addr: Address
+        , context: ValueBufferItemContext
+        , typ_attr: TypeAttrubute) {
+        self.current_mut_unckecked().push_with_addr_context_typattr_to_value_buffer(
+            typ, addr, context, typ_attr)
     }
 
     pub fn push_to_value_buffer(&mut self, typ: Type) {
@@ -118,7 +132,8 @@ impl ScopeContext {
         let mut var_addr = var.addr_ref().clone();
         *var_addr.addr_mut().addr_mut().scope_mut() += scope;
         // println!("--- {}, {}", var_addr.addr_mut().addr_mut().scope_ref(), scope);
-        Some((name, Variant::new_with_all(var_addr, var.typ_ref().clone())))
+        Some((name, Variant::new_with_all(var_addr, var.typ_ref().clone()
+                    , var.typ_attr_ref().clone())))
     }
 
     fn find_variant_inner(&self, name: &str, scope: &mut usize

@@ -36,9 +36,12 @@ impl<'a, F: Compile> Compiler<'a, F> {
         let buf_ctx = ValueBufferItemContext::Variant(
             RefPtr::from_ref(name));
         // println!("{:?}, name: {}", &buf_ctx, name);
-        self.scope_context.push_with_addr_context_to_value_buffer(
-            var.typ_ref().clone()
-            , var.addr(), buf_ctx);
+        let (var_addr, var_typ, var_typ_attr) = var.fields_move();
+        // println!("{:?}", &var_typ_attr);
+        self.scope_context.push_with_addr_context_typattr_to_value_buffer(
+            var_typ
+            , var_addr, buf_ctx
+            , var_typ_attr);
         DescResult::Success
     }
 }
