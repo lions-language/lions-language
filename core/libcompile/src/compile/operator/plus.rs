@@ -79,8 +79,9 @@ impl<'a, F: Compile> Compiler<'a, F> {
          * 构建 函数参数
          * + 号运算一定只有一个参数
          * */
-        let param = FunctionParamData::Single(FunctionParamDataItem::new(
-            right.typ, right.typ_attr));
+        let param = FunctionParamData::Multi(vec![
+            FunctionParamDataItem::new(left.typ_clone(), left.typ_attr_clone())
+            , FunctionParamDataItem::new(right.typ_clone(), right.typ_attr_clone())]);
         let statement_str = FunctionSplice::get_function_without_return_string_by_type(
             consts::OPERATOR_FUNCTION_NAME, &Some(&param), &Some(&left.typ));
         /*
@@ -99,7 +100,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 return DescResult::Error(desc);
             },
             FindFunctionResult::NotFound => {
-                unimplemented!();
+                return DescResult::Error(format!("func: {:?} not found", statement_str));
             }
         };
         let func = func_ptr.as_ref::<Function>();
@@ -109,28 +110,33 @@ impl<'a, F: Compile> Compiler<'a, F> {
          * 1. 判断参数的属性(Move, Ref, Pointer)
          *  决定是存储地址还是存储数据
          * */
+        /*
         let right_addr = match &func.func_statement.func_param {
             Some(p) => {
                 match &p.data {
-                    FunctionParamData::Single(param) => {
-                        self.alloc_addr_for_single_type(&param.typ, &right.addr, &mut context)
+                    FunctionParamData::Multi(ps) => {
+                        for param in ps {
+                            self.alloc_addr_for_single_type(&param.typ, &right.addr, &mut context);
+                        }
                     },
-                    FunctionParamData::Multi(_) => {
+                    FunctionParamData::Single(param) => {
                         /*
-                         * + 号运算符只能有一个参数, Grammar 在重载时需要进行限制
+                         * + 号运算必须有两个参数, Grammar 在重载时需要进行限制
                          * */
-                        panic!("+ should not have multiple parameters");
-                    }
+                        panic!("+ should have multiple parameters");
+                    },
                 }
             },
             None => {
                 panic!("+ at least one parameter is required");
             }
         };
+        */
         /*
          * 计算第一个参数的地址 (第一个参数就是 操作数的类型)
          * */
         let left_addr = self.alloc_addr_for_single_type(&left.typ, &left.addr, &mut context);
+        let right_addr = self.alloc_addr_for_single_type(&right.typ, &right.addr, &mut context);
         /*
          * 从后向前加载, 因为虚拟机加载参数是从前向后的, 那么对于栈, 写入时应该是相反的顺序
          * */
@@ -153,7 +159,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 Address::new(AddressValue::new_invalid())
             },
             _ => {
-                match return_data.typ.attr_ref() {
+                match return_data.typ_attr_ref() {
                     TypeAttrubute::Ref => {
                         /*
                          * Ref 的情况下, 此时, 虚拟机需要根据给定的地址, 找到数据,
@@ -199,7 +205,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                         a
                     },
                     _ => {
-                        unimplemented!();
+                        unimplemented!("return type attr: {:?}", return_data.typ_attr_ref());
                     }
                 }
             }
@@ -232,9 +238,9 @@ impl<'a, F: Compile> Compiler<'a, F> {
          * 获取返回类型, 将其写入到队列中
          * */
         if !return_addr.is_invalid() {
-            self.scope_context.push_with_addr_to_value_buffer(
+            self.scope_context.push_with_addr_typattr_to_value_buffer(
                 return_data.typ.clone()
-                , return_addr);
+                , return_addr, return_data.typ_attr_ref().clone());
         }
         DescResult::Success
     }
