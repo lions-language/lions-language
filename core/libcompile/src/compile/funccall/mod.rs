@@ -5,7 +5,8 @@ use libtype::function::{FindFunctionContext, FindFunctionResult
     , FunctionDefine, FunctionParamData
     , OptcodeFunctionDefine, FunctionParamLengthenAttr
     , CallFunctionParamAddr, Function, splice::FunctionSplice
-    , FunctionReturnDataAttr, FunctionParamDataItem};
+    , FunctionReturnDataAttr, FunctionParamDataItem
+    , CallFunctionReturnData};
 use libtype::AddressValue;
 use libtype::package::{PackageStr};
 use libgrammar::token::{TokenValue, TokenData};
@@ -89,6 +90,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 let func_statement = func.func_statement_ref();
                 let return_data = &func_statement.func_return.data;
                 let mut scope: Option<usize> = None;
+                let mut return_is_alloc = false;
                 let return_addr = match return_data.typ_ref().typ_ref() {
                     TypeValue::Empty => {
                         /*
@@ -116,6 +118,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                  *  因为返回值需要绑定到前一个作用域中
                                  * */
                                 scope = Some(1);
+                                return_is_alloc = true;
                                 let a = self.scope_context.alloc_address(
                                     return_data.typ.to_address_type(), 1);
                                 self.scope_context.ref_counter_create(a.addr_ref().addr_clone());
@@ -134,7 +137,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
                     package_str: input_value.package_str(),
                     func: &func,
                     param_addrs: Some(param_addrs),
-                    return_addr: return_addr.addr_clone()
+                    return_data: CallFunctionReturnData::new_with_all(
+                        return_addr.addr_clone(), return_is_alloc)
                 };
                 self.call_function_and_ctrl_scope(call_context);
                 /*
@@ -172,6 +176,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
         };
         let (exists, handle) = self.function_control.is_exists(&find_func_context);
         if exists {
+            let mut return_is_alloc = false;
             let h = Some(handle);
             let func_res = self.function_control.find_function(&find_func_context, &h);
             let func_ptr = match func_res {
@@ -279,7 +284,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 package_str: call_scope_context.package_str(),
                 func: &func,
                 param_addrs: param_addrs,
-                return_addr: return_addr.addr_clone()
+                return_data: CallFunctionReturnData::new_with_all(
+                    return_addr.addr_clone(), return_is_alloc)
             };
             self.call_function_and_ctrl_scope(call_context);
             /*

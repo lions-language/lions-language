@@ -2,7 +2,8 @@ use libcommon::optcode;
 use libcommon::address::{FunctionAddress};
 use libmacro::{FieldGet, FieldGetClone
     , NewWithAll, FieldGetMove};
-use crate::function::{CallFunctionParamAddr};
+use crate::function::{CallFunctionParamAddr
+    , CallFunctionReturnData};
 use crate::{AddressValue, AddressKey, Data};
 use crate::package::PackageStr;
 use crate::primeval::string::Str;
@@ -11,14 +12,14 @@ use crate::primeval::string::Str;
 pub struct CallPrimevalFunction {
     pub opt: optcode::OptCode,
     pub param_addrs: Option<Vec<CallFunctionParamAddr>>,
-    pub return_addr: AddressValue
+    pub return_data: CallFunctionReturnData
 }
 
 #[derive(Debug, FieldGet, Clone)]
 pub struct CallFunction {
     pub package_str: PackageStr,
     pub define_addr: FunctionAddress,
-    pub return_addr: AddressValue
+    pub return_data: CallFunctionReturnData
 }
 
 #[derive(Debug, FieldGet, Clone, NewWithAll

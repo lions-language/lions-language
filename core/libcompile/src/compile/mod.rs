@@ -3,7 +3,8 @@ use libgrammar::grammar::{Grammar, CallFuncScopeContext
     , ConstNumberContext, ConstStringContext};
 use libgrammar::token::{TokenValue};
 use libtype::{Type, Data};
-use libtype::function::{Function, CallFunctionParamAddr};
+use libtype::function::{Function, CallFunctionParamAddr
+    , CallFunctionReturnData};
 use libtypecontrol::function::FunctionControl;
 use libtype::module::Module;
 use libresult::*;
@@ -41,7 +42,7 @@ pub struct CallFunctionContext<'a> {
     pub package_str: PackageStr,
     pub func: &'a Function,
     pub param_addrs: Option<Vec<CallFunctionParamAddr>>,
-    pub return_addr: AddressValue
+    pub return_data: CallFunctionReturnData
 }
 
 #[derive(Debug, FieldGet)]

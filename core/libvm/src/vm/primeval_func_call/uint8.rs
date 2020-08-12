@@ -53,14 +53,14 @@ impl VirtualMachine {
         /*
          * 检测返回值是否有效
          * */
-        if value.return_addr.is_invalid() {
+        if !*value.return_data.is_alloc_ref() {
             return;
         }
         /*
-         * 返回值有效 => 将返回值写入到内存
+         * 返回值需要分配内存 => 将返回值写入到内存
          * */
         self.thread_context.current_mut_unchecked().alloc_and_write_data(
-            &value.return_addr
+            &value.return_data.addr_value()
             , Data::new(DataValue::Primeval(
                     PrimevalData::Uint16(
                         Some(Uint16::new(result))))));
@@ -89,7 +89,7 @@ impl VirtualMachine {
         /*
          * 检测返回值是否有效
          * */
-        if value.return_addr.is_invalid() {
+        if !*value.return_data.is_alloc_ref() {
             return;
         }
         /*
@@ -97,7 +97,7 @@ impl VirtualMachine {
          * 注意: 返回值一定要写入到前一个作用域中
          * */
         self.thread_context.current_mut_unchecked().alloc_and_write_data(
-            &value.return_addr
+            &value.return_data.addr_value()
             , Data::new(DataValue::Primeval(
                     PrimevalData::Str(
                         Some(Str::new(StrValue::Utf8(result)))))));

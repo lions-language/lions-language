@@ -1,6 +1,6 @@
 use libtype::{PackageType, PackageTypeValue};
 use libtype::function::{FindFunctionContext, FindFunctionResult
-    , Function};
+    , Function, CallFunctionReturnData};
 use libtype::AddressValue;
 use libtype::package::{PackageStr};
 use libcommon::ptr::{RefPtr};
@@ -47,7 +47,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                             package_str: PackageStr::Itself,
                             func: &func,
                             param_addrs: None,
-                            return_addr: AddressValue::new_invalid()
+                            return_data: CallFunctionReturnData::default()
                         };
                         self.cb.call_function(call_context);
                     },

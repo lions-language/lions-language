@@ -2,7 +2,7 @@ use super::{Type, PackageType, TypeAttrubute};
 use libcommon::address::FunctionAddress;
 use libcommon::optcode::OptCode;
 use libcommon::ptr::RefPtr;
-use libmacro::{FieldGet, NewWithAll};
+use libmacro::{FieldGet, FieldGetMove, NewWithAll};
 use libresult::DescResult;
 use crate::{AddressKey, AddressValue};
 use std::hash::Hash;
@@ -71,6 +71,17 @@ impl FunctionReturn {
         }
     }
 }
+
+#[derive(Debug, Clone, FieldGet, FieldGetMove
+    , NewWithAll, Default)]
+pub struct CallFunctionReturnData {
+    addr_value: AddressValue,
+    /*
+     * 是否需要对返回值分配内存
+     * */
+    is_alloc: bool
+}
+
 
 /*
  * 函数参数

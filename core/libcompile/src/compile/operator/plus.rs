@@ -4,7 +4,8 @@ use libtype::{Type, TypeAttrubute};
 use libtype::function::{FunctionParamData, FunctionParamDataItem
         , splice::FunctionSplice, FindFunctionContext
         , FindFunctionResult, FunctionReturnDataAttr
-        , Function, CallFunctionParamAddr};
+        , Function, CallFunctionParamAddr
+        , CallFunctionReturnData};
 use libtype::{AddressType, AddressValue, TypeValue};
 use libtype::package::{PackageStr};
 use libcommon::ptr::{RefPtr};
@@ -149,6 +150,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
          * Ref: 分配一个新的引用地址, 引用中的地址, 由 return 字段决定
          * */
         let mut scope: Option<usize> = None;
+        let mut return_is_alloc = false;
         let return_data = &func.func_statement.func_return.data;
         let mut return_addr = match return_data.typ_ref().typ_ref() {
             TypeValue::Empty => {
@@ -190,6 +192,9 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                  * */
                                 context.remove(ref_addr);
                             },
+                            FunctionReturnDataAttr::Create => {
+                                return_is_alloc = true;
+                            },
                             _ => {}
                         }
                         /*
@@ -215,7 +220,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
             func: &func,
             param_addrs: Some(vec![CallFunctionParamAddr::Fixed(left_addr_value)
                 , CallFunctionParamAddr::Fixed(right_addr_value)]),
-            return_addr: return_addr.addr_clone()
+            return_data: CallFunctionReturnData::new_with_all(
+                return_addr.addr_clone(), return_is_alloc)
         });
         /*
          * 函数调用结束后, 如果之前为 scope 加过1, 需要将返回值地址中的 scope 减掉

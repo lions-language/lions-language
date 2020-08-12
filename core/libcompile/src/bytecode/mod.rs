@@ -57,7 +57,7 @@ impl<'a, 'b, F: Writer> Compile for Bytecode<'a, 'b, F> {
                     CallPrimevalFunction{
                         opt: def.optcode.clone(),
                         param_addrs: context.param_addrs,
-                        return_addr: context.return_addr
+                        return_data: context.return_data
                     }
                     );
                 self.write(instruction);
@@ -67,7 +67,7 @@ impl<'a, 'b, F: Writer> Compile for Bytecode<'a, 'b, F> {
                     CallFunction{
                         package_str: context.package_str,
                         define_addr: addr.addr_ref().clone(),
-                        return_addr: context.return_addr
+                        return_data: context.return_data
                     }
                 );
                 self.write(instruction);
