@@ -14,34 +14,13 @@ use crate::compile::{Compile, Compiler, CallFunctionContext
 use crate::address::{Address};
 use std::collections::HashSet;
 
-struct Context {
-    recycle_addrs: HashSet<AddressValue>
-}
-
-impl Context {
-    fn push(&mut self, addr: AddressValue) {
-        self.recycle_addrs.insert(addr);
-    }
-
-    fn remove(&mut self, addr: &AddressValue) {
-        self.recycle_addrs.remove(addr);
-    }
-
-    fn new() -> Self {
-        Self {
-            recycle_addrs: HashSet::new()
-        }
-    }
-}
-
 impl<'a, F: Compile> Compiler<'a, F> {
     /*
      * 参数:
      *  typ: 参数的类型
      *  addr: value buffer 中存储的地址信息
      * */
-    fn alloc_addr_for_single_type(&mut self, typ: &Type, addr: &Address
-        , context: &mut Context)
+    fn alloc_addr_for_single_type(&mut self, typ: &Type, addr: &Address)
         -> Address {
         match typ.attr_ref() {
             TypeAttrubute::Move => {
@@ -52,7 +31,6 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 /*
                  * 为了回收地址, 需要添加到回收中
                  * */
-                context.push(addr.addr_clone());
             },
             _ => {}
         }
@@ -72,6 +50,10 @@ impl<'a, F: Compile> Compiler<'a, F> {
         let right = self.scope_context.take_top_from_value_buffer();
         let left = self.scope_context.take_top_from_value_buffer();
         /*
+        println!("left type attr: {:?}, right type attr: {:?}"
+            , left.typ_attr_ref(), right.typ_attr_ref());
+        */
+        /*
          * 1. 将地址中的 scope 值加1, 因为进行函数调用的时候, 会进入一个新的作用域
          * */
         let left_addr_value = left.addr_ref().addr_ref().clone_with_scope_plus(1);
@@ -84,7 +66,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
             FunctionParamDataItem::new(left.typ_clone(), left.typ_attr_clone())
             , FunctionParamDataItem::new(right.typ_clone(), right.typ_attr_clone())]);
         let statement_str = FunctionSplice::get_function_without_return_string_by_type(
-            consts::OPERATOR_FUNCTION_NAME, &Some(&param), &Some(&left.typ));
+            consts::OPERATOR_PLUS_FUNCTION_NAME, &Some(&param), &Some(&left.typ));
         /*
          * 查找方法声明
          * */
@@ -105,7 +87,6 @@ impl<'a, F: Compile> Compiler<'a, F> {
             }
         };
         let func = func_ptr.as_ref::<Function>();
-        let mut context = Context::new();
         /*
          * 为虚拟机准备函数调用的参数 (从后向前入栈, 因为读取的时候是从栈顶向下读取)
          * 1. 判断参数的属性(Move, Ref, Pointer)
@@ -136,8 +117,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
         /*
          * 计算第一个参数的地址 (第一个参数就是 操作数的类型)
          * */
-        let left_addr = self.alloc_addr_for_single_type(&left.typ, &left.addr, &mut context);
-        let right_addr = self.alloc_addr_for_single_type(&right.typ, &right.addr, &mut context);
+        let left_addr = self.alloc_addr_for_single_type(&left.typ, &left.addr);
+        let right_addr = self.alloc_addr_for_single_type(&right.typ, &right.addr);
         /*
          * 从后向前加载, 因为虚拟机加载参数是从前向后的, 那么对于栈, 写入时应该是相反的顺序
          * */
@@ -190,7 +171,6 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                 /*
                                  * 将移入的值移出来了, 所以 不用回收地址 (这个地址还是存在的)
                                  * */
-                                context.remove(ref_addr);
                             },
                             FunctionReturnDataAttr::Create => {
                                 return_is_alloc = true;
@@ -236,10 +216,12 @@ impl<'a, F: Compile> Compiler<'a, F> {
         /*
          * 回收地址
          * */
+        /*
         for addr in context.recycle_addrs.iter() {
             self.scope_context.recycle_address(addr.clone());
             // println!("free: {:?}", addr);
         }
+        */
         /*
          * 获取返回类型, 将其写入到队列中
          * */

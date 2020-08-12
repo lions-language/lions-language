@@ -9,6 +9,7 @@ use crate::address::Address;
 impl<'a, F: Compile> Compiler<'a, F> {
     pub fn handle_const_string(&mut self, context: ConstStringContext) {
         let (value, typ_attr) = context.fields_move();
+        // println!("{:?}", &typ_attr);
         /*
          * TokenType 转换为 Type
          * */

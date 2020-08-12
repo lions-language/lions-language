@@ -80,6 +80,10 @@ impl VecU8 {
         self.v.append(&mut content.v);
     }
 
+    fn length(&self) -> usize {
+        self.v.len()
+    }
+
     pub fn from_vec_u8(v: Vec<u8>) -> Self {
         Self{
             v: v,
@@ -355,7 +359,11 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
         if self.content.index > 0 {
             self.content.append(content);
         } else {
-            *(&mut self.content) = content;
+            if self.content.length() > 0 {
+                self.content.append(content);
+            } else {
+                *(&mut self.content) = content;
+            }
         }
     }
 

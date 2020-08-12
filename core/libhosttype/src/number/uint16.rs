@@ -27,7 +27,7 @@ lazy_static!{
      * */
     static ref MOVE_UINT16_PLUS_OPERATOR_REF_UINT8_FUNCTION: Function = Function{
         func_statement: FunctionStatement::new(
-            String::from(consts::OPERATOR_FUNCTION_NAME),
+            String::from(consts::OPERATOR_PLUS_FUNCTION_NAME),
             Some(FunctionParam::new(
                 FunctionParamData::Multi(
                     vec![FunctionParamDataItem::new(
@@ -124,7 +124,7 @@ lazy_static!{
         })
     };
 
-    static ref UINT16_FUNCTION_VEC: Vec<&'static Function> = {
+    static ref FUNCTION_VEC: Vec<&'static Function> = {
         let mut v = Vec::with_capacity(UINT16_METHOD.len());
         v.push(&*MOVE_UINT16_PLUS_OPERATOR_REF_UINT8_FUNCTION);
         v.push(&*REF_UINT16_TO_STR_FUNCTION);
@@ -142,10 +142,10 @@ pub fn get_method(func_str: &str) -> Option<&'static Function> {
             return None;
         }
     };  
-    if *index > UINT16_FUNCTION_VEC.len() as u32 {
+    if *index > FUNCTION_VEC.len() as u32 {
         return None;
     }   
-    match UINT16_FUNCTION_VEC.get(*index as usize) {
+    match FUNCTION_VEC.get(*index as usize) {
         Some(v) => {
             Some(v)
         },

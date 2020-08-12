@@ -21,7 +21,7 @@ impl StringToken {
         token: &Token<T, CB>, grammar: &mut GrammarParser<T, CB>
         , express_context: &ExpressContext<T, CB>) -> TokenMethodResult {
         grammar.string_process(DescContext::new(
-                TypeAttrubute::Move));
+                TypeAttrubute::Ref));
         TokenMethodResult::End
     }
 }

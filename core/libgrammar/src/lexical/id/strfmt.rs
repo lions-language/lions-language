@@ -3,6 +3,24 @@ use libcommon::strtool::strcompare::{U8ArrayIsEqual};
 use crate::grammar::Grammar;
 
 impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
+    fn id_kw_strfmt_process_next_is_strend(&mut self) -> bool {
+        /*
+         * 检测下一个字符是否是字符串结束符
+         * */
+        let mut is_strend = false;
+        self.lookup_next_one_with_cb_wrap(|_, c| {
+            if c == '"' {
+                is_strend = true;
+            }
+        }, |parser| {
+            /*
+             * next 要么是 `"`, 要么不是 `"`, 但是一定应该存在字符
+             * */
+            parser.panic("expect `\"` or other char, but arrive EOF");
+        });
+        return is_strend;
+    }
+
     fn id_kw_strfmt_process_content(&mut self, start: &[u8], end: &[u8]) {
         // 跳过 "
         self.content.skip_next_one();
@@ -14,8 +32,8 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
             Finding,
             NotFound
         }
-        let mut content = Vec::new();
-        // let mut buffer = Vec::new();
+        // let mut content = Vec::new();
+        let mut content = String::new();
         let mut status = Status::DoubleQuotes;
         let mut start_u8_array_is_equal = U8ArrayIsEqual::new(start);
         let mut end_u8_array_is_equal = U8ArrayIsEqual::new(end);
@@ -28,34 +46,54 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
                             match c {
                                 '"' => {
                                     self.content.skip_next_one();
-                                    self.push_string_token_to_token_buffer(content.clone());
+                                    // self.push_string_token_to_token_buffer(content.clone());
+                                    // if !self.id_kw_strfmt_process_next_is_strend() {
+                                    if content.len() > 0 {
+                                        self.push_utf8_token_to_token_buffer(content.clone());
+                                    }
                                     break;
                                 },
                                 _ => {
-                                    if self.input_str_match_with_u8arrayisequal(&mut start_u8_array_is_equal) {
+                                    if self.input_str_match_with_u8arrayisequal(
+                                        /*
+                                         * 找到 开始符号 => 进入查找 结束符号 模式
+                                         * */
+                                        &mut start_u8_array_is_equal) {
                                         // match start
                                         status = Status::EndSymbol;
-                                        self.push_string_token_to_token_buffer(content.clone());
+                                        // self.push_string_token_to_token_buffer(content.clone());
+                                        self.push_utf8_token_to_token_buffer(content.clone());
                                         // 模拟生成 token => ... + (...) + ...
                                         content.clear();
                                         self.push_token_plus();
                                         self.push_token_left_parenthese();
                                     } else {
                                         self.new_line_check(c);
-                                        content.push(c as u8);
+                                        // content.push(c as u8);
+                                        content.push(c);
                                         self.content.skip_next_one();
                                     }
                                 }
                             }
                         },
                         Status::EndSymbol => {
+                            /*
+                             * 查找 结束符号 模式
+                             * */
                             if self.input_str_match_with_u8arrayisequal(&mut end_u8_array_is_equal) {
                                 status = Status::DoubleQuotes;
                                 self.push_token_right_parenthese();
-                                self.push_token_plus();
+                                if !self.id_kw_strfmt_process_next_is_strend() {
+                                    /*
+                                     * 如果下一个字符不是 `"`, 说明后面还有字符串,
+                                     * 那么就需要添加 `+` token
+                                     * */
+                                    self.push_token_plus();
+                                }
                             } else {
                                 if c == '"' {
-                                    self.panic(&format!("expect {:?}, but arrive \"", &unsafe{String::from_utf8_unchecked(end.to_vec())}));
+                                    self.panic(&format!("expect {:?}, but arrive \""
+                                        , &unsafe{String::from_utf8_unchecked(end.to_vec())}));
                                 }
                                 self.select(c);
                             }

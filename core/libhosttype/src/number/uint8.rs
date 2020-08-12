@@ -27,7 +27,7 @@ lazy_static!{
      * */
     static ref REF_UINT8_PLUS_OPERATOR_REF_UINT8_FUNCTION: Function = Function{
         func_statement: FunctionStatement::new(
-            String::from(consts::OPERATOR_FUNCTION_NAME),
+            String::from(consts::OPERATOR_PLUS_FUNCTION_NAME),
             Some(FunctionParam::new(
                 FunctionParamData::Multi(
                     vec![FunctionParamDataItem::new(
@@ -64,7 +64,7 @@ lazy_static!{
      * */
     static ref REF_UINT8_PLUS_OPERATOR_REF_UINT16_FUNCTION: Function = Function{
         func_statement: FunctionStatement::new(
-            String::from(consts::OPERATOR_FUNCTION_NAME),
+            String::from(consts::OPERATOR_PLUS_FUNCTION_NAME),
             Some(FunctionParam::new(
                 FunctionParamData::Multi(
                     vec![FunctionParamDataItem::new(

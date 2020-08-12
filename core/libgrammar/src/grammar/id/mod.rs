@@ -26,6 +26,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         /*
          * 1. 判断是否是函数调用
          * */
+        // println!("{:?}", &desc_ctx);
         let scope_context = CallFuncScopeContext{
             package_type: Some(PackageType::new(PackageTypeValue::Crate)),
             package_str: PackageStr::Itself,

@@ -13,7 +13,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
         /*
          * 1. 从作用域中递归查找变量名对应的地址
          * */
-        let (first, other, typ_attr) = context.fields_move();
+        let (first, _, _) = context.fields_move();
         let first_data = first.token_data().expect("should not happend");
         let first = extract_token_data!(first_data, Id);
         let (name, var) = match self.scope_context.find_variant(&first) {

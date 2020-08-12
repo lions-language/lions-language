@@ -68,6 +68,9 @@ impl VirtualMachine {
             OptCode::MoveUint16ToStr => {
                 self.move_uint16_to_str(value);
             },
+            OptCode::RefStrPlusOperatorRefStr => {
+                self.ref_str_plus_operator_ref_str(value);
+            },
             _ => {
                 unimplemented!("{:?}", &value.opt);
             }
@@ -77,5 +80,6 @@ impl VirtualMachine {
 
 mod uint8;
 mod uint16;
+mod string;
 mod print;
 

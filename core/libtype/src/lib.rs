@@ -51,6 +51,7 @@ pub enum TypeAttrubute {
     Move,
     Pointer,
     Ref,
+    MutRef,
     Empty
 }
 
@@ -62,6 +63,9 @@ impl TypeAttrubute {
             },
             TypeAttrubute::Ref => {
                 "&"
+            },
+            TypeAttrubute::MutRef => {
+                "&mut "
             },
             TypeAttrubute::Pointer => {
                 "*"

@@ -271,6 +271,10 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> Token<T, CB> {
         &self.context.token_value.token_type
     }
 
+    pub fn context_token_value_ref(&self) -> &TokenValue {
+        &self.context.token_value
+    }
+
     pub fn token_value(self) -> TokenValue {
         self.context.token_value
     }
