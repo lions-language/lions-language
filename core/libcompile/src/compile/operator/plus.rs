@@ -163,6 +163,26 @@ impl<'a, F: Compile> Compiler<'a, F> {
                         let ref_addr = &param_addrs[*param_index as usize];
                         ref_addr.clone()
                     },
+                    TypeAttrubute::MutRef => {
+                        /*
+                         * Ref 的情况下, 此时, 虚拟机需要根据给定的地址, 找到数据,
+                         * 然后对数据进行修改
+                         * */
+                        let param_addrs = vec![left_addr.clone(), right_addr.clone()];
+                        let param_index =
+                            match &return_data.attr {
+                            FunctionReturnDataAttr::RefParamIndex(idx) => {
+                                idx
+                            },
+                            _ => {
+                                panic!("returns a reference, 
+                                    but does not specify which input
+                                    parameter of the reference");
+                            }
+                        };
+                        let ref_addr = &param_addrs[*param_index as usize];
+                        ref_addr.clone()
+                    },
                     TypeAttrubute::Move => {
                         let param_addrs = vec![left_addr.addr(), right_addr.addr()];
                         match &return_data.attr {
@@ -187,6 +207,16 @@ impl<'a, F: Compile> Compiler<'a, F> {
                         scope = Some(1);
                         let a = self.scope_context.alloc_address(return_data.typ.to_address_type(), 1);
                         self.scope_context.ref_counter_create(a.addr_ref().addr_clone());
+                        a
+                    },
+                    TypeAttrubute::CreateRef => {
+                        /*
+                         * 所有权移动到这一层, 但是属性变成了 MoveRef, 之后就会调用 &move
+                         * 相关的方法
+                         * */
+                        return_is_alloc = true;
+                        scope = Some(1);
+                        let a = self.scope_context.alloc_address(return_data.typ.to_address_type(), 1);
                         a
                     },
                     _ => {

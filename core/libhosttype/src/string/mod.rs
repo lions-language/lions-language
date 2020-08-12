@@ -18,11 +18,11 @@ lazy_static!{
     static ref STR_METHOD: phf::Map<&'static str, u32> = {
         phf_map! {
             "str:+(&str,&str)" => 0,
-            "str+(str,&str)" => 1,
+            "str:+(&create str,&str)" => 1,
         }
     };
     /*
-     * &str + &str -> str
+     * &str + &str -> &create str
      * */
     static ref REF_STR_PLUS_OPERATOR_REF_STR_FUNCTION: Function = Function{
         func_statement: FunctionStatement::new(
@@ -46,7 +46,7 @@ lazy_static!{
                     Type::new_without_attr(
                         TypeValue::Primeval(Primeval::new(
                             PrimevalType::Str)))
-                    , TypeAttrubute::Move
+                    , TypeAttrubute::CreateRef
                     , FunctionReturnDataAttr::Create
                     ),
                 ),
@@ -59,9 +59,9 @@ lazy_static!{
         })
     };
     /*
-     * str + &str -> &mut str
+     * &create str + &str -> &mut str
      * */
-    static ref MOVE_STR_PLUS_OPERATOR_REF_STR_FUNCTION: Function = Function{
+    static ref CREATEREF_STR_PLUS_OPERATOR_REF_STR_FUNCTION: Function = Function{
         func_statement: FunctionStatement::new(
             String::from(consts::OPERATOR_PLUS_FUNCTION_NAME),
             Some(FunctionParam::new(
@@ -70,7 +70,7 @@ lazy_static!{
                         Type::new_without_attr(
                             TypeValue::Primeval(Primeval::new(
                                 PrimevalType::Str)))
-                        , TypeAttrubute::Move
+                        , TypeAttrubute::CreateRef
                     ), FunctionParamDataItem::new(
                         Type::new_without_attr(TypeValue::Primeval(Primeval::new(
                                 PrimevalType::Str)))
@@ -83,21 +83,21 @@ lazy_static!{
                         TypeValue::Primeval(Primeval::new(
                             PrimevalType::Str)))
                     , TypeAttrubute::MutRef
-                    , FunctionReturnDataAttr::MoveIndex(0)
+                    , FunctionReturnDataAttr::RefParamIndex(0)
                     )
                 ),
             Some(Type::new_without_attr(TypeValue::Primeval(Primeval::new(
                         PrimevalType::Str))))
         ),
         func_define: FunctionDefine::Optcode(OptcodeFunctionDefine{
-            optcode: OptCode::MoveStrPlusOperatorRefStr
+            optcode: OptCode::CreateRefStrPlusOperatorRefStr
         })
     };
 
     static ref FUNCTION_VEC: Vec<&'static Function> = {
         let mut v = Vec::with_capacity(STR_METHOD.len());
         v.push(&*REF_STR_PLUS_OPERATOR_REF_STR_FUNCTION);
-        v.push(&*MOVE_STR_PLUS_OPERATOR_REF_STR_FUNCTION);
+        v.push(&*CREATEREF_STR_PLUS_OPERATOR_REF_STR_FUNCTION);
         v
     };
 }

@@ -51,6 +51,11 @@ pub enum TypeAttrubute {
     Move,
     Pointer,
     Ref,
+    /*
+     * 函数内部创建的对象, 最终会到外层作用域
+     * 但是属性不是Move, 是一个引用, 之后就可以调用 &create 作为参数的方法了
+     * */
+    CreateRef,
     MutRef,
     Empty
 }
@@ -63,6 +68,9 @@ impl TypeAttrubute {
             },
             TypeAttrubute::Ref => {
                 "&"
+            },
+            TypeAttrubute::CreateRef => {
+                "&create "
             },
             TypeAttrubute::MutRef => {
                 "&mut "
