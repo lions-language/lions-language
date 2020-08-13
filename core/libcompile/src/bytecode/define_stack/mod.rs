@@ -31,7 +31,6 @@ impl DefineStack {
         match DefineType::from(obj.ptr_ref().typ_ref()) {
             DefineType::Function => {
                 let fd = obj.ptr_mut().as_mut::<FunctionDefine>();
-                fd.length_add(1);
                 fd.write(instruction);
             }
         }

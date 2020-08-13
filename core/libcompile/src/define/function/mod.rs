@@ -11,10 +11,7 @@ impl FunctionDefine {
          * 将指令先缓存下来, 全部完成后写入到文件
          * */
         self.define_stream.as_mut::<DefineStream>().write(instruction);
-    }
-
-    pub fn length_add(&mut self, n: usize) {
-        self.length += n;
+        self.length += 1;
     }
 
     pub fn new(start_pos: usize, statement: FunctionStatement

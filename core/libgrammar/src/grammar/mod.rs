@@ -1,10 +1,12 @@
 use crate::lexical::{LexicalParser, CallbackReturnStatus, TokenVecItem, TokenPointer};
 use crate::token::{TokenType, TokenValue, TokenMethodResult};
+use libcommon::ptr::RefPtr;
 use libtype::{Type, PackageType, TypeAttrubute};
+use libtype::function::{FindFunctionHandle};
 use libresult::*;
 use libtype::package::PackageStr;
 use libmacro::{FieldGet, NewWithAll
-    , FieldGetMove};
+    , FieldGetMove, FieldGetClone};
 
 #[derive(FieldGet)]
 pub struct CallFuncScopeContext {
@@ -37,6 +39,23 @@ pub struct LoadVariantContext {
     first: TokenValue,
     other: Option<Vec<TokenValue>>,
     typ_attr: TypeAttrubute
+}
+
+#[derive(Debug, FieldGet, FieldGetClone
+    , NewWithAll, FieldGetMove
+    , Default)]
+pub struct CallFunctionContext {
+    func_ptr: RefPtr,
+    package_str: PackageStr
+}
+
+impl CallFunctionContext {
+    pub fn set_func_ptr(&mut self, func_ptr: RefPtr) {
+        *&mut self.func_ptr = func_ptr;
+    }
+    pub fn set_package_str(&mut self,  package_str: PackageStr) {
+        *&mut self.package_str = package_str;
+    }
 }
 
 #[derive(Debug, FieldGet, NewWithAll, FieldGetMove)]
@@ -128,8 +147,16 @@ pub trait Grammar {
          * */
         println!("named function define end");
     }
-    fn call_function(&mut self, _context: CallFuncScopeContext, _name: TokenValue
-        , _param_len: usize)
+    fn call_function_prepare(&mut self, _context: CallFuncScopeContext
+        , _name: TokenValue, _: &mut CallFunctionContext) -> DescResult {
+        DescResult::Success
+    }
+    fn call_function_param(&mut self, _index: usize
+        , _: &mut CallFunctionContext) {
+    }
+    fn call_function(&mut self
+        , _param_len: usize
+        , _: CallFunctionContext)
         -> DescResult {
         DescResult::Success
     }

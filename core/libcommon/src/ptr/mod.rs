@@ -49,3 +49,9 @@ impl RefPtr {
         }
     }
 }
+
+impl Default for RefPtr {
+    fn default() -> Self {
+        RefPtr::new_null()
+    }
+}

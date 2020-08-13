@@ -50,6 +50,9 @@ impl<'a, F: Compile> Compiler<'a, F> {
          * */
         let right = self.scope_context.take_top_from_value_buffer();
         let left = self.scope_context.take_top_from_value_buffer();
+        let left_addr = left.addr_clone();
+        let left_type = left.typ_clone();
+        let left_typ_attr = left.typ_attr_clone();
         /*
         println!("left type attr: {:?}, right type attr: {:?}"
             , left.typ_attr_ref(), right.typ_attr_ref());
@@ -57,22 +60,34 @@ impl<'a, F: Compile> Compiler<'a, F> {
         /*
          * 1. 将地址中的 scope 值加1, 因为进行函数调用的时候, 会进入一个新的作用域
          * */
-        let left_addr_value = left.addr_ref().addr_ref().clone_with_scope_plus(1);
+        // let left_addr_value = left.addr_ref().addr_ref().clone_with_scope_plus(1);
         let right_addr_value = right.addr_ref().addr_ref().clone_with_scope_plus(1);
+        let left_expect_type = self.compile_context.expect_type_ref().clone();
+        let left_addr_value = match self.binary_type_match(
+            left, &left_expect_type
+            , *self.compile_context.is_auto_call_totype_ref()) {
+            Ok(addr) => {
+                addr
+            },
+            Err(e) => {
+                return e;
+            }
+        };
+        let left_addr_value = left_addr_value.clone_with_scope_plus(1);
         /*
          * 构建 函数参数
          * + 号运算一定只有一个参数
          * */
         let param = FunctionParamData::Multi(vec![
-            FunctionParamDataItem::new(left.typ_clone(), left.typ_attr_clone())
+            FunctionParamDataItem::new(left_type.clone(), left_typ_attr.clone())
             , FunctionParamDataItem::new(right.typ_clone(), right.typ_attr_clone())]);
         let statement_str = FunctionSplice::get_function_without_return_string_by_type(
-            consts::OPERATOR_PLUS_FUNCTION_NAME, &Some(&param), &Some(&left.typ));
+            consts::OPERATOR_PLUS_FUNCTION_NAME, &Some(&param), &Some(&left_type));
         /*
          * 查找方法声明
          * */
         let func_ptr = match self.function_control.find_function(&FindFunctionContext{
-            typ: Some(&left.typ),
+            typ: Some(&left_type),
             package_typ: None,
             func_str: &statement_str,
             module_str: self.module_stack.current().to_str()
@@ -118,7 +133,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
         /*
          * 计算第一个参数的地址 (第一个参数就是 操作数的类型)
          * */
-        let left_addr = self.alloc_addr_for_single_type(&left.typ, &left.addr);
+        let left_addr = self.alloc_addr_for_single_type(&left_type, &left_addr);
         let right_addr = self.alloc_addr_for_single_type(&right.typ, &right.addr);
         /*
          * 从后向前加载, 因为虚拟机加载参数是从前向后的, 那么对于栈, 写入时应该是相反的顺序

@@ -4,3 +4,9 @@ pub enum PackageStr {
     Third(String),
     Empty
 }
+
+impl Default for PackageStr {
+    fn default() -> Self {
+        PackageStr::Empty
+    }
+}

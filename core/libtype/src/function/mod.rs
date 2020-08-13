@@ -192,6 +192,26 @@ pub struct FunctionStatement {
     statement_str: String
 }
 
+impl FunctionStatement {
+    pub fn get_func_param_len(&self) -> usize {
+        match &self.func_param {
+            Some(pd) => {
+                match pd.data_ref() {
+                    FunctionParamData::Single(_) => {
+                        1
+                    },
+                    FunctionParamData::Multi(ps) => {
+                        ps.len()
+                    }
+                }
+            },
+            None => {
+                0
+            }
+        }
+    }
+}
+
 /*
  * 函数定义
  * */

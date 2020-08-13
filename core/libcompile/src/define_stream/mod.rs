@@ -13,7 +13,7 @@ pub struct DefineStream {
 impl DefineStream {
     pub fn write(&mut self, instruction: Instruction) {
         /*
-         * TODO 当前直接写入到内存中
+         * TODO 现阶段直接写入到内存中, 后期将用文件缓存
          * */
         self.memory.write(instruction);
     }

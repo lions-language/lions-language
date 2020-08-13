@@ -110,6 +110,9 @@ impl<'a, 'b, F: Writer> Compile for Bytecode<'a, 'b, F> {
 
 impl<'a, 'b, F: Writer> Bytecode<'a, 'b, F> {
     fn write(&mut self, instruction: Instruction) {
+        /*
+         * NOTE: 决定将字节码向哪个输出流写
+         * */
         if self.define_stack.is_empty() {
             self.writer.write(instruction);
         } else {

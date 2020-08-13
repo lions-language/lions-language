@@ -1,6 +1,7 @@
 use libgrammar::grammar::{Grammar, CallFuncScopeContext
     , VarStmtContext, LoadVariantContext as GrammarLoadVariantContext
-    , ConstNumberContext, ConstStringContext};
+    , ConstNumberContext, ConstStringContext
+    , CallFunctionContext as GrammarCallFunctionContext};
 use libgrammar::token::{TokenValue};
 use libtype::{Type, Data};
 use libtype::function::{Function, CallFunctionParamAddr
@@ -10,7 +11,7 @@ use libtype::module::Module;
 use libresult::*;
 use libtype::{AddressKey, AddressValue};
 use libtype::package::{PackageStr};
-use libmacro::{FieldGet, FieldGetMove, NewWithAll};
+use libmacro::{FieldGet, FieldGetClone, FieldGetMove, NewWithAll};
 use crate::address;
 use crate::address::PackageIndex;
 use crate::static_dispatch::{StaticVariantDispatch};
@@ -57,6 +58,41 @@ pub struct LoadVariantContext {
 pub enum CompileType {
     Runtime,
     Compile
+}
+
+#[derive(Debug, FieldGet
+    , FieldGetMove, FieldGetClone
+    , NewWithAll)]
+pub struct CompileContext {
+    is_auto_call_totype: bool,
+    expect_type: Type
+}
+
+impl Default for CompileContext {
+    fn default() -> Self {
+        Self {
+            is_auto_call_totype: false,
+            expect_type: Type::new_empty()
+        }
+    }
+}
+
+impl CompileContext {
+    fn set(&mut self, context: CompileContext) {
+        *self = context;
+    }
+
+    fn new(is_auto_call_totype: bool
+        , expect_type: Type) -> Self {
+        Self {
+            is_auto_call_totype: is_auto_call_totype,
+            expect_type: expect_type
+        }
+    }
+
+    fn reset(&mut self) {
+        *self = CompileContext::default()
+    }
 }
 
 trait TokenValueExpand {
@@ -156,6 +192,7 @@ pub struct Compiler<'a, F: Compile> {
     package_index: &'a mut PackageIndex,
     static_variant_dispatch: &'a mut StaticVariantDispatch<'a>,
     package_str: &'a str,
+    compile_context: CompileContext,
     cb: F
 }
 
@@ -196,9 +233,19 @@ impl<'a, F: Compile> Grammar for Compiler<'a, F> {
         self.handle_function_define_end();
     }
 
-    fn call_function(&mut self, scope_context: CallFuncScopeContext
-        , name: TokenValue, param_len: usize) -> DescResult {
-        self.handle_call_function(scope_context, name, param_len)
+    fn call_function_prepare(&mut self, scope_context: CallFuncScopeContext
+        , name: TokenValue, call_context: &mut GrammarCallFunctionContext) -> DescResult {
+        self.handle_call_function_prepare(scope_context, name, call_context)
+    }
+
+    fn call_function_param(&mut self, index: usize
+        , call_context: &mut GrammarCallFunctionContext) {
+        self.handle_call_function_param(index, call_context);
+    }
+
+    fn call_function(&mut self
+        , param_len: usize, call_context: GrammarCallFunctionContext) -> DescResult {
+        self.handle_call_function(param_len, call_context)
     }
 
     fn var_stmt_start(&mut self) {
@@ -231,6 +278,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
             package_index: package_index,
             static_variant_dispatch: static_variant_dispatch,
             package_str: package_str,
+            compile_context: CompileContext::default(),
             cb: cb
         }
     }
