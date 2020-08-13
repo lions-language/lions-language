@@ -34,6 +34,17 @@ impl Str {
         }
     }
 
+    pub fn extract_utf8_mut(&mut self) -> &mut String {
+        match &mut self.value {
+            StrValue::Utf8(v) => {
+                v
+            },
+            _ => {
+                panic!("should not happend: extract utf8, but found other");
+            }
+        }
+    }
+
     pub fn extract_vecu8_ref(&self) -> &Vec<u8> {
         match &self.value {
             StrValue::VecU8(v) => {

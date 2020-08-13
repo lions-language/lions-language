@@ -37,6 +37,7 @@ impl VirtualMachine {
     pub fn read_static_variant(&mut self, mut value: StaticVariant) {
         /*
          * 将给定的地址绑定到静态区域
+         * NOTE: 进入这里的时候, link 阶段已经将 static 地址更改过了
          * */
         self.thread_context.current_mut_unchecked()
             .alloc_and_write_static(value.addr_ref()

@@ -29,14 +29,14 @@ macro_rules! extract_primeval_number_ref {
     }};
 }
 
-macro_rules! extract_primeval_utf8_str_ref {
-    ($data_ptr:expr, $typ:ident) => {{
+macro_rules! extract_primeval_str_ref {
+    ($data_ptr:expr, $typ:ident, $func:ident) => {{
         let data = $data_ptr.as_ref::<Data>();
         match data.value_ref() {
             DataValue::Primeval(d) => {
-                match &d {
+                match d {
                     PrimevalData::Str(v) => {
-                        v.as_ref().expect("should not happend").extract_utf8_ref()
+                        v.as_ref().expect("should not happend").$func()
                     },
                     _ => {
                         unimplemented!();
@@ -47,6 +47,39 @@ macro_rules! extract_primeval_utf8_str_ref {
                 unimplemented!();
             }
         }
+    }};
+}
+
+macro_rules! extract_primeval_str_mut {
+    ($data_ptr:expr, $typ:ident, $func:ident) => {{
+        let data = $data_ptr.as_mut::<Data>();
+        match data.value_mut() {
+            DataValue::Primeval(d) => {
+                match d {
+                    PrimevalData::Str(v) => {
+                        v.as_mut().expect("should not happend").$func()
+                    },
+                    _ => {
+                        unimplemented!();
+                    }
+                }
+            },
+            _ => {
+                unimplemented!();
+            }
+        }
+    }};
+}
+
+macro_rules! extract_primeval_utf8_str_ref {
+    ($data_ptr:expr, $typ:ident) => {{
+        extract_primeval_str_ref!($data_ptr, $typ, extract_utf8_ref)
+    }};
+}
+
+macro_rules! extract_primeval_utf8_str_mut {
+    ($data_ptr:expr, $typ:ident) => {{
+        extract_primeval_str_mut!($data_ptr, $typ, extract_utf8_mut)
     }};
 }
 
@@ -70,6 +103,9 @@ impl VirtualMachine {
             },
             OptCode::RefStrPlusOperatorRefStr => {
                 self.ref_str_plus_operator_ref_str(value);
+            },
+            OptCode::CreateRefStrPlusOperatorRefStr => {
+                self.create_ref_str_plus_operator_ref_str(value);
             },
             _ => {
                 unimplemented!("{:?}", &value.opt);

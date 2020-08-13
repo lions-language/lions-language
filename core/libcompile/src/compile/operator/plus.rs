@@ -38,6 +38,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
     }
 
     pub fn operator_plus(&mut self, _value: TokenValue) -> DescResult {
+        // println!("plus ...");
         /*
          * 注意:
          *  如果 Move 进去的没有 Move 出来, 尽管由函数内部销毁, 但是编译期, 需要将地址值回收

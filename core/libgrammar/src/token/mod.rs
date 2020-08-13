@@ -186,6 +186,10 @@ impl TokenValue {
         }
     }
 
+    pub fn print_token_data(&self) {
+        println!("{:?}", &self.token_data);
+    }
+
     /*
      * 因为 TokenType 中都是枚举, 所以拷贝的消耗非常小
      * */

@@ -38,6 +38,7 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
         let mut start_u8_array_is_equal = U8ArrayIsEqual::new(start);
         let mut end_u8_array_is_equal = U8ArrayIsEqual::new(end);
         let mut find_end_status = FindEndStatus::Finding;
+        let mut prefix_is_exist_parenthese = false;
         loop {
             match self.content.lookup_next_one() {
                 Some(c) => {
@@ -49,6 +50,7 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
                                     // self.push_string_token_to_token_buffer(content.clone());
                                     // if !self.id_kw_strfmt_process_next_is_strend() {
                                     if content.len() > 0 {
+                                        // println!("{}", content);
                                         self.push_utf8_token_to_token_buffer(content.clone());
                                     }
                                     break;
@@ -62,11 +64,17 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
                                         // match start
                                         status = Status::EndSymbol;
                                         // self.push_string_token_to_token_buffer(content.clone());
-                                        self.push_utf8_token_to_token_buffer(content.clone());
+                                        // println!("{}", content);
+                                        if !content.is_empty() {
+                                            self.push_utf8_token_to_token_buffer(content.clone());
+                                            self.push_token_plus();
+                                            self.push_token_left_parenthese();
+                                            prefix_is_exist_parenthese = true;
+                                        } else {
+                                            prefix_is_exist_parenthese = false;
+                                        }
                                         // 模拟生成 token => ... + (...) + ...
                                         content.clear();
-                                        self.push_token_plus();
-                                        self.push_token_left_parenthese();
                                     } else {
                                         self.new_line_check(c);
                                         // content.push(c as u8);
@@ -82,7 +90,9 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
                              * */
                             if self.input_str_match_with_u8arrayisequal(&mut end_u8_array_is_equal) {
                                 status = Status::DoubleQuotes;
-                                self.push_token_right_parenthese();
+                                if prefix_is_exist_parenthese {
+                                    self.push_token_right_parenthese();
+                                }
                                 if !self.id_kw_strfmt_process_next_is_strend() {
                                     /*
                                      * 如果下一个字符不是 `"`, 说明后面还有字符串,
