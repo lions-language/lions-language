@@ -107,6 +107,9 @@ impl VirtualMachine {
             OptCode::CreateRefStrPlusOperatorRefStr => {
                 self.create_ref_str_plus_operator_ref_str(value);
             },
+            OptCode::MutRefStrPlusOperatorRefStr => {
+                self.mut_ref_str_plus_operator_ref_str(value);
+            },
             _ => {
                 unimplemented!("{:?}", &value.opt);
             }

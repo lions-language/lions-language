@@ -10,6 +10,7 @@ pub enum OptCode {
     MoveUint32PlusOperatorRefUint8,
     RefStrPlusOperatorRefStr,
     CreateRefStrPlusOperatorRefStr,
+    MutRefStrPlusOperatorRefStr,
     MoveStrPlusOperatorRefStr,
     Println
 }

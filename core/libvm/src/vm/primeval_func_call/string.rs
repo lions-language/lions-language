@@ -104,5 +104,49 @@ impl VirtualMachine {
          * 该函数返回的是一个 &mut, 所以不需要分配内存
          * */
     }
+
+    pub fn mut_ref_str_plus_operator_ref_str(&mut self, value: CallPrimevalFunction) {
+        /*
+         * 加载参数
+         *  在进入这里的时候, 当前作用域中的映射集合中已经存在了参数的映射
+         *  所以, 直接用 索引0访问查找第一个参数的数据, 以此类推 注意:
+         *  与自定义函数不同, 这里不需要为函数调用开辟新的作用域, 因为原生函数调用是 "死代码"
+         * */
+        let param_addrs = value.param_addrs.expect("should not happend");
+        let left_param_compile_addr = match param_addrs.get(0).expect("should not happend") {
+            CallFunctionParamAddr::Fixed(p) => {
+                p
+            },
+            _ => {
+                panic!("should not happend");
+            }
+        };
+        let right_param_compile_addr = match param_addrs.get(1).expect("should not happend") {
+            CallFunctionParamAddr::Fixed(p) => {
+                p
+            },
+            _ => {
+                panic!("should not happend");
+            }
+        };
+        /*
+         * 获取数据
+         * */
+        let mut left_value = self.thread_context.current_unchecked().get_data_unchecked(
+            &left_param_compile_addr, &self.link_static);
+        let right_value = self.thread_context.current_unchecked().get_data_unchecked(
+            &right_param_compile_addr, &self.link_static);
+        let left_value = extract_primeval_utf8_str_mut!(left_value, Str);
+        let right_value = extract_primeval_utf8_str_ref!(right_value, Str);
+        // println!("{}", &right_value);
+        /*
+         * 计算返回值
+         * */
+        left_value.push_str(right_value);
+        // println!("result: {}", result);
+        /*
+         * 该函数返回的是一个 &mut, 所以不需要分配内存
+         * */
+    }
 }
 
