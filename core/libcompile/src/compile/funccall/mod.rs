@@ -23,14 +23,16 @@ use std::collections::VecDeque;
 impl<'a, F: Compile> Compiler<'a, F> {
     pub fn binary_type_match(&mut self, input_value: ValueBufferItem, expect_typ: &Type
         , is_auto_call_totype: bool)
-        -> Result<AddressValue, DescResult> {
+        -> Result<(Type, TypeAttrubute, AddressValue), DescResult> {
+        // let input_typ = input_value.typ_ref();
+        let (input_typ, input_addr, input_typ_attr, input_package_type
+            , input_package_str, _) = input_value.fields_move();
         if !is_auto_call_totype {
             /*
              * 不需要自动调用 to_#type => 直接返回输入的地址
              * */
-            return Ok(input_value.addr().addr());
+            return Ok((input_typ.clone(), input_typ_attr, input_addr.addr()));
         }
-        let input_typ = input_value.typ_ref();
         let et = expect_typ.typ_ref();
         let it = input_typ.typ_ref();
         if !et.is_any() {
@@ -49,15 +51,15 @@ impl<'a, F: Compile> Compiler<'a, F> {
                  * */
                 let func_name = FunctionSplice::get_to_type_by_type(expect_typ);
                 let param = FunctionParamData::Single(FunctionParamDataItem::new(
-                    input_typ.clone(), input_value.typ_attr_ref().clone()));
+                    input_typ.clone(), input_typ_attr.clone()));
                 let expect_func_str = FunctionSplice::get_function_without_return_string_by_type(
-                    &func_name, &Some(&param), &Some(input_typ));
+                    &func_name, &Some(&param), &Some(&input_typ));
                 /*
                  * 查找方法
                  * */
                 let find_func_context = FindFunctionContext {
-                    typ: Some(input_typ),
-                    package_typ: input_value.package_type_ref().as_ref(),
+                    typ: Some(&input_typ),
+                    package_typ: input_package_type.as_ref(),
                     func_str: &expect_func_str,
                     module_str: self.module_stack.current().name_ref()
                 };
@@ -85,7 +87,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                  * 将参数地址中的 scope 加1, 告诉虚拟机要从上一个作用域中查找
                  * */
                 let param_addrs = vec![CallFunctionParamAddr::Fixed(
-                    input_value.addr_ref().addr_ref().clone_with_scope_plus(1))];
+                    input_addr.addr_ref().clone_with_scope_plus(1))];
                 let func_statement = func.func_statement_ref();
                 let return_data = &func_statement.func_return.data;
                 let mut scope: Option<usize> = None;
@@ -133,7 +135,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                     }
                 };
                 let call_context = CallFunctionContext {
-                    package_str: input_value.package_str(),
+                    package_str: input_package_str,
                     func: &func,
                     param_addrs: Some(param_addrs),
                     return_data: CallFunctionReturnData::new_with_all(
@@ -146,10 +148,17 @@ impl<'a, F: Compile> Compiler<'a, F> {
                  * */
                 match scope {
                     Some(n) => {
-                        return Ok(return_addr.addr().addr_with_scope_minus(n));
+                        return Ok((expect_typ.clone()
+                                /*
+                                 * to_#type 返回的一定是 Move
+                                 * */
+                                , TypeAttrubute::Move
+                                , return_addr.addr().addr_with_scope_minus(n)));
                     },
                     None => {
-                        return Ok(return_addr.addr());
+                        return Ok((expect_typ.clone()
+                                , TypeAttrubute::Move
+                                , return_addr.addr()));
                     }
                 }
             }
@@ -157,7 +166,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
         /*
          * 返回输入的地址
          * */
-        Ok(input_value.addr().addr())
+        Ok((input_typ, input_typ_attr, input_addr.addr()))
         // Ok(input_value.addr_ref().addr_ref().clone_with_scope_plus(1))
     }
 
@@ -295,7 +304,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                      * 告诉虚拟机要从上一个作用域中查找
                                      * */
                                     params_addr.push_front(
-                                    value_addr.clone_with_scope_plus(1));
+                                    value_addr.2.clone_with_scope_plus(1));
                                 }
                                 Some(vec![CallFunctionParamAddr::Lengthen(params_addr)])
                             },
@@ -319,7 +328,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                  * 参数正确 => 构建参数地址列表
                                  * */
                                 Some(vec![CallFunctionParamAddr::Fixed(
-                                        value_addr.clone_with_scope_plus(1))])
+                                        value_addr.2.clone_with_scope_plus(1))])
                             }
                         }
                     },

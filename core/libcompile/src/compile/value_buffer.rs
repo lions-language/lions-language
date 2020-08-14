@@ -1,7 +1,8 @@
 use libtype::{Type, PackageType
     , PackageTypeValue, TypeAttrubute};
 use libtype::package::{PackageStr};
-use libmacro::{FieldGet, FieldGetClone};
+use libmacro::{FieldGet, FieldGetClone
+    , FieldGetMove};
 use libcommon::ptr::RefPtr;
 use crate::address::{Address};
 use std::collections::{VecDeque};
@@ -12,7 +13,8 @@ pub enum ValueBufferItemContext {
     Null
 }
 
-#[derive(Debug, FieldGet, FieldGetClone, Clone)]
+#[derive(Debug, FieldGet, FieldGetClone
+    , FieldGetMove, Clone)]
 pub struct ValueBufferItem {
     pub typ: Type,
     pub addr: Address,
