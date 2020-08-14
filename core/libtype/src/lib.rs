@@ -61,6 +61,18 @@ pub enum TypeAttrubute {
 }
 
 impl TypeAttrubute {
+    pub fn is_ref(&self) -> bool {
+        match self {
+            TypeAttrubute::Ref
+            | TypeAttrubute::MutRef => {
+                true
+            },
+            _ => {
+                false
+            }
+        }
+    }
+
     pub fn to_str(&self) -> &'static str {
         match self {
             TypeAttrubute::Move => {

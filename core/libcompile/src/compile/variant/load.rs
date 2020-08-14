@@ -40,20 +40,21 @@ impl<'a, F: Compile> Compiler<'a, F> {
         // println!("{:?}", var_addr);
         // println!("{:?}", &var_typ_attr);
         // println!("{:?}: {:?}", name, &typ_attr);
-        match var_addr.addr_ref().typ_ref() {
-            AddressType::Static => {
-                self.scope_context.push_with_addr_context_typattr_to_value_buffer(
-                    var_typ
-                    , var_addr, buf_ctx
-                    , TypeAttrubute::Ref);
-            },
-            _ => {
-                self.scope_context.push_with_addr_context_typattr_to_value_buffer(
-                    var_typ
-                    , var_addr, buf_ctx
-                    , typ_attr);
-            }
-        }
+        /*
+         * NOTE
+         *  如果变量前面有 `&`, 那么就是 引用
+         *  如果变量前面没有 `&`, 那么是否是 引用 决定于 被指向的数据
+         *  (可能存在 var b = &1; var a = b; 那么 a 应该是引用, 而不是 移动)
+         * */
+        let at = if var_typ_attr.is_ref() {
+            var_typ_attr
+        } else {
+            typ_attr
+        };
+        self.scope_context.push_with_addr_context_typattr_to_value_buffer(
+            var_typ
+            , var_addr, buf_ctx
+            , at);
         DescResult::Success
     }
 }
