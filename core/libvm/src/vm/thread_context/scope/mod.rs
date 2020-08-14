@@ -46,7 +46,7 @@ impl Scope {
         }
     }
 
-    pub fn take_data_unchecked(&self, addr: &AddressValue
+    pub fn take_data_unchecked(&mut self, addr: &AddressValue
         , link_static: &RefPtr, memory: &mut ThreadMemory)
         -> Data {
         match addr.typ_ref() {
@@ -56,6 +56,7 @@ impl Scope {
             AddressType::Stack => {
                 let stack_addr = self.addr_mapping.get_unwrap(addr.addr_ref());
                 let data = memory.stack_data_mut().take_unwrap(stack_addr);
+                self.addr_mapping.remove(addr.addr_clone());
                 data
             },
             _ => {
@@ -70,6 +71,7 @@ impl Scope {
 
     pub fn alloc_and_write_data(&mut self, addr: &AddressValue
         , data: Data, mut memory: RefPtr) {
+        // println!("write: {:?} => {:?}", addr, &data);
         let memory = memory.as_mut::<ThreadMemory>();
         match addr.typ_ref() {
             AddressType::Stack => {

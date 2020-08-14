@@ -24,6 +24,8 @@ impl<T> Rand<T> for RandStack<T> {
              * 存在被回收的 => 返回回收的地址
              * */
             let index = self.recycles.remove(0);
+            self.datas.insert(index, data);
+            // println!("get: {}", index);
             MemoryValue::new(AddressKey::new(index as u64))
         }
     }
@@ -41,6 +43,7 @@ impl<T> Rand<T> for RandStack<T> {
         /*
          * 添加到回收中
          * */
+        // println!("take: {}", index);
         self.recycles.push(index);
         self.datas.remove(&index).expect("randstack take error")
     }

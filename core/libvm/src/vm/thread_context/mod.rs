@@ -44,8 +44,10 @@ impl ThreadScope {
     pub fn take_data_unchecked(&mut self, addr: &AddressValue
         , link_static: &RefPtr)
         -> Data {
+        // self.print_addr_mapping(addr.addr_clone());
+        // self.print_stack_datas();
         let scope = addr.scope_clone();
-        self.scope_context.last_n_unchecked(scope).take_data_unchecked(
+        self.scope_context.last_n_mut_unchecked(scope).take_data_unchecked(
             addr, link_static, &mut self.memory)
     }
 
