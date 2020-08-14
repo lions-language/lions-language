@@ -13,6 +13,18 @@ impl ScopeContext {
     pub fn leave(&mut self) {
         self.scopes.pop_back();
     }
+
+    pub fn last_n_is_valid(&self, scope: usize) -> bool {
+        let len = self.scopes.len();
+        if len == 0 {
+            return false;
+        }
+        if self.scopes.len() - 1 < scope {
+            false
+        } else {
+            true
+        }
+    }
     
     pub fn current_mut_unchecked(&mut self) -> &mut Scope {
         self.scopes.back_mut().expect("should not happend")

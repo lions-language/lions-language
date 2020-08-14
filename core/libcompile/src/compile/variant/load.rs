@@ -2,7 +2,7 @@ use libgrammar::token::{TokenValue, TokenData};
 use libgrammar::grammar::{LoadVariantContext};
 use libtype::function::{AddFunctionContext};
 use libtype::{PackageType, PackageTypeValue
-    , AddressType};
+    , AddressType, TypeAttrubute};
 use libresult::DescResult;
 use libcommon::ptr::{RefPtr};
 use crate::compile::{Compile, Compiler};
@@ -13,7 +13,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
         /*
          * 1. 从作用域中递归查找变量名对应的地址
          * */
-        let (first, _, _) = context.fields_move();
+        let (first, _, typ_attr) = context.fields_move();
         let first_data = first.token_data().expect("should not happend");
         let first = extract_token_data!(first_data, Id);
         let (name, var) = match self.scope_context.find_variant(&first) {
@@ -37,11 +37,23 @@ impl<'a, F: Compile> Compiler<'a, F> {
             RefPtr::from_ref(name));
         // println!("{:?}, name: {}", &buf_ctx, name);
         let (var_addr, var_typ, var_typ_attr) = var.fields_move();
+        // println!("{:?}", var_addr);
         // println!("{:?}", &var_typ_attr);
-        self.scope_context.push_with_addr_context_typattr_to_value_buffer(
-            var_typ
-            , var_addr, buf_ctx
-            , var_typ_attr);
+        // println!("{:?}: {:?}", name, &typ_attr);
+        match var_addr.addr_ref().typ_ref() {
+            AddressType::Static => {
+                self.scope_context.push_with_addr_context_typattr_to_value_buffer(
+                    var_typ
+                    , var_addr, buf_ctx
+                    , TypeAttrubute::Ref);
+            },
+            _ => {
+                self.scope_context.push_with_addr_context_typattr_to_value_buffer(
+                    var_typ
+                    , var_addr, buf_ctx
+                    , typ_attr);
+            }
+        }
         DescResult::Success
     }
 }

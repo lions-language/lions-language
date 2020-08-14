@@ -1,9 +1,9 @@
 use libtype::{AddressValue, AddressKey, AddressType};
-use libtype::instruction::{VariantDefine};
+use libtype::instruction::{OwnershipMove};
 use crate::vm::VirtualMachine;
 
 impl VirtualMachine {
-    pub fn variant_define(&mut self, value: VariantDefine) {
+    pub fn ownership_move(&mut self, value: OwnershipMove) {
         // println!("{:?}", &value);
         /*
          * 1. 将 dst_addr 绑定到 src_addr 指向的数据地址
@@ -23,7 +23,8 @@ impl VirtualMachine {
          * */
         self.thread_context.current_mut_unchecked()
             .remove_bind(src_addr.addr());
-        self.thread_context.current_mut_unchecked().print_addr_mapping(dst_addr.addr());
+        self.thread_context.current_mut_unchecked().print_current_addr_mapping();
+        self.thread_context.current_mut_unchecked().print_last_n_addr_mapping(1);
         self.thread_context.current_mut_unchecked().print_stack_datas();
     }
 }

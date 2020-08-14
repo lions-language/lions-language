@@ -90,6 +90,21 @@ impl ThreadScope {
         let scope = addr.scope_clone();
         self.scope_context.last_n_mut_unchecked(scope).remove_bind(addr);
     }
+    
+    pub fn print_current_addr_mapping(&mut self) {
+        println!("**************** current scope addr mapping ******************");
+        self.scope_context.last_n_mut_unchecked(0).print_addr_mapping();
+        println!("*************************************************************");
+    }
+
+    pub fn print_last_n_addr_mapping(&mut self, scope: usize) {
+        if !self.scope_context.last_n_is_valid(scope) {
+            return;
+        }
+        println!("**************** last {} scope addr mapping ******************", scope);
+        self.scope_context.last_n_mut_unchecked(scope).print_addr_mapping();
+        println!("**************************************************************");
+    }
 
     pub fn print_addr_mapping(&mut self, addr: AddressKey) {
         let scope = addr.scope_clone();

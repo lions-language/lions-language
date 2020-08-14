@@ -14,6 +14,18 @@ impl ThreadContext {
         self.scopes.pop_back();
     }
 
+    pub fn last_n_is_valid(&self, scope: usize) -> bool {
+        let len = self.scopes.len();
+        if len == 0 {
+            return false;
+        }
+        if self.scopes.len() - 1 < scope {
+            false
+        } else {
+            true
+        }
+    }
+
     pub fn enter_thread_scope(&mut self) {
         self.current_mut_unchecked().scope_context_mut().enter();
     }

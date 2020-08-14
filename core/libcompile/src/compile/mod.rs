@@ -33,7 +33,7 @@ pub struct LoadStackContext {
 
 #[derive(Debug, FieldGet, NewWithAll
     , FieldGetMove)]
-pub struct VariantDefineContext {
+pub struct OwnershipMoveContext {
     pub dst_addr: AddressValue,
     pub src_addr: AddressValue
 }
@@ -140,7 +140,7 @@ pub trait Compile {
         unimplemented!();
     }
 
-    fn variant_define(&mut self, context: VariantDefineContext) {
+    fn ownership_move(&mut self, context: OwnershipMoveContext) {
         unimplemented!();
     }
 

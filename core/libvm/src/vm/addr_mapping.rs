@@ -21,7 +21,9 @@ impl AddressMapping {
     }
 
     pub fn print(&self) {
-        println!("{:?}", &self.maps);
+        for value in self.maps.iter() {
+            println!("{:?}", value);
+        }
     }
 
     pub fn new() -> Self {

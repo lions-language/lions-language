@@ -73,6 +73,33 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         TokenMethodResult::Continue
     }
 
+    pub fn expression_end_right_parenthese(grammar: &mut GrammarParser<T, CB>
+        , token: &TokenVecItem<T, CB>) -> TokenMethodResult {
+        let tp = match grammar.skip_white_space_token_with_input(TokenPointer::from_ref(token)) {
+            Some(tp) => {
+                tp
+            },
+            None => {
+                /*
+                 * 查找 ) 时, 遇到了 IoEOF => 语法错误
+                 * */
+                 grammar.panic("expect a `)`, but arrive IoEOF");
+                 return TokenMethodResult::Panic;
+            }
+        };
+        let t = tp.as_ref::<T, CB>();
+        match t.context_ref().token_type() {
+            TokenType::RightParenthese => {
+                grammar.skip_next_one();
+                return TokenMethodResult::ParentheseEnd;
+            },
+            _ => {
+            }
+        }
+        TokenMethodResult::Continue
+    }
+
+
     pub fn expression_end_param_list(
         grammar: &mut GrammarParser<T, CB>
         , token: &TokenVecItem<T, CB>) -> TokenMethodResult {
@@ -86,6 +113,28 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
             }
         }
         TokenMethodResult::Continue
+    }
+
+    pub fn expression_process_start_with_parenthese(&mut self) -> TokenMethodResult {
+        /*
+         * 表达式中遇到 ( 符号
+         * 1. 先跳过  (
+         * 2. 调用 expression (因为 小括号内的可以视为一个完整的语句)
+         * */
+        self.skip_next_one();
+        let tp = match self.lookup_next_one_ptr() {
+            Some(tp) => {
+                tp
+            },
+            None => {
+                /*
+                 * ( 后面是 EOF => 语法错误
+                 * */
+                self.panic("expect operand after `(`, but arrive EOF");
+                return TokenMethodResult::Panic;
+            }
+        };
+        self.expression(&0, &ExpressContext::new(GrammarParser::expression_end_right_parenthese), &tp)
     }
 
     pub fn expression_process_default_exprcontext(&mut self, token: &TokenPointer) {

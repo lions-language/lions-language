@@ -39,7 +39,7 @@ macro_rules! extract_primeval_str_ref {
                         v.as_ref().expect("should not happend").$func()
                     },
                     _ => {
-                        unimplemented!();
+                        unimplemented!("{:?}", d);
                     }
                 }
             },

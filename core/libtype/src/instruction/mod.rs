@@ -24,7 +24,7 @@ pub struct CallFunction {
 
 #[derive(Debug, FieldGet, Clone, NewWithAll
     , FieldGetMove)]
-pub struct VariantDefine {
+pub struct OwnershipMove {
     pub dst_addr: AddressValue,
     pub src_addr: AddressValue
 }
@@ -94,7 +94,7 @@ pub enum Instruction {
     ReadStaticVariant(StaticVariant),
     CallPrimevalFunction(CallPrimevalFunction),
     CallFunction(CallFunction),
-    VariantDefine(VariantDefine),
+    OwnershipMove(OwnershipMove),
     EnterScope,
     LeaveScope,
     Invalid

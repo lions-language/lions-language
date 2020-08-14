@@ -6,10 +6,10 @@ use libtype::instruction::{Instruction, CallPrimevalFunction
     , VariantValue, Uint8Static
     , Uint16Static, Uint32Static
     , StringStatic, StaticVariant
-    , LoadStack, VariantDefine};
+    , LoadStack, OwnershipMove};
 use crate::compile::{StaticContext, CallFunctionContext
     , FunctionNamedStmtContext, Compile
-    , LoadStackContext, VariantDefineContext};
+    , LoadStackContext, OwnershipMoveContext};
 use crate::address;
 use define_stack::DefineStack;
 use crate::define_dispatch::{FunctionDefineDispatch};
@@ -46,6 +46,7 @@ impl<'a, 'b, F: Writer> Compile for Bytecode<'a, 'b, F> {
     
     fn load_stack(&mut self, context: LoadStackContext) {
         let (addr, data) = context.fields_move();
+        // println!("{:?}", addr);
         self.write(Instruction::LoadStack(LoadStack::new_with_all(
                     addr, data)));
     }
@@ -90,10 +91,10 @@ impl<'a, 'b, F: Writer> Compile for Bytecode<'a, 'b, F> {
         self.func_define_dispatch.finish_define(ds)
     }
 
-    fn variant_define(&mut self, context: VariantDefineContext) {
+    fn ownership_move(&mut self, context: OwnershipMoveContext) {
         // println!("{:?}", &context);
         let (dst_addr, src_addr) = context.fields_move();
-        self.write(Instruction::VariantDefine(VariantDefine::new_with_all(
+        self.write(Instruction::OwnershipMove(OwnershipMove::new_with_all(
                     dst_addr, src_addr)));
     }
 

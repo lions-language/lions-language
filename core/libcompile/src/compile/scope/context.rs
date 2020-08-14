@@ -35,7 +35,8 @@ impl ScopeContext {
     }
 
     pub fn recycle_address(&mut self, addr: AddressValue) {
-        self.current_mut_unckecked().recycle_address(addr);
+        let scope = *addr.addr_ref().scope_ref();
+        self.get_back_mut_n_unchecked(scope).recycle_address(addr);
     }
 
     pub fn current_mut_unckecked(&mut self) -> &mut Scope {
