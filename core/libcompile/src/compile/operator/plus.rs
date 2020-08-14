@@ -14,7 +14,6 @@ use crate::compile::{Compile, Compiler, CallFunctionContext
     , AddressValueExpand, OwnershipMoveContext};
 use crate::compile::value_buffer::{ValueBufferItemContext};
 use crate::address::{Address};
-use std::collections::HashSet;
 
 impl<'a, F: Compile> Compiler<'a, F> {
     /*
@@ -23,9 +22,10 @@ impl<'a, F: Compile> Compiler<'a, F> {
      *  addr: value buffer 中存储的地址信息
      * */
     fn process_param(&mut self, typ: &Type
-        , typ_attr: &TypeAttrubute, src_addr: &AddressValue
+        , typ_attr: &TypeAttrubute, src_addr: AddressValue
         , index: usize
-        , value_context: ValueBufferItemContext) {
+        , value_context: ValueBufferItemContext)
+        -> AddressValue {
         match typ_attr {
             TypeAttrubute::Move
             | TypeAttrubute::CreateRef => {
@@ -37,9 +37,9 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 // let addr = self.scope_context.alloc_address(AddressType::Stack, 0);
                 let addr = AddressValue::new(AddressType::Stack
                     , AddressKey::new_with_scope(index as u64, 0));
-                println!("{:?} => {:?}", &addr, src_addr.addr_ref());
+                println!("{:?} => {:?}", &addr, src_addr.clone_with_scope_plus(1));
                 self.cb.ownership_move(OwnershipMoveContext::new_with_all(
-                    addr, src_addr.clone()));
+                    addr.clone(), src_addr.clone_with_scope_plus(1)));
                 /*
                  * 如果是移动的变量, 需要将被移动的变量从变量列表中移除
                  * */
@@ -57,6 +57,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                  * */
                 // println!("{:?}", src_addr);
                 self.scope_context.recycle_address(src_addr.clone());
+                return addr;
             },
             TypeAttrubute::Ref
             | TypeAttrubute::MutRef => {
@@ -69,6 +70,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 unimplemented!();
             }
         }
+        src_addr.clone_with_scope_plus(1)
     }
 
     pub fn operator_plus(&mut self, _value: TokenValue) -> DescResult {
@@ -109,7 +111,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 return e;
             }
         };
-        let left_addr_value = left_addr_value.clone_with_scope_plus(1);
+        // let left_addr_value = left_addr_value.clone_with_scope_plus(1);
         let right_expect_type = self.compile_context.expect_type_ref().clone();
         let (right_type, right_typ_attr, right_addr_value) = match self.binary_type_match(
             right, &right_expect_type
@@ -121,7 +123,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 return e;
             }
         };
-        let right_addr_value = right_addr_value.clone_with_scope_plus(1);
+        // let right_addr_value = right_addr_value.clone_with_scope_plus(1);
         /*
          * 构建 函数参数
          * + 号运算一定只有一个参数
@@ -293,8 +295,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
         /*
          * TODO
          * */
-        // self.process_param(&left_type, &left_typ_attr, &left_addr_value, 0, left_context);
-        // self.process_param(&right_type, &right_typ_attr, &right_addr_value, 1, right_context);
+        let left_addr_value = self.process_param(&left_type, &left_typ_attr, left_addr_value, 0, left_context);
+        let right_addr_value = self.process_param(&right_type, &right_typ_attr, right_addr_value, 1, right_context);
         self.cb.call_function(CallFunctionContext{
             package_str: PackageStr::Empty,
             func: &func,
