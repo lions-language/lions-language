@@ -79,7 +79,7 @@ impl Scope {
                  * 1. 在栈区分配一个空间, 并将数据存入
                  * 2. 将编译期的地址和实际的地址进行绑定
                  * */
-                let stack_addr = memory.stack_data.alloc(data);
+                let stack_addr = memory.stack_data.alloc(addr.typ_clone(), data);
                 self.addr_mapping.bind(addr.addr_clone()
                     , stack_addr);
             },
@@ -95,13 +95,14 @@ impl Scope {
          * 将给定的编译期地址与静态区的地址进行绑定
          * */
         self.addr_mapping.bind(addr.addr_clone()
-            , MemoryValue::new(static_addr));
+            , MemoryValue::new(AddressType::Static, static_addr));
     }
 
     pub fn add_bind(&mut self, addr: AddressKey
+        , src_addr_typ: AddressType
         , src_addr: AddressKey) {
         self.addr_mapping.bind(addr
-            , MemoryValue::new(src_addr));
+            , MemoryValue::new(src_addr_typ, src_addr));
     }
 
     pub fn remove_bind(&mut self, addr: AddressKey) {

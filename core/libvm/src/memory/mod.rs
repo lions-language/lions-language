@@ -1,28 +1,36 @@
-use libtype::{Data, AddressKey};
+use libtype::{AddressKey
+    , AddressValue
+    , AddressType};
 
 #[derive(Debug, Clone)]
-pub struct MemoryValue(AddressKey);
+pub struct MemoryValue{
+    addr_value: AddressValue
+}
 
 impl MemoryValue {
     pub fn get_ref(&self) -> &AddressKey {
-        &self.0
+        self.addr_value.addr_ref()
     }
 
     pub fn get_clone(&self) -> AddressKey {
-        self.0.clone()
+        self.addr_value.addr_clone()
     }
 
     pub fn get_single_clone(&self) -> usize {
-        self.0.index_ref().clone() as usize
+        self.addr_value.addr_ref().index_ref().clone() as usize
     }
 
-    pub fn new(v: AddressKey) -> Self {
-        Self(v)
+    pub fn new(addr_typ: AddressType
+        , addr_key: AddressKey) -> Self {
+        Self {
+            addr_value: AddressValue::new(
+                    addr_typ, addr_key)
+        }
     }
 }
 
 pub trait Rand<T> {
-    fn alloc(&mut self, _: T) -> MemoryValue;
+    fn alloc(&mut self, _: AddressType, _: T) -> MemoryValue;
     fn free(&mut self, _: MemoryValue);
     fn take_unwrap(&mut self, _: &MemoryValue) -> T;
     fn get_unwrap(&self, index: &MemoryValue) -> &T;

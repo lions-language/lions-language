@@ -17,7 +17,7 @@ impl VirtualMachine {
          * */
         self.thread_context.current_mut_unchecked()
             .add_bind(dst_addr.addr_clone()
-                , src_data_addr);
+                , src_addr.typ_clone(), src_data_addr);
         /*
          * 解绑
          * */

@@ -1,4 +1,5 @@
-use libtype::{Data, AddressKey};
+use libtype::{AddressType, AddressKey
+    , AddressValue};
 use crate::memory::{Rand, MemoryValue};
 use std::collections::HashMap;
 use std::fmt::Debug;
@@ -10,13 +11,15 @@ pub struct RandStack<T> {
 }
 
 impl<T> Rand<T> for RandStack<T> {
-    fn alloc(&mut self, data: T) -> MemoryValue {
+    fn alloc(&mut self, addr_typ: AddressType, data: T) -> MemoryValue {
         if self.recycles.is_empty() {
             /*
              * 没有被回收的地址 => 创建一个新的地址
              * */
             self.datas.insert(self.index, data);
-            let k = MemoryValue::new(AddressKey::new(self.index as u64));
+            let k = MemoryValue::new(
+                addr_typ
+                    , AddressKey::new(self.index as u64));
             self.index += 1;
             k
         } else {
@@ -26,7 +29,9 @@ impl<T> Rand<T> for RandStack<T> {
             let index = self.recycles.remove(0);
             self.datas.insert(index, data);
             // println!("get: {}", index);
-            MemoryValue::new(AddressKey::new(index as u64))
+            MemoryValue::new(
+                addr_typ,
+                    AddressKey::new(index as u64))
         }
     }
 

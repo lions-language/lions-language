@@ -1,5 +1,5 @@
 use libtype::{Data, AddressValue
-    , AddressKey};
+    , AddressKey, AddressType};
 use libmacro::{FieldGet};
 use libcommon::ptr::RefPtr;
 use scope::context::{ScopeContext};
@@ -80,10 +80,11 @@ impl ThreadScope {
     }
 
     pub fn add_bind(&mut self, addr: AddressKey
+        , src_addr_typ: AddressType
         , src_addr: AddressKey) {
         let scope = addr.scope_clone();
         self.scope_context.last_n_mut_unchecked(scope).add_bind(
-            addr, src_addr);
+            addr, src_addr_typ, src_addr);
     }
 
     pub fn remove_bind(&mut self, addr: AddressKey) {
