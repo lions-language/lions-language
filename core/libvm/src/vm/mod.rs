@@ -18,8 +18,8 @@ use crate::memory::{stack, Rand};
 use crate::vm::thread_context::context::ThreadContext;
 
 struct MemoryContext {
-    static_stack: stack::RandStack<usize>,
-    thread_stack: stack::RandStack<Data>,
+    static_stack: stack::rand::RandStack<usize>,
+    thread_stack: stack::rand::RandStack<Data>,
     static_addr_mapping: addr_mapping::AddressMapping,
     thread_addr_mapping: addr_mapping::AddressMapping
 }
@@ -27,8 +27,8 @@ struct MemoryContext {
 impl MemoryContext {
     fn new() -> Self {
         Self {
-            static_stack: stack::RandStack::new(),
-            thread_stack: stack::RandStack::new(),
+            static_stack: stack::rand::RandStack::new(),
+            thread_stack: stack::rand::RandStack::new(),
             static_addr_mapping: addr_mapping::AddressMapping::new(),
             thread_addr_mapping: addr_mapping::AddressMapping::new(),
         }

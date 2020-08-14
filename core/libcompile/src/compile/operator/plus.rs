@@ -51,9 +51,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
         let right = self.scope_context.take_top_from_value_buffer();
         let left = self.scope_context.take_top_from_value_buffer();
         let left_addr = left.addr_clone();
-        let left_typ_attr = left.typ_attr_clone();
         let right_addr = right.addr_clone();
-        let right_typ_attr = right.typ_attr_clone();
         /*
         println!("left type attr: {:?}, right type attr: {:?}"
             , left.typ_attr_ref(), right.typ_attr_ref());

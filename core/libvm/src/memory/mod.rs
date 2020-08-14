@@ -24,6 +24,7 @@ impl MemoryValue {
 pub trait Rand<T> {
     fn alloc(&mut self, _: T) -> MemoryValue;
     fn free(&mut self, _: MemoryValue);
+    fn take_unwrap(&mut self, _: &MemoryValue) -> T;
     fn get_unwrap(&self, index: &MemoryValue) -> &T;
     fn get_mut_unwrap(&mut self, index: &MemoryValue) -> &mut T;
 }

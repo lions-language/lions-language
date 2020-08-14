@@ -3,7 +3,7 @@ use libtype::{Data, AddressValue
 use libmacro::{FieldGet};
 use libcommon::ptr::RefPtr;
 use scope::context::{ScopeContext};
-use crate::memory::stack::RandStack;
+use crate::memory::stack::rand::RandStack;
 use crate::memory::{Rand, MemoryValue};
 
 #[derive(FieldGet)]
@@ -39,6 +39,14 @@ impl ThreadScope {
         self.scope_context.current_unchecked().get_data_unchecked(
             addr, link_static, &self.memory)
         */
+    }
+
+    pub fn take_data_unchecked(&mut self, addr: &AddressValue
+        , link_static: &RefPtr)
+        -> Data {
+        let scope = addr.scope_clone();
+        self.scope_context.last_n_unchecked(scope).take_data_unchecked(
+            addr, link_static, &mut self.memory)
     }
 
     pub fn get_data_addr_unchecked(&self, addr: &AddressValue) -> &MemoryValue {

@@ -20,6 +20,7 @@ lazy_static!{
             "str:+(&str,&str)" => 0,
             "str:+(&create str,&str)" => 1,
             "str:+(&mut str,&str)" => 2,
+            "str:+(&mut str,str)" => 3,
         }
     };
     /*
@@ -129,12 +130,48 @@ lazy_static!{
             optcode: OptCode::MutRefStrPlusOperatorRefStr
         })
     };
+    /*
+     * &mut str + str -> &mut str
+     * */
+    static ref MUT_REF_STR_PLUS_OPERATOR_MOVE_STR_FUNCTION: Function = Function{
+        func_statement: FunctionStatement::new(
+            String::from(consts::OPERATOR_PLUS_FUNCTION_NAME),
+            Some(FunctionParam::new(
+                FunctionParamData::Multi(
+                    vec![FunctionParamDataItem::new(
+                        Type::new_without_attr(
+                            TypeValue::Primeval(Primeval::new(
+                                PrimevalType::Str)))
+                        , TypeAttrubute::MutRef
+                    ), FunctionParamDataItem::new(
+                        Type::new_without_attr(TypeValue::Primeval(Primeval::new(
+                                PrimevalType::Str)))
+                        , TypeAttrubute::Move
+                    )])
+                )),
+            FunctionReturn::new(
+                FunctionReturnData::new_with_attr(
+                    Type::new_without_attr(
+                        TypeValue::Primeval(Primeval::new(
+                            PrimevalType::Str)))
+                    , TypeAttrubute::MutRef
+                    , FunctionReturnDataAttr::RefParamIndex(0)
+                    )
+                ),
+            Some(Type::new_without_attr(TypeValue::Primeval(Primeval::new(
+                        PrimevalType::Str))))
+        ),
+        func_define: FunctionDefine::Optcode(OptcodeFunctionDefine{
+            optcode: OptCode::MutRefStrPlusOperatorMoveStr
+        })
+    };
 
     static ref FUNCTION_VEC: Vec<&'static Function> = {
         let mut v = Vec::with_capacity(STR_METHOD.len());
         v.push(&*REF_STR_PLUS_OPERATOR_REF_STR_FUNCTION);
         v.push(&*CREATE_REF_STR_PLUS_OPERATOR_REF_STR_FUNCTION);
         v.push(&*MUT_REF_STR_PLUS_OPERATOR_REF_STR_FUNCTION);
+        v.push(&*MUT_REF_STR_PLUS_OPERATOR_MOVE_STR_FUNCTION);
         v
     };
 }

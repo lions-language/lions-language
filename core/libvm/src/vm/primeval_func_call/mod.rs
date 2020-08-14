@@ -71,6 +71,26 @@ macro_rules! extract_primeval_str_mut {
     }};
 }
 
+macro_rules! extract_primeval_str_move {
+    ($data:expr, $typ:ident, $func:ident) => {{
+        match $data.value() {
+            DataValue::Primeval(d) => {
+                match d {
+                    PrimevalData::Str(v) => {
+                        v.expect("should not happend").$func()
+                    },
+                    _ => {
+                        unimplemented!();
+                    }
+                }
+            },
+            _ => {
+                unimplemented!();
+            }
+        }
+    }};
+}
+
 macro_rules! extract_primeval_utf8_str_ref {
     ($data_ptr:expr, $typ:ident) => {{
         extract_primeval_str_ref!($data_ptr, $typ, extract_utf8_ref)
@@ -80,6 +100,12 @@ macro_rules! extract_primeval_utf8_str_ref {
 macro_rules! extract_primeval_utf8_str_mut {
     ($data_ptr:expr, $typ:ident) => {{
         extract_primeval_str_mut!($data_ptr, $typ, extract_utf8_mut)
+    }};
+}
+
+macro_rules! extract_primeval_utf8_str_move {
+    ($data:expr, $typ:ident) => {{
+        extract_primeval_str_move!($data, $typ, extract_utf8)
     }};
 }
 
@@ -109,6 +135,9 @@ impl VirtualMachine {
             },
             OptCode::MutRefStrPlusOperatorRefStr => {
                 self.mut_ref_str_plus_operator_ref_str(value);
+            },
+            OptCode::MutRefStrPlusOperatorMoveStr => {
+                self.mut_ref_str_plus_operator_move_str(value);
             },
             _ => {
                 unimplemented!("{:?}", &value.opt);

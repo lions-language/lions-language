@@ -1,8 +1,13 @@
 use libtype::{Data, AddressKey};
 use crate::memory::{Rand, MemoryValue};
-use super::RandStack;
-use std::collections::VecDeque;
+use std::collections::HashMap;
 use std::fmt::Debug;
+
+pub struct RandStack<T> {
+    datas: HashMap<usize, T>,
+    recycles: Vec<usize>,
+    index: usize
+}
 
 impl<T> Rand<T> for RandStack<T> {
     fn alloc(&mut self, data: T) -> MemoryValue {
@@ -10,8 +15,10 @@ impl<T> Rand<T> for RandStack<T> {
             /*
              * 没有被回收的地址 => 创建一个新的地址
              * */
-            self.datas.push_back(data);
-            MemoryValue::new(AddressKey::new(self.datas.len() as u64 - 1))
+            self.datas.insert(self.index, data);
+            let k = MemoryValue::new(AddressKey::new(self.index as u64));
+            self.index += 1;
+            k
         } else {
             /*
              * 存在被回收的 => 返回回收的地址
@@ -22,26 +29,36 @@ impl<T> Rand<T> for RandStack<T> {
     }
 
     fn get_unwrap(&self, index: &MemoryValue) -> &T {
-        self.datas.get(index.get_single_clone()).unwrap()
+        self.datas.get(&(index.get_single_clone() as usize)).unwrap()
     }
 
     fn get_mut_unwrap(&mut self, index: &MemoryValue) -> &mut T {
-        self.datas.get_mut(index.get_single_clone()).unwrap()
+        self.datas.get_mut(&index.get_single_clone()).unwrap()
+    }
+
+    fn take_unwrap(&mut self, index: &MemoryValue) -> T {
+        let index = index.get_single_clone();
+        /*
+         * 添加到回收中
+         * */
+        self.recycles.push(index);
+        self.datas.remove(&index).expect("randstack take error")
     }
 
     fn free(&mut self, index: MemoryValue) {
-        if index.get_single_clone() == self.datas.len() - 1 {
+        let index = index.get_single_clone();
+        if index == self.datas.len() - 1 {
             /*
              * 将要移除的是顶端元素
              *  不需要回收地址, 直接释放
              * */
-            self.datas.pop_back();
+            self.datas.remove(&index);
         } else {
             /*
              * 移除的是中间元素
              *  回收地址, 以备后续使用
              * */
-            self.recycles.push(index.get_single_clone());
+            self.recycles.push(index);
         }
     }
 }
@@ -61,8 +78,9 @@ impl<T: Debug> RandStack<T> {
 
     pub fn with_capacity(cap: usize) -> Self {
         Self {
-            datas: VecDeque::with_capacity(cap),
-            recycles: Vec::new()
+            datas: HashMap::with_capacity(cap),
+            recycles: Vec::new(),
+            index: 0
         }
     }
 

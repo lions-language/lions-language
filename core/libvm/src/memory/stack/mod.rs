@@ -1,14 +1,10 @@
 use libtype::Data;
+use std::collections::HashMap;
 use std::collections::VecDeque;
-
-pub struct RandStack<T> {
-    datas: VecDeque<T>,
-    recycles: Vec<usize>
-}
 
 pub struct TopStack<T> {
     datas: VecDeque<T>
 }
 
-mod rand;
+pub mod rand;
 mod top;

@@ -2,7 +2,7 @@ use libtype::{AddressValue, AddressType
     , AddressKey, Data};
 use libcommon::ptr::RefPtr;
 use liblink::statics::LinkStatic;
-use crate::memory::stack::RandStack;
+use crate::memory::stack::rand::RandStack;
 use crate::vm::addr_mapping::{AddressMapping};
 use crate::vm::thread_context::{ThreadMemory};
 use crate::memory::{Rand, MemoryValue};
@@ -39,6 +39,24 @@ impl Scope {
                 let stack_addr = self.addr_mapping.get_unwrap(addr.addr_ref());
                 let data = memory.stack_data_ref().get_unwrap(stack_addr);
                 RefPtr::from_ref::<Data>(data)
+            },
+            _ => {
+                unimplemented!("{:?}", addr.typ_ref());
+            }
+        }
+    }
+
+    pub fn take_data_unchecked(&self, addr: &AddressValue
+        , link_static: &RefPtr, memory: &mut ThreadMemory)
+        -> Data {
+        match addr.typ_ref() {
+            AddressType::Static => {
+                panic!("static should not be taked");
+            },
+            AddressType::Stack => {
+                let stack_addr = self.addr_mapping.get_unwrap(addr.addr_ref());
+                let data = memory.stack_data_mut().take_unwrap(stack_addr);
+                data
             },
             _ => {
                 unimplemented!("{:?}", addr.typ_ref());
