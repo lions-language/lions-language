@@ -6,11 +6,13 @@ use libtype::function::{FunctionParamData, FunctionParamDataItem
         , FindFunctionResult, FunctionReturnDataAttr
         , Function, CallFunctionParamAddr
         , CallFunctionReturnData};
-use libtype::{AddressType, AddressValue, TypeValue};
+use libtype::{AddressType, AddressValue, TypeValue
+    , AddressKey};
 use libtype::package::{PackageStr};
 use libcommon::ptr::{RefPtr};
 use crate::compile::{Compile, Compiler, CallFunctionContext
-    , AddressValueExpand};
+    , AddressValueExpand, OwnershipMoveContext};
+use crate::compile::value_buffer::{ValueBufferItemContext};
 use crate::address::{Address};
 use std::collections::HashSet;
 
@@ -20,21 +22,53 @@ impl<'a, F: Compile> Compiler<'a, F> {
      *  typ: 参数的类型
      *  addr: value buffer 中存储的地址信息
      * */
-    fn alloc_addr_for_single_type(&mut self, typ: &Type, addr: &Address)
-        -> Address {
-        match typ.attr_ref() {
-            TypeAttrubute::Move => {
+    fn process_param(&mut self, typ: &Type
+        , typ_attr: &TypeAttrubute, src_addr: &AddressValue
+        , index: usize
+        , value_context: ValueBufferItemContext) {
+        match typ_attr {
+            TypeAttrubute::Move
+            | TypeAttrubute::CreateRef => {
                 /*
-                 * 如果是 Move, 说明将不归这里管理, 将其所有权移除
+                 * 告诉虚拟机移动地址(交换地址映射),
+                 *  主要是为了让实际存储数据的地址有一个可以被找到的标识
+                 * 这样虚拟机在作用域结束的时候就可以通过这个标识找到地址, 然后进行释放
                  * */
-                self.scope_context.ref_counter_remove(addr.addr_ref().addr_ref());
+                // let addr = self.scope_context.alloc_address(AddressType::Stack, 0);
+                let addr = AddressValue::new(AddressType::Stack
+                    , AddressKey::new_with_scope(index as u64, 0));
+                println!("{:?} => {:?}", &addr, src_addr.addr_ref());
+                self.cb.ownership_move(OwnershipMoveContext::new_with_all(
+                    addr, src_addr.clone()));
                 /*
-                 * 为了回收地址, 需要添加到回收中
+                 * 如果是移动的变量, 需要将被移动的变量从变量列表中移除
+                 * */
+                match value_context {
+                    ValueBufferItemContext::Variant(v) => {
+                        let var_name = v.as_ref::<String>();
+                        self.scope_context.remove_variant_unchecked(
+                            src_addr.addr_ref().scope_clone()
+                            , var_name);
+                    },
+                    _ => {}
+                }
+                /*
+                 * 回收索引
+                 * */
+                // println!("{:?}", src_addr);
+                self.scope_context.recycle_address(src_addr.clone());
+            },
+            TypeAttrubute::Ref
+            | TypeAttrubute::MutRef => {
+                /*
+                 * 将实际存储数据的地址存储到 Variant 对象中 (也就是 src_addr)
                  * */
             },
-            _ => {}
+            TypeAttrubute::Pointer
+            | TypeAttrubute::Empty => {
+                unimplemented!();
+            }
         }
-        addr.clone()
     }
 
     pub fn operator_plus(&mut self, _value: TokenValue) -> DescResult {
@@ -52,6 +86,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
         let left = self.scope_context.take_top_from_value_buffer();
         let left_addr = left.addr_clone();
         let right_addr = right.addr_clone();
+        let left_context = left.context_clone();
+        let right_context = right.context_clone();
         /*
         println!("left type attr: {:?}, right type attr: {:?}"
             , left.typ_attr_ref(), right.typ_attr_ref());
@@ -145,8 +181,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
         /*
          * 计算第一个参数的地址 (第一个参数就是 操作数的类型)
          * */
-        let left_addr = self.alloc_addr_for_single_type(&left_type, &left_addr);
-        let right_addr = self.alloc_addr_for_single_type(&right_type, &right_addr);
+        // let left_addr = self.process_param(&left_type, &left_typ_attr, &left_addr);
+        // let right_addr = self.process_param(&right_type, &right_typ_attr, &right_addr);
         /*
          * 从后向前加载, 因为虚拟机加载参数是从前向后的, 那么对于栈, 写入时应该是相反的顺序
          * */
@@ -212,7 +248,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                         ref_addr.clone()
                     },
                     TypeAttrubute::Move => {
-                        let param_addrs = vec![left_addr.addr(), right_addr.addr()];
+                        let param_addrs = vec![left_addr.addr_clone(), right_addr.addr_clone()];
                         match &return_data.attr {
                             FunctionReturnDataAttr::MoveIndex(param_index) => {
                                 let ref_addr = &param_addrs[*param_index as usize];
@@ -253,7 +289,13 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 }
             }
         };
-        self.call_function_and_ctrl_scope(CallFunctionContext{
+        self.cb.enter_scope();
+        /*
+         * TODO
+         * */
+        // self.process_param(&left_type, &left_typ_attr, &left_addr_value, 0, left_context);
+        // self.process_param(&right_type, &right_typ_attr, &right_addr_value, 1, right_context);
+        self.cb.call_function(CallFunctionContext{
             package_str: PackageStr::Empty,
             func: &func,
             param_addrs: Some(vec![CallFunctionParamAddr::Fixed(left_addr_value)
@@ -261,6 +303,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
             return_data: CallFunctionReturnData::new_with_all(
                 return_addr.addr_clone(), return_is_alloc)
         });
+        self.cb.leave_scope();
         /*
          * 函数调用结束后, 如果之前为 scope 加过1, 需要将返回值地址中的 scope 减掉
          * */
