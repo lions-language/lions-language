@@ -27,8 +27,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
         , value_context: ValueBufferItemContext)
         -> AddressValue {
         match typ_attr {
-            TypeAttrubute::Move
-            | TypeAttrubute::CreateRef => {
+            TypeAttrubute::Move => {
                 /*
                  * 告诉虚拟机移动地址(交换地址映射),
                  *  主要是为了让实际存储数据的地址有一个可以被找到的标识
@@ -37,7 +36,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 // let addr = self.scope_context.alloc_address(AddressType::Stack, 0);
                 let addr = AddressValue::new(AddressType::Stack
                     , AddressKey::new_with_scope(index as u64, 0));
-                println!("{:?} => {:?}", &addr, src_addr.clone_with_scope_plus(1));
+                // println!("{:?} => {:?}", &addr, src_addr.clone_with_scope_plus(1));
                 self.cb.ownership_move(OwnershipMoveContext::new_with_all(
                     addr.clone(), src_addr.clone_with_scope_plus(1)));
                 /*
@@ -60,6 +59,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 return addr;
             },
             TypeAttrubute::Ref
+            | TypeAttrubute::CreateRef
             | TypeAttrubute::MutRef => {
                 /*
                  * 将实际存储数据的地址存储到 Variant 对象中 (也就是 src_addr)
@@ -295,8 +295,10 @@ impl<'a, F: Compile> Compiler<'a, F> {
         /*
          * TODO
          * */
-        let left_addr_value = self.process_param(&left_type, &left_typ_attr, left_addr_value, 0, left_context);
-        let right_addr_value = self.process_param(&right_type, &right_typ_attr, right_addr_value, 1, right_context);
+        let left_addr_value = self.process_param
+            (&left_type, &left_typ_attr, left_addr_value, 0, left_context);
+        let right_addr_value = self.process_param(
+            &right_type, &right_typ_attr, right_addr_value, 1, right_context);
         self.cb.call_function(CallFunctionContext{
             package_str: PackageStr::Empty,
             func: &func,

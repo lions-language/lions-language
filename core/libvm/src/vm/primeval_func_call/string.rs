@@ -188,9 +188,9 @@ impl VirtualMachine {
          * */
         left_value.push_str(&right_value);
         // println!("result: {}", result);
-        self.thread_context.current_mut_unchecked().print_current_addr_mapping();
-        self.thread_context.current_mut_unchecked().print_last_n_addr_mapping(1);
-        self.thread_context.current_mut_unchecked().print_stack_datas();
+        // self.thread_context.current_mut_unchecked().print_current_addr_mapping();
+        // self.thread_context.current_mut_unchecked().print_last_n_addr_mapping(1);
+        // self.thread_context.current_mut_unchecked().print_stack_datas();
         /*
          * 该函数返回的是一个 &mut, 所以不需要分配内存
          * */
