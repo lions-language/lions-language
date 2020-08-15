@@ -111,10 +111,12 @@ impl LinkDefine {
     }
 
     pub fn read(&self, addr: &FunctionAddrValue) -> LinkDefineBlock {
+        let pos = addr.start_pos_ref().clone();
+        let length = addr.length_ref().clone() + pos;
         LinkDefineBlock {
             link_define: self,
-            pos: addr.start_pos_ref().clone(),
-            length: addr.length_ref().clone()
+            pos: pos,
+            length: length
         }
     }
 
@@ -146,6 +148,7 @@ impl<'a> Iterator for LinkDefineBlock<'a> {
         match self.link_define.code_segment.get(self.pos) {
             Some(v) => {
                 self.pos += 1;
+                // println!("{:?}", v);
                 Some(v.clone())
             },
             None => {

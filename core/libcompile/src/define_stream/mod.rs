@@ -15,14 +15,17 @@ impl DefineStream {
         /*
          * TODO 现阶段直接写入到内存中, 后期将用文件缓存
          * */
+        println!("{:?}", &instruction);
         self.memory.write(instruction);
     }
 
     pub fn read(&mut self, addr: &FunctionAddrValue) -> DefineBlock {
+        let pos = addr.start_pos_ref().clone();
+        let length = addr.length_ref().clone() + pos;
         let block = DefineBlock{
             stream: self,
-            pos: addr.start_pos_ref().clone(),
-            length: addr.length_ref().clone()
+            pos: pos,
+            length: length,
         };
         block
     }
@@ -54,6 +57,7 @@ impl<'a> Iterator for DefineBlock<'a> {
         match self.stream.memory.get(self.pos) {
             Some(v) => {
                 self.pos += 1;
+                // println!("{:?}", v);
                 Some(RefPtr::from_ref::<Instruction>(v))
             },
             None => {
