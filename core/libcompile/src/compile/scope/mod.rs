@@ -6,15 +6,13 @@ use crate::compile::ref_count::RefCounter;
 use crate::compile::value_buffer::{ValueBuffer
     , ValueBufferItem, ValueBufferItemContext};
 use crate::address::{Address};
-use crate::define::{DefineObject};
 
 #[derive(FieldGet, FieldGetMove)]
 pub struct Scope {
     address_dispatch: AddressDispatch,
     ref_counter: RefCounter,
     vars: vars::Variants,
-    value_buffer: ValueBuffer,
-    func_define_object: DefineObject
+    value_buffer: ValueBuffer
 }
 
 impl Scope {
@@ -97,7 +95,6 @@ impl Scope {
             ref_counter: RefCounter::new(),
             vars: vars::Variants::new(),
             value_buffer: ValueBuffer::new(),
-            func_define_object: DefineObject::default()
         }
     }
 }

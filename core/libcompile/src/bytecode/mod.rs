@@ -1,4 +1,5 @@
-use libtype::function::{FunctionDefine, Function};
+use libtype::function::{FunctionDefine, Function
+    , FunctionParamDataItem};
 use libtype::primeval::{PrimevalData};
 use libtype::DataValue;
 use libtype::instruction::{Instruction, CallPrimevalFunction
@@ -13,6 +14,7 @@ use crate::compile::{StaticContext, CallFunctionContext
 use crate::address;
 use define_stack::DefineStack;
 use crate::define_dispatch::{FunctionDefineDispatch};
+use crate::define::{DefineObject};
 
 pub trait Writer {
     fn write(&mut self, _: Instruction) {
@@ -86,9 +88,15 @@ impl<'a, 'b, F: Writer> Compile for Bytecode<'a, 'b, F> {
         self.define_stack.enter(self.func_define_dispatch.alloc_define(context));
     }
 
+    fn function_push_param_to_statement(&mut self
+        , item: FunctionParamDataItem) {
+        let ds = self.define_stack.back_mut_unchecked();
+        self.func_define_dispatch.push_function_param_to_statement(ds, item);
+    }
+
     fn function_define_end(&mut self) -> Function {
         let ds = self.define_stack.leave();
-        self.func_define_dispatch.finish_define(ds)
+        self.func_define_dispatch.finish_define(&ds)
     }
 
     fn ownership_move(&mut self, context: OwnershipMoveContext) {

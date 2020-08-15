@@ -58,7 +58,7 @@ pub struct FunctionDefine {
 /*
  * 用来保存 FunctionDefine 对象
  * */
-#[derive(FieldGet, FieldGetClone)]
+#[derive(FieldGet, FieldGetClone, Clone)]
 pub struct DefineObject {
     ptr: RefPtr
 }

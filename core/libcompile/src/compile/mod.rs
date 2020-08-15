@@ -7,7 +7,8 @@ use libgrammar::token::{TokenValue};
 use libtype::{Type, Data
     , TypeAttrubute};
 use libtype::function::{Function, CallFunctionParamAddr
-    , CallFunctionReturnData};
+    , CallFunctionReturnData
+    , FunctionParamDataItem};
 use libtypecontrol::function::FunctionControl;
 use libtype::module::Module;
 use libresult::*;
@@ -18,6 +19,7 @@ use crate::address;
 use crate::address::PackageIndex;
 use crate::static_dispatch::{StaticVariantDispatch};
 use scope::context::ScopeContext;
+use crate::define::DefineObject;
 
 #[derive(Debug)]
 pub struct StaticContext {
@@ -132,6 +134,11 @@ pub trait Compile {
     }
 
     fn function_named_stmt(&mut self, _context: FunctionNamedStmtContext) {
+        unimplemented!();
+    }
+
+    fn function_push_param_to_statement(&mut self
+        , item: FunctionParamDataItem) {
     }
     
     fn function_define_start(&mut self) {
@@ -219,7 +226,7 @@ impl<'a, F: Compile> Grammar for Compiler<'a, F> {
         self.handle_end()
     }
 
-    fn function_named_stmt(&mut self, value: TokenValue) {
+    fn function_named_stmt(&mut self, value: TokenValue)  {
         self.handle_function_named_stmt(value);
     }
 

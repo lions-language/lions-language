@@ -12,6 +12,10 @@ impl DefineStack {
         self.ws.push_back(obj);
     }
 
+    pub fn back_mut_unchecked(&mut self) -> &mut DefineObject {
+        self.ws.back_mut().expect("should not happend")
+    }
+
     pub fn leave(&mut self) -> DefineObject {
         self.ws.pop_back().expect("should not happend")
     }

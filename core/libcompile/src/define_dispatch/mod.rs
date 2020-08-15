@@ -2,7 +2,9 @@ use libcommon::ptr::RefPtr;
 use libcommon::address::{FunctionAddress, FunctionAddrValue};
 use libtype::function::{self, FunctionStatement
     , FunctionReturn, Function
-    , AddressFunctionDefine};
+    , AddressFunctionDefine
+    , FunctionParam, FunctionParamData
+    , FunctionParamDataItem};
 use crate::define::{DefineObject, FunctionDefine
     , DefineType};
 use crate::compile::FunctionNamedStmtContext;
@@ -36,7 +38,39 @@ impl<'a> FunctionDefineDispatch<'a> {
                 FunctionAddress::Define(addr))))
     }
 
-    pub fn finish_define(&mut self, obj: DefineObject) -> Function {
+    pub fn push_function_param_to_statement(&mut self
+        , define_obj: &mut DefineObject
+        , item: FunctionParamDataItem) {
+        let fd = define_obj.ptr_mut().as_mut::<FunctionDefine>();
+        let statement = fd.statement_mut();
+        match statement.func_param_mut() {
+            Some(func_param) => {
+                /*
+                 * 存在参数, 需要追加
+                 * */
+                match func_param.data_mut() {
+                    FunctionParamData::Single(data) => {
+                        *statement.func_param_mut() =
+                            Some(FunctionParam::new(
+                                    FunctionParamData::Multi(
+                                        vec![data.clone(), item])));
+                    },
+                    FunctionParamData::Multi(data) => {
+                        data.push(item);
+                    }
+                }
+            },
+            None => {
+                /*
+                 * 修改之前没有参数 => 创建一个 Single
+                 * */
+                *statement.func_param_mut() =
+                    Some(FunctionParam::new(FunctionParamData::Single(item)));
+            }
+        }
+    }
+
+    pub fn finish_define(&mut self, obj: &DefineObject) -> Function {
         /*
          * 暂时不考虑多线程问题, 这里的 obj 就是为了以后多线程时, 可以从中间移除元素
          * (在 FunctionDefine 中存储 索引, 移除的时候根据这个索引移除元素)

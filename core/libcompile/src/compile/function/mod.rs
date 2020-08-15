@@ -1,6 +1,7 @@
 use libgrammar::token::{TokenValue, TokenData};
 use libgrammar::grammar::{FunctionDefineParamContext};
-use libtype::function::{AddFunctionContext};
+use libtype::function::{AddFunctionContext
+    , FunctionParamDataItem};
 use libtype::{PackageType, PackageTypeValue
     , TypeAttrubute, Type
     , AddressKey, AddressValue
@@ -48,7 +49,13 @@ impl<'a, F: Compile> Compiler<'a, F> {
             , Variant::new_with_all(
                 Address::new(AddressValue::new(typ.to_address_type()
                         , AddressKey::new(param_no as u64)))
-                , typ, typ_attr));
+                , typ.clone(), typ_attr.clone()));
+        /*
+         * 填充函数声明
+         * */
+        let func_param_item = FunctionParamDataItem::new_with_all(
+            typ, typ_attr, lengthen_attr, false);
+        self.cb.function_push_param_to_statement(func_param_item);
     }
 
     pub fn handle_function_define_start(&mut self) {

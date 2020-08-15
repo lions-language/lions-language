@@ -333,7 +333,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                         }
                     },
                     FunctionParamData::Multi(_) => {
-                        unimplemented!();
+                        unimplemented!("param is multi");
                     }
                 }
             },
