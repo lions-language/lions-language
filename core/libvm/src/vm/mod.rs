@@ -227,13 +227,29 @@ mod test {
     use std::fs;
     use std::io::Read;
 
+    // use rust_parse::cmd::CCmd;
+
     #[test]
     fn virtual_machine_test() {
+        /*
+        let mut cmd_handler = CCmd::new();
+        let path = cmd_handler.register_with_desc("-path", "main.lions", "main file path");
+        cmd_handler.parse();
+        let path = path.borrow();
+
+        let file = String::from(&*path);
+        let mut f = match fs::File::open(&file) {
+            Ok(f) => f,
+            Err(err) => {
+                panic!("read file error, err: {}", err);
+            }
+        };
+        */
         let file = String::from("main.lions");
         let mut f = match fs::File::open(&file) {
             Ok(f) => f,
-            Err(_err) => {
-                panic!("read file error");
+            Err(err) => {
+                panic!("read file error, err: {}", err);
             }
         };
         let lexical_parser = LexicalParser::new(file.clone(), || -> CallbackReturnStatus {

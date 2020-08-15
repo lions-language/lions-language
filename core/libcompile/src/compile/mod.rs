@@ -1,9 +1,11 @@
 use libgrammar::grammar::{Grammar, CallFuncScopeContext
     , VarStmtContext, LoadVariantContext as GrammarLoadVariantContext
     , ConstNumberContext, ConstStringContext
-    , CallFunctionContext as GrammarCallFunctionContext};
+    , CallFunctionContext as GrammarCallFunctionContext
+    , FunctionDefineParamContext};
 use libgrammar::token::{TokenValue};
-use libtype::{Type, Data};
+use libtype::{Type, Data
+    , TypeAttrubute};
 use libtype::function::{Function, CallFunctionParamAddr
     , CallFunctionReturnData};
 use libtypecontrol::function::FunctionControl;
@@ -225,8 +227,8 @@ impl<'a, F: Compile> Grammar for Compiler<'a, F> {
         self.handle_function_define_start();
     }
 
-    fn function_define_param(&mut self, name_token: TokenValue, type_token: TokenValue) {
-        self.handle_function_define_param(name_token, type_token);
+    fn function_define_param(&mut self, context: FunctionDefineParamContext) {
+        self.handle_function_define_param(context);
     }
 
     fn function_define_end(&mut self, _value: TokenValue) {

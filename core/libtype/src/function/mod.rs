@@ -92,16 +92,6 @@ pub struct FunctionParam {
 }
 
 #[derive(Debug, Clone)]
-pub enum FunctionParamAddrAttr {
-    /*
-     * Move / Ref / Ptr
-     * */
-    Move,
-    Ref,
-    Ptr
-}
-
-#[derive(Debug, Clone)]
 pub enum FunctionParamLengthenAttr {
     /*
      * 变长参数
@@ -117,7 +107,6 @@ pub enum FunctionParamLengthenAttr {
 pub struct FunctionParamDataItem {
     pub typ: Type,
     pub typ_attr: TypeAttrubute,
-    pub addr_attr: FunctionParamAddrAttr,
     /*
      * 是否是变长参数
      * */
@@ -150,7 +139,6 @@ impl FunctionParamDataItem {
     pub fn new(typ: Type, typ_attr: TypeAttrubute) -> Self {
         FunctionParamDataItem::new_with_all(typ
             , typ_attr
-            , FunctionParamAddrAttr::Move
             , FunctionParamLengthenAttr::Fixed
             , false)
     }
@@ -158,7 +146,6 @@ impl FunctionParamDataItem {
     pub fn new_lengthen(typ: Type, typ_attr: TypeAttrubute) -> Self {
         FunctionParamDataItem::new_with_all(typ
             , typ_attr
-            , FunctionParamAddrAttr::Move
             , FunctionParamLengthenAttr::Lengthen
             , false)
     }
@@ -168,7 +155,6 @@ impl FunctionParamDataItem {
         , is_auto_call_totype: bool) -> Self {
         FunctionParamDataItem::new_with_all(typ
             , typ_attr
-            , FunctionParamAddrAttr::Move
             , FunctionParamLengthenAttr::Lengthen
             , is_auto_call_totype)
     }

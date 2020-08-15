@@ -1,4 +1,7 @@
-use super::{GrammarParser, Grammar, NextToken, ExpressContext};
+use libtype::{TypeAttrubute};
+use libtype::function::{FunctionParamLengthenAttr};
+use super::{GrammarParser, Grammar, NextToken, ExpressContext
+    , FunctionDefineParamContext};
 use crate::lexical::{CallbackReturnStatus, TokenVecItem, TokenPointer};
 use crate::token::{TokenType, TokenValue};
 
@@ -184,8 +187,10 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
     }
 
     fn function_find_params(&mut self) {
+        let mut param_no = 0;
         loop {
-            self.function_find_param();
+            self.function_find_param(param_no);
+            param_no += 1;
             let tp = match self.lookup_next_one_ptr() {
                 Some(tp) => {
                     tp
@@ -242,22 +247,32 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         self.take_next_one()
     }
 
-    fn function_find_param_type_with_token(&mut self, t: TokenPointer) {
+    fn function_find_param_type_with_token(&mut self, t: TokenPointer) 
+        -> (TypeAttrubute, FunctionParamLengthenAttr) {
         /*
          * 支持 name type 的方式, 也支持 name: type 的方式
          * 所以如果后面是 :(冒号) => 跳过
          * */
+        let mut typ_attr = TypeAttrubute::default();
+        let mut lengthen_attr = FunctionParamLengthenAttr::Fixed;
         let token = t.as_ref::<T, CB>();
         match token.context_ref().token_type() {
             TokenType::Id => {
                 /*
                  * name type 形式
                  * */
+                typ_attr = TypeAttrubute::Move;
             },
             TokenType::Multiplication => {
                 /*
                  * name *type 形式
                  * */
+                typ_attr = TypeAttrubute::Pointer;
+                self.skip_next_one();
+            },
+            TokenType::And => {
+                typ_attr = TypeAttrubute::Ref;
+                self.skip_next_one();
             },
             TokenType::Colon => {
                 /*
@@ -268,10 +283,21 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                  * 查找 : 后面的 id
                  * 如果不是 id => 语法错误
                  * */
+                // println!("colon");
                 self.expect_next_token(|parser, t| {
                     let token = t.as_ref::<T, CB>();
+                    // println!("{:?}", token.context_token_type());
                     match token.context_ref().token_type() {
                         TokenType::Id => {
+                            typ_attr = TypeAttrubute::Move;
+                        },
+                        TokenType::Multiplication => {
+                            typ_attr = TypeAttrubute::Pointer;
+                            parser.skip_next_one();
+                        },
+                        TokenType::And => {
+                            typ_attr = TypeAttrubute::Ref;
+                            parser.skip_next_one();
                         },
                         _ => {
                             /*
@@ -289,37 +315,45 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                 self.panic(&format!("expect id as type or `:`, but found: {:?}", token.context_ref().token_type()));
             }
         }
+        (typ_attr, lengthen_attr)
     }
 
-    fn function_find_param_type(&mut self, tp: Option<TokenPointer>) -> TokenVecItem<T, CB> {
+    fn function_find_param_type(&mut self, tp: Option<TokenPointer>)
+        -> (TypeAttrubute, FunctionParamLengthenAttr, TokenVecItem<T, CB>) {
         /*
          * 如果已经获取了next token, 那么直接传入 token
          * 否则, 查看下一个, 再调用
          * */
-        match tp {
+        let (typ_attr, lengthen_attr) = match tp {
             Some(tp) => {
-                self.function_find_param_type_with_token(tp);
+                self.function_find_param_type_with_token(tp)
             },
             None => {
-                self.expect_next_token(|parser, t| {
-                    parser.function_find_param_type_with_token(t);
+                let tp = self.expect_next_token(|_, _| {
                 }, "type");
+                self.function_find_param_type_with_token(tp.expect("should not happend"))
             }
-        }
+        };
         /*
          * 语法正确的情况下, 到达了这里 => 下一个 token 一定是 id
          * */
+        self.expect_next_token(|_, _| {
+        }, "id as type");
         let type_token = self.take_next_one();
-        type_token
+        // println!("{:?}", type_token.context_token_type());
+        (typ_attr, lengthen_attr, type_token)
     }
 
-    fn function_find_param(&mut self) {
+    fn function_find_param(&mut self, param_no: usize) {
         /*
          * 查找 name id
          * */
         let name_token = self.function_find_param_name();
-        let type_token = self.function_find_param_type(None);
-        self.grammar_context().cb.function_define_param(name_token.token_value(), type_token.token_value());
+        let (typ_attr, lengthen_attr, type_token) = self.function_find_param_type(None);
+        self.grammar_context().cb.function_define_param(
+            FunctionDefineParamContext::new_with_all(
+                name_token.token_value(), type_token.token_value()
+                , typ_attr, lengthen_attr, param_no));
     }
 
     pub fn function_process(&mut self) {

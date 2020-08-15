@@ -1,7 +1,8 @@
 use crate::lexical::{LexicalParser, CallbackReturnStatus, TokenVecItem, TokenPointer};
 use crate::token::{TokenType, TokenValue, TokenMethodResult};
 use libcommon::ptr::RefPtr;
-use libtype::{Type, PackageType, TypeAttrubute};
+use libtype::{Type, PackageType, TypeAttrubute
+    , function::FunctionParamLengthenAttr};
 use libtype::function::{FindFunctionHandle};
 use libresult::*;
 use libtype::package::PackageStr;
@@ -81,6 +82,18 @@ pub struct ConstStringContext {
     typ_attr: TypeAttrubute
 }
 
+#[derive(FieldGet, NewWithAll, FieldGetMove)]
+pub struct FunctionDefineParamContext {
+    name_token: TokenValue,
+    type_token: TokenValue,
+    typ_attr: TypeAttrubute,
+    lengthen_attr: FunctionParamLengthenAttr,
+    /*
+     * 参数序号
+     * */
+    param_no: usize
+}
+
 pub trait Grammar {
     // type IdUse;
     
@@ -137,9 +150,9 @@ pub trait Grammar {
          * */
         println!("named function define start");
     }
-    fn function_define_param(&mut self, name_token: TokenValue, type_token: TokenValue) {
-        name_token.print_token_type(Some("function param name:"));
-        type_token.print_token_type(Some("function param type:"));
+    fn function_define_param(&mut self, context: FunctionDefineParamContext) {
+        context.name_token.print_token_type(Some("function param name:"));
+        context.type_token.print_token_type(Some("function param type:"));
     }
     fn function_define_end(&mut self, _value: TokenValue) {
         /*

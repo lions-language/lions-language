@@ -1,3 +1,4 @@
+use libmacro::{FieldGet, FieldGetMove};
 use libtype::{AddressType, AddressValue, AddressKey
     , Type, TypeAttrubute};
 use crate::compile::address_dispatch::AddressDispatch;
@@ -5,12 +6,15 @@ use crate::compile::ref_count::RefCounter;
 use crate::compile::value_buffer::{ValueBuffer
     , ValueBufferItem, ValueBufferItemContext};
 use crate::address::{Address};
+use crate::define::{DefineObject};
 
+#[derive(FieldGet, FieldGetMove)]
 pub struct Scope {
     address_dispatch: AddressDispatch,
     ref_counter: RefCounter,
     vars: vars::Variants,
-    value_buffer: ValueBuffer
+    value_buffer: ValueBuffer,
+    func_define_object: DefineObject
 }
 
 impl Scope {
@@ -92,7 +96,8 @@ impl Scope {
             address_dispatch: AddressDispatch::new(),
             ref_counter: RefCounter::new(),
             vars: vars::Variants::new(),
-            value_buffer: ValueBuffer::new()
+            value_buffer: ValueBuffer::new(),
+            func_define_object: DefineObject::default()
         }
     }
 }

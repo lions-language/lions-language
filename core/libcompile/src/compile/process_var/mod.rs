@@ -19,9 +19,9 @@ impl<'a, F: Compile> Compiler<'a, F> {
          * 1. 为变量在栈上分配一个空的地址 (如果存在`=`, 再改变该地址)
          * 2. 将变量写入到作用域中
          * */
-         let name = extract_token_data!(
-            context.id_token().token_data().expect("should not happend")
-            , Id);
+        let name = extract_token_data!(
+           context.id_token().token_data().expect("should not happend")
+           , Id);
         if !is_exist_equal {
             self.scope_context.add_variant(name
                 , Variant::new_with_all(

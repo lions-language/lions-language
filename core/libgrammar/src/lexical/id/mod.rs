@@ -116,6 +116,7 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
             "func"|"fn" => {
                 self.id_kw_func();
             },
+            /*
             "i8"|"int8" => {
                 self.id_primeval_type(PrimevalType::Int8);
             },
@@ -149,6 +150,7 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
             "string" => {
                 self.id_primeval_type(PrimevalType::Str);
             },
+            */
             "let" => {
                 self.id_kw_let();
             },

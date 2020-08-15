@@ -55,9 +55,20 @@ pub struct FunctionDefine {
     define_stream: RefPtr
 }
 
+/*
+ * 用来保存 FunctionDefine 对象
+ * */
 #[derive(FieldGet, FieldGetClone)]
 pub struct DefineObject {
     ptr: RefPtr
+}
+
+impl Default for DefineObject {
+    fn default() -> Self {
+        Self {
+            ptr: RefPtr::new_null()
+        }
+    }
 }
 
 impl DefineObject {

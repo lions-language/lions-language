@@ -223,6 +223,11 @@ impl Type {
         Type::new(typ, TypeAttrubute::Empty)
     }
 
+    pub fn new_with_addrtyp(typ: TypeValue
+        , addr_typ: TypeAddrType) -> Self {
+        Type::_new(typ, TypeAttrubute::Empty, addr_typ)
+    }
+
     pub fn new_heap(typ: TypeValue, attr: TypeAttrubute) -> Self {
         Type::_new(typ, attr, TypeAddrType::Heap)
     }
