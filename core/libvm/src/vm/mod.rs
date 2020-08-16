@@ -74,6 +74,9 @@ impl VirtualMachine {
             Instruction::OwnershipMove(v) => {
                 self.ownership_move(v);
             },
+            Instruction::AddressBind(v) => {
+                self.address_bind(v);
+            },
             Instruction::ReadStaticVariant(v) => {
                 self.read_static_variant(v);
             },
@@ -208,6 +211,7 @@ mod addr_mapping;
 mod func_call;
 mod thread_context;
 mod ownership;
+mod address;
 
 #[cfg(test)]
 mod test {
