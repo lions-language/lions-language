@@ -1,15 +1,18 @@
-use libmacro::FieldGet;
+use libmacro::{FieldGet, FieldGetClone
+    , FieldGetMove};
 
-#[derive(Debug, Clone, FieldGet)]
+#[derive(Debug, Clone, FieldGet
+    , FieldGetClone
+    , FieldGetMove)]
 pub struct FunctionAddrValue {
-    start_pos: usize,
+    index: usize,
     length: usize
 }
 
 impl FunctionAddrValue {
-    pub fn new(start_pos: usize, length: usize) -> Self {
+    pub fn new(index: usize, length: usize) -> Self {
         Self {
-            start_pos: start_pos,
+            index: index,
             length: length
         }
     }

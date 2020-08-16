@@ -10,13 +10,13 @@ pub struct Link {
 }
 
 impl bytecode::Writer for Link {
-    fn write(&mut self, instruction: Instruction) {
+    fn write(&mut self, mut instruction: Instruction) {
         // println!("{:?}", instruction);
         /*
          * 这里只会进一次, main入口
          * 第一个指令一定是调用入口函数, 所以交给 define 处理
          * */
-        self.link_define.start(&instruction);
+        self.link_define.start(&mut instruction);
         /*
          * 链接静态量
          * */

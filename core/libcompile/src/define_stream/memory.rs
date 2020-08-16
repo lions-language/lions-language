@@ -15,6 +15,10 @@ impl Memory {
         self.instructions.get(index)
     }
 
+    pub fn get_all_mut(&mut self) -> &mut VecDeque<Instruction> {
+        &mut self.instructions
+    }
+
     pub fn length(&self) -> usize {
         self.instructions.len()
     }
