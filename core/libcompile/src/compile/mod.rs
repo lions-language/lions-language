@@ -99,6 +99,14 @@ impl CompileContext {
     }
 }
 
+#[derive(Debug, FieldGet
+    , FieldGetMove, FieldGetClone
+    , NewWithAll)]
+pub struct AddressBindContext {
+    addr_key: AddressKey,
+    addr_value: AddressValue
+}
+
 trait TokenValueExpand {
     fn to_type(&self) -> Type;
     fn to_data(self) -> Data;
@@ -138,7 +146,7 @@ pub trait Compile {
     }
 
     fn function_push_param_to_statement(&mut self
-        , item: FunctionParamDataItem) {
+        , _item: FunctionParamDataItem) {
     }
     
     fn function_define_start(&mut self) {
@@ -149,7 +157,11 @@ pub trait Compile {
         unimplemented!();
     }
 
-    fn ownership_move(&mut self, context: OwnershipMoveContext) {
+    fn ownership_move(&mut self, _context: OwnershipMoveContext) {
+        unimplemented!();
+    }
+
+    fn address_bind(&mut self, _context: AddressBindContext) {
         unimplemented!();
     }
 

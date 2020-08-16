@@ -1,20 +1,15 @@
 use libtype::function::{FunctionDefine, Function
     , FunctionParamDataItem};
-use libtype::primeval::{PrimevalData};
-use libtype::DataValue;
 use libtype::instruction::{Instruction, CallPrimevalFunction
-    , CallFunction
-    , VariantValue, Uint8Static
-    , Uint16Static, Uint32Static
-    , StringStatic, StaticVariant
-    , LoadStack, OwnershipMove};
+    , CallFunction, StaticVariant
+    , LoadStack, OwnershipMove
+    , AddressBind};
 use crate::compile::{StaticContext, CallFunctionContext
     , FunctionNamedStmtContext, Compile
-    , LoadStackContext, OwnershipMoveContext};
-use crate::address;
+    , LoadStackContext, OwnershipMoveContext
+    , AddressBindContext};
 use define_stack::DefineStack;
 use crate::define_dispatch::{FunctionDefineDispatch};
-use crate::define::{DefineObject};
 
 pub trait Writer {
     fn write(&mut self, _: Instruction) {
@@ -104,6 +99,12 @@ impl<'a, 'b, F: Writer> Compile for Bytecode<'a, 'b, F> {
         let (dst_addr, src_addr) = context.fields_move();
         self.write(Instruction::OwnershipMove(OwnershipMove::new_with_all(
                     dst_addr, src_addr)));
+    }
+
+    fn address_bind(&mut self, context: AddressBindContext) {
+        let (addr_key, addr_value) = context.fields_move();
+        self.write(Instruction::AddressBind(AddressBind::new_with_all(
+            addr_key, addr_value)));
     }
 
     fn enter_scope(&mut self) {

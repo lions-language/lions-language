@@ -29,6 +29,13 @@ pub struct OwnershipMove {
     pub src_addr: AddressValue
 }
 
+#[derive(Debug, FieldGet, Clone, NewWithAll
+    , FieldGetMove, FieldGetClone)]
+pub struct AddressBind {
+    addr_key: AddressKey,
+    addr_value: AddressValue
+}
+
 #[derive(Debug, Clone)]
 pub struct VariantValue {
     pub direction: AddressValue
@@ -95,6 +102,7 @@ pub enum Instruction {
     CallPrimevalFunction(CallPrimevalFunction),
     CallFunction(CallFunction),
     OwnershipMove(OwnershipMove),
+    AddressBind(AddressBind),
     EnterScope,
     LeaveScope,
     Invalid

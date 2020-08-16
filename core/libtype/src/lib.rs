@@ -271,19 +271,24 @@ impl Default for Type {
 }
 
 #[derive(Clone, Debug, PartialEq, Hash, Eq, Default, FieldGet, FieldGetClone
-    , NewWithAll)]
+    , NewWithAll, FieldGetMove)]
 pub struct AddressKey {
     index: u64,
+    offset: usize,
     scope: usize
 }
 
 impl AddressKey {
     pub fn new(index: u64) -> Self {
-        AddressKey::new_with_all(index, 0)
+        AddressKey::new_with_all(index, 0, 0)
     }
 
     pub fn new_with_scope(index: u64, scope: usize) -> Self {
-        AddressKey::new_with_all(index, scope)
+        AddressKey::new_with_all(index, 0, scope)
+    }
+
+    pub fn new_with_offset(index: u64, offset: usize) -> Self {
+        AddressKey::new_with_all(index, offset, 0)
     }
 }
 

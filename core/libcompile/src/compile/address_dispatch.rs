@@ -34,12 +34,16 @@ impl AddressDispatch {
         self.recycles.push(addr);
     }
 
-    pub fn new() -> Self {
+    pub fn new_with_start(start: usize) -> Self {
         Self {
-            addr_key: AddressKey::new(0),
+            addr_key: AddressKey::new(start as u64),
             recycles: Vec::new(),
             index: 0
         }
+    }
+
+    pub fn new() -> Self {
+        AddressDispatch::new_with_start(0)
     }
 }
 

@@ -7,7 +7,7 @@ use libtype::function::{FindFunctionContext, FindFunctionResult
     , CallFunctionParamAddr, Function, splice::FunctionSplice
     , FunctionReturnDataAttr, FunctionParamDataItem
     , CallFunctionReturnData};
-use libtype::AddressValue;
+use libtype::{AddressKey, AddressValue};
 use libtype::package::{PackageStr};
 use libgrammar::token::{TokenValue, TokenData};
 use libgrammar::grammar::{CallFuncScopeContext
@@ -16,7 +16,8 @@ use libresult::*;
 use libcommon::ptr::RefPtr;
 use crate::compile::{Compile, Compiler, FileType
     , CallFunctionContext, value_buffer::ValueBufferItem
-    , AddressValueExpand, CompileContext};
+    , AddressValueExpand, CompileContext
+    , AddressBindContext};
 use crate::address::Address;
 use std::collections::VecDeque;
 
@@ -243,6 +244,23 @@ impl<'a, F: Compile> Compiler<'a, F> {
         }
     }
 
+    pub fn handle_call_function_get_top_addr(&mut self
+        , item: &FunctionParamDataItem)
+         -> Result<AddressValue, DescResult> {
+        let value = self.scope_context.take_top_from_value_buffer();
+        // let value_addr = value.addr_ref().addr_clone();
+        match self.binary_type_match(
+            value, item.typ_ref()
+            , *item.is_auto_call_totype_ref()) {
+            Ok(addr) => {
+                Ok(addr.2)
+            },
+            Err(e) => {
+                Err(e)
+            }
+        }
+    }
+
     pub fn handle_call_function(&mut self
         , param_len: usize
         , call_context: GrammarCallFunctionContext) -> DescResult {
@@ -266,6 +284,140 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 unimplemented!();
             }
         };
+        match func_statement.func_param_ref() {
+            Some(fp) => {
+                /*
+                 * 存在参数
+                 * */
+                match fp.data_ref() {
+                    FunctionParamData::Single(item) => {
+                        match item.lengthen_attr_ref() {
+                            FunctionParamLengthenAttr::Lengthen => {
+                                for i in 0..param_len {
+                                    let addr_value = match self.handle_call_function_get_top_addr(item) {
+                                        Ok(v) => v,
+                                        Err(e) => return e
+                                    };
+                                    println!("{}", func.func_statement_ref().func_name_ref());
+                                    self.cb.address_bind(
+                                    AddressBindContext::new_with_all(
+                                    AddressKey::new_with_offset(0, i)
+                                    , addr_value));
+                                }
+                            },
+                            FunctionParamLengthenAttr::Fixed => {
+                                if param_len == 1 {
+                                    let addr_value = match self.handle_call_function_get_top_addr(item) {
+                                        Ok(v) => v,
+                                        Err(e) => return e
+                                    };
+                                    self.cb.address_bind(
+                                    AddressBindContext::new_with_all(
+                                    AddressKey::new(0)
+                                    , addr_value));
+                                } else {
+                                    /*
+                                     * 希望是1个固定的参数, 但是参数个数不等于1
+                                     * */
+                                    return DescResult::Error(
+                                        format!("expect 1 param, but got {} param", param_len));
+                                }
+                            }
+                        }
+                    },
+                    FunctionParamData::Multi(items) => {
+                        let statement_param_len = items.len();
+                        /*
+                         * 检测:
+                         *  查看最后一个参数类型是不是可变的
+                         * */
+                        match items.last().unwrap().lengthen_attr_ref() {
+                            FunctionParamLengthenAttr::Lengthen => {
+                                if param_len < statement_param_len - 1 {
+                                    /*
+                                     * 最后一个参数是变长参数, 那么允许不填
+                                     * 但是最后一个参数之前的参数必须给定
+                                     * */
+                                    return DescResult::Error(
+                                    format!("expect {} param, but got {}"
+                                        , statement_param_len, param_len));
+                                }
+                                /*
+                                 * 参数正确的情况下:
+                                 * 1. 绑定前面固定参数
+                                 * 2. 绑定变长参数
+                                 * */
+                                /*
+                                 * 绑定固定参数
+                                 * */
+                                let (fixed_param_len, lengthen_param_len) =
+                                    if param_len == statement_param_len - 1 {
+                                        (param_len, 0)
+                                    } else {
+                                        (statement_param_len
+                                            , param_len - statement_param_len + 1)
+                                    };
+                                for i in 0..fixed_param_len {
+                                    let item = items.get(i).unwrap();
+                                    let addr_value = match self.handle_call_function_get_top_addr(item) {
+                                        Ok(v) => v,
+                                        Err(e) => return e
+                                    };
+                                    self.cb.address_bind(
+                                    AddressBindContext::new_with_all(
+                                    AddressKey::new(i as u64)
+                                    , addr_value));
+                                }
+                                /*
+                                 * 绑定变长参数
+                                 * */
+                                if lengthen_param_len > 0 {
+                                    let lengthen_param_start = fixed_param_len - 1;
+                                    for i in 0..lengthen_param_len {
+                                        let item = items.get(lengthen_param_start+i).unwrap();
+                                        let addr_value = match self.handle_call_function_get_top_addr(item) {
+                                            Ok(v) => v,
+                                            Err(e) => return e
+                                        };
+                                        self.cb.address_bind(
+                                        AddressBindContext::new_with_all(
+                                        AddressKey::new_with_offset(
+                                            lengthen_param_start as u64
+                                            , i)
+                                        , addr_value));
+                                    }
+                                }
+                            },
+                            FunctionParamLengthenAttr::Fixed => {
+                                if statement_param_len != param_len {
+                                    /*
+                                     * 最后一个参数不是变长的,
+                                     * 但是给定的参数和函数声明的参数长度不一致, 则报错
+                                     * */
+                                    return DescResult::Error(
+                                    format!("expect {} param, but got {}"
+                                        , statement_param_len, param_len));
+                                }
+                                for i in 0..param_len {
+                                    let item = items.get(i).unwrap();
+                                    let addr_value = match self.handle_call_function_get_top_addr(item) {
+                                        Ok(v) => v,
+                                        Err(e) => return e
+                                    };
+                                    self.cb.address_bind(
+                                    AddressBindContext::new_with_all(
+                                    AddressKey::new(i as u64)
+                                    , addr_value));
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            None => {
+            }
+        }
+        /*
         let param_addrs = match func_statement.func_param_ref() {
             Some(fp) => {
                 /*
@@ -341,10 +493,11 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 None
             }
         };
+        */
         let call_context = CallFunctionContext {
             package_str: call_context.package_str(),
             func: &func,
-            param_addrs: param_addrs,
+            param_addrs: None,
             return_data: CallFunctionReturnData::new_with_all(
                 return_addr.addr_clone(), return_is_alloc)
         };

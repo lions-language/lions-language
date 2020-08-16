@@ -1,22 +1,40 @@
 use libtype::AddressKey;
 use crate::memory::MemoryValue;
 use std::collections::HashMap;
+use std::cmp::{PartialEq, Eq};
+use std::hash::Hash;
+
+#[derive(Debug, PartialEq, Eq, Hash)]
+struct Key(usize, usize);
+
+impl From<AddressKey> for Key {
+    fn from(v: AddressKey) -> Self {
+        let (index, offset, _) = v.fields_move();
+        Key(index as usize, offset)
+    }
+}
+
+impl From<&AddressKey> for Key {
+    fn from(v: &AddressKey) -> Self {
+        Key(v.index_clone() as usize, v.offset_clone())
+    }
+}
 
 pub struct AddressMapping {
-    maps: HashMap<u64, MemoryValue>
+    maps: HashMap<Key, MemoryValue>
 }
 
 impl AddressMapping {
     pub fn bind(&mut self, key: AddressKey, value: MemoryValue) {
-        self.maps.insert(key.index(), value);
+        self.maps.insert(Key::from(key), value);
     }
 
     pub fn remove(&mut self, key: AddressKey) {
-        self.maps.remove(key.index_ref());
+        self.maps.remove(&Key::from(key));
     }
 
     pub fn get_unwrap(&self, key: &AddressKey) -> &MemoryValue {
-        self.maps.get(key.index_ref()).expect(&format!("address key: {:?}, maps: {:?}"
+        self.maps.get(&Key::from(key)).expect(&format!("address key: {:?}, maps: {:?}"
                 , key, &self.maps))
     }
 
