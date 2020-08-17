@@ -18,8 +18,8 @@ impl<T> Rand<T> for RandStack<T> {
              * */
             self.datas.insert(self.index, data);
             let k = MemoryValue::new(
-                addr_typ
-                    , AddressKey::new(self.index as u64));
+                AddressValue::new(addr_typ
+                    , AddressKey::new(self.index as u64)));
             self.index += 1;
             k
         } else {
@@ -30,21 +30,21 @@ impl<T> Rand<T> for RandStack<T> {
             self.datas.insert(index, data);
             // println!("get: {}", index);
             MemoryValue::new(
-                addr_typ,
-                    AddressKey::new(index as u64))
+                AddressValue::new(addr_typ,
+                    AddressKey::new(index as u64)))
         }
     }
 
     fn get_unwrap(&self, index: &MemoryValue) -> &T {
-        self.datas.get(&(index.get_single_clone() as usize)).unwrap()
+        self.datas.get(&(index.get_index_clone() as usize)).unwrap()
     }
 
     fn get_mut_unwrap(&mut self, index: &MemoryValue) -> &mut T {
-        self.datas.get_mut(&index.get_single_clone()).unwrap()
+        self.datas.get_mut(&index.get_index_clone()).unwrap()
     }
 
     fn take_unwrap(&mut self, index: &MemoryValue) -> T {
-        let index = index.get_single_clone();
+        let index = index.get_index_clone();
         /*
          * 添加到回收中
          * */
@@ -54,7 +54,7 @@ impl<T> Rand<T> for RandStack<T> {
     }
 
     fn free(&mut self, index: MemoryValue) {
-        let index = index.get_single_clone();
+        let index = index.get_index_clone();
         if index == self.datas.len() - 1 {
             /*
              * 将要移除的是顶端元素

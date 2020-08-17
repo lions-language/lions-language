@@ -34,8 +34,8 @@ pub struct OwnershipMove {
 #[derive(Debug, FieldGet, Clone, NewWithAll
     , FieldGetMove, FieldGetClone)]
 pub struct AddressBind {
-    addr_key: AddressKey,
-    addr_value: AddressValue
+    src_addr: AddressKey,
+    dst_addr: AddressKey
 }
 
 #[derive(Debug, Clone)]

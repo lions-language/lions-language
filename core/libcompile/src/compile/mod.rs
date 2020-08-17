@@ -104,8 +104,8 @@ impl CompileContext {
     , FieldGetMove, FieldGetClone
     , NewWithAll)]
 pub struct AddressBindContext {
-    addr_key: AddressKey,
-    addr_value: AddressValue
+    src_addr: AddressKey,
+    dst_addr: AddressValue
 }
 
 trait TokenValueExpand {

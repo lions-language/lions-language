@@ -448,8 +448,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
              *  如果不存在移动, 则返回输入的地址
              * */
             let addr = self.process_param(
-                &typ, &typ_attr, address_bind_context.addr_value_clone(), 0, value_context);
-            *address_bind_context.addr_value_mut() = addr;
+                &typ, &typ_attr, address_bind_context.dst_addr_clone(), 0, value_context);
+            *address_bind_context.dst_addr_mut() = addr;
             self.cb.address_bind(address_bind_context);
             /*
             self.process_param(

@@ -11,6 +11,7 @@ pub struct MemoryValue{
 }
 
 impl MemoryValue {
+    /*
     pub fn get_ref(&self) -> &AddressKey {
         self.addr_value.addr_ref()
     }
@@ -22,12 +23,15 @@ impl MemoryValue {
     pub fn get_single_clone(&self) -> usize {
         self.addr_value.addr_ref().index_ref().clone() as usize
     }
+    */
 
-    pub fn new(addr_typ: AddressType
-        , addr_key: AddressKey) -> Self {
+    pub fn get_index_clone(&self) -> usize {
+        self.addr_value.addr_ref().index_clone() as usize
+    }
+
+    pub fn new(addr_value: AddressValue) -> Self {
         Self {
-            addr_value: AddressValue::new(
-                    addr_typ, addr_key)
+            addr_value: addr_value
         }
     }
 }

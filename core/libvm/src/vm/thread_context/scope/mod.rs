@@ -27,7 +27,7 @@ impl Scope {
                  * */
                 let static_addr = self.addr_mapping.get_unwrap(addr.addr_ref());
                 let data = link_static.as_ref::<LinkStatic>().read_uncheck(
-                    static_addr.get_ref());
+                    static_addr.addr_value_ref().addr_ref());
                 RefPtr::from_ref::<Data>(data)
             },
             AddressType::Stack => {
@@ -55,7 +55,7 @@ impl Scope {
                  *  根据实际地址, 在静态区查找数据
                  * */
                 let data = link_static.as_ref::<LinkStatic>().read_uncheck(
-                    data_addr.get_ref());
+                    data_addr.addr_value_ref().addr_ref());
                 RefPtr::from_ref::<Data>(data)
             },
             AddressType::Stack => {
@@ -122,14 +122,13 @@ impl Scope {
          * 将给定的编译期地址与静态区的地址进行绑定
          * */
         self.addr_mapping.bind(addr.addr_clone()
-            , MemoryValue::new(AddressType::Static, static_addr));
+            , MemoryValue::new(AddressValue::new(AddressType::Static, static_addr)));
     }
 
     pub fn add_bind(&mut self, addr: AddressKey
-        , src_addr_typ: AddressType
-        , src_addr: AddressKey) {
+        , src_addr_value: AddressValue) {
         self.addr_mapping.bind(addr
-            , MemoryValue::new(src_addr_typ, src_addr));
+            , MemoryValue::new(src_addr_value));
     }
 
     pub fn remove_bind(&mut self, addr: AddressKey) {

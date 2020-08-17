@@ -103,9 +103,9 @@ impl<'a, 'b, F: Writer> Compile for Bytecode<'a, 'b, F> {
     }
 
     fn address_bind(&mut self, context: AddressBindContext) {
-        let (addr_key, addr_value) = context.fields_move();
+        let (src_addr, dst_addr) = context.fields_move();
         self.write(Instruction::AddressBind(AddressBind::new_with_all(
-            addr_key, addr_value)));
+            src_addr, dst_addr.addr())));
     }
 
     fn enter_scope(&mut self) {
