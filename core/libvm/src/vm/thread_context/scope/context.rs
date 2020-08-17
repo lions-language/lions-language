@@ -46,6 +46,7 @@ impl ScopeContext {
     }
 
     pub fn last_n_unchecked(&self, n: usize) -> &Scope {
+        // println!("len: {}, n: {}", self.scopes.len(), n);
         let index = self.scopes.len() - 1 - n;
         self.scopes.get(index).expect(&format!("len: {}, index: {}", self.scopes.len(), index))
     }

@@ -21,7 +21,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
      *  typ: 参数的类型
      *  addr: value buffer 中存储的地址信息
      * */
-    fn process_param(&mut self, typ: &Type
+    pub fn process_param(&mut self, typ: &Type
         , typ_attr: &TypeAttrubute, src_addr: AddressValue
         , index: usize
         , value_context: ValueBufferItemContext)

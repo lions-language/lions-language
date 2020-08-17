@@ -16,6 +16,7 @@ use libresult::*;
 use libcommon::ptr::RefPtr;
 use crate::compile::{Compile, Compiler, FileType
     , CallFunctionContext, value_buffer::ValueBufferItem
+    , value_buffer::ValueBufferItemContext
     , AddressValueExpand, CompileContext
     , AddressBindContext};
 use crate::address::Address;
@@ -247,19 +248,25 @@ impl<'a, F: Compile> Compiler<'a, F> {
 
     pub fn handle_call_function_get_top_addr(&mut self
         , item: &FunctionParamDataItem)
-         -> Result<AddressValue, DescResult> {
+         -> Result<(Type, TypeAttrubute, AddressValue, ValueBufferItemContext), DescResult> {
         let value = self.scope_context.take_top_from_value_buffer();
+        let value_context = value.context_clone();
         // let value_addr = value.addr_ref().addr_clone();
         match self.binary_type_match(
             value, item.typ_ref()
             , *item.is_auto_call_totype_ref()) {
-            Ok(addr) => {
-                Ok(addr.2.clone_with_scope_plus(1))
+            Ok(v) => {
+                Ok((v.0, v.1, v.2, value_context))
             },
             Err(e) => {
                 Err(e)
             }
         }
+        // Ok(addr_value.clone_with_scope_plus(1))
+        /*
+        Ok(self.process_param(
+            &typ, &typ_attr, addr_value, 0, value_context))
+        */
     }
 
     pub fn handle_call_function(&mut self
@@ -296,28 +303,30 @@ impl<'a, F: Compile> Compiler<'a, F> {
                         match item.lengthen_attr_ref() {
                             FunctionParamLengthenAttr::Lengthen => {
                                 for i in 0..param_len {
-                                    let addr_value = match self.handle_call_function_get_top_addr(item) {
+                                    let (typ, typ_attr, addr_value, value_context)
+                                        = match self.handle_call_function_get_top_addr(item) {
                                         Ok(v) => v,
                                         Err(e) => return e
                                     };
                                     // println!("{}", func.func_statement_ref().func_name_ref());
                                     // println!("{:?}", addr_value);
-                                    address_bind_contexts.push(
-                                    AddressBindContext::new_with_all(
+                                    address_bind_contexts.push((typ, typ_attr
+                                    , AddressBindContext::new_with_all(
                                     AddressKey::new_with_offset(0, param_len-1-i)
-                                    , addr_value));
+                                    , addr_value), value_context));
                                 }
                             },
                             FunctionParamLengthenAttr::Fixed => {
                                 if param_len == 1 {
-                                    let addr_value = match self.handle_call_function_get_top_addr(item) {
+                                    let (typ, typ_attr, addr_value, value_context)
+                                        = match self.handle_call_function_get_top_addr(item) {
                                         Ok(v) => v,
                                         Err(e) => return e
                                     };
-                                    address_bind_contexts.push(
-                                    AddressBindContext::new_with_all(
+                                    address_bind_contexts.push((typ, typ_attr
+                                    , AddressBindContext::new_with_all(
                                     AddressKey::new(0)
-                                    , addr_value));
+                                    , addr_value), value_context));
                                 } else {
                                     /*
                                      * 希望是1个固定的参数, 但是参数个数不等于1
@@ -368,17 +377,17 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                     let lengthen_param_start = fixed_param_len - 1;
                                     for i in 0..lengthen_param_len {
                                         let item = items.get(lengthen_param_start+i).unwrap();
-                                        let addr_value = 
+                                        let (typ, typ_attr, addr_value, value_context) = 
                                             match self.handle_call_function_get_top_addr(item) {
                                             Ok(v) => v,
                                             Err(e) => return e
                                         };
-                                        address_bind_contexts.push(
-                                        AddressBindContext::new_with_all(
+                                        address_bind_contexts.push((typ, typ_attr
+                                        , AddressBindContext::new_with_all(
                                         AddressKey::new_with_offset(
                                             lengthen_param_start as u64
                                             , lengthen_param_len-1-i)
-                                        , addr_value));
+                                        , addr_value), value_context));
                                     }
                                 }
                                 /*
@@ -386,14 +395,15 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                  * */
                                 for i in 0..fixed_param_len {
                                     let item = items.get(i).unwrap();
-                                    let addr_value = match self.handle_call_function_get_top_addr(item) {
+                                    let (typ, typ_attr, addr_value, value_context)
+                                        = match self.handle_call_function_get_top_addr(item) {
                                         Ok(v) => v,
                                         Err(e) => return e
                                     };
-                                    address_bind_contexts.push(
-                                    AddressBindContext::new_with_all(
+                                    address_bind_contexts.push((typ, typ_attr
+                                    , AddressBindContext::new_with_all(
                                     AddressKey::new((fixed_param_len-1-i) as u64)
-                                    , addr_value));
+                                    , addr_value), value_context));
                                 }
                             },
                             FunctionParamLengthenAttr::Fixed => {
@@ -408,14 +418,15 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                 }
                                 for i in 0..param_len {
                                     let item = items.get(i).unwrap();
-                                    let addr_value = match self.handle_call_function_get_top_addr(item) {
+                                    let (typ, typ_attr, addr_value, value_context)
+                                        = match self.handle_call_function_get_top_addr(item) {
                                         Ok(v) => v,
                                         Err(e) => return e
                                     };
-                                    address_bind_contexts.push(
-                                    AddressBindContext::new_with_all(
+                                    address_bind_contexts.push((typ, typ_attr
+                                    , AddressBindContext::new_with_all(
                                     AddressKey::new((param_len-1-i) as u64)
-                                    , addr_value));
+                                    , addr_value), value_context));
                                 }
                             }
                         }
@@ -425,86 +436,25 @@ impl<'a, F: Compile> Compiler<'a, F> {
             None => {
             }
         }
-        /*
-        let param_addrs = match func_statement.func_param_ref() {
-            Some(fp) => {
-                /*
-                 * 存在参数
-                 * */
-                match fp.data_ref() {
-                    FunctionParamData::Single(item) => {
-                        let item_typ = item.typ_ref();
-                        /*
-                         * 只有一个参数, 判断该参数是不是变长参数
-                         * */
-                        match item.lengthen_attr_ref() {
-                            FunctionParamLengthenAttr::Lengthen => {
-                                /*
-                                 * 函数需要一个变长的参数
-                                 * 将 param_len 个参数从 value_buffer 中取出
-                                 *  1. 因为只有一个参数,
-                                 *     所以调用时候所有的参数都是这个可变参数的值
-                                 * */
-                                let mut params_addr = VecDeque::with_capacity(param_len);
-                                for _ in 0..param_len {
-                                    let value = self.scope_context.take_top_from_value_buffer();
-                                    // let value_addr = value.addr_ref().addr_clone();
-                                    let value_addr = match self.binary_type_match(
-                                        value, item_typ
-                                        , *item.is_auto_call_totype_ref()) {
-                                        Ok(addr) => {
-                                            addr
-                                        },
-                                        Err(e) => {
-                                            return e;
-                                        }
-                                    };
-                                    /*
-                                     * 将参数地址中的 scope 加1,
-                                     * 告诉虚拟机要从上一个作用域中查找
-                                     * */
-                                    params_addr.push_front(
-                                    value_addr.2.clone_with_scope_plus(1));
-                                }
-                                Some(vec![CallFunctionParamAddr::Lengthen(params_addr)])
-                            },
-                            FunctionParamLengthenAttr::Fixed => {
-                                /*
-                                 * 判断参数的类型是否和函数声明的一致
-                                 * */
-                                let value = self.scope_context.take_top_from_value_buffer();
-                                // let value_addr = value.addr_ref().addr_clone();
-                                let value_addr = match self.binary_type_match(
-                                    value, item_typ
-                                    , *item.is_auto_call_totype_ref()) {
-                                    Ok(addr) => {
-                                        addr
-                                    },
-                                    Err(e) => {
-                                        return e;
-                                    }
-                                };
-                                /*
-                                 * 参数正确 => 构建参数地址列表
-                                 * */
-                                Some(vec![CallFunctionParamAddr::Fixed(
-                                        value_addr.2.clone_with_scope_plus(1))])
-                            }
-                        }
-                    },
-                    FunctionParamData::Multi(_) => {
-                        unimplemented!("param is multi");
-                    }
-                }
-            },
-            None => {
-                None
-            }
-        };
-        */
         self.cb.enter_scope();
         while !address_bind_contexts.is_empty() {
-            self.cb.address_bind(address_bind_contexts.remove(0));
+            let (typ, typ_attr, mut address_bind_context, value_context) =
+                address_bind_contexts.remove(0);
+            /*
+             * NOTE
+             * 因为 process_param 中会让虚拟机执行移动操作
+             * 所以必须要在虚拟机进入作用域之后执行
+             * 如果 process_param 中存在移动, 则返回新的地址
+             *  如果不存在移动, 则返回输入的地址
+             * */
+            let addr = self.process_param(
+                &typ, &typ_attr, address_bind_context.addr_value_clone(), 0, value_context);
+            *address_bind_context.addr_value_mut() = addr;
+            self.cb.address_bind(address_bind_context);
+            /*
+            self.process_param(
+                &typ, &typ_attr, addr_value, 0, value_context);
+            */
         }
         let call_context = CallFunctionContext {
             package_str: call_context.package_str(),
