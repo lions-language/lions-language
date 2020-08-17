@@ -89,13 +89,17 @@ impl Scope {
         self.vars.get_mut(name)
     }
 
-    pub fn new() -> Self {
+    pub fn new_with_addr_start(start: usize) -> Self {
         Self {
-            address_dispatch: AddressDispatch::new(),
+            address_dispatch: AddressDispatch::new_with_start(start),
             ref_counter: RefCounter::new(),
             vars: vars::Variants::new(),
             value_buffer: ValueBuffer::new(),
         }
+    }
+
+    pub fn new() -> Self {
+        Scope::new_with_addr_start(0)
     }
 }
 

@@ -37,9 +37,12 @@ impl<'a, F: Compile> Compiler<'a, F> {
             , Id);
         let typ = Type::from_str(&typ);
         /*
-         * 1. 生成参数加载指令
-         * 2. 填充函数声明
+         * 为参数分配一个地址
+         *  只是分配一个地址, 不做其他事情 (就是增加地址分配器的索引,
+         *  函数体中的起始地址是从参数个数开始的)
          * */
+        self.scope_context.alloc_address(
+            typ.to_address_type(), 0);
         /*
          * 添加到变量列表中
          * 其中:

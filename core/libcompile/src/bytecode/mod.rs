@@ -55,6 +55,7 @@ impl<'a, 'b, F: Writer> Compile for Bytecode<'a, 'b, F> {
                     CallPrimevalFunction{
                         opt: def.optcode.clone(),
                         param_addrs: context.param_addrs,
+                        call_param_len: context.call_param_len,
                         return_data: context.return_data
                     }
                     );

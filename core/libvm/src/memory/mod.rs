@@ -1,8 +1,11 @@
 use libtype::{AddressKey
     , AddressValue
     , AddressType};
+use libmacro::{FieldGet, FieldGetMove
+    , FieldGetClone};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, FieldGet
+    , FieldGetMove, FieldGetClone)]
 pub struct MemoryValue{
     addr_value: AddressValue
 }

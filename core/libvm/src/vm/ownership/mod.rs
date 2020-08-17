@@ -13,7 +13,7 @@ impl VirtualMachine {
         // self.thread_context.current_mut_unchecked().print_last_n_addr_mapping(1);
         let (dst_addr, src_addr) = value.fields_move();
         let src_data_addr = self.thread_context.current_mut_unchecked()
-            .get_data_addr_unchecked(&src_addr).get_clone();
+            .get_data_addr_unchecked(src_addr.addr_ref()).get_clone();
         /*
          * 绑定
          * */

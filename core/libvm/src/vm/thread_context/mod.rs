@@ -41,6 +41,17 @@ impl ThreadScope {
         */
     }
 
+    pub fn get_data_by_data_addr_unchecked(&self
+        , data_addr: &MemoryValue
+        , link_static: &RefPtr)
+        -> RefPtr {
+        let scope = data_addr.addr_value_ref().addr_ref().scope_clone();
+        // println!("{}", scope);
+        // self.print_stack_datas();
+        self.scope_context.last_n_unchecked(scope).get_data_by_data_addr_unchecked(
+            data_addr, link_static, &self.memory)
+    }
+
     pub fn take_data_unchecked(&mut self, addr: &AddressValue
         , link_static: &RefPtr)
         -> Data {
@@ -51,7 +62,7 @@ impl ThreadScope {
             addr, link_static, &mut self.memory)
     }
 
-    pub fn get_data_addr_unchecked(&self, addr: &AddressValue) -> &MemoryValue {
+    pub fn get_data_addr_unchecked(&self, addr: &AddressKey) -> &MemoryValue {
         let scope = addr.scope_clone();
         self.scope_context.last_n_unchecked(scope).get_data_addr_unchecked(addr)
     }

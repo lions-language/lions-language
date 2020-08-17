@@ -295,8 +295,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
         /*
          * TODO
          * */
-        let left_addr_value = self.process_param
-            (&left_type, &left_typ_attr, left_addr_value, 0, left_context);
+        let left_addr_value = self.process_param(
+            &left_type, &left_typ_attr, left_addr_value, 0, left_context);
         let right_addr_value = self.process_param(
             &right_type, &right_typ_attr, right_addr_value, 1, right_context);
         self.cb.call_function(CallFunctionContext{
@@ -304,6 +304,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
             func: &func,
             param_addrs: Some(vec![CallFunctionParamAddr::Fixed(left_addr_value)
                 , CallFunctionParamAddr::Fixed(right_addr_value)]),
+            call_param_len: 2,
             return_data: CallFunctionReturnData::new_with_all(
                 return_addr.addr_clone(), return_is_alloc)
         });
@@ -331,6 +332,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
          * 获取返回类型, 将其写入到队列中
          * */
         if !return_addr.is_invalid() {
+            // println!("{:?}", return_addr);
             self.scope_context.push_with_addr_typattr_to_value_buffer(
                 return_data.typ.clone()
                 , return_addr, return_data.typ_attr_ref().clone());

@@ -22,6 +22,10 @@ impl ScopeContext {
         self.scopes.push_back(Scope::new());
     }
 
+    pub fn enter_with_addr_start(&mut self, start: usize) {
+        self.scopes.push_back(Scope::new_with_addr_start(start));
+    }
+
     pub fn leave(&mut self) {
         self.scopes.pop_back();
     }

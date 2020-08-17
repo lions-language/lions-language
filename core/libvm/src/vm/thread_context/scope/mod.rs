@@ -46,6 +46,33 @@ impl Scope {
         }
     }
 
+    pub fn get_data_by_data_addr_unchecked(&self, data_addr: &MemoryValue
+        , link_static: &RefPtr, memory: &ThreadMemory)
+        -> RefPtr {
+        match data_addr.addr_value_ref().typ_ref() {
+            AddressType::Static => {
+                /*
+                 *  根据实际地址, 在静态区查找数据
+                 * */
+                let data = link_static.as_ref::<LinkStatic>().read_uncheck(
+                    data_addr.get_ref());
+                RefPtr::from_ref::<Data>(data)
+            },
+            AddressType::Stack => {
+                /*
+                 * 数据存储在栈区中
+                 *  1. 获取绑定的实际地址
+                 *  2. 根据实际地址, 在栈区中查找数据
+                 * */
+                let data = memory.stack_data_ref().get_unwrap(data_addr);
+                RefPtr::from_ref::<Data>(data)
+            },
+            _ => {
+                unimplemented!("{:?}", data_addr.addr_value_ref().typ_ref());
+            }
+        }
+    }
+
     pub fn take_data_unchecked(&mut self, addr: &AddressValue
         , link_static: &RefPtr, memory: &mut ThreadMemory)
         -> Data {
@@ -65,8 +92,8 @@ impl Scope {
         }
     }
 
-    pub fn get_data_addr_unchecked(&self, addr: &AddressValue) -> &MemoryValue {
-        self.addr_mapping.get_unwrap(addr.addr_ref())
+    pub fn get_data_addr_unchecked(&self, addr: &AddressKey) -> &MemoryValue {
+        self.addr_mapping.get_unwrap(addr)
     }
 
     pub fn alloc_and_write_data(&mut self, addr: &AddressValue

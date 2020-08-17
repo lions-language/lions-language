@@ -27,6 +27,7 @@ pub struct AddressMapping {
 impl AddressMapping {
     pub fn bind(&mut self, key: AddressKey, value: MemoryValue) {
         self.maps.insert(Key::from(key), value);
+        // println!("{:?}", self.maps);
     }
 
     pub fn remove(&mut self, key: AddressKey) {

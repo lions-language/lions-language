@@ -8,10 +8,12 @@ use crate::{AddressValue, AddressKey, Data};
 use crate::package::PackageStr;
 use crate::primeval::string::Str;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, FieldGetClone
+    , FieldGetMove, FieldGet)]
 pub struct CallPrimevalFunction {
     pub opt: optcode::OptCode,
     pub param_addrs: Option<Vec<CallFunctionParamAddr>>,
+    pub call_param_len: usize,
     pub return_data: CallFunctionReturnData
 }
 

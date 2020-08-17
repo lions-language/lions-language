@@ -139,6 +139,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                     package_str: input_package_str,
                     func: &func,
                     param_addrs: Some(param_addrs),
+                    call_param_len: 1,
                     return_data: CallFunctionReturnData::new_with_all(
                         return_addr.addr_clone(), return_is_alloc)
                 };
@@ -253,7 +254,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
             value, item.typ_ref()
             , *item.is_auto_call_totype_ref()) {
             Ok(addr) => {
-                Ok(addr.2)
+                Ok(addr.2.clone_with_scope_plus(1))
             },
             Err(e) => {
                 Err(e)
@@ -284,6 +285,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 unimplemented!();
             }
         };
+        let mut address_bind_contexts = Vec::new();
         match func_statement.func_param_ref() {
             Some(fp) => {
                 /*
@@ -298,8 +300,9 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                         Ok(v) => v,
                                         Err(e) => return e
                                     };
-                                    println!("{}", func.func_statement_ref().func_name_ref());
-                                    self.cb.address_bind(
+                                    // println!("{}", func.func_statement_ref().func_name_ref());
+                                    // println!("{:?}", addr_value);
+                                    address_bind_contexts.push(
                                     AddressBindContext::new_with_all(
                                     AddressKey::new_with_offset(0, i)
                                     , addr_value));
@@ -311,7 +314,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                         Ok(v) => v,
                                         Err(e) => return e
                                     };
-                                    self.cb.address_bind(
+                                    address_bind_contexts.push(
                                     AddressBindContext::new_with_all(
                                     AddressKey::new(0)
                                     , addr_value));
@@ -363,7 +366,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                         Ok(v) => v,
                                         Err(e) => return e
                                     };
-                                    self.cb.address_bind(
+                                    address_bind_contexts.push(
                                     AddressBindContext::new_with_all(
                                     AddressKey::new(i as u64)
                                     , addr_value));
@@ -375,11 +378,12 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                     let lengthen_param_start = fixed_param_len - 1;
                                     for i in 0..lengthen_param_len {
                                         let item = items.get(lengthen_param_start+i).unwrap();
-                                        let addr_value = match self.handle_call_function_get_top_addr(item) {
+                                        let addr_value = 
+                                            match self.handle_call_function_get_top_addr(item) {
                                             Ok(v) => v,
                                             Err(e) => return e
                                         };
-                                        self.cb.address_bind(
+                                        address_bind_contexts.push(
                                         AddressBindContext::new_with_all(
                                         AddressKey::new_with_offset(
                                             lengthen_param_start as u64
@@ -404,7 +408,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                         Ok(v) => v,
                                         Err(e) => return e
                                     };
-                                    self.cb.address_bind(
+                                    address_bind_contexts.push(
                                     AddressBindContext::new_with_all(
                                     AddressKey::new(i as u64)
                                     , addr_value));
@@ -494,14 +498,20 @@ impl<'a, F: Compile> Compiler<'a, F> {
             }
         };
         */
+        self.cb.enter_scope();
+        while !address_bind_contexts.is_empty() {
+            self.cb.address_bind(address_bind_contexts.remove(0));
+        }
         let call_context = CallFunctionContext {
             package_str: call_context.package_str(),
             func: &func,
             param_addrs: None,
+            call_param_len: param_len,
             return_data: CallFunctionReturnData::new_with_all(
                 return_addr.addr_clone(), return_is_alloc)
         };
-        self.call_function_and_ctrl_scope(call_context);
+        self.cb.call_function(call_context);
+        self.cb.leave_scope();
         /*
          * 获取返回类型, 将其写入到队列中
          * */

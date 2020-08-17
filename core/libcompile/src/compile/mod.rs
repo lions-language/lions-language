@@ -47,6 +47,7 @@ pub struct CallFunctionContext<'a> {
     pub package_str: PackageStr,
     pub func: &'a Function,
     pub param_addrs: Option<Vec<CallFunctionParamAddr>>,
+    pub call_param_len: usize,
     pub return_data: CallFunctionReturnData
 }
 
