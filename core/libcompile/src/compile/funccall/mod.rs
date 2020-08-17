@@ -304,7 +304,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                     // println!("{:?}", addr_value);
                                     address_bind_contexts.push(
                                     AddressBindContext::new_with_all(
-                                    AddressKey::new_with_offset(0, i)
+                                    AddressKey::new_with_offset(0, param_len-1-i)
                                     , addr_value));
                                 }
                             },
@@ -349,9 +349,10 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                  * 参数正确的情况下:
                                  * 1. 绑定前面固定参数
                                  * 2. 绑定变长参数
-                                 * */
-                                /*
-                                 * 绑定固定参数
+                                 * NOTE:
+                                 *  参数写入到 value_buffer 是栈的顺序,
+                                 *  所以需要注意取参数应该用相反的顺序
+                                 * => 先绑定变长参数
                                  * */
                                 let (fixed_param_len, lengthen_param_len) =
                                     if param_len == statement_param_len - 1 {
@@ -360,17 +361,6 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                         (statement_param_len
                                             , param_len - statement_param_len + 1)
                                     };
-                                for i in 0..fixed_param_len {
-                                    let item = items.get(i).unwrap();
-                                    let addr_value = match self.handle_call_function_get_top_addr(item) {
-                                        Ok(v) => v,
-                                        Err(e) => return e
-                                    };
-                                    address_bind_contexts.push(
-                                    AddressBindContext::new_with_all(
-                                    AddressKey::new(i as u64)
-                                    , addr_value));
-                                }
                                 /*
                                  * 绑定变长参数
                                  * */
@@ -387,9 +377,23 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                         AddressBindContext::new_with_all(
                                         AddressKey::new_with_offset(
                                             lengthen_param_start as u64
-                                            , i)
+                                            , lengthen_param_len-1-i)
                                         , addr_value));
                                     }
+                                }
+                                /*
+                                 * 绑定固定参数
+                                 * */
+                                for i in 0..fixed_param_len {
+                                    let item = items.get(i).unwrap();
+                                    let addr_value = match self.handle_call_function_get_top_addr(item) {
+                                        Ok(v) => v,
+                                        Err(e) => return e
+                                    };
+                                    address_bind_contexts.push(
+                                    AddressBindContext::new_with_all(
+                                    AddressKey::new((fixed_param_len-1-i) as u64)
+                                    , addr_value));
                                 }
                             },
                             FunctionParamLengthenAttr::Fixed => {
@@ -410,7 +414,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                     };
                                     address_bind_contexts.push(
                                     AddressBindContext::new_with_all(
-                                    AddressKey::new(i as u64)
+                                    AddressKey::new((param_len-1-i) as u64)
                                     , addr_value));
                                 }
                             }
