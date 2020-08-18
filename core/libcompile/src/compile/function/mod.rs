@@ -3,7 +3,8 @@ use libgrammar::grammar::{FunctionDefineParamContext
     , FunctionDefineReturnContext};
 use libtype::function::{AddFunctionContext
     , FunctionParamDataItem
-    , FunctionReturnData, FunctionReturn};
+    , FunctionReturnData, FunctionReturn
+    , FunctionStatement};
 use libtype::{PackageType, PackageTypeValue
     , TypeAttrubute, Type
     , AddressKey, AddressValue
@@ -24,7 +25,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 panic!("should not happend");
             }
         };
-        self.cb.function_named_stmt(FunctionNamedStmtContext{
+        let statement_ptr = self.cb.function_named_stmt(FunctionNamedStmtContext{
             name: s
         });
     }
@@ -68,7 +69,9 @@ impl<'a, F: Compile> Compiler<'a, F> {
         let (typ_attr, _, type_token) = context.fields_move();
         let func_return_data = FunctionReturnData::new(
             type_token.to_type(), typ_attr);
-        self.cb.function_set_return_to_statement(FunctionReturn::new(func_return_data));
+        let func_return = FunctionReturn::new(func_return_data);
+        self.scope_context.set_current_func_return(func_return.clone());
+        self.cb.function_set_return_to_statement(func_return);
     }
 
     pub fn handle_function_define_start(&mut self) {
@@ -76,6 +79,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
     }
 
     pub fn handle_function_define_end(&mut self) {
+        println!("{:?}", self.scope_context.get_current_func_return_ref());
         let func = self.cb.function_define_end();
         // println!("{:?}", func.func_statement_ref().statement_full_str());
         let package_typ = PackageType::new(PackageTypeValue::Crate);
@@ -86,6 +90,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
             // func_str: func.func_statement_ref().func_name.clone()
             func_str: func.func_statement_ref().statement_full_str().to_string()
         };
+        // println!("{:?}", func);
         self.function_control.add_function(context, None, func);
         self.scope_context.leave();
     }

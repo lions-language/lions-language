@@ -20,7 +20,7 @@ pub struct FunctionDefineDispatch<'a> {
 }
 
 impl<'a> FunctionDefineDispatch<'a> {
-    pub fn alloc_define(&mut self, context: FunctionNamedStmtContext) -> DefineObject {
+    pub fn alloc_define(&mut self, context: FunctionNamedStmtContext) -> (RefPtr, DefineObject) {
         let def = FunctionDefine::new(
             FunctionStatement::new(context.name(), None, FunctionReturn::default(), None)
             , self.define_stream.alloc_item());
@@ -29,8 +29,9 @@ impl<'a> FunctionDefineDispatch<'a> {
          * */
         self.processing_funcs.push_back(def);
         let v = self.processing_funcs.back().expect("should not happend");
+        let statement_ptr = RefPtr::from_ref(v.statement_ref());
         let ptr = RefPtr::from_ref_typ::<FunctionDefine>(v, DefineType::Function.into());
-        DefineObject::new(ptr)
+        (statement_ptr, DefineObject::new(ptr))
     }
 
     fn to_function(&self, statement: FunctionStatement

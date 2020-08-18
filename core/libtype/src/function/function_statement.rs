@@ -26,6 +26,7 @@ impl FunctionStatement {
                     &self.func_name, &self.func_param, &self.func_return, &self.typ);
                 */
                 let mut p = RefPtr::from_ref(self);
+                // println!("ptr: {:?}", p);
                 p.as_mut::<FunctionStatement>().statement_str = Some(statement_str);
                 match &self.statement_str {
                     Some(s) => {
@@ -102,8 +103,6 @@ impl FunctionStatement {
 impl FunctionStatement {
     pub fn new(func_name: String, func_param: Option<FunctionParam>
             , func_return: FunctionReturn, typ: Option<Type>) -> Self {
-        let statement_str = FunctionStatement::calc_function_statement_string(
-            &func_name, &func_param, &func_return, &typ);
         Self {
             func_name: func_name,
             func_param: func_param,

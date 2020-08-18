@@ -1,3 +1,4 @@
+use libcommon::ptr::RefPtr;
 use libtype::function::{FunctionDefine, Function
     , FunctionParamDataItem
     , FunctionReturn};
@@ -81,8 +82,10 @@ impl<'a, 'b, F: Writer> Compile for Bytecode<'a, 'b, F> {
     fn function_define_start(&mut self) {
     }
 
-    fn function_named_stmt(&mut self, context: FunctionNamedStmtContext) {
-        self.define_stack.enter(self.func_define_dispatch.alloc_define(context));
+    fn function_named_stmt(&mut self, context: FunctionNamedStmtContext) -> RefPtr {
+        let (statement_ptr, define_obj) = self.func_define_dispatch.alloc_define(context);
+        self.define_stack.enter(define_obj);
+        statement_ptr
     }
 
     fn function_push_param_to_statement(&mut self

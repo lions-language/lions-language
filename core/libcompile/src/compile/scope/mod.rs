@@ -1,6 +1,9 @@
-use libmacro::{FieldGet, FieldGetMove};
+use libcommon::ptr::RefPtr;
+use libmacro::{FieldGet, FieldGetMove
+    , FieldGetClone};
 use libtype::{AddressType, AddressValue, AddressKey
     , Type, TypeAttrubute};
+use libtype::function::{FunctionReturn};
 use crate::compile::address_dispatch::AddressDispatch;
 use crate::compile::ref_count::RefCounter;
 use crate::compile::value_buffer::{ValueBuffer
@@ -12,7 +15,11 @@ pub struct Scope {
     address_dispatch: AddressDispatch,
     ref_counter: RefCounter,
     vars: vars::Variants,
-    value_buffer: ValueBuffer
+    value_buffer: ValueBuffer,
+    /*
+     * 如果作用域是函数, 那么下面的字段一定需要被填充
+     * */
+    func_return: Option<FunctionReturn>
 }
 
 impl Scope {
@@ -89,12 +96,17 @@ impl Scope {
         self.vars.get_mut(name)
     }
 
+    fn set_function_return(&mut self, func_return: FunctionReturn) {
+        *&mut self.func_return = Some(func_return);
+    }
+
     pub fn new_with_addr_start(start: usize) -> Self {
         Self {
             address_dispatch: AddressDispatch::new_with_start(start),
             ref_counter: RefCounter::new(),
             vars: vars::Variants::new(),
             value_buffer: ValueBuffer::new(),
+            func_return: None
         }
     }
 

@@ -1,3 +1,4 @@
+use libcommon::ptr::RefPtr;
 use libgrammar::grammar::{Grammar, CallFuncScopeContext
     , VarStmtContext, LoadVariantContext as GrammarLoadVariantContext
     , ConstNumberContext, ConstStringContext
@@ -148,7 +149,7 @@ pub trait Compile {
         println!("{:?}", context);
     }
 
-    fn function_named_stmt(&mut self, _context: FunctionNamedStmtContext) {
+    fn function_named_stmt(&mut self, _context: FunctionNamedStmtContext) -> RefPtr {
         unimplemented!();
     }
 
@@ -249,7 +250,7 @@ impl<'a, F: Compile> Grammar for Compiler<'a, F> {
         self.handle_end()
     }
 
-    fn function_named_stmt(&mut self, value: TokenValue)  {
+    fn function_named_stmt(&mut self, value: TokenValue) {
         self.handle_function_named_stmt(value);
     }
 

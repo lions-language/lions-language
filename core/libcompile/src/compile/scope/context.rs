@@ -1,5 +1,6 @@
 use libtype::{AddressType, AddressValue
     , AddressKey, Type, TypeAttrubute};
+use libtype::function::{FunctionReturn};
 use libcommon::ptr::{RefPtr};
 use super::Scope;
 use super::{vars::Variant};
@@ -172,6 +173,14 @@ impl ScopeContext {
                 return None;
             }
         }
+    }
+
+    pub fn set_current_func_return(&mut self, func_return: FunctionReturn) {
+        self.current_mut_unckecked().set_function_return(func_return);
+    }
+
+    pub fn get_current_func_return_ref(&self) -> Option<&FunctionReturn> {
+        self.current_unckecked().func_return_ref().as_ref()
     }
 
     pub fn new_with_first() -> Self {
