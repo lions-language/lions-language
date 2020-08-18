@@ -19,7 +19,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
             let context = FindFunctionContext{
                 typ: None,
                 package_typ: Some(&package_typ),
-                func_str: "main",
+                func_str: "main()",
                 module_str: self.module_stack.current().name_ref()
             };
             let (exists, handle) = self.function_control.is_exists(&context);

@@ -19,8 +19,8 @@ pub struct FunctionReturn {
 
 #[derive(Debug, Clone)]
 pub enum FunctionReturnDataAttr {
-    RefParamIndex(u8),
-    MoveIndex(u8),
+    RefParamIndex(usize),
+    MoveIndex(usize),
     Create,
     Empty
 }
@@ -34,7 +34,8 @@ impl Default for FunctionReturnDataAttr {
 /*
  * 如果返回值是多个值, 将抽象为元组
  * */
-#[derive(Debug, Clone, Default, FieldGet)]
+#[derive(Debug, Clone, Default, FieldGet
+    , NewWithAll)]
 pub struct FunctionReturnData {
     pub typ: Type,
     pub typ_attr: TypeAttrubute,
@@ -175,7 +176,7 @@ pub struct FunctionStatement {
      * 如果是类方法, 给出类型
      * */
     pub typ: Option<Type>,
-    statement_str: String
+    statement_str: Option<String>
 }
 
 impl FunctionStatement {

@@ -46,6 +46,9 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                     TokenType::Point => {
                         unimplemented!();
                     },
+                    TokenType::ColonColon => {
+                        unimplemented!();
+                    },
                     _ => {
                         self.restore_from_backtrack_point();
                         self.id_process_id(desc_ctx);

@@ -1,9 +1,11 @@
 use libgrammar::token::{TokenType, TokenValue, TokenData};
+use libgrammar::grammar::TypeToken;
 use libtype::{Type, Data, TypeValue
     , Primeval, TypeAttrubute
     , DataValue, AddressValue};
 use super::{Compiler, Compile, TokenValueExpand
-    , CallFunctionContext, AddressValueExpand};
+    , CallFunctionContext, AddressValueExpand
+    , TypeTokenExpand};
 
 impl<'a, F: Compile> Compiler<'a, F> {
     pub fn tokentype_to_type(&self, typ: TokenType) -> Type {
@@ -99,5 +101,20 @@ impl AddressValueExpand for AddressValue {
 
     fn addr_mut_with_scope_minus(&mut self, n: usize) {
         *self.addr_mut().scope_mut() -= n;
+    }
+}
+
+impl TypeTokenExpand for TypeToken {
+    fn to_type(self) -> Type {
+        match self {
+            TypeToken::Single(tv) => {
+                let token_data = tv.token_data().expect("should not happend");
+                let t = extract_token_data!(token_data, Id);
+                Type::from_str(&t)
+            },
+            _ => {
+                unimplemented!();
+            }
+        }
     }
 }

@@ -1,10 +1,42 @@
+use libcommon::ptr::RefPtr;
 use super::{FunctionStatement, FunctionParam, FunctionReturn
         , FunctionParamData, FunctionReturnData};
+use crate::function::splice::FunctionSplice;
 use crate::{Type};
 
 impl FunctionStatement {
     pub fn statement_full_str(&self) -> &str {
-        &self.statement_str
+        match &self.statement_str {
+            Some(s) => {
+                s
+            },
+            None => {
+                let func_param_data = match &self.func_param {
+                    Some(fp) => {
+                        Some(fp.data_ref())
+                    },
+                    None => {
+                        None
+                    }
+                };
+                let statement_str = FunctionSplice::get_function_without_return_string_by_type(
+                    &self.func_name, &func_param_data, &self.typ.as_ref());
+                /*
+                let statement_str = FunctionStatement::calc_function_statement_string(
+                    &self.func_name, &self.func_param, &self.func_return, &self.typ);
+                */
+                let mut p = RefPtr::from_ref(self);
+                p.as_mut::<FunctionStatement>().statement_str = Some(statement_str);
+                match &self.statement_str {
+                    Some(s) => {
+                        s
+                    },
+                    None => {
+                        panic!("should not happend");
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -77,7 +109,7 @@ impl FunctionStatement {
             func_param: func_param,
             func_return: func_return,
             typ: typ,
-            statement_str: statement_str
+            statement_str: None
         }
     }
 }

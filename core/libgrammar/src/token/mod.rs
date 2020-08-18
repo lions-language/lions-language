@@ -31,6 +31,8 @@ pub enum TokenType {
     Equal,
     // ==
     EqualEqual,
+    // >
+    RightAngularBracket,
     // \r | \r\n | \n
     NewLine,
     // if
@@ -45,6 +47,10 @@ pub enum TokenType {
     Let,
     // var
     Var,
+    // return
+    Return,
+    // ->
+    RightArrow,
     // (
     LeftParenthese,
     // )
@@ -65,6 +71,8 @@ pub enum TokenType {
     Semicolon,
     // :
     Colon,
+    // ::
+    ColonColon,
     // ,
     Comma,
     // .
@@ -168,7 +176,7 @@ impl TokenValue {
 }
 */
 
-#[derive(Default, FieldGet, NewWithAll)]
+#[derive(Debug, Default, FieldGet, NewWithAll)]
 pub struct TokenValue {
     pub token_type: TokenType,
     pub token_data: Option<TokenData>

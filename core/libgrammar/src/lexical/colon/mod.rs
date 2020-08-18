@@ -8,6 +8,11 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
         self.push_to_token_buffer(colon::ColonToken::new(context));
     }
 
+    fn colon_colon(&mut self) {
+        let context = self.build_token_context_without_data(TokenType::ColonColon);
+        self.push_to_token_buffer(colon_colon::ColonColonToken::new(context));
+    }
+
     pub fn colon_process(&mut self) {
         /*
          * 跳过 :
@@ -24,6 +29,8 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
                     /*
                      * ::
                      * */
+                    parser.content.skip_next_one();
+                    parser.colon_colon();
                 },
                 _ => {
                     /*
@@ -38,3 +45,4 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
 }
             
 pub mod colon;
+pub mod colon_colon;

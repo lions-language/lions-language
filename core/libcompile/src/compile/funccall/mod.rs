@@ -204,15 +204,29 @@ impl<'a, F: Compile> Compiler<'a, F> {
             call_context.set_func_ptr(func_ptr);
             call_context.set_package_str(call_scope_context.package_str());
         } else {
+            let (package_type, package_str, typ) = call_scope_context.fields_move();
+            call_context.set_typ(typ);
+            call_context.set_func_name(func_str);
+            call_context.set_package_str(package_str);
+            call_context.set_package_typ(package_type);
+            /*
             return DescResult::Error(
                 format!("the {} function is not found", func_str));
+            */
         }
         DescResult::Success
     }
 
-    pub fn handle_call_function_param(&mut self, index: usize
+    pub fn handle_call_function_param_before_expr(&mut self, index: usize
         , call_context: &mut GrammarCallFunctionContext) {
         let func_ptr = call_context.func_ptr_clone();
+        if func_ptr.is_null() {
+            return;
+        }
+        /*
+         * 在当前函数被调用的时候, 只有内置函数才能找到函数的声明
+         * 因为内置函数只检测函数名, 而不检测函数参数
+         * */
         let func = func_ptr.as_ref::<Function>();
         let func_statement = func.func_statement_ref();
         match func_statement.func_param_ref() {
@@ -246,6 +260,19 @@ impl<'a, F: Compile> Compiler<'a, F> {
         }
     }
 
+    pub fn handle_call_function_param_after_expr(&mut self, index: usize
+        , call_context: &mut GrammarCallFunctionContext) {
+        let func_ptr = call_context.func_ptr_clone();
+        if !func_ptr.is_null() {
+            /*
+             * 已经找到了函数名, 那么不需要解析类型
+             * */
+            return;
+        }
+        let value = self.scope_context.top_n_with_panic_from_value_buffer(1);
+        call_context.push_param_typ(value.typ_clone(), value.typ_attr_clone());
+    }
+
     pub fn handle_call_function_get_top_addr(&mut self
         , item: &FunctionParamDataItem)
          -> Result<(Type, TypeAttrubute, AddressValue, ValueBufferItemContext), DescResult> {
@@ -276,7 +303,59 @@ impl<'a, F: Compile> Compiler<'a, F> {
          * 1. 查找函数声明
          * */
         let mut return_is_alloc = false;
-        let func_ptr = call_context.func_ptr_clone();
+        let mut func_ptr = call_context.func_ptr_clone();
+        if func_ptr.is_null() {
+            /*
+             * prepare 阶没有找到函数声明 => 查找
+             * */
+            /*
+            let (func_ptr, package_str, typ, func_name, param_typs)
+                = call_context.fields_move();
+            */
+            let mut param_typs = call_context.param_typs_clone();
+            let mut func_param_data = None;
+            let param_typs_len = param_typs.len();
+            if param_typs_len == 1 {
+                let (typ, typ_attr) = param_typs.remove(0);
+                func_param_data = Some(FunctionParamData::Single(
+                    FunctionParamDataItem::new(typ, typ_attr)));
+            } else if param_typs_len > 1 {
+                let mut items = Vec::new();
+                while !param_typs.is_empty() {
+                    let (typ, typ_attr) = param_typs.remove(0);
+                    items.push(FunctionParamDataItem::new(typ, typ_attr));
+                }
+                func_param_data = Some(FunctionParamData::Multi(items));
+            }
+            let func_str = FunctionSplice::get_function_without_return_string_by_type(
+                call_context.func_name_ref().as_ref().expect("should not happend").as_ref()
+                , &func_param_data.as_ref(), &call_context.typ_ref().as_ref());
+            let find_func_context = FindFunctionContext {
+                typ: call_context.typ_ref().as_ref(),
+                package_typ: call_context.package_typ_ref().as_ref(),
+                func_str: &func_str,
+                module_str: self.module_stack.current().name_ref()
+            };
+            let (exists, handle) = self.function_control.is_exists(&find_func_context);
+            if exists {
+                let h = Some(handle);
+                let func_res = self.function_control.find_function(&find_func_context, &h);
+                func_ptr = match func_res {
+                    FindFunctionResult::Success(r) => {
+                        RefPtr::from_ref(r.func)
+                    },
+                    FindFunctionResult::Panic(s) => {
+                        return DescResult::Error(s);
+                    },
+                    _ => {
+                        panic!("should not happend");
+                    }
+                };
+            } else {
+                return DescResult::Error(
+                    format!("the {} function is not found", func_str));
+            }
+        }
         let func = func_ptr.as_ref::<Function>();
         let func_statement = func.func_statement_ref();
         let return_data = &func_statement.func_return.data;
@@ -289,7 +368,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 Address::new(AddressValue::new_invalid())
             },
             _ => {
-                unimplemented!();
+                // unimplemented!();
+                Address::new(AddressValue::new_invalid())
             }
         };
         let mut address_bind_contexts = Vec::new();

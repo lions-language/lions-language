@@ -198,7 +198,13 @@ pub enum PackageTypeValue {
     Unknown
 }
 
-#[derive(Debug, Clone, FieldGet, FieldGetClone)]
+impl Default for PackageTypeValue {
+    fn default() -> Self {
+        PackageTypeValue::Unknown
+    }
+}
+
+#[derive(Debug, Clone, Default, FieldGet, FieldGetClone)]
 pub struct PackageType {
     typ: PackageTypeValue
 }

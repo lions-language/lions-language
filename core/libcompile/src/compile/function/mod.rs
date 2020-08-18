@@ -1,12 +1,15 @@
 use libgrammar::token::{TokenValue, TokenData};
-use libgrammar::grammar::{FunctionDefineParamContext};
+use libgrammar::grammar::{FunctionDefineParamContext
+    , FunctionDefineReturnContext};
 use libtype::function::{AddFunctionContext
-    , FunctionParamDataItem};
+    , FunctionParamDataItem
+    , FunctionReturnData, FunctionReturn};
 use libtype::{PackageType, PackageTypeValue
     , TypeAttrubute, Type
     , AddressKey, AddressValue
     , AddressType};
-use crate::compile::{Compile, Compiler, FunctionNamedStmtContext};
+use crate::compile::{Compile, Compiler, FunctionNamedStmtContext
+    , TypeTokenExpand};
 use crate::compile::scope::vars::Variant;
 use crate::address::Address;
 
@@ -61,18 +64,27 @@ impl<'a, F: Compile> Compiler<'a, F> {
         self.cb.function_push_param_to_statement(func_param_item);
     }
 
+    pub fn handle_function_define_return(&mut self, context: FunctionDefineReturnContext) {
+        let (typ_attr, _, type_token) = context.fields_move();
+        let func_return_data = FunctionReturnData::new(
+            type_token.to_type(), typ_attr);
+        self.cb.function_set_return_to_statement(FunctionReturn::new(func_return_data));
+    }
+
     pub fn handle_function_define_start(&mut self) {
         self.cb.function_define_start();
     }
 
     pub fn handle_function_define_end(&mut self) {
         let func = self.cb.function_define_end();
+        // println!("{:?}", func.func_statement_ref().statement_full_str());
         let package_typ = PackageType::new(PackageTypeValue::Crate);
         let context = AddFunctionContext{
             typ: None,
             package_typ: Some(&package_typ),
             module_str: self.module_stack.current().to_str().to_string(),
-            func_str: func.func_statement_ref().func_name.clone()
+            // func_str: func.func_statement_ref().func_name.clone()
+            func_str: func.func_statement_ref().statement_full_str().to_string()
         };
         self.function_control.add_function(context, None, func);
         self.scope_context.leave();

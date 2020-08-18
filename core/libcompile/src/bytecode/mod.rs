@@ -1,5 +1,6 @@
 use libtype::function::{FunctionDefine, Function
-    , FunctionParamDataItem};
+    , FunctionParamDataItem
+    , FunctionReturn};
 use libtype::instruction::{Instruction, CallPrimevalFunction
     , CallFunction, StaticVariant
     , LoadStack, OwnershipMove
@@ -88,6 +89,12 @@ impl<'a, 'b, F: Writer> Compile for Bytecode<'a, 'b, F> {
         , item: FunctionParamDataItem) {
         let ds = self.define_stack.back_mut_unchecked();
         self.func_define_dispatch.push_function_param_to_statement(ds, item);
+    }
+
+    fn function_set_return_to_statement(&mut self
+        , item: FunctionReturn) {
+        let ds = self.define_stack.back_mut_unchecked();
+        self.func_define_dispatch.set_function_return_to_statement(ds, item);
     }
 
     fn function_define_end(&mut self) -> Function {

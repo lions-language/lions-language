@@ -9,7 +9,8 @@ use libtype::package::PackageStr;
 use libmacro::{FieldGet, NewWithAll
     , FieldGetMove, FieldGetClone};
 
-#[derive(FieldGet)]
+#[derive(FieldGet, FieldGetClone
+    , FieldGetMove)]
 pub struct CallFuncScopeContext {
     package_type: Option<PackageType>,
     package_str: PackageStr,
@@ -47,7 +48,11 @@ pub struct LoadVariantContext {
     , Default)]
 pub struct CallFunctionContext {
     func_ptr: RefPtr,
-    package_str: PackageStr
+    package_str: PackageStr,
+    package_typ: Option<PackageType>,
+    typ: Option<Type>,
+    func_name: Option<String>,
+    param_typs: Vec<(Type, TypeAttrubute)>
 }
 
 impl CallFunctionContext {
@@ -56,6 +61,19 @@ impl CallFunctionContext {
     }
     pub fn set_package_str(&mut self,  package_str: PackageStr) {
         *&mut self.package_str = package_str;
+    }
+    pub fn set_package_typ(&mut self, package_typ: Option<PackageType>) {
+        *&mut self.package_typ = package_typ;
+    }
+    pub fn set_typ(&mut self, typ: Option<Type>) {
+        *&mut self.typ = typ;
+    }
+    pub fn set_func_name(&mut self, func_name: String) {
+        *&mut self.func_name = Some(func_name);
+    }
+    pub fn push_param_typ(&mut self
+        , typ: Type, typ_attr: TypeAttrubute) {
+        self.param_typs.push((typ, typ_attr));
     }
 }
 
@@ -92,6 +110,20 @@ pub struct FunctionDefineParamContext {
      * 参数序号
      * */
     param_no: usize
+}
+
+#[derive(Debug, FieldGet, NewWithAll, FieldGetMove)]
+pub struct FunctionDefineReturnContext {
+    typ_attr: TypeAttrubute,
+    lengthen_attr: FunctionParamLengthenAttr,
+    type_token: TypeToken
+}
+
+#[derive(Debug)]
+pub enum TypeToken {
+    Single(TokenValue),
+    Multi,
+    Tuple,
 }
 
 pub trait Grammar {
@@ -154,6 +186,8 @@ pub trait Grammar {
         context.name_token.print_token_type(Some("function param name:"));
         context.type_token.print_token_type(Some("function param type:"));
     }
+    fn function_define_return(&mut self, _context: FunctionDefineReturnContext) {
+    }
     fn function_define_end(&mut self, _value: TokenValue) {
         /*
          * 命名函数函数体结束
@@ -164,7 +198,10 @@ pub trait Grammar {
         , _name: TokenValue, _: &mut CallFunctionContext) -> DescResult {
         DescResult::Success
     }
-    fn call_function_param(&mut self, _index: usize
+    fn call_function_param_before_expr(&mut self, _index: usize
+        , _: &mut CallFunctionContext) {
+    }
+    fn call_function_param_after_expr(&mut self, _index: usize
         , _: &mut CallFunctionContext) {
     }
     fn call_function(&mut self
@@ -477,6 +514,7 @@ mod block;
 mod and;
 mod number;
 mod string;
+mod typ;
 
 #[cfg(test)]
 mod test {

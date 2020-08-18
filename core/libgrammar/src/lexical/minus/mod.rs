@@ -9,6 +9,11 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
         self.push_to_token_buffer(minus::MinusToken::new(context));
     }
 
+    fn minus_right_angular_brackets(&mut self) {
+        let context = self.build_token_context_without_data(TokenType::RightArrow);
+        self.push_to_token_buffer(right_arrow::RightArrowToken::new(context));
+    }
+
     pub fn minus_process(&mut self) {
         // 跳过 + 号
         self.content.skip_next_one();
@@ -21,6 +26,11 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
                         },
                         '=' => {
                             // -=
+                        },
+                        '>' => {
+                            self.content.skip_next_one();
+                            self.minus_right_angular_brackets();
+                            break;
                         },
                         _ => {
                             // -
@@ -47,4 +57,5 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
 
 mod minus;
 mod minus_minus;
+mod right_arrow;
 

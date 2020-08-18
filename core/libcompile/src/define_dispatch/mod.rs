@@ -72,6 +72,14 @@ impl<'a> FunctionDefineDispatch<'a> {
         }
     }
 
+    pub fn set_function_return_to_statement(&mut self
+        , define_obj: &mut DefineObject
+        , item: FunctionReturn) {
+        let fd = define_obj.ptr_mut().as_mut::<FunctionDefine>();
+        let statement = fd.statement_mut();
+        *statement.func_return_mut() = item;
+    }
+
     pub fn finish_define(&mut self, obj: &DefineObject) -> Function {
         /*
          * 暂时不考虑多线程问题, 这里的 obj 就是为了以后多线程时, 可以从中间移除元素

@@ -2,13 +2,15 @@ use libgrammar::grammar::{Grammar, CallFuncScopeContext
     , VarStmtContext, LoadVariantContext as GrammarLoadVariantContext
     , ConstNumberContext, ConstStringContext
     , CallFunctionContext as GrammarCallFunctionContext
-    , FunctionDefineParamContext};
+    , FunctionDefineParamContext
+    , FunctionDefineReturnContext};
 use libgrammar::token::{TokenValue};
 use libtype::{Type, Data
     , TypeAttrubute};
 use libtype::function::{Function, CallFunctionParamAddr
     , CallFunctionReturnData
-    , FunctionParamDataItem};
+    , FunctionParamDataItem
+    , FunctionReturn};
 use libtypecontrol::function::FunctionControl;
 use libtype::module::Module;
 use libresult::*;
@@ -121,6 +123,10 @@ trait AddressValueExpand {
     fn addr_mut_with_scope_minus(&mut self, n: usize);
 }
 
+trait TypeTokenExpand {
+    fn to_type(self) -> Type;
+}
+
 pub trait Compile {
     fn const_number(&mut self, context: StaticContext) {
         println!("{:?}", context);
@@ -148,6 +154,10 @@ pub trait Compile {
 
     fn function_push_param_to_statement(&mut self
         , _item: FunctionParamDataItem) {
+    }
+
+    fn function_set_return_to_statement(&mut self
+        , _item: FunctionReturn) {
     }
     
     fn function_define_start(&mut self) {
@@ -251,6 +261,10 @@ impl<'a, F: Compile> Grammar for Compiler<'a, F> {
         self.handle_function_define_param(context);
     }
 
+    fn function_define_return(&mut self, context: FunctionDefineReturnContext) {
+        self.handle_function_define_return(context);
+    }
+
     fn function_define_end(&mut self, _value: TokenValue) {
         self.handle_function_define_end();
     }
@@ -260,9 +274,14 @@ impl<'a, F: Compile> Grammar for Compiler<'a, F> {
         self.handle_call_function_prepare(scope_context, name, call_context)
     }
 
-    fn call_function_param(&mut self, index: usize
+    fn call_function_param_before_expr(&mut self, index: usize
         , call_context: &mut GrammarCallFunctionContext) {
-        self.handle_call_function_param(index, call_context);
+        self.handle_call_function_param_before_expr(index, call_context);
+    }
+
+    fn call_function_param_after_expr(&mut self, index: usize
+        , call_context: &mut GrammarCallFunctionContext) {
+        self.handle_call_function_param_after_expr(index, call_context);
     }
 
     fn call_function(&mut self
