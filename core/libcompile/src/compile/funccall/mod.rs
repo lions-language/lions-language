@@ -366,7 +366,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
         let func = func_ptr.as_ref::<Function>();
         let func_statement = func.func_statement_ref();
         let return_data = &func_statement.func_return.data;
-        let return_addr = match return_data.typ_ref().typ_ref() {
+        let mut scope: Option<usize> = None;
+        let mut return_addr = match return_data.typ_ref().typ_ref() {
             TypeValue::Empty => {
                 /*
                  * 如果返回值是空的, 那么就没有必要分配内存
@@ -375,10 +376,27 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 Address::new(AddressValue::new_invalid())
             },
             _ => {
-                // unimplemented!();
-                Address::new(AddressValue::new_invalid())
+                match return_data.typ_attr_ref() {
+                    TypeAttrubute::Move => {
+                        /*
+                         * 根据类型, 判断是在哪里分配地址
+                         *  返回值地址中的 scope 需要分配为1,
+                         *  因为返回值需要绑定到前一个作用域中
+                         * */
+                        scope = Some(1);
+                        return_is_alloc = true;
+                        let a = self.scope_context.alloc_address(
+                            return_data.typ_ref().to_address_type(), 1);
+                        self.scope_context.ref_counter_create(a.addr_ref().addr_clone());
+                        a
+                    },
+                    _ => {
+                        unimplemented!("{:?}", return_data.typ_attr_ref());
+                    }
+                }
             }
         };
+        // println!("{:?}", return_addr);
         let mut address_bind_contexts = Vec::new();
         match func_statement.func_param_ref() {
             Some(fp) => {
@@ -553,6 +571,13 @@ impl<'a, F: Compile> Compiler<'a, F> {
         };
         self.cb.call_function(call_context);
         self.cb.leave_scope();
+        match scope {
+            Some(n) => {
+                return_addr.addr_mut().addr_mut_with_scope_minus(n);
+            },
+            None => {
+            }
+        }
         /*
          * 获取返回类型, 将其写入到队列中
          * */

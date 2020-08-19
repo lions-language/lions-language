@@ -55,12 +55,12 @@ impl<'a, F: Compile> Compiler<'a, F> {
                  *  主要是为了让实际存储数据的地址有一个可以被找到的标识
                  * 这样虚拟机在作用域结束的时候就可以通过这个标识找到地址, 然后进行释放
                  * */
-                let addr = self.scope_context.alloc_address(AddressType::Stack, 0);
+                let addr = self.scope_context.alloc_address(typ.to_address_type(), 0);
                 self.scope_context.add_variant(name
                     , Variant::new_with_all(
                         Address::new(addr.addr_clone()), typ, typ_attr));
                 self.cb.ownership_move(OwnershipMoveContext::new_with_all(
-                    addr.addr(), src_addr.clone()));
+                    addr.addr().addr(), src_addr.clone()));
                 /*
                  * 如果是移动的变量, 需要将被移动的变量从变量列表中移除
                  * */

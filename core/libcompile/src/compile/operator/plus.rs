@@ -13,6 +13,7 @@ use libcommon::ptr::{RefPtr};
 use crate::compile::{Compile, Compiler, CallFunctionContext
     , AddressValueExpand, OwnershipMoveContext};
 use crate::compile::value_buffer::{ValueBufferItemContext};
+use crate::compile::scope::{ScopeType};
 use crate::address::{Address};
 
 impl<'a, F: Compile> Compiler<'a, F> {
@@ -34,11 +35,11 @@ impl<'a, F: Compile> Compiler<'a, F> {
                  * 这样虚拟机在作用域结束的时候就可以通过这个标识找到地址, 然后进行释放
                  * */
                 // let addr = self.scope_context.alloc_address(AddressType::Stack, 0);
-                let addr = AddressValue::new(AddressType::Stack
+                let addr = AddressValue::new(typ.to_address_type()
                     , AddressKey::new_with_scope(index as u64, 0));
                 // println!("{:?} => {:?}", &addr, src_addr.clone_with_scope_plus(1));
                 self.cb.ownership_move(OwnershipMoveContext::new_with_all(
-                    addr.clone(), src_addr.clone_with_scope_plus(1)));
+                    addr.addr_clone(), src_addr.clone_with_scope_plus(1)));
                 /*
                  * 如果是移动的变量, 需要将被移动的变量从变量列表中移除
                  * */
@@ -196,6 +197,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
          * Move: 分配一个新的变量地址, 虚拟机将函数计算后的值与该地址绑定
          * Ref: 分配一个新的引用地址, 引用中的地址, 由 return 字段决定
          * */
+        // self.scope_context.enter(ScopeType::Block);
         let mut scope: Option<usize> = None;
         let mut return_is_alloc = false;
         let return_data = &func.func_statement.func_return.data;
@@ -291,6 +293,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 }
             }
         };
+        // self.scope_context.leave();
         self.cb.enter_scope();
         /*
          * TODO

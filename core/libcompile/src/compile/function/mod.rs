@@ -12,11 +12,12 @@ use libtype::{PackageType, PackageTypeValue
 use crate::compile::{Compile, Compiler, FunctionNamedStmtContext
     , TypeTokenExpand};
 use crate::compile::scope::vars::Variant;
+use crate::compile::scope::ScopeType;
 use crate::address::Address;
 
 impl<'a, F: Compile> Compiler<'a, F> {
     pub fn handle_function_named_stmt(&mut self, value: TokenValue) {
-        self.scope_context.enter();
+        self.scope_context.enter(ScopeType::Function);
         let s = match value.token_data.expect("should not happend") {
             TokenData::Id(v) => {
                 v

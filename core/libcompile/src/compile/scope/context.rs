@@ -2,7 +2,7 @@ use libtype::{AddressType, AddressValue
     , AddressKey, Type, TypeAttrubute};
 use libtype::function::{FunctionReturn};
 use libcommon::ptr::{RefPtr};
-use super::Scope;
+use super::{Scope, ScopeType};
 use super::{vars::Variant};
 use crate::address::Address;
 use crate::compile::value_buffer::{
@@ -19,12 +19,13 @@ pub struct FindVariantResult {
 }
 
 impl ScopeContext {
-    pub fn enter(&mut self) {
-        self.scopes.push_back(Scope::new());
+    pub fn enter(&mut self, scope_typ: ScopeType) {
+        self.scopes.push_back(Scope::new(scope_typ));
     }
 
-    pub fn enter_with_addr_start(&mut self, start: usize) {
-        self.scopes.push_back(Scope::new_with_addr_start(start));
+    pub fn enter_with_addr_start(&mut self, start: usize
+        , scope_typ: ScopeType) {
+        self.scopes.push_back(Scope::new_with_addr_start(start, scope_typ));
     }
 
     pub fn leave(&mut self) {
@@ -37,6 +38,7 @@ impl ScopeContext {
          * 即使是最外层的函数进入的时候也一定需要调用 enter, 所以栈中一定存在元素
          * */
         self.current_mut_unckecked().alloc_address(addr_typ, scope)
+        // self.get_back_mut_n_unchecked(scope).alloc_address(addr_typ, scope)
     }
 
     pub fn recycle_address(&mut self, addr: AddressValue) {
@@ -175,20 +177,48 @@ impl ScopeContext {
         }
     }
 
+    pub fn get_last_scope_type_index(&mut self, scope_typ: &ScopeType) -> Option<usize> {
+        let mut index = self.scopes.len() - 1;
+        let mut scope = 0;
+        if !self.get_last_scope_type_index_inner(scope_typ, &mut index
+            , &mut scope) {
+            return None;
+        }
+        Some(scope)
+    }
+
+    fn get_last_scope_type_index_inner(&mut self, scope_typ: &ScopeType
+        , index: &mut usize, scope: &mut usize) -> bool {
+        let sp = match self.scopes.get(*index) {
+            Some(sp) => {
+                sp
+            },
+            None => {
+                return false;
+            }
+        };
+        let current_scope_typ = sp.scope_typ_ref();
+        if scope_typ == current_scope_typ {
+            /*
+             * 检测到类型相等 => 返回
+             * */
+            return true;
+        } else {
+            if *index == 0 {
+                return false;
+            }
+            *index -= 1;
+            *scope += 1;
+            return self.get_last_scope_type_index_inner(scope_typ, index, scope);
+        }
+    }
+
     pub fn set_current_func_return(&mut self, func_return: FunctionReturn) {
         self.current_mut_unckecked().set_function_return(func_return);
     }
 
     pub fn get_current_func_return_ref(&self) -> Option<&FunctionReturn> {
         self.current_unckecked().func_return_ref().as_ref()
-    }
-
-    pub fn new_with_first() -> Self {
-        let mut scopes = VecDeque::new();
-        scopes.push_back(Scope::new());
-        Self {
-            scopes: scopes
-        }
     }
 
     pub fn new() -> Self {

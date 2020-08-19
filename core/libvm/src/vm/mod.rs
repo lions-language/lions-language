@@ -77,6 +77,9 @@ impl VirtualMachine {
             Instruction::AddressBind(v) => {
                 self.address_bind(v);
             },
+            Instruction::ReturnStmt(v) => {
+                self.process_return_stmt(v);
+            },
             Instruction::ReadStaticVariant(v) => {
                 self.read_static_variant(v);
             },
@@ -212,6 +215,7 @@ mod func_call;
 mod thread_context;
 mod ownership;
 mod address;
+mod process_return;
 
 #[cfg(test)]
 mod test {

@@ -4,7 +4,8 @@ use libgrammar::grammar::{Grammar, CallFuncScopeContext
     , ConstNumberContext, ConstStringContext
     , CallFunctionContext as GrammarCallFunctionContext
     , FunctionDefineParamContext
-    , FunctionDefineReturnContext};
+    , FunctionDefineReturnContext
+    , ReturnStmtContext as GrammarReturnStmtContext};
 use libgrammar::token::{TokenValue};
 use libtype::{Type, Data
     , TypeAttrubute};
@@ -41,7 +42,7 @@ pub struct LoadStackContext {
 #[derive(Debug, FieldGet, NewWithAll
     , FieldGetMove)]
 pub struct OwnershipMoveContext {
-    pub dst_addr: AddressValue,
+    pub dst_addr: AddressKey,
     pub src_addr: AddressValue
 }
 
@@ -111,6 +112,14 @@ pub struct AddressBindContext {
     dst_addr: AddressValue
 }
 
+#[derive(Debug, FieldGet
+    , FieldGetMove, FieldGetClone
+    , NewWithAll)]
+pub struct ReturnStmtContext {
+    scope: usize,
+    addr_key: AddressKey
+}
+
 trait TokenValueExpand {
     fn to_type(&self) -> Type;
     fn to_data(self) -> Data;
@@ -174,6 +183,10 @@ pub trait Compile {
     }
 
     fn address_bind(&mut self, _context: AddressBindContext) {
+        unimplemented!();
+    }
+
+    fn return_stmt(&mut self, _context: ReturnStmtContext) {
         unimplemented!();
     }
 
@@ -298,6 +311,11 @@ impl<'a, F: Compile> Grammar for Compiler<'a, F> {
         self.handle_var_stmt_end(context);
     }
 
+    fn return_stmt(&mut self, context: GrammarReturnStmtContext) -> DescResult {
+        self.handle_return_stmt(context);
+        DescResult::Success
+    }
+
     fn anonymous_block_start(&mut self) {
         self.process_anonymous_block_start();
     }
@@ -341,6 +359,7 @@ mod function;
 mod scope;
 mod funccall;
 mod process_var;
+mod process_return;
 mod variant;
 mod block;
 

@@ -126,7 +126,8 @@ pub enum TypeToken {
     Tuple,
 }
 
-#[derive(Debug, FieldGet, NewWithAll, FieldGetMove)]
+#[derive(Debug, FieldGet, NewWithAll, FieldGetMove
+    , FieldGetClone)]
 pub struct ReturnStmtContext {
     is_exist_expr: bool
 }
@@ -221,8 +222,9 @@ pub trait Grammar {
     fn var_stmt_end(&mut self, _context: VarStmtContext) {
         println!("var stmt end");
     }
-    fn return_stmt(&mut self, _context: ReturnStmtContext) {
+    fn return_stmt(&mut self, _context: ReturnStmtContext) -> DescResult {
         println!("return stmt");
+        DescResult::Success
     }
     fn anonymous_block_start(&mut self) {
         println!("anonymous block start");

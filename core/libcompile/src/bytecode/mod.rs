@@ -5,11 +5,11 @@ use libtype::function::{FunctionDefine, Function
 use libtype::instruction::{Instruction, CallPrimevalFunction
     , CallFunction, StaticVariant
     , LoadStack, OwnershipMove
-    , AddressBind};
+    , AddressBind, ReturnStmt};
 use crate::compile::{StaticContext, CallFunctionContext
     , FunctionNamedStmtContext, Compile
     , LoadStackContext, OwnershipMoveContext
-    , AddressBindContext};
+    , AddressBindContext, ReturnStmtContext};
 use define_stack::DefineStack;
 use crate::define_dispatch::{FunctionDefineDispatch};
 
@@ -116,6 +116,12 @@ impl<'a, 'b, F: Writer> Compile for Bytecode<'a, 'b, F> {
         let (src_addr, dst_addr) = context.fields_move();
         self.write(Instruction::AddressBind(AddressBind::new_with_all(
             src_addr, dst_addr.addr())));
+    }
+
+    fn return_stmt(&mut self, context: ReturnStmtContext) {
+        let (scope, addr_key) = context.fields_move();
+        self.write(Instruction::ReturnStmt(ReturnStmt::new_with_all(
+                    scope, addr_key)));
     }
 
     fn enter_scope(&mut self) {

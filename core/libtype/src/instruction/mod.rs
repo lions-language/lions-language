@@ -27,7 +27,7 @@ pub struct CallFunction {
 #[derive(Debug, FieldGet, Clone, NewWithAll
     , FieldGetMove)]
 pub struct OwnershipMove {
-    pub dst_addr: AddressValue,
+    pub dst_addr: AddressKey,
     pub src_addr: AddressValue
 }
 
@@ -89,6 +89,13 @@ pub struct LoadStack {
     data: Data
 }
 
+#[derive(Debug, Clone, FieldGet, NewWithAll
+    , FieldGetMove, FieldGetClone)]
+pub struct ReturnStmt {
+    scope: usize,
+    addr_key: AddressKey
+}
+
 /*
  * 指令
  * */
@@ -105,6 +112,7 @@ pub enum Instruction {
     CallFunction(CallFunction),
     OwnershipMove(OwnershipMove),
     AddressBind(AddressBind),
+    ReturnStmt(ReturnStmt),
     EnterScope,
     LeaveScope,
     Invalid

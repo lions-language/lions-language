@@ -101,6 +101,15 @@ impl ThreadScope {
         let scope = addr.scope_clone();
         self.scope_context.last_n_mut_unchecked(scope).remove_bind(addr);
     }
+
+    pub fn set_result_data_addr(&mut self, scope: usize
+        , addr_value: AddressValue) {
+        self.scope_context.last_n_mut_unchecked(scope).set_result_data_addr(addr_value);
+    }
+
+    pub fn get_result_data_addr(&self) -> &AddressValue {
+        self.scope_context.current_unchecked().get_result_data_addr()
+    }
     
     pub fn print_current_addr_mapping(&mut self) {
         println!("**************** current scope addr mapping ******************");
@@ -123,50 +132,6 @@ impl ThreadScope {
         self.scope_context.last_n_mut_unchecked(scope).print_addr_mapping();
         println!("**********************************************************");
     }
-
-    /*
-    /*
-     * last n
-     * */
-    pub fn get_last_n_data_unchecked(&self, addr: &AddressValue, n: usize
-        , link_static: &RefPtr)
-        -> RefPtr {
-        self.scope_context.last_n_unchecked(n).get_data_unchecked(
-            addr, link_static, &self.memory)
-    }
-
-    pub fn alloc_and_write_last_n_data(&mut self, addr: &AddressValue
-        , n: usize, data: Data) {
-        let memory = RefPtr::from_ref::<ThreadMemory>(&self.memory);
-        self.scope_context.last_n_mut_unchecked(n).alloc_and_write_data(
-            addr, data, memory);
-    }
-
-    pub fn alloc_and_write_last_n_static(&mut self, addr: &AddressValue
-        , n: usize, static_addr: AddressKey) {
-        self.scope_context.last_n_mut_unchecked(n).alloc_and_write_static(
-            addr, static_addr);
-    }
-
-    pub fn alloc_and_write_last_one_data(&mut self, addr: &AddressValue
-        , data: Data) {
-        self.alloc_and_write_last_n_data(addr, 1, data);
-    }
-
-    /*
-     * lats one
-     * */
-    pub fn get_last_one_data_unchecked(&self, addr: &AddressValue
-        , link_static: &RefPtr)
-        -> RefPtr {
-        self.get_last_n_data_unchecked(addr, 1, link_static)
-    }
-
-    pub fn alloc_and_write_last_one_static(&mut self, addr: &AddressValue
-        , static_addr: AddressKey) {
-        self.alloc_and_write_last_n_static(addr, 1, static_addr);
-    }
-    */
 
     pub fn print_stack_datas(&self) {
         println!("**************** stack data ******************");

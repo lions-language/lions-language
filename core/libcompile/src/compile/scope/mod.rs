@@ -9,9 +9,17 @@ use crate::compile::ref_count::RefCounter;
 use crate::compile::value_buffer::{ValueBuffer
     , ValueBufferItem, ValueBufferItemContext};
 use crate::address::{Address};
+use std::cmp::{PartialEq};
+
+#[derive(Debug, PartialEq)]
+pub enum ScopeType {
+    Function,
+    Block
+}
 
 #[derive(FieldGet, FieldGetMove)]
 pub struct Scope {
+    scope_typ: ScopeType,
     address_dispatch: AddressDispatch,
     ref_counter: RefCounter,
     vars: vars::Variants,
@@ -100,8 +108,9 @@ impl Scope {
         *&mut self.func_return = Some(func_return);
     }
 
-    pub fn new_with_addr_start(start: usize) -> Self {
+    pub fn new_with_addr_start(start: usize, scope_typ: ScopeType) -> Self {
         Self {
+            scope_typ: scope_typ,
             address_dispatch: AddressDispatch::new_with_start(start),
             ref_counter: RefCounter::new(),
             vars: vars::Variants::new(),
@@ -110,8 +119,8 @@ impl Scope {
         }
     }
 
-    pub fn new() -> Self {
-        Scope::new_with_addr_start(0)
+    pub fn new(scope_typ: ScopeType) -> Self {
+        Scope::new_with_addr_start(0, scope_typ)
     }
 }
 

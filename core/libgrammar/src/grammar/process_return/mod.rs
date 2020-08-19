@@ -1,3 +1,4 @@
+use libresult::{DescResult};
 use super::{GrammarParser, Grammar, NextToken, ExpressContext
     , ReturnStmtContext};
 use crate::lexical::{CallbackReturnStatus, TokenVecItem, TokenPointer};
@@ -38,7 +39,12 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         let context = ReturnStmtContext{
             is_exist_expr: is_exist_expr
         };
-        self.cb().return_stmt(context);
+        match self.cb().return_stmt(context) {
+            DescResult::Error(e) => {
+                self.panic(&e);
+            },
+            _ => {}
+        }
     }
 }
 

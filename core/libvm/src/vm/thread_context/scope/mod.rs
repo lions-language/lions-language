@@ -8,7 +8,11 @@ use crate::vm::thread_context::{ThreadMemory};
 use crate::memory::{Rand, MemoryValue};
 
 pub struct Scope {
-    addr_mapping: AddressMapping
+    addr_mapping: AddressMapping,
+    /*
+     * 记录当前作用域的结果 数据地址
+     * */
+    result_data_addr: AddressValue
 }
 
 impl Scope {
@@ -135,13 +139,22 @@ impl Scope {
         self.addr_mapping.remove(addr);
     }
 
+    pub fn set_result_data_addr(&mut self, addr_value: AddressValue) {
+        *&mut self.result_data_addr = addr_value;
+    }
+
+    pub fn get_result_data_addr(&self) -> &AddressValue {
+        &self.result_data_addr
+    }
+
     pub fn print_addr_mapping(&self) {
         self.addr_mapping.print();
     }
 
     pub fn new() -> Self {
         Self {
-            addr_mapping: AddressMapping::new()
+            addr_mapping: AddressMapping::new(),
+            result_data_addr: AddressValue::new_invalid()
         }
     }
 }
