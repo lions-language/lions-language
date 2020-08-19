@@ -60,6 +60,32 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         TokenMethodResult::Continue
     }
 
+    pub fn expression_end_block(grammar: &mut GrammarParser<T, CB>
+        , token: &TokenVecItem<T, CB>) -> TokenMethodResult {
+        // println!("normal end ... ");
+        match token.context_ref().token_type() {
+            TokenType::Semicolon
+            | TokenType::NewLine
+            | TokenType::RightBigParenthese => {
+                grammar.skip_next_one();
+                return TokenMethodResult::StmtEnd;
+            },
+            _ => {
+            }
+        }
+        match token.token_attrubute().oper_type {
+            TokenOperType::Operator => {
+            },
+            _ => {
+                /*
+                 * 如果 token 不是操作符 => 表达式结束
+                 * */
+                return TokenMethodResult::StmtEnd;
+            }
+        }
+        TokenMethodResult::Continue
+    }
+
     pub fn expression_end_right_big_parenthese(
         grammar: &mut GrammarParser<T, CB>
         , token: &TokenVecItem<T, CB>) -> TokenMethodResult {

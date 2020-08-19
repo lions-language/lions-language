@@ -56,6 +56,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                     input_typ.clone(), input_typ_attr.clone()));
                 let expect_func_str = FunctionSplice::get_function_without_return_string_by_type(
                     &func_name, &Some(&param), &Some(&input_typ));
+                // println!("{:?}", expect_func_str);
                 /*
                  * 查找方法
                  * */
@@ -279,11 +280,17 @@ impl<'a, F: Compile> Compiler<'a, F> {
         let value = self.scope_context.take_top_from_value_buffer();
         let value_context = value.context_clone();
         // let value_addr = value.addr_ref().addr_clone();
+        let value_typ_attr = value.typ_attr_clone();
         match self.binary_type_match(
             value, item.typ_ref()
             , *item.is_auto_call_totype_ref()) {
             Ok(v) => {
-                Ok((v.0, v.1, v.2, value_context))
+                let ta = if value_typ_attr.is_ref() {
+                    value_typ_attr
+                } else {
+                    v.1
+                };
+                Ok((v.0, ta, v.2, value_context))
             },
             Err(e) => {
                 Err(e)

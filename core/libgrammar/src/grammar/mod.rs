@@ -126,6 +126,11 @@ pub enum TypeToken {
     Tuple,
 }
 
+#[derive(Debug, FieldGet, NewWithAll, FieldGetMove)]
+pub struct ReturnStmtContext {
+    is_exist_expr: bool
+}
+
 pub trait Grammar {
     // type IdUse;
     
@@ -215,6 +220,9 @@ pub trait Grammar {
     }
     fn var_stmt_end(&mut self, _context: VarStmtContext) {
         println!("var stmt end");
+    }
+    fn return_stmt(&mut self, _context: ReturnStmtContext) {
+        println!("return stmt");
     }
     fn anonymous_block_start(&mut self) {
         println!("anonymous block start");
@@ -308,6 +316,9 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
             },
             TokenType::Var => {
                 self.var_process();
+            },
+            TokenType::Return => {
+                self.return_process();
             },
             _ => {
                 self.expression_process(token, express_context);
@@ -510,6 +521,7 @@ mod token_extend;
 mod annotate;
 mod typesof;
 mod process_var;
+mod process_return;
 mod block;
 mod and;
 mod number;

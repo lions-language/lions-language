@@ -51,6 +51,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
         } else {
             typ_attr
         };
+        // println!("{:?}, {:?}", name, at);
         self.scope_context.push_with_addr_context_typattr_to_value_buffer(
             var_typ
             , var_addr, buf_ctx

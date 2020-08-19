@@ -79,7 +79,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
     }
 
     pub fn handle_function_define_end(&mut self) {
-        println!("{:?}", self.scope_context.get_current_func_return_ref());
+        // println!("{:?}", self.scope_context.get_current_func_return_ref());
         let func = self.cb.function_define_end();
         // println!("{:?}", func.func_statement_ref().statement_full_str());
         let package_typ = PackageType::new(PackageTypeValue::Crate);
