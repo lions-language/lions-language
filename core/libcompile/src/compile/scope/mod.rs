@@ -10,11 +10,18 @@ use crate::compile::value_buffer::{ValueBuffer
     , ValueBufferItem, ValueBufferItemContext};
 use crate::address::{Address};
 use std::cmp::{PartialEq};
+use std::collections::VecDeque;
 
 #[derive(Debug, PartialEq)]
 pub enum ScopeType {
     Function,
     Block
+}
+
+#[derive(Default)]
+pub struct ScopeFuncCall {
+    is_auto_call_totype: bool,
+    expect_type: Type
 }
 
 #[derive(FieldGet, FieldGetMove)]
@@ -27,7 +34,8 @@ pub struct Scope {
     /*
      * 如果作用域是函数, 那么下面的字段一定需要被填充
      * */
-    func_return: Option<FunctionReturn>
+    func_return: Option<FunctionReturn>,
+    func_call_stack: VecDeque<ScopeFuncCall>
 }
 
 impl Scope {
@@ -108,6 +116,23 @@ impl Scope {
         *&mut self.func_return = Some(func_return);
     }
 
+    fn enter_func_call(&mut self) {
+        self.func_call_stack.push_back(ScopeFuncCall::default());
+    }
+
+    fn leave_func_call(&mut self) {
+        self.func_call_stack.pop_back();
+    }
+
+    fn set_current_func_call(&mut self, func_call: ScopeFuncCall) {
+        *self.func_call_stack.back_mut().expect("should not happend, enter func call first")
+            = func_call;
+    }
+
+    fn get_current_func_call(&self) -> &ScopeFuncCall {
+        self.func_call_stack.back().expect("enter func call first")
+    }
+
     pub fn new_with_addr_start(start: usize, scope_typ: ScopeType) -> Self {
         Self {
             scope_typ: scope_typ,
@@ -115,7 +140,8 @@ impl Scope {
             ref_counter: RefCounter::new(),
             vars: vars::Variants::new(),
             value_buffer: ValueBuffer::new(),
-            func_return: None
+            func_return: None,
+            func_call_stack: VecDeque::new()
         }
     }
 

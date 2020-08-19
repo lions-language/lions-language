@@ -582,9 +582,9 @@ impl<'a, F: Compile> Compiler<'a, F> {
          * 获取返回类型, 将其写入到队列中
          * */
         if !return_addr.is_invalid() {
-            self.scope_context.push_with_addr_to_value_buffer(
+            self.scope_context.push_with_addr_typattr_to_value_buffer(
                 return_data.typ.clone()
-                , return_addr);
+                , return_addr, return_data.typ_attr_ref().clone());
         }
         self.compile_context.reset();
         DescResult::Success

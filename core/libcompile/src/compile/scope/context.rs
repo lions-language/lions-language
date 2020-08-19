@@ -2,7 +2,7 @@ use libtype::{AddressType, AddressValue
     , AddressKey, Type, TypeAttrubute};
 use libtype::function::{FunctionReturn};
 use libcommon::ptr::{RefPtr};
-use super::{Scope, ScopeType};
+use super::{Scope, ScopeType, ScopeFuncCall};
 use super::{vars::Variant};
 use crate::address::Address;
 use crate::compile::value_buffer::{
@@ -219,6 +219,22 @@ impl ScopeContext {
 
     pub fn get_current_func_return_ref(&self) -> Option<&FunctionReturn> {
         self.current_unckecked().func_return_ref().as_ref()
+    }
+
+    fn enter_func_call(&mut self) {
+        self.current_mut_unckecked().enter_func_call();
+    }
+
+    fn leave_func_call(&mut self) {
+        self.current_mut_unckecked().leave_func_call();
+    }
+
+    fn set_current_func_call(&mut self, func_call: ScopeFuncCall) {
+        self.current_mut_unckecked().set_current_func_call(func_call);
+    }
+
+    fn get_current_func_call(&self) -> &ScopeFuncCall {
+        self.current_unckecked().get_current_func_call()
     }
 
     pub fn new() -> Self {
