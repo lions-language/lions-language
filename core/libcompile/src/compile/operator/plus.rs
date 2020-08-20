@@ -75,6 +75,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
     }
 
     pub fn operator_plus(&mut self, _value: TokenValue) -> DescResult {
+        // self.scope_context.enter_func_call();
         // println!("plus ...");
         /*
          * 注意:
@@ -101,10 +102,18 @@ impl<'a, F: Compile> Compiler<'a, F> {
         // let left_addr_value = left.addr_ref().addr_ref().clone_with_scope_plus(1);
         // let right_addr_value = right.addr_ref().addr_ref().clone_with_scope_plus(1);
         // println!("{}", *self.compile_context.is_auto_call_totype_ref());
-        let left_expect_type = self.compile_context.expect_type_ref().clone();
+        let (is_auto_call_totype, expect_type) = match self.scope_context.get_current_func_call() {
+            Some(v) => {
+                (v.is_auto_call_totype_clone(), v.expect_type_clone())
+            },
+            None => {
+                (false, Type::default())
+            }
+        };
+        // let left_expect_type = self.compile_context.expect_type_ref().clone();
         let (left_type, left_typ_attr, left_addr_value) = match self.binary_type_match(
-            left, &left_expect_type
-            , *self.compile_context.is_auto_call_totype_ref()) {
+            left, &expect_type
+            , is_auto_call_totype) {
             Ok(addr) => {
                 addr
             },
@@ -113,10 +122,10 @@ impl<'a, F: Compile> Compiler<'a, F> {
             }
         };
         // let left_addr_value = left_addr_value.clone_with_scope_plus(1);
-        let right_expect_type = self.compile_context.expect_type_ref().clone();
+        // let right_expect_type = self.compile_context.expect_type_ref().clone();
         let (right_type, right_typ_attr, right_addr_value) = match self.binary_type_match(
-            right, &right_expect_type
-            , *self.compile_context.is_auto_call_totype_ref()) {
+            right, &expect_type
+            , is_auto_call_totype) {
             Ok(addr) => {
                 addr
             },
@@ -340,6 +349,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 return_data.typ.clone()
                 , return_addr, return_data.typ_attr_ref().clone());
         }
+        // self.scope_context.leave_func_call();
         DescResult::Success
     }
 }

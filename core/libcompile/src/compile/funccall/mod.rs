@@ -19,6 +19,7 @@ use crate::compile::{Compile, Compiler, FileType
     , value_buffer::ValueBufferItemContext
     , AddressValueExpand, CompileContext
     , AddressBindContext};
+use crate::compile::scope::{ScopeFuncCall};
 use crate::address::Address;
 use std::collections::VecDeque;
 
@@ -176,6 +177,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
 
     pub fn handle_call_function_prepare(&mut self, call_scope_context: CallFuncScopeContext
         , name: TokenValue, call_context: &mut GrammarCallFunctionContext) -> DescResult {
+        self.scope_context.enter_func_call();
         /*
          * 1. 查找函数声明
          * */
@@ -239,7 +241,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                     FunctionParamData::Single(item) => {
                         let item_typ = item.typ_ref().clone();
                         let is_auto_call_totype = *item.is_auto_call_totype_ref();
-                        self.compile_context.set(CompileContext::new(
+                        self.scope_context.set_current_func_call(ScopeFuncCall::new_with_all(
                                 is_auto_call_totype, item_typ));
                         // println!("{:?}", &self.compile_context);
                         /*
@@ -586,7 +588,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 return_data.typ.clone()
                 , return_addr, return_data.typ_attr_ref().clone());
         }
-        self.compile_context.reset();
+        // self.compile_context.reset();
+        self.scope_context.leave_func_call();
         DescResult::Success
         /*
         let name_data = name.token_data().expect("should not happend");

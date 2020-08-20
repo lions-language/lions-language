@@ -1,6 +1,6 @@
 use libcommon::ptr::RefPtr;
 use libmacro::{FieldGet, FieldGetMove
-    , FieldGetClone};
+    , FieldGetClone, NewWithAll};
 use libtype::{AddressType, AddressValue, AddressKey
     , Type, TypeAttrubute};
 use libtype::function::{FunctionReturn};
@@ -18,7 +18,9 @@ pub enum ScopeType {
     Block
 }
 
-#[derive(Default)]
+#[derive(Default, FieldGet, NewWithAll
+    , FieldGetClone, FieldGetMove
+    , Clone)]
 pub struct ScopeFuncCall {
     is_auto_call_totype: bool,
     expect_type: Type
@@ -129,8 +131,8 @@ impl Scope {
             = func_call;
     }
 
-    fn get_current_func_call(&self) -> &ScopeFuncCall {
-        self.func_call_stack.back().expect("enter func call first")
+    fn get_current_func_call(&self) -> Option<&ScopeFuncCall> {
+        self.func_call_stack.back()
     }
 
     pub fn new_with_addr_start(start: usize, scope_typ: ScopeType) -> Self {

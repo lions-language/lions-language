@@ -221,19 +221,19 @@ impl ScopeContext {
         self.current_unckecked().func_return_ref().as_ref()
     }
 
-    fn enter_func_call(&mut self) {
+    pub fn enter_func_call(&mut self) {
         self.current_mut_unckecked().enter_func_call();
     }
 
-    fn leave_func_call(&mut self) {
+    pub fn leave_func_call(&mut self) {
         self.current_mut_unckecked().leave_func_call();
     }
 
-    fn set_current_func_call(&mut self, func_call: ScopeFuncCall) {
+    pub fn set_current_func_call(&mut self, func_call: ScopeFuncCall) {
         self.current_mut_unckecked().set_current_func_call(func_call);
     }
 
-    fn get_current_func_call(&self) -> &ScopeFuncCall {
+    pub fn get_current_func_call(&self) -> Option<&ScopeFuncCall> {
         self.current_unckecked().get_current_func_call()
     }
 
