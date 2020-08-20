@@ -96,6 +96,25 @@ pub struct ReturnStmt {
     addr_key: AddressKey
 }
 
+#[derive(Debug, Clone)]
+pub enum JumpType {
+    Forward,
+    Backward
+}
+
+impl Default for JumpType {
+    fn default() -> Self {
+        JumpType::Backward
+    }
+}
+
+#[derive(Debug, Clone, FieldGet, NewWithAll
+    , FieldGetMove, FieldGetClone, Default)]
+pub struct Jump {
+    typ: JumpType,
+    index: usize
+}
+
 /*
  * 指令
  * */
@@ -113,6 +132,7 @@ pub enum Instruction {
     OwnershipMove(OwnershipMove),
     AddressBind(AddressBind),
     ReturnStmt(ReturnStmt),
+    Jump(Jump),
     EnterScope,
     LeaveScope,
     Invalid

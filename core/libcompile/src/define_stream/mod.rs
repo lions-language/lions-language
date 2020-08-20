@@ -1,4 +1,4 @@
-use libtype::instruction::Instruction;
+use libtype::instruction::{Instruction, Jump};
 use libcommon::ptr::RefPtr;
 use libcommon::address::FunctionAddrValue;
 use std::collections::VecDeque;
@@ -16,6 +16,10 @@ impl DefineItem {
     pub fn write(&mut self, instruction: Instruction) {
         // println!("{:?}", &instruction);
         self.mem.write(instruction);
+    }
+
+    pub fn set_jump(&mut self, index: usize, jump: Jump) {
+        self.mem.set_jump(index, jump);
     }
 
     pub fn get(&self, index: usize) -> Option<&Instruction> {

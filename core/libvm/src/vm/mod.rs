@@ -83,6 +83,8 @@ impl VirtualMachine {
             Instruction::ReadStaticVariant(v) => {
                 self.read_static_variant(v);
             },
+            Instruction::Jump(_) => {
+            },
             Instruction::EnterScope => {
                 self.thread_context.enter_thread_scope();
             },

@@ -13,6 +13,7 @@ use libtype::function::{Function, CallFunctionParamAddr
     , CallFunctionReturnData
     , FunctionParamDataItem
     , FunctionReturn};
+use libtype::instruction::{Jump};
 use libtypecontrol::function::FunctionControl;
 use libtype::module::Module;
 use libresult::*;
@@ -187,6 +188,18 @@ pub trait Compile {
     }
 
     fn return_stmt(&mut self, _context: ReturnStmtContext) {
+        unimplemented!();
+    }
+
+    fn current_index(&self) -> usize {
+        unimplemented!();
+    }
+
+    fn set_jump(&mut self, _: usize, _: Jump) {
+        unimplemented!();
+    }
+
+    fn jump(&mut self, _context: Jump) -> usize {
         unimplemented!();
     }
 

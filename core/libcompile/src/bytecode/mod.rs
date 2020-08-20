@@ -5,7 +5,8 @@ use libtype::function::{FunctionDefine, Function
 use libtype::instruction::{Instruction, CallPrimevalFunction
     , CallFunction, StaticVariant
     , LoadStack, OwnershipMove
-    , AddressBind, ReturnStmt};
+    , AddressBind, ReturnStmt
+    , Jump};
 use crate::compile::{StaticContext, CallFunctionContext
     , FunctionNamedStmtContext, Compile
     , LoadStackContext, OwnershipMoveContext
@@ -15,6 +16,12 @@ use crate::define_dispatch::{FunctionDefineDispatch};
 
 pub trait Writer {
     fn write(&mut self, _: Instruction) {
+    }
+    fn current_index(&self) -> usize {
+        unimplemented!();
+    }
+    fn set_jump(&mut self, _: usize, _: Jump) {
+        unimplemented!();
     }
 }
 
@@ -122,6 +129,27 @@ impl<'a, 'b, F: Writer> Compile for Bytecode<'a, 'b, F> {
         let (scope, addr_key) = context.fields_move();
         self.write(Instruction::ReturnStmt(ReturnStmt::new_with_all(
                     scope, addr_key)));
+    }
+
+    fn jump(&mut self, context: Jump) -> usize {
+        self.write(Instruction::Jump(context));
+        self.current_index()
+    }
+
+    fn current_index(&self) -> usize {
+        if self.define_stack.is_empty() {
+            self.writer.current_index()
+        } else {
+            self.define_stack.current_index()
+        }
+    }
+
+    fn set_jump(&mut self, index: usize, jump: Jump) {
+        if self.define_stack.is_empty() {
+            self.writer.set_jump(index, jump);
+        } else {
+            self.define_stack.set_jump(index, jump);
+        }
     }
 
     fn enter_scope(&mut self) {

@@ -1,5 +1,6 @@
 use libtype::instruction::{
-    Instruction, CallFunction};
+    Instruction, CallFunction
+    , JumpType};
 use libcommon::ptr::RefPtr;
 use libcommon::address::{FunctionAddress, FunctionAddrValue};
 use libtype::package::{PackageStr};
@@ -266,6 +267,28 @@ pub struct LinkDefineBlock<'a> {
     length: usize
 }
 
+impl<'a> LinkDefineBlock<'a> {
+    fn update_pos(&mut self, ins: &Instruction) {
+        match ins {
+            Instruction::Jump(jp) => {
+                match jp.typ_ref() {
+                    JumpType::Backward => {
+                        self.pos += jp.index_clone();
+                        // self.pos += 1;
+                        // println!("{:?}", jp);
+                    },
+                    JumpType::Forward => {
+                        self.pos -= jp.index_clone();
+                    }
+                }
+            },
+            _ => {
+                self.pos += 1;
+            }
+        }
+    }
+}
+
 impl<'a> Iterator for LinkDefineBlock<'a> {
     type Item = Instruction;
 
@@ -275,7 +298,8 @@ impl<'a> Iterator for LinkDefineBlock<'a> {
         }
         match self.link_define.code_segment.get(self.pos) {
             Some(v) => {
-                self.pos += 1;
+                // self.pos += 1;
+                self.update_pos(v);
                 // println!("{:?}", v);
                 Some(v.clone())
             },

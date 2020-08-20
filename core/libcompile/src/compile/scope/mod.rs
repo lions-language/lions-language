@@ -37,7 +37,11 @@ pub struct Scope {
      * 如果作用域是函数, 那么下面的字段一定需要被填充
      * */
     func_return: Option<FunctionReturn>,
-    func_call_stack: VecDeque<ScopeFuncCall>
+    func_call_stack: VecDeque<ScopeFuncCall>,
+    /*
+     * 记录 return 语句 的跳转指令索引
+     * */
+    return_jumps: Option<Vec<usize>>
 }
 
 impl Scope {
@@ -135,6 +139,21 @@ impl Scope {
         self.func_call_stack.back()
     }
 
+    pub fn add_return_jump(&mut self, index: usize) {
+        match &mut self.return_jumps {
+            Some(v) => {
+                v.push(index);
+            },
+            None => {
+                self.return_jumps = Some(vec![index]);
+            }
+        }
+    }
+
+    pub fn get_all_return_jumps_ref(&self) -> &Option<Vec<usize>> {
+        &self.return_jumps
+    }
+
     pub fn new_with_addr_start(start: usize, scope_typ: ScopeType) -> Self {
         Self {
             scope_typ: scope_typ,
@@ -143,7 +162,8 @@ impl Scope {
             vars: vars::Variants::new(),
             value_buffer: ValueBuffer::new(),
             func_return: None,
-            func_call_stack: VecDeque::new()
+            func_call_stack: VecDeque::new(),
+            return_jumps: None
         }
     }
 

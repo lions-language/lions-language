@@ -9,6 +9,7 @@ use libtype::{PackageType, PackageTypeValue
     , TypeAttrubute, Type
     , AddressKey, AddressValue
     , AddressType};
+use libtype::instruction::{JumpType, Jump};
 use crate::compile::{Compile, Compiler, FunctionNamedStmtContext
     , TypeTokenExpand};
 use crate::compile::scope::vars::Variant;
@@ -80,6 +81,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
     }
 
     pub fn handle_function_define_end(&mut self) {
+        self.fill_return_jumps();
         // println!("{:?}", self.scope_context.get_current_func_return_ref());
         let func = self.cb.function_define_end();
         // println!("{:?}", func.func_statement_ref().statement_full_str());
@@ -94,5 +96,32 @@ impl<'a, F: Compile> Compiler<'a, F> {
         // println!("{:?}", func);
         self.function_control.add_function(context, None, func);
         self.scope_context.leave();
+    }
+
+    fn fill_return_jumps(&mut self) {
+        let return_jumps = self.scope_context.current_unchecked().get_all_return_jumps_ref();
+        match return_jumps {
+            Some(rs) => {
+                let current_index = self.cb.current_index();
+                for ins in rs {
+                    /*
+                     * 计算函数定义结束时的索引和 jump 指令之间的偏移
+                     * */
+                    let offset = current_index - *ins;
+                    /*
+                     * offset 只是两条指令之间的距离, 但是因为需要跳过它们,
+                     * 所以需要对 offset 加1, 最终的结果才是 要跳转后的位置
+                     * */
+                    let jump_index = offset + 1;
+                    /*
+                     * 更新 jump 指令中的值
+                     * */
+                    self.cb.set_jump(*ins, Jump::new_with_all(
+                            JumpType::Backward, jump_index));
+                }
+            },
+            None => {
+            }
+        }
     }
 }

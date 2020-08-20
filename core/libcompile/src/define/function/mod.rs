@@ -1,4 +1,4 @@
-use libtype::instruction::Instruction;
+use libtype::instruction::{Jump, Instruction};
 use libtype::function::FunctionStatement;
 use libcommon::ptr::RefPtr;
 use crate::define::FunctionDefine;
@@ -13,6 +13,17 @@ impl FunctionDefine {
         self.define_item.as_mut::<DefineItem>().write(instruction);
     }
 
+    pub fn set_jump(&mut self, index: usize, jump: Jump) {
+        self.define_item.as_mut::<DefineItem>().set_jump(index, jump);
+    }
+
+    pub fn current_index(&self) -> usize {
+        self.define_item.as_ref::<DefineItem>().length() - 1
+    }
+
+    /*
+     * item 在 define_stream 中的索引
+     * */
     pub fn index(&self) -> usize {
         self.define_item.as_ref::<DefineItem>().index()
     }

@@ -50,8 +50,12 @@ impl ScopeContext {
         self.scopes.back_mut().expect("should not happend")
     }
 
-    pub fn current_unckecked(&self) -> &Scope {
+    pub fn current_unchecked(&self) -> &Scope {
         self.scopes.back().expect("should not happend")
+    }
+
+    pub fn last_n_mut_unchecked(&mut self, n: usize) -> &mut Scope {
+        self.scopes.get_mut(self.scopes.len() - 1 - n).expect("should not happend")
     }
 
     pub fn ref_counter_create(&mut self, r: AddressKey) {
@@ -63,11 +67,11 @@ impl ScopeContext {
     }
 
     pub fn top_n_with_panic_from_value_buffer(&self, n: usize) -> &ValueBufferItem {
-        self.current_unckecked().top_n_with_panic_from_value_buffer(n)
+        self.current_unchecked().top_n_with_panic_from_value_buffer(n)
     }
 
     pub fn top_n_from_value_buffer(&self, n: usize) -> Option<&ValueBufferItem> {
-        self.current_unckecked().top_n_from_value_buffer(n)
+        self.current_unchecked().top_n_from_value_buffer(n)
     }
 
     pub fn take_top_from_value_buffer(&mut self) -> ValueBufferItem {
@@ -218,7 +222,7 @@ impl ScopeContext {
     }
 
     pub fn get_current_func_return_ref(&self) -> Option<&FunctionReturn> {
-        self.current_unckecked().func_return_ref().as_ref()
+        self.current_unchecked().func_return_ref().as_ref()
     }
 
     pub fn enter_func_call(&mut self) {
@@ -234,7 +238,7 @@ impl ScopeContext {
     }
 
     pub fn get_current_func_call(&self) -> Option<&ScopeFuncCall> {
-        self.current_unckecked().get_current_func_call()
+        self.current_unchecked().get_current_func_call()
     }
 
     pub fn new() -> Self {
