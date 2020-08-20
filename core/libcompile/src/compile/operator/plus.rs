@@ -92,6 +92,9 @@ impl<'a, F: Compile> Compiler<'a, F> {
         let right_addr = right.addr_clone();
         let left_context = left.context_clone();
         let right_context = right.context_clone();
+        let value_left_typ_attr = left.typ_attr_clone();
+        let value_right_typ_attr = right.typ_attr_clone();
+        // println!("{:?}, {:?}", value_left_typ_attr, value_right_typ_attr);
         /*
         println!("left type attr: {:?}, right type attr: {:?}"
             , left.typ_attr_ref(), right.typ_attr_ref());
@@ -121,6 +124,11 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 return e;
             }
         };
+        let left_typ_attr = if value_left_typ_attr.is_ref() {
+            value_left_typ_attr
+        } else {
+            left_typ_attr
+        };
         // let left_addr_value = left_addr_value.clone_with_scope_plus(1);
         // let right_expect_type = self.compile_context.expect_type_ref().clone();
         let (right_type, right_typ_attr, right_addr_value) = match self.binary_type_match(
@@ -132,6 +140,11 @@ impl<'a, F: Compile> Compiler<'a, F> {
             Err(e) => {
                 return e;
             }
+        };
+        let right_typ_attr = if value_right_typ_attr.is_ref() {
+            value_right_typ_attr
+        } else {
+            right_typ_attr
         };
         // let right_addr_value = right_addr_value.clone_with_scope_plus(1);
         /*

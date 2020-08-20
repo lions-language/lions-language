@@ -189,6 +189,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
             func_str: &func_str,
             module_str: self.module_stack.current().name_ref()
         };
+        call_context.set_desc_ctx(call_scope_context.desc_ctx_clone());
         let (exists, handle) = self.function_control.is_exists(&find_func_context);
         if exists {
             let h = Some(handle);
@@ -207,7 +208,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
             call_context.set_func_ptr(func_ptr);
             call_context.set_package_str(call_scope_context.package_str());
         } else {
-            let (package_type, package_str, typ) = call_scope_context.fields_move();
+            let (package_type, package_str, desc_ctx, typ) = call_scope_context.fields_move();
             call_context.set_typ(typ);
             call_context.set_func_name(func_str);
             call_context.set_package_str(package_str);
@@ -563,7 +564,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 &typ, &typ_attr, addr_value, 0, value_context);
             */
         }
-        let call_context = CallFunctionContext {
+        let desc_ctx = call_context.desc_ctx_clone();
+        let cc = CallFunctionContext {
             package_str: call_context.package_str(),
             func: &func,
             param_addrs: None,
@@ -571,7 +573,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
             return_data: CallFunctionReturnData::new_with_all(
                 return_addr.addr_clone(), return_is_alloc)
         };
-        self.cb.call_function(call_context);
+        self.cb.call_function(cc);
         self.cb.leave_scope();
         match scope {
             Some(n) => {
@@ -584,9 +586,14 @@ impl<'a, F: Compile> Compiler<'a, F> {
          * 获取返回类型, 将其写入到队列中
          * */
         if !return_addr.is_invalid() {
+            let ta = if desc_ctx.typ_attr_ref().is_ref() {
+                desc_ctx.typ_attr()
+            } else {
+                return_data.typ_attr_ref().clone()
+            };
             self.scope_context.push_with_addr_typattr_to_value_buffer(
                 return_data.typ.clone()
-                , return_addr, return_data.typ_attr_ref().clone());
+                , return_addr, ta);
         }
         // self.compile_context.reset();
         self.scope_context.leave_func_call();

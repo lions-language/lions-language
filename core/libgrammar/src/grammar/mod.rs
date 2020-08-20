@@ -14,6 +14,7 @@ use libmacro::{FieldGet, NewWithAll
 pub struct CallFuncScopeContext {
     package_type: Option<PackageType>,
     package_str: PackageStr,
+    desc_ctx: DescContext,
     typ: Option<Type>
 }
 
@@ -52,7 +53,8 @@ pub struct CallFunctionContext {
     package_typ: Option<PackageType>,
     typ: Option<Type>,
     func_name: Option<String>,
-    param_typs: Vec<(Type, TypeAttrubute)>
+    param_typs: Vec<(Type, TypeAttrubute)>,
+    desc_ctx: DescContext
 }
 
 impl CallFunctionContext {
@@ -75,9 +77,13 @@ impl CallFunctionContext {
         , typ: Type, typ_attr: TypeAttrubute) {
         self.param_typs.push((typ, typ_attr));
     }
+    pub fn set_desc_ctx(&mut self, desc_ctx: DescContext) {
+        *&mut self.desc_ctx = desc_ctx;
+    }
 }
 
-#[derive(Debug, FieldGet, NewWithAll, FieldGetMove)]
+#[derive(Debug, FieldGet, NewWithAll, FieldGetMove
+    , Clone, Default)]
 pub struct DescContext {
     typ_attr: TypeAttrubute
 }
