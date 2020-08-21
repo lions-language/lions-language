@@ -268,7 +268,7 @@ pub struct LinkDefineBlock<'a> {
 }
 
 impl<'a> LinkDefineBlock<'a> {
-    fn update_pos(&mut self, ins: &Instruction) {
+    fn update_pos(&mut self, ins: &Instruction) -> Option<Instruction> {
         match ins {
             Instruction::Jump(jp) => {
                 match jp.typ_ref() {
@@ -281,9 +281,18 @@ impl<'a> LinkDefineBlock<'a> {
                         self.pos -= jp.index_clone();
                     }
                 }
+                match self.link_define.code_segment.get(self.pos) {
+                    Some(v) => {
+                        return Some(v.clone());
+                    },
+                    None => {
+                        return None;
+                    }
+                }
             },
             _ => {
                 self.pos += 1;
+                return Some(ins.clone());
             }
         }
     }
@@ -299,9 +308,16 @@ impl<'a> Iterator for LinkDefineBlock<'a> {
         match self.link_define.code_segment.get(self.pos) {
             Some(v) => {
                 // self.pos += 1;
-                self.update_pos(v);
+                match self.update_pos(v) {
+                    Some(ins) => {
+                        Some(ins)
+                    },
+                    None => {
+                        None
+                    }
+                }
                 // println!("{:?}", v);
-                Some(v.clone())
+                // Some(v.clone())
             },
             None => {
                 None
