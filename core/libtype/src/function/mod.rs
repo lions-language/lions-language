@@ -2,7 +2,8 @@ use super::{Type, PackageType, TypeAttrubute};
 use libcommon::address::FunctionAddress;
 use libcommon::optcode::OptCode;
 use libcommon::ptr::RefPtr;
-use libmacro::{FieldGet, FieldGetMove, NewWithAll};
+use libmacro::{FieldGet, FieldGetMove, NewWithAll
+    , FieldGetClone};
 use libresult::DescResult;
 use crate::{AddressKey, AddressValue};
 use std::hash::Hash;
@@ -12,7 +13,7 @@ use std::collections::VecDeque;
 /*
  * 函数返回值
  * */
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Default, Clone, FieldGet)]
 pub struct FunctionReturn {
     pub data: FunctionReturnData
 }
@@ -35,7 +36,7 @@ impl Default for FunctionReturnDataAttr {
  * 如果返回值是多个值, 将抽象为元组
  * */
 #[derive(Debug, Clone, Default, FieldGet
-    , NewWithAll)]
+    , NewWithAll, FieldGetClone)]
 pub struct FunctionReturnData {
     pub typ: Type,
     pub typ_attr: TypeAttrubute,

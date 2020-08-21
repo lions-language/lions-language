@@ -31,6 +31,13 @@ pub struct OwnershipMove {
     pub src_addr: AddressValue
 }
 
+#[derive(Debug, Clone, FieldGetClone
+    , FieldGetMove, FieldGet
+    , NewWithAll)]
+pub struct RemoveOwnership {
+    addr: AddressKey
+}
+
 #[derive(Debug, FieldGet, Clone, NewWithAll
     , FieldGetMove, FieldGetClone)]
 pub struct AddressBind {
@@ -133,6 +140,7 @@ pub enum Instruction {
     AddressBind(AddressBind),
     ReturnStmt(ReturnStmt),
     Jump(Jump),
+    RemoveOwnership(RemoveOwnership),
     EnterScope,
     LeaveScope,
     Invalid

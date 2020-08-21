@@ -37,7 +37,7 @@ impl ScopeContext {
         /*
          * 即使是最外层的函数进入的时候也一定需要调用 enter, 所以栈中一定存在元素
          * */
-        self.current_mut_unckecked().alloc_address(addr_typ, scope)
+        self.current_mut_unchecked().alloc_address(addr_typ, scope)
         // self.get_back_mut_n_unchecked(scope).alloc_address(addr_typ, scope)
     }
 
@@ -46,7 +46,7 @@ impl ScopeContext {
         self.get_back_mut_n_unchecked(scope).recycle_address(addr);
     }
 
-    pub fn current_mut_unckecked(&mut self) -> &mut Scope {
+    pub fn current_mut_unchecked(&mut self) -> &mut Scope {
         self.scopes.back_mut().expect("should not happend")
     }
 
@@ -59,11 +59,11 @@ impl ScopeContext {
     }
 
     pub fn ref_counter_create(&mut self, r: AddressKey) {
-        self.current_mut_unckecked().ref_counter_create(r)
+        self.current_mut_unchecked().ref_counter_create(r)
     }
 
     pub fn ref_counter_remove(&mut self, r: &AddressKey) {
-        self.current_mut_unckecked().ref_counter_remove(r);
+        self.current_mut_unchecked().ref_counter_remove(r);
     }
 
     pub fn top_n_with_panic_from_value_buffer(&self, n: usize) -> &ValueBufferItem {
@@ -75,23 +75,23 @@ impl ScopeContext {
     }
 
     pub fn take_top_from_value_buffer(&mut self) -> ValueBufferItem {
-        self.current_mut_unckecked().take_top_from_value_buffer()
+        self.current_mut_unchecked().take_top_from_value_buffer()
     }
 
     pub fn push_with_addr_to_value_buffer(&mut self, typ: Type, addr: Address) {
-        self.current_mut_unckecked().push_with_addr_to_value_buffer(typ, addr)
+        self.current_mut_unchecked().push_with_addr_to_value_buffer(typ, addr)
     }
 
     pub fn push_with_addr_typattr_to_value_buffer(&mut self, typ: Type, addr: Address
         , typ_attr: TypeAttrubute) {
-        self.current_mut_unckecked().push_with_addr_typattr_to_value_buffer(
+        self.current_mut_unchecked().push_with_addr_typattr_to_value_buffer(
             typ, addr, typ_attr)
     }
 
     pub fn push_with_addr_context_to_value_buffer(&mut self
         , typ: Type, addr: Address
         , context: ValueBufferItemContext) {
-        self.current_mut_unckecked().push_with_addr_context_to_value_buffer(
+        self.current_mut_unchecked().push_with_addr_context_to_value_buffer(
             typ, addr, context)
     }
 
@@ -99,16 +99,16 @@ impl ScopeContext {
         , typ: Type, addr: Address
         , context: ValueBufferItemContext
         , typ_attr: TypeAttrubute) {
-        self.current_mut_unckecked().push_with_addr_context_typattr_to_value_buffer(
+        self.current_mut_unchecked().push_with_addr_context_typattr_to_value_buffer(
             typ, addr, context, typ_attr)
     }
 
     pub fn push_to_value_buffer(&mut self, typ: Type) {
-        self.current_mut_unckecked().push_to_value_buffer(typ)
+        self.current_mut_unchecked().push_to_value_buffer(typ)
     }
 
     pub fn add_variant(&mut self, name: String, var: Variant) {
-        self.current_mut_unckecked().add_variant(name, var);
+        self.current_mut_unchecked().add_variant(name, var);
     }
 
     pub fn remove_variant_unchecked(&mut self, scope: usize, name: &String) {
@@ -218,7 +218,7 @@ impl ScopeContext {
     }
 
     pub fn set_current_func_return(&mut self, func_return: FunctionReturn) {
-        self.current_mut_unckecked().set_function_return(func_return);
+        self.current_mut_unchecked().set_function_return(func_return);
     }
 
     pub fn get_current_func_return_ref(&self) -> Option<&FunctionReturn> {
@@ -226,15 +226,15 @@ impl ScopeContext {
     }
 
     pub fn enter_func_call(&mut self) {
-        self.current_mut_unckecked().enter_func_call();
+        self.current_mut_unchecked().enter_func_call();
     }
 
     pub fn leave_func_call(&mut self) {
-        self.current_mut_unckecked().leave_func_call();
+        self.current_mut_unchecked().leave_func_call();
     }
 
     pub fn set_current_func_call(&mut self, func_call: ScopeFuncCall) {
-        self.current_mut_unckecked().set_current_func_call(func_call);
+        self.current_mut_unchecked().set_current_func_call(func_call);
     }
 
     pub fn get_current_func_call(&self) -> Option<&ScopeFuncCall> {

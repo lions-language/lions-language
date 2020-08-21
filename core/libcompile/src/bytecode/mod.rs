@@ -6,7 +6,7 @@ use libtype::instruction::{Instruction, CallPrimevalFunction
     , CallFunction, StaticVariant
     , LoadStack, OwnershipMove
     , AddressBind, ReturnStmt
-    , Jump};
+    , Jump, RemoveOwnership};
 use crate::compile::{StaticContext, CallFunctionContext
     , FunctionNamedStmtContext, Compile
     , LoadStackContext, OwnershipMoveContext
@@ -160,6 +160,10 @@ impl<'a, 'b, F: Writer> Compile for Bytecode<'a, 'b, F> {
     fn leave_scope(&mut self) {
         // println!("yyyyyyyyy");
         self.write(Instruction::LeaveScope);
+    }
+
+    fn remove_ownership(&mut self, context: RemoveOwnership) {
+        self.write(Instruction::RemoveOwnership(context));
     }
 }
 

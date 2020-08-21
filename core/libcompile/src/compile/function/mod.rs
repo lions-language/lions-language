@@ -47,8 +47,13 @@ impl<'a, F: Compile> Compiler<'a, F> {
          *  只是分配一个地址, 不做其他事情 (就是增加地址分配器的索引,
          *  函数体中的起始地址是从参数个数开始的)
          * */
-        self.scope_context.alloc_address(
+        let addr = self.scope_context.alloc_address(
             typ.to_address_type(), 0);
+        /*
+         * 将函数参数地址索引, 写入到当前作用域中
+         * */
+        self.scope_context.current_mut_unchecked()
+            .add_func_param_addr_index(addr.addr_ref().addr_index_clone());
         /*
          * 添加到变量列表中
          * 其中:
@@ -56,8 +61,11 @@ impl<'a, F: Compile> Compiler<'a, F> {
          * */
         self.scope_context.add_variant(name
             , Variant::new_with_all(
+                /*
                 Address::new(AddressValue::new(typ.to_address_type()
                         , AddressKey::new(param_no as u64)))
+                */
+                addr
                 , typ.clone(), typ_attr.clone()));
         /*
          * 填充函数声明

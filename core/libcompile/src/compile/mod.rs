@@ -13,7 +13,7 @@ use libtype::function::{Function, CallFunctionParamAddr
     , CallFunctionReturnData
     , FunctionParamDataItem
     , FunctionReturn};
-use libtype::instruction::{Jump};
+use libtype::instruction::{Jump, RemoveOwnership};
 use libtypecontrol::function::FunctionControl;
 use libtype::module::Module;
 use libresult::*;
@@ -208,6 +208,10 @@ pub trait Compile {
     }
 
     fn leave_scope(&mut self) {
+        unimplemented!();
+    }
+
+    fn remove_ownership(&mut self, _context: RemoveOwnership) {
         unimplemented!();
     }
 }

@@ -45,7 +45,7 @@ pub enum BoolType {
     False
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum TypeAttrubute {
     // Replicate,
     Move,
@@ -65,6 +65,18 @@ impl TypeAttrubute {
         match self {
             TypeAttrubute::Ref
             | TypeAttrubute::MutRef => {
+                true
+            },
+            _ => {
+                false
+            }
+        }
+    }
+
+    pub fn is_move(&self) -> bool {
+        match self {
+            TypeAttrubute::Move
+            | TypeAttrubute::CreateRef => {
                 true
             },
             _ => {
@@ -332,6 +344,10 @@ impl AddressValue {
 
     pub fn scope_clone(&self) -> usize {
         self.addr_ref().scope_ref().clone()
+    }
+
+    pub fn addr_index_clone(&self) -> usize {
+        self.addr_ref().index_clone() as usize
     }
 
     pub fn is_invalid(&self) -> bool {

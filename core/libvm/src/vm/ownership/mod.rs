@@ -1,5 +1,5 @@
 use libtype::{AddressValue, AddressKey, AddressType};
-use libtype::instruction::{OwnershipMove};
+use libtype::instruction::{OwnershipMove, RemoveOwnership};
 use crate::vm::VirtualMachine;
 
 impl VirtualMachine {
@@ -28,5 +28,10 @@ impl VirtualMachine {
         // self.thread_context.current_mut_unchecked().print_current_addr_mapping();
         // self.thread_context.current_mut_unchecked().print_last_n_addr_mapping(1);
         // self.thread_context.current_mut_unchecked().print_stack_datas();
+    }
+
+    pub fn remove_ownership(&mut self, value: RemoveOwnership) {
+        self.thread_context.current_mut_unchecked()
+            .remove_bind(value.addr());
     }
 }

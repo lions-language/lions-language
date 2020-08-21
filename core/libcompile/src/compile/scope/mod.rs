@@ -39,7 +39,10 @@ pub struct Scope {
     func_return: Option<FunctionReturn>,
     func_call_stack: VecDeque<ScopeFuncCall>,
     /*
-     * 记录 return 语句 的跳转指令索引
+     * 记录函数传入参数的地址索引, 用于 return 语句的时候, 如果是引用类型, 判断引用的是哪个输入参数
+     * */
+    func_param_addr_index: Option<Vec<usize>>,
+    /* 记录 return 语句 的跳转指令索引
      * */
     return_jumps: Option<Vec<usize>>
 }
@@ -154,6 +157,21 @@ impl Scope {
         &self.return_jumps
     }
 
+    pub fn add_func_param_addr_index(&mut self, addr_index: usize) {
+        match &mut self.func_param_addr_index {
+            Some(v) => {
+                v.push(addr_index);
+            },
+            None => {
+                self.func_param_addr_index = Some(vec![addr_index]);
+            }
+        }
+    }
+
+    pub fn get_all_func_param_addr_index_ref(&self) -> &Option<Vec<usize>> {
+        &self.func_param_addr_index
+    }
+
     pub fn new_with_addr_start(start: usize, scope_typ: ScopeType) -> Self {
         Self {
             scope_typ: scope_typ,
@@ -163,6 +181,7 @@ impl Scope {
             value_buffer: ValueBuffer::new(),
             func_return: None,
             func_call_stack: VecDeque::new(),
+            func_param_addr_index: None,
             return_jumps: None
         }
     }
