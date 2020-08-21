@@ -1,8 +1,10 @@
 use libcommon::ptr::{RefPtr};
 use libgrammar::token::{TokenValue, TokenData};
-use libtype::function::{FunctionReturn};
+use libtype::function::{FunctionReturn
+    , FunctionReturnDataAttr};
 use libtype::{PackageType, PackageTypeValue
     , AddressType, AddressValue
+    , AddressKey
     , Type, TypeAttrubute};
 use libtype::instruction::{Jump, RemoveOwnership};
 use libgrammar::grammar::{ReturnStmtContext as GrammarReturnStmtContext};
@@ -27,6 +29,60 @@ impl<'a, F: Compile> Compiler<'a, F> {
             return DescResult::Error(
                 format!("expect return type attr: {:?}, but found return type attr: {:?}"
                     , func_return_data.typ_attr_ref(), input_typ_attr));
+        }
+        DescResult::Success
+    }
+
+    fn return_stmt_ref_process(&mut self, scope: usize
+        , mut func_return_ptr: RefPtr, addr: AddressKey) -> DescResult {
+        /*
+         * NOTE
+         *  1. 如果引用的输入参数不是引用类型, 那么将报错
+         *      因为, 如果返回了一个具有所有权的参数, 那么作用域结束的时候是会被释放的
+         *      那么将导致内存访问错误
+         * */
+        let (expr_addr_index, expr_addr_offset, _) = addr.fields_move();
+        let expr_addr_index = expr_addr_index as usize;
+        let expr_addr_offset = expr_addr_offset as usize;
+        let func_return = func_return_ptr.as_mut::<FunctionReturn>();
+        let func_return_data = func_return.data_mut();
+        let func_params = self.scope_context.last_n_unchecked(scope)
+            .get_all_func_param_addr_index_ref();
+        let fps = match func_params {
+            Some(fps) => {
+                fps
+            },
+            None => {
+                return DescResult::Error(
+                    format!("return is a ref, but not exist params"));
+            }
+        };
+        let mut ref_param_index = None;
+        for (i, (addr_index, typ_attr)) in fps.iter().enumerate() {
+            if *addr_index == expr_addr_index {
+                /*
+                 * 返回值引用的是这个参数 => 判断该参数是否是移动
+                 * 如果是移动, 报错 => 不能返回局部变量的引用
+                 * */
+                if typ_attr.is_move() {
+                    return DescResult::Error(
+                        format!("cannot return references to local variables
+                            , param index: {:?}", i));
+                }
+                ref_param_index = Some(i);
+                break;
+            }
+        }
+        /*
+         * 更新函数返回值声明中的属性
+         * */
+        match ref_param_index {
+            Some(index) => {
+                self.cb.update_func_return_data_addr(
+                    FunctionReturnDataAttr::RefParamIndex((index, expr_addr_offset)));
+            },
+            None => {
+            }
         }
         DescResult::Success
     }
@@ -70,7 +126,19 @@ impl<'a, F: Compile> Compiler<'a, F> {
              * */
             if func_return_ptr.as_ref::<FunctionReturn>().data_ref().typ_attr_ref().is_move() {
                 self.cb.remove_ownership(RemoveOwnership::new_with_all(
-                        src_addr.addr()));
+                        src_addr.addr_clone()));
+            }
+            /*
+             * 如果函数声明中的返回值是引用, 需要查找与输入参数中的哪一个地址一致
+             * */
+            if func_return_ptr.as_ref::<FunctionReturn>().data_ref().typ_attr_ref().is_ref() {
+                match self.return_stmt_ref_process(scope, func_return_ptr.clone()
+                    , src_addr.addr()) {
+                    DescResult::Error(e) => {
+                        return DescResult::Error(e);
+                    },
+                    _ => {}
+                }
             }
         }
         /*

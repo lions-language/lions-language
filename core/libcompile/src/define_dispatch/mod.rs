@@ -2,6 +2,7 @@ use libcommon::ptr::RefPtr;
 use libcommon::address::{FunctionAddress, FunctionAddrValue};
 use libtype::function::{self, FunctionStatement
     , FunctionReturn, Function
+    , FunctionReturnDataAttr
     , AddressFunctionDefine
     , FunctionParam, FunctionParamData
     , FunctionParamDataItem};
@@ -79,6 +80,14 @@ impl<'a> FunctionDefineDispatch<'a> {
         let fd = define_obj.ptr_mut().as_mut::<FunctionDefine>();
         let statement = fd.statement_mut();
         *statement.func_return_mut() = item;
+    }
+
+    pub fn update_func_return_data_attr(&mut self
+        , define_obj: &mut DefineObject
+        , attr: FunctionReturnDataAttr) {
+        let fd = define_obj.ptr_mut().as_mut::<FunctionDefine>();
+        let statement = fd.statement_mut();
+        *statement.func_return_mut().data_mut().attr_mut() = attr;
     }
 
     pub fn finish_define(&mut self, obj: &DefineObject) -> Function {

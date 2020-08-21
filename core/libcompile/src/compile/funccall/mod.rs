@@ -368,37 +368,6 @@ impl<'a, F: Compile> Compiler<'a, F> {
         }
         let func = func_ptr.as_ref::<Function>();
         let func_statement = func.func_statement_ref();
-        let return_data = &func_statement.func_return.data;
-        let mut scope: Option<usize> = None;
-        let mut return_addr = match return_data.typ_ref().typ_ref() {
-            TypeValue::Empty => {
-                /*
-                 * 如果返回值是空的, 那么就没有必要分配内存
-                 * (不过对于 plus 操作, 一定是要有返回值的, 不会到达这里)
-                 * */
-                Address::new(AddressValue::new_invalid())
-            },
-            _ => {
-                match return_data.typ_attr_ref() {
-                    TypeAttrubute::Move => {
-                        /*
-                         * 根据类型, 判断是在哪里分配地址
-                         *  返回值地址中的 scope 需要分配为1,
-                         *  因为返回值需要绑定到前一个作用域中
-                         * */
-                        scope = Some(1);
-                        return_is_alloc = true;
-                        let a = self.scope_context.alloc_address(
-                            return_data.typ_ref().to_address_type(), 1);
-                        self.scope_context.ref_counter_create(a.addr_ref().addr_clone());
-                        a
-                    },
-                    _ => {
-                        unimplemented!("{:?}", return_data.typ_attr_ref());
-                    }
-                }
-            }
-        };
         // println!("{:?}", return_addr);
         let mut address_bind_contexts = Vec::new();
         match func_statement.func_param_ref() {
@@ -408,6 +377,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                  * */
                 match fp.data_ref() {
                     FunctionParamData::Single(item) => {
+                        let start = 0;
                         match item.lengthen_attr_ref() {
                             FunctionParamLengthenAttr::Lengthen => {
                                 for i in 0..param_len {
@@ -420,7 +390,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                     // println!("{:?}", addr_value);
                                     address_bind_contexts.push((typ, typ_attr
                                     , AddressBindContext::new_with_all(
-                                    AddressKey::new_with_offset(0, param_len-1-i)
+                                    AddressKey::new_with_offset(start, param_len-1-i)
                                     , addr_value), value_context));
                                 }
                             },
@@ -433,7 +403,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                     };
                                     address_bind_contexts.push((typ, typ_attr
                                     , AddressBindContext::new_with_all(
-                                    AddressKey::new(0)
+                                    AddressKey::new(start)
                                     , addr_value), value_context));
                                 } else {
                                     /*
@@ -544,6 +514,50 @@ impl<'a, F: Compile> Compiler<'a, F> {
             None => {
             }
         }
+        let return_data = &func_statement.func_return.data;
+        let mut scope: Option<usize> = None;
+        let mut return_addr = match return_data.typ_ref().typ_ref() {
+            TypeValue::Empty => {
+                /*
+                 * 如果返回值是空的, 那么就没有必要分配内存
+                 * (不过对于 plus 操作, 一定是要有返回值的, 不会到达这里)
+                 * */
+                Address::new(AddressValue::new_invalid())
+            },
+            _ => {
+                match return_data.typ_attr_ref() {
+                    TypeAttrubute::Move
+                    | TypeAttrubute::CreateRef => {
+                        /*
+                         * 根据类型, 判断是在哪里分配地址
+                         *  返回值地址中的 scope 需要分配为1,
+                         *  因为返回值需要绑定到前一个作用域中
+                         * */
+                        scope = Some(1);
+                        return_is_alloc = true;
+                        let a = self.scope_context.alloc_address(
+                            return_data.typ_ref().to_address_type(), 1);
+                        self.scope_context.ref_counter_create(a.addr_ref().addr_clone());
+                        a
+                    },
+                    TypeAttrubute::Ref
+                    | TypeAttrubute::MutRef => {
+                        match return_data.attr_ref() {
+                            FunctionReturnDataAttr::RefParamIndex(pos) => {
+                                let (index, offset) = pos;
+                                unimplemented!("xxx");
+                            },
+                            _ => {
+                                panic!("should not happend");
+                            }
+                        }
+                    },
+                    _ => {
+                        unimplemented!("{:?}", return_data.typ_attr_ref());
+                    }
+                }
+            }
+        };
         self.cb.enter_scope();
         while !address_bind_contexts.is_empty() {
             let (typ, typ_attr, mut address_bind_context, value_context) =

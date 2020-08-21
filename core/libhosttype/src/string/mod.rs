@@ -85,7 +85,7 @@ lazy_static!{
                         TypeValue::Primeval(Primeval::new(
                             PrimevalType::Str)))
                     , TypeAttrubute::MutRef
-                    , FunctionReturnDataAttr::RefParamIndex(0)
+                    , FunctionReturnDataAttr::RefParamIndex((0, 0))
                     )
                 ),
             Some(Type::new_without_attr(TypeValue::Primeval(Primeval::new(
@@ -120,7 +120,7 @@ lazy_static!{
                         TypeValue::Primeval(Primeval::new(
                             PrimevalType::Str)))
                     , TypeAttrubute::MutRef
-                    , FunctionReturnDataAttr::RefParamIndex(0)
+                    , FunctionReturnDataAttr::RefParamIndex((0, 0))
                     )
                 ),
             Some(Type::new_without_attr(TypeValue::Primeval(Primeval::new(
@@ -155,7 +155,7 @@ lazy_static!{
                         TypeValue::Primeval(Primeval::new(
                             PrimevalType::Str)))
                     , TypeAttrubute::MutRef
-                    , FunctionReturnDataAttr::RefParamIndex(0)
+                    , FunctionReturnDataAttr::RefParamIndex((0, 0))
                     )
                 ),
             Some(Type::new_without_attr(TypeValue::Primeval(Primeval::new(

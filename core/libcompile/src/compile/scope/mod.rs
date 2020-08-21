@@ -41,7 +41,7 @@ pub struct Scope {
     /*
      * 记录函数传入参数的地址索引, 用于 return 语句的时候, 如果是引用类型, 判断引用的是哪个输入参数
      * */
-    func_param_addr_index: Option<Vec<usize>>,
+    func_param_addr_index: Option<Vec<(usize, TypeAttrubute)>>,
     /* 记录 return 语句 的跳转指令索引
      * */
     return_jumps: Option<Vec<usize>>
@@ -157,18 +157,19 @@ impl Scope {
         &self.return_jumps
     }
 
-    pub fn add_func_param_addr_index(&mut self, addr_index: usize) {
+    pub fn add_func_param_addr_index(&mut self, addr_index: usize
+        , typ_attr: TypeAttrubute) {
         match &mut self.func_param_addr_index {
             Some(v) => {
-                v.push(addr_index);
+                v.push((addr_index, typ_attr));
             },
             None => {
-                self.func_param_addr_index = Some(vec![addr_index]);
+                self.func_param_addr_index = Some(vec![(addr_index, typ_attr)]);
             }
         }
     }
 
-    pub fn get_all_func_param_addr_index_ref(&self) -> &Option<Vec<usize>> {
+    pub fn get_all_func_param_addr_index_ref(&self) -> &Option<Vec<(usize, TypeAttrubute)>> {
         &self.func_param_addr_index
     }
 

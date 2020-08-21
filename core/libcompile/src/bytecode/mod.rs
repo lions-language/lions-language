@@ -1,7 +1,8 @@
 use libcommon::ptr::RefPtr;
 use libtype::function::{FunctionDefine, Function
     , FunctionParamDataItem
-    , FunctionReturn};
+    , FunctionReturn
+    , FunctionReturnDataAttr};
 use libtype::instruction::{Instruction, CallPrimevalFunction
     , CallFunction, StaticVariant
     , LoadStack, OwnershipMove
@@ -105,6 +106,11 @@ impl<'a, 'b, F: Writer> Compile for Bytecode<'a, 'b, F> {
         , item: FunctionReturn) {
         let ds = self.define_stack.back_mut_unchecked();
         self.func_define_dispatch.set_function_return_to_statement(ds, item);
+    }
+
+    fn update_func_return_data_addr(&mut self, attr: FunctionReturnDataAttr) {
+        let ds = self.define_stack.back_mut_unchecked();
+        self.func_define_dispatch.update_func_return_data_attr(ds, attr);
     }
 
     fn function_define_end(&mut self) -> Function {

@@ -58,6 +58,10 @@ impl ScopeContext {
         self.scopes.get_mut(self.scopes.len() - 1 - n).expect("should not happend")
     }
 
+    pub fn last_n_unchecked(&self, n: usize) -> &Scope {
+        self.scopes.get(self.scopes.len() - 1 - n).expect("should not happend")
+    }
+
     pub fn ref_counter_create(&mut self, r: AddressKey) {
         self.current_mut_unchecked().ref_counter_create(r)
     }

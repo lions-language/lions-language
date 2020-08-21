@@ -53,7 +53,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
          * 将函数参数地址索引, 写入到当前作用域中
          * */
         self.scope_context.current_mut_unchecked()
-            .add_func_param_addr_index(addr.addr_ref().addr_index_clone());
+            .add_func_param_addr_index(addr.addr_ref().addr_index_clone()
+                , typ_attr.clone());
         /*
          * 添加到变量列表中
          * 其中:

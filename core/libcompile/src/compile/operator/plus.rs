@@ -239,7 +239,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                          * 然后对数据进行修改
                          * */
                         let param_addrs = vec![left_addr.clone(), right_addr.clone()];
-                        let param_index =
+                        let (param_index, offset) =
                             match &return_data.attr {
                             FunctionReturnDataAttr::RefParamIndex(idx) => {
                                 idx
@@ -259,7 +259,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                          * 然后对数据进行修改
                          * */
                         let param_addrs = vec![left_addr.clone(), right_addr.clone()];
-                        let param_index =
+                        let (param_index, offset) =
                             match &return_data.attr {
                             FunctionReturnDataAttr::RefParamIndex(idx) => {
                                 idx

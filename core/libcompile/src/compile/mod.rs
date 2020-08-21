@@ -12,7 +12,8 @@ use libtype::{Type, Data
 use libtype::function::{Function, CallFunctionParamAddr
     , CallFunctionReturnData
     , FunctionParamDataItem
-    , FunctionReturn};
+    , FunctionReturn
+    , FunctionReturnDataAttr};
 use libtype::instruction::{Jump, RemoveOwnership};
 use libtypecontrol::function::FunctionControl;
 use libtype::module::Module;
@@ -212,6 +213,10 @@ pub trait Compile {
     }
 
     fn remove_ownership(&mut self, _context: RemoveOwnership) {
+        unimplemented!();
+    }
+
+    fn update_func_return_data_addr(&mut self, _: FunctionReturnDataAttr) {
         unimplemented!();
     }
 }
