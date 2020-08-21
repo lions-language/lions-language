@@ -23,10 +23,11 @@ pub enum FunctionReturnDataAttr {
     /*
      * 元组第一个位置: 参数的位置索引
      * 元组第二个位置: 参数的地址偏移
-     *  如果引用的参数是 变长参数 / 结构体中的某个字段, 那么在解析完 return 后面的表达式之后
+     *  如果引用的参数是 结构体中的某个字段, 那么在解析完 return 后面的表达式之后
      *  将得到地址的偏移量
+     * 元组第三个位置: 变长参数的偏移
      * */
-    RefParamIndex((usize, usize)),
+    RefParamIndex((usize, usize, usize)),
     MoveIndex(usize),
     Create,
     Empty

@@ -370,6 +370,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
         let func_statement = func.func_statement_ref();
         // println!("{:?}", return_addr);
         let mut address_bind_contexts = Vec::new();
+        let mut param_addrs = VecDeque::new();
         match func_statement.func_param_ref() {
             Some(fp) => {
                 /*
@@ -386,11 +387,15 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                         Ok(v) => v,
                                         Err(e) => return e
                                     };
+                                    param_addrs.push_front(addr_value.clone());
                                     // println!("{}", func.func_statement_ref().func_name_ref());
                                     // println!("{:?}", addr_value);
                                     address_bind_contexts.push((typ, typ_attr
                                     , AddressBindContext::new_with_all(
-                                    AddressKey::new_with_offset(start, param_len-1-i)
+                                    AddressKey::new_with_all(start
+                                        , addr_value.offset_clone()
+                                        , param_len-1-i
+                                        , addr_value.scope_clone())
                                     , addr_value), value_context));
                                 }
                             },
@@ -401,6 +406,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                         Ok(v) => v,
                                         Err(e) => return e
                                     };
+                                    param_addrs.push_front(addr_value.clone());
                                     address_bind_contexts.push((typ, typ_attr
                                     , AddressBindContext::new_with_all(
                                     AddressKey::new(start)
@@ -460,11 +466,14 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                             Ok(v) => v,
                                             Err(e) => return e
                                         };
+                                        param_addrs.push_front(addr_value.clone());
                                         address_bind_contexts.push((typ, typ_attr
                                         , AddressBindContext::new_with_all(
-                                        AddressKey::new_with_offset(
+                                        AddressKey::new_with_all(
                                             lengthen_param_start as u64
-                                            , lengthen_param_len-1-i)
+                                            , addr_value.offset_clone()
+                                            , lengthen_param_len-1-i
+                                            , addr_value.scope_clone())
                                         , addr_value), value_context));
                                     }
                                 }
@@ -478,6 +487,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                         Ok(v) => v,
                                         Err(e) => return e
                                     };
+                                    param_addrs.push_front(addr_value.clone());
                                     address_bind_contexts.push((typ, typ_attr
                                     , AddressBindContext::new_with_all(
                                     AddressKey::new((fixed_param_len-1-i) as u64)
@@ -501,6 +511,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                         Ok(v) => v,
                                         Err(e) => return e
                                     };
+                                    param_addrs.push_front(addr_value.clone());
                                     address_bind_contexts.push((typ, typ_attr
                                     , AddressBindContext::new_with_all(
                                     AddressKey::new((param_len-1-i) as u64)
@@ -544,8 +555,11 @@ impl<'a, F: Compile> Compiler<'a, F> {
                     | TypeAttrubute::MutRef => {
                         match return_data.attr_ref() {
                             FunctionReturnDataAttr::RefParamIndex(pos) => {
-                                let (index, offset) = pos;
-                                unimplemented!("xxx");
+                                let (index, offset, lengthen_offset) = pos;
+                                let mut addr = param_addrs[*index+*lengthen_offset].clone();
+                                *addr.addr_mut().offset_mut() = *offset;
+                                // println!("{:?}", addr);
+                                Address::new(addr)
                             },
                             _ => {
                                 panic!("should not happend");

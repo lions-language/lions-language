@@ -292,21 +292,25 @@ impl Default for Type {
     , NewWithAll, FieldGetMove)]
 pub struct AddressKey {
     index: u64,
+    /*
+     * 为复合类型准备的偏移量
+     * */
     offset: usize,
+    lengthen_offset: usize,
     scope: usize
 }
 
 impl AddressKey {
     pub fn new(index: u64) -> Self {
-        AddressKey::new_with_all(index, 0, 0)
+        AddressKey::new_with_all(index, 0, 0, 0)
     }
 
     pub fn new_with_scope(index: u64, scope: usize) -> Self {
-        AddressKey::new_with_all(index, 0, scope)
+        AddressKey::new_with_all(index, 0, 0, scope)
     }
 
     pub fn new_with_offset(index: u64, offset: usize) -> Self {
-        AddressKey::new_with_all(index, offset, 0)
+        AddressKey::new_with_all(index, offset, 0, 0)
     }
 }
 
@@ -344,6 +348,10 @@ impl AddressValue {
 
     pub fn scope_clone(&self) -> usize {
         self.addr_ref().scope_ref().clone()
+    }
+
+    pub fn offset_clone(&self) -> usize {
+        self.addr_ref().offset_clone()
     }
 
     pub fn addr_index_clone(&self) -> usize {

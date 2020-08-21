@@ -41,9 +41,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
          *      因为, 如果返回了一个具有所有权的参数, 那么作用域结束的时候是会被释放的
          *      那么将导致内存访问错误
          * */
-        let (expr_addr_index, expr_addr_offset, _) = addr.fields_move();
+        let (expr_addr_index, expr_addr_offset, expr_addr_lengthen_offset, _) = addr.fields_move();
         let expr_addr_index = expr_addr_index as usize;
-        let expr_addr_offset = expr_addr_offset as usize;
         let func_return = func_return_ptr.as_mut::<FunctionReturn>();
         let func_return_data = func_return.data_mut();
         let func_params = self.scope_context.last_n_unchecked(scope)
@@ -79,7 +78,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
         match ref_param_index {
             Some(index) => {
                 self.cb.update_func_return_data_addr(
-                    FunctionReturnDataAttr::RefParamIndex((index, expr_addr_offset)));
+                    FunctionReturnDataAttr::RefParamIndex(
+                        (index, expr_addr_offset, expr_addr_lengthen_offset)));
             },
             None => {
             }

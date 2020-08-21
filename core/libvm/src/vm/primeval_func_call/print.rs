@@ -32,7 +32,7 @@ impl VirtualMachine {
         let mut stdout = io::stdout();
         // for (index, param_compile_addr) in param_compile_addrs.iter().enumerate() {
         for i in 0..value.call_param_len_clone() {
-            let param_compile_addr = AddressKey::new_with_offset(0, i);
+            let param_compile_addr = AddressKey::new_with_all(0, 0, i, 0);
             let data_addr = self.thread_context.current_unchecked().get_data_addr_unchecked(
                 &param_compile_addr);
             // println!("{:?}", data_addr);
