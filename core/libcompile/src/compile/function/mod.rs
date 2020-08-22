@@ -85,8 +85,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
         /*
          * 填充函数声明
          * */
-        let func_param_item = FunctionParamDataItem::new_with_all(
-            typ, typ_attr, lengthen_attr, false);
+        let func_param_item = FunctionParamDataItem::new_with_lengthen(
+            typ, typ_attr, lengthen_attr);
         self.cb.function_push_param_to_statement(func_param_item);
     }
 

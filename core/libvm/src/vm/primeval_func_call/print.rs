@@ -32,13 +32,28 @@ impl VirtualMachine {
          * */
         let mut stdout = io::stdout();
         // for (index, param_compile_addr) in param_compile_addrs.iter().enumerate() {
-        for i in 0..value.call_param_len_clone() {
+        // for i in 0..value.call_param_len_clone() {
+        let mut move_i = 0;
+        let mut ref_i = 0;
+        let mut i = 0;
+        for item in value.param_typ_attrs_ref().as_ref().expect("should not happend") {
             /*
             let param_compile_addr = AddressKey::new_with_all(0, 0, i, 0);
             let data_addr = self.thread_context.current_unchecked().get_data_addr_unchecked(
                 &param_compile_addr);
             */
-            let data_addr = self.thread_context.current_unchecked().get_param_ref_unchecked(i);
+            let data_addr = if item.is_move() {
+                let param_compile_addr = AddressKey::new_with_all(0, 0, move_i, 0);
+                move_i += 1;
+                self.thread_context.current_unchecked().get_data_addr_unchecked(
+                    &param_compile_addr)
+            } else if item.is_ref() {
+                let ri = ref_i;
+                ref_i += 1;
+                self.thread_context.current_unchecked().get_param_ref_unchecked(ri)
+            } else {
+                unimplemented!();
+            };
             // println!("{:?}", data_addr);
             let param_value = self.thread_context.current_unchecked().get_data_by_data_addr_unchecked(
                 data_addr, &self.link_static);
@@ -68,6 +83,7 @@ impl VirtualMachine {
                     panic!("should not happend");
                 }
             }
+            i += 1;
         }
         stdout.write(b"\n");
         stdout.flush();

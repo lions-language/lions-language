@@ -29,6 +29,7 @@ use crate::address::PackageIndex;
 use crate::static_dispatch::{StaticVariantDispatch};
 use scope::context::ScopeContext;
 use crate::define::DefineObject;
+use std::collections::{VecDeque};
 
 #[derive(Debug)]
 pub struct StaticContext {
@@ -57,6 +58,7 @@ pub struct CallFunctionContext<'a> {
     pub func: &'a Function,
     pub param_addrs: Option<Vec<CallFunctionParamAddr>>,
     pub call_param_len: usize,
+    pub param_typ_attrs: Option<VecDeque<TypeAttrubute>>,
     pub return_data: CallFunctionReturnData
 }
 

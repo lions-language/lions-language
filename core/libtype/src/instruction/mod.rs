@@ -4,9 +4,11 @@ use libmacro::{FieldGet, FieldGetClone
     , NewWithAll, FieldGetMove};
 use crate::function::{CallFunctionParamAddr
     , CallFunctionReturnData};
-use crate::{AddressValue, AddressKey, Data};
+use crate::{AddressValue, AddressKey, Data
+    , TypeAttrubute};
 use crate::package::PackageStr;
 use crate::primeval::string::Str;
+use std::collections::VecDeque;
 
 #[derive(Debug, Clone, FieldGetClone
     , FieldGetMove, FieldGet)]
@@ -14,6 +16,7 @@ pub struct CallPrimevalFunction {
     pub opt: optcode::OptCode,
     pub param_addrs: Option<Vec<CallFunctionParamAddr>>,
     pub call_param_len: usize,
+    pub param_typ_attrs: Option<VecDeque<TypeAttrubute>>,
     pub return_data: CallFunctionReturnData
 }
 

@@ -144,6 +144,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                     func: &func,
                     param_addrs: Some(param_addrs),
                     call_param_len: 1,
+                    param_typ_attrs: None,
                     return_data: CallFunctionReturnData::new_with_all(
                         return_addr.addr_clone(), return_is_alloc)
                 };
@@ -172,6 +173,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
         /*
          * 返回输入的地址
          * */
+        // Ok((input_typ, input_typ_attr, input_addr.addr()))
         Ok((input_typ, input_typ_attr, input_addr.addr()))
         // Ok(input_value.addr_ref().addr_ref().clone_with_scope_plus(1))
     }
@@ -289,12 +291,14 @@ impl<'a, F: Compile> Compiler<'a, F> {
             value, item.typ_ref()
             , *item.is_auto_call_totype_ref()) {
             Ok(v) => {
+                /*
                 let ta = if value_typ_attr.is_ref() {
                     value_typ_attr
                 } else {
                     v.1
                 };
-                Ok((v.0, ta, v.2, value_context))
+                */
+                Ok((v.0, v.1, v.2, value_context))
             },
             Err(e) => {
                 Err(e)
@@ -373,6 +377,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
         let mut address_bind_contexts = Vec::new();
         let mut param_addrs = VecDeque::new();
         let mut param_refs = VecDeque::new();
+        let mut param_typ_attrs = VecDeque::with_capacity(0);
         match func_statement.func_param_ref() {
             Some(fp) => {
                 /*
@@ -389,12 +394,20 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                         Ok(v) => v,
                                         Err(e) => return e
                                     };
-                                    if item.typ_attr_ref() != &typ_attr {
-                                        return DescResult::Error(
-                                            format!("expect typ attr: {:?}, but found {:?}"
-                                                , item.typ_attr_ref(), &typ_attr));
+                                    if item.is_check_func_call_param_typ_attr_clone() {
+                                        /*
+                                         * TODO
+                                         *  临时方案, 这里是对 println 的特殊处理
+                                         * */
+                                        if item.typ_attr_ref() != &typ_attr {
+                                            return DescResult::Error(
+                                                format!("expect typ attr: {:?}, but found {:?}"
+                                                    , item.typ_attr_ref(), &typ_attr));
+                                        }
+                                    } else {
+                                        param_typ_attrs.push_front(typ_attr.clone());
                                     }
-                                    if item.typ_attr_ref().is_move() {
+                                    if typ_attr.is_move() {
                                         param_addrs.push_front(addr_value.clone());
                                         // println!("{}", func.func_statement_ref().func_name_ref());
                                         // println!("{:?}", addr_value);
@@ -405,7 +418,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                             , param_len-1-i
                                             , addr_value.scope_clone())
                                         , addr_value), value_context));
-                                    } else if item.typ_attr_ref().is_ref() {
+                                    } else if typ_attr.is_ref() {
                                         param_refs.push_front(PushParamRef::new_with_all(
                                             addr_value.clone_with_scope_plus(1)));
                                     } else {
@@ -487,15 +500,22 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                             Ok(v) => v,
                                             Err(e) => return e
                                         };
-                                        param_addrs.push_front(addr_value.clone());
-                                        address_bind_contexts.push((typ, typ_attr
-                                        , AddressBindContext::new_with_all(
-                                        AddressKey::new_with_all(
-                                            lengthen_param_start as u64
-                                            , addr_value.offset_clone()
-                                            , lengthen_param_len-1-i
-                                            , addr_value.scope_clone())
-                                        , addr_value), value_context));
+                                        if item.typ_attr_ref().is_move() {
+                                            param_addrs.push_front(addr_value.clone());
+                                            address_bind_contexts.push((typ, typ_attr
+                                            , AddressBindContext::new_with_all(
+                                            AddressKey::new_with_all(
+                                                lengthen_param_start as u64
+                                                , addr_value.offset_clone()
+                                                , lengthen_param_len-1-i
+                                                , addr_value.scope_clone())
+                                            , addr_value), value_context));
+                                        } else if item.typ_attr_ref().is_ref() {
+                                            param_refs.push_front(PushParamRef::new_with_all(
+                                                addr_value.clone_with_scope_plus(1)));
+                                        } else {
+                                            unimplemented!();
+                                        }
                                     }
                                 }
                                 /*
@@ -508,11 +528,18 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                         Ok(v) => v,
                                         Err(e) => return e
                                     };
-                                    param_addrs.push_front(addr_value.clone());
-                                    address_bind_contexts.push((typ, typ_attr
-                                    , AddressBindContext::new_with_all(
-                                    AddressKey::new((fixed_param_len-1-i) as u64)
-                                    , addr_value), value_context));
+                                    if item.typ_attr_ref().is_move() {
+                                        param_addrs.push_front(addr_value.clone());
+                                        address_bind_contexts.push((typ, typ_attr
+                                        , AddressBindContext::new_with_all(
+                                        AddressKey::new((fixed_param_len-1-i) as u64)
+                                        , addr_value), value_context));
+                                    } else if item.typ_attr_ref().is_ref() {
+                                        param_refs.push_front(PushParamRef::new_with_all(
+                                            addr_value.clone_with_scope_plus(1)));
+                                    } else {
+                                        unimplemented!();
+                                    }
                                 }
                             },
                             FunctionParamLengthenAttr::Fixed => {
@@ -630,6 +657,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
             func: &func,
             param_addrs: None,
             call_param_len: param_len,
+            param_typ_attrs: if param_typ_attrs.is_empty() { None } else { Some(param_typ_attrs) },
             return_data: CallFunctionReturnData::new_with_all(
                 return_addr.addr_clone(), return_is_alloc)
         };

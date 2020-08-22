@@ -22,7 +22,7 @@ lazy_static!{
                         Type::new_without_attr(TypeValue::Primeval(Primeval::new(
                                 PrimevalType::Str)))
                         , TypeAttrubute::Ref
-                        , true
+                        , true, false
                         )
                     ),
                 )),

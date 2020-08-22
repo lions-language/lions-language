@@ -28,7 +28,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
         , value_context: ValueBufferItemContext)
         -> AddressValue {
         match typ_attr {
-            TypeAttrubute::Move => {
+            TypeAttrubute::Move
+            | TypeAttrubute::CreateRef => {
                 /*
                  * 告诉虚拟机移动地址(交换地址映射),
                  *  主要是为了让实际存储数据的地址有一个可以被找到的标识
@@ -60,7 +61,6 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 return addr;
             },
             TypeAttrubute::Ref
-            | TypeAttrubute::CreateRef
             | TypeAttrubute::MutRef => {
                 /*
                  * 将实际存储数据的地址存储到 Variant 对象中 (也就是 src_addr)
@@ -330,6 +330,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
             param_addrs: Some(vec![CallFunctionParamAddr::Fixed(left_addr_value)
                 , CallFunctionParamAddr::Fixed(right_addr_value)]),
             call_param_len: 2,
+            param_typ_attrs: None,
             return_data: CallFunctionReturnData::new_with_all(
                 return_addr.addr_clone(), return_is_alloc)
         });

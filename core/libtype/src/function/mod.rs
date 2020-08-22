@@ -112,7 +112,8 @@ pub enum FunctionParamLengthenAttr {
     Fixed
 }
 
-#[derive(Debug, Clone, FieldGet, NewWithAll)]
+#[derive(Debug, Clone, FieldGet, NewWithAll
+    , FieldGetClone)]
 pub struct FunctionParamDataItem {
     pub typ: Type,
     pub typ_attr: TypeAttrubute,
@@ -123,7 +124,8 @@ pub struct FunctionParamDataItem {
     /*
      * 该字段决定: 当函数调用时, 如果传入的参数和要求的参数类型不匹配, 是否自动调用 to_#type 方法
      * */
-    pub is_auto_call_totype: bool
+    pub is_auto_call_totype: bool,
+    pub is_check_func_call_param_typ_attr: bool
 }
 
 #[derive(Debug, Clone)]
@@ -149,23 +151,34 @@ impl FunctionParamDataItem {
         FunctionParamDataItem::new_with_all(typ
             , typ_attr
             , FunctionParamLengthenAttr::Fixed
-            , false)
+            , false, true)
+    }
+
+    pub fn new_with_lengthen(typ: Type
+        , typ_attr: TypeAttrubute
+        , lengthen_attr: FunctionParamLengthenAttr) -> Self {
+        FunctionParamDataItem::new_with_all(typ
+            , typ_attr
+            , lengthen_attr
+            , false, true)
     }
 
     pub fn new_lengthen(typ: Type, typ_attr: TypeAttrubute) -> Self {
         FunctionParamDataItem::new_with_all(typ
             , typ_attr
             , FunctionParamLengthenAttr::Lengthen
-            , false)
+            , false, true)
     }
 
     pub fn new_lengthen_auto_call_totype(typ: Type
         , typ_attr: TypeAttrubute
-        , is_auto_call_totype: bool) -> Self {
+        , is_auto_call_totype: bool
+        , is_check_func_call_param_typ_attr: bool) -> Self {
         FunctionParamDataItem::new_with_all(typ
             , typ_attr
             , FunctionParamLengthenAttr::Lengthen
-            , is_auto_call_totype)
+            , is_auto_call_totype
+            , is_check_func_call_param_typ_attr)
     }
 }
 
