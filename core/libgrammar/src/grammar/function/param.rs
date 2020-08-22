@@ -1,9 +1,10 @@
 use libtype::{TypeAttrubute};
 use libtype::function::{FunctionParamLengthenAttr};
-use super::{GrammarParser, Grammar, NextToken, ExpressContext
+use super::{GrammarParser, Grammar
     , FunctionDefineParamContext};
+use crate::grammar::{FunctionDefineParamMutContext};
 use crate::lexical::{CallbackReturnStatus, TokenVecItem, TokenPointer};
-use crate::token::{TokenType, TokenValue};
+use crate::token::{TokenType};
 
 enum FunctionType {
     Unknown,
@@ -65,8 +66,9 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
 
     fn function_find_params(&mut self) {
         let mut param_no = 0;
+        let mut mut_context = FunctionDefineParamMutContext::default();
         loop {
-            self.function_find_param(param_no);
+            self.function_find_param(param_no, &mut mut_context);
             param_no += 1;
             let tp = match self.lookup_next_one_ptr() {
                 Some(tp) => {
@@ -221,7 +223,8 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         (typ_attr, lengthen_attr, type_token)
     }
 
-    fn function_find_param(&mut self, param_no: usize) {
+    fn function_find_param(&mut self, param_no: usize
+        , mut_context: &mut FunctionDefineParamMutContext) {
         /*
          * 查找 name id
          * */
@@ -230,7 +233,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         self.grammar_context().cb.function_define_param(
             FunctionDefineParamContext::new_with_all(
                 name_token.token_value(), type_token.token_value()
-                , typ_attr, lengthen_attr, param_no));
+                , typ_attr, lengthen_attr, param_no), mut_context);
     }
 }
 

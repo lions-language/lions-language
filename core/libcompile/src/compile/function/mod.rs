@@ -1,5 +1,6 @@
 use libgrammar::token::{TokenValue, TokenData};
 use libgrammar::grammar::{FunctionDefineParamContext
+    , FunctionDefineParamMutContext
     , FunctionDefineReturnContext};
 use libtype::function::{AddFunctionContext
     , FunctionParamDataItem
@@ -32,7 +33,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
         });
     }
 
-    pub fn handle_function_define_param(&mut self, context: FunctionDefineParamContext) {
+    pub fn handle_function_define_param(&mut self, context: FunctionDefineParamContext
+        , mut_context: &mut FunctionDefineParamMutContext) {
         let (name_token, type_token, typ_attr, lengthen_attr, param_no)
             = context.fields_move();
         let name = extract_token_data!(
@@ -46,9 +48,21 @@ impl<'a, F: Compile> Compiler<'a, F> {
          * 为参数分配一个地址
          *  只是分配一个地址, 不做其他事情 (就是增加地址分配器的索引,
          *  函数体中的起始地址是从参数个数开始的)
+         * NOTE
+         *  只有移动的参数才需要分配
          * */
-        let addr = self.scope_context.alloc_address(
-            typ.to_address_type(), 0);
+        let addr = if typ_attr.is_move() {
+            self.scope_context.alloc_address(
+                typ.to_address_type(), 0)
+        } else if typ_attr.is_ref() {
+            let a = Address::new(AddressValue::new(
+                    AddressType::ParamRef(mut_context.ref_param_no_clone())
+                    , AddressKey::default()));
+            *mut_context.ref_param_no_mut() += 1;
+            a
+        } else {
+            unimplemented!();
+        };
         /*
          * 将函数参数地址索引, 写入到当前作用域中
          * */

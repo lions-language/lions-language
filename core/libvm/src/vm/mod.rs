@@ -86,6 +86,9 @@ impl VirtualMachine {
             Instruction::ReadStaticVariant(v) => {
                 self.read_static_variant(v);
             },
+            Instruction::PushParamRef(v) => {
+                self.push_param_ref(v);
+            },
             Instruction::EnterScope => {
                 self.thread_context.enter_thread_scope();
             },

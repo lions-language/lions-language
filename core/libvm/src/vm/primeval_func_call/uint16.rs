@@ -106,5 +106,43 @@ impl VirtualMachine {
                         Some(Str::new(StrValue::Utf8(result)))))));
         // self.thread_context.current_unchecked().print_stack_datas();
     }
+
+    pub fn ref_uint16_to_str(&mut self, value: CallPrimevalFunction) {
+        let param_addrs = value.param_addrs.expect("should not happend");
+        let param_compile_addr = match param_addrs.get(0).expect("should not happend") {
+            CallFunctionParamAddr::Fixed(p) => {
+                p
+            },
+            _ => {
+                panic!("should not happend");
+            }
+        };
+        /*
+         * 获取数据
+         * */
+        let param_value = self.thread_context.current_unchecked().get_data_unchecked(
+            &param_compile_addr, &self.link_static);
+        let param_value = extract_primeval_number_ref!(param_value, Uint16);
+        /*
+         * 计算返回值
+         * */
+        let result = param_value.to_string();
+        /*
+         * 检测返回值是否有效
+         * */
+        if !*value.return_data.is_alloc_ref() {
+            return;
+        }
+        /*
+         * 返回值有效 => 将返回值写入到内存
+         * 注意: 返回值一定要写入到前一个作用域中
+         * */
+        self.thread_context.current_mut_unchecked().alloc_and_write_data(
+            &value.return_data.addr_value()
+            , Data::new(DataValue::Primeval(
+                    PrimevalData::Str(
+                        Some(Str::new(StrValue::Utf8(result)))))));
+        // self.thread_context.current_unchecked().print_stack_datas();
+    }
 }
 

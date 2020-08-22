@@ -1,4 +1,6 @@
-use libtype::instruction::{CallFunction};
+use libtype::instruction::{
+    CallFunction
+    , PushParamRef};
 use libcommon::optcode::{OptCode};
 use libcommon::address::{FunctionAddrValue, FunctionAddress};
 use libcompile::define_stream::{DefineStream};
@@ -45,6 +47,15 @@ impl VirtualMachine {
          * 离开作用域
          * */
         // self.thread_context.leave_thread_scope();
+    }
+
+    pub fn push_param_ref(&mut self, value: PushParamRef) {
+        /*
+         * 获取地址对应的数据地址
+         * */
+        let data_addr = self.thread_context.current_unchecked().get_data_addr_unchecked(
+            value.addr_ref().addr_ref()).clone();
+        self.thread_context.current_mut_unchecked().push_current_param_ref(data_addr);
     }
 }
 

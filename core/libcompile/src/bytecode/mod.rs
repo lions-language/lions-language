@@ -7,7 +7,8 @@ use libtype::instruction::{Instruction, CallPrimevalFunction
     , CallFunction, StaticVariant
     , LoadStack, OwnershipMove
     , AddressBind, ReturnStmt
-    , Jump, RemoveOwnership};
+    , Jump, RemoveOwnership
+    , PushParamRef};
 use crate::compile::{StaticContext, CallFunctionContext
     , FunctionNamedStmtContext, Compile
     , LoadStackContext, OwnershipMoveContext
@@ -170,6 +171,10 @@ impl<'a, 'b, F: Writer> Compile for Bytecode<'a, 'b, F> {
 
     fn remove_ownership(&mut self, context: RemoveOwnership) {
         self.write(Instruction::RemoveOwnership(context));
+    }
+
+    fn push_param_ref(&mut self, context: PushParamRef) {
+        self.write(Instruction::PushParamRef(context));
     }
 }
 

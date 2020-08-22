@@ -185,6 +185,10 @@ impl ScopeContext {
         }
     }
 
+    pub fn get_last_function_scope_unchecked(&mut self) -> usize {
+        self.get_last_scope_type_index(&ScopeType::Function).expect("should not happend")
+    }
+
     pub fn get_last_scope_type_index(&mut self, scope_typ: &ScopeType) -> Option<usize> {
         let mut index = self.scopes.len() - 1;
         let mut scope = 0;

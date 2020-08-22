@@ -110,6 +110,14 @@ impl ThreadScope {
     pub fn get_result_data_addr(&self) -> &AddressValue {
         self.scope_context.current_unchecked().get_result_data_addr()
     }
+
+    pub fn push_current_param_ref(&mut self, data_addr: MemoryValue) {
+        self.scope_context.current_mut_unchecked().push_param_ref(data_addr);
+    }
+
+    pub fn get_param_ref_unchecked(&self, index: usize) -> &MemoryValue {
+        self.scope_context.current_unchecked().get_param_ref_unchecked(index)
+    }
     
     pub fn print_current_addr_mapping(&mut self) {
         println!("**************** current scope addr mapping ******************");

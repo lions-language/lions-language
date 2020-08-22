@@ -122,6 +122,12 @@ pub struct Jump {
     index: usize
 }
 
+#[derive(Debug, Clone, FieldGet, NewWithAll
+    , FieldGetMove, FieldGetClone, Default)]
+pub struct PushParamRef {
+    addr: AddressValue
+}
+
 /*
  * 指令
  * */
@@ -141,6 +147,7 @@ pub enum Instruction {
     ReturnStmt(ReturnStmt),
     Jump(Jump),
     RemoveOwnership(RemoveOwnership),
+    PushParamRef(PushParamRef),
     EnterScope,
     LeaveScope,
     Invalid

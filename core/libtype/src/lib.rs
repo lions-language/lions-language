@@ -319,6 +319,7 @@ pub enum AddressType {
     Static,
     Stack,
     Heap,
+    ParamRef(usize),
     Invalid
 }
 

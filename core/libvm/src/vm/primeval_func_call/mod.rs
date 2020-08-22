@@ -124,6 +124,9 @@ impl VirtualMachine {
             OptCode::RefUint8ToStr => {
                 self.ref_uint8_to_str(value);
             },
+            OptCode::RefUint16ToStr => {
+                self.ref_uint16_to_str(value);
+            },
             OptCode::MoveUint16ToStr => {
                 self.move_uint16_to_str(value);
             },

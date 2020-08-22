@@ -7,6 +7,7 @@ use libtype::function::{FindFunctionContext, FindFunctionResult
     , CallFunctionParamAddr, Function, splice::FunctionSplice
     , FunctionReturnDataAttr, FunctionParamDataItem
     , CallFunctionReturnData};
+use libtype::instruction::{PushParamRef};
 use libtype::{AddressKey, AddressValue};
 use libtype::package::{PackageStr};
 use libgrammar::token::{TokenValue, TokenData};
@@ -19,7 +20,7 @@ use crate::compile::{Compile, Compiler, FileType
     , value_buffer::ValueBufferItemContext
     , AddressValueExpand, CompileContext
     , AddressBindContext};
-use crate::compile::scope::{ScopeFuncCall};
+use crate::compile::scope::{ScopeFuncCall, ScopeType};
 use crate::address::Address;
 use std::collections::VecDeque;
 
@@ -371,6 +372,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
         // println!("{:?}", return_addr);
         let mut address_bind_contexts = Vec::new();
         let mut param_addrs = VecDeque::new();
+        let mut param_refs = VecDeque::new();
         match func_statement.func_param_ref() {
             Some(fp) => {
                 /*
@@ -387,16 +389,28 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                         Ok(v) => v,
                                         Err(e) => return e
                                     };
-                                    param_addrs.push_front(addr_value.clone());
-                                    // println!("{}", func.func_statement_ref().func_name_ref());
-                                    // println!("{:?}", addr_value);
-                                    address_bind_contexts.push((typ, typ_attr
-                                    , AddressBindContext::new_with_all(
-                                    AddressKey::new_with_all(start
-                                        , addr_value.offset_clone()
-                                        , param_len-1-i
-                                        , addr_value.scope_clone())
-                                    , addr_value), value_context));
+                                    if item.typ_attr_ref() != &typ_attr {
+                                        return DescResult::Error(
+                                            format!("expect typ attr: {:?}, but found {:?}"
+                                                , item.typ_attr_ref(), &typ_attr));
+                                    }
+                                    if item.typ_attr_ref().is_move() {
+                                        param_addrs.push_front(addr_value.clone());
+                                        // println!("{}", func.func_statement_ref().func_name_ref());
+                                        // println!("{:?}", addr_value);
+                                        address_bind_contexts.push((typ, typ_attr
+                                        , AddressBindContext::new_with_all(
+                                        AddressKey::new_with_all(start
+                                            , addr_value.offset_clone()
+                                            , param_len-1-i
+                                            , addr_value.scope_clone())
+                                        , addr_value), value_context));
+                                    } else if item.typ_attr_ref().is_ref() {
+                                        param_refs.push_front(PushParamRef::new_with_all(
+                                            addr_value.clone_with_scope_plus(1)));
+                                    } else {
+                                        unimplemented!();
+                                    }
                                 }
                             },
                             FunctionParamLengthenAttr::Fixed => {
@@ -406,11 +420,18 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                         Ok(v) => v,
                                         Err(e) => return e
                                     };
-                                    param_addrs.push_front(addr_value.clone());
-                                    address_bind_contexts.push((typ, typ_attr
-                                    , AddressBindContext::new_with_all(
-                                    AddressKey::new(start)
-                                    , addr_value), value_context));
+                                    if item.typ_attr_ref().is_move() {
+                                        param_addrs.push_front(addr_value.clone());
+                                        address_bind_contexts.push((typ, typ_attr
+                                        , AddressBindContext::new_with_all(
+                                        AddressKey::new(start)
+                                        , addr_value), value_context));
+                                    } else if item.typ_attr_ref().is_ref() {
+                                        param_refs.push_front(PushParamRef::new_with_all(
+                                            addr_value.clone_with_scope_plus(1)));
+                                    } else {
+                                        unimplemented!();
+                                    }
                                 } else {
                                     /*
                                      * 希望是1个固定的参数, 但是参数个数不等于1
@@ -511,11 +532,18 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                         Ok(v) => v,
                                         Err(e) => return e
                                     };
-                                    param_addrs.push_front(addr_value.clone());
-                                    address_bind_contexts.push((typ, typ_attr
-                                    , AddressBindContext::new_with_all(
-                                    AddressKey::new((param_len-1-i) as u64)
-                                    , addr_value), value_context));
+                                    if item.typ_attr_ref().is_move() {
+                                        param_addrs.push_front(addr_value.clone());
+                                        address_bind_contexts.push((typ, typ_attr
+                                        , AddressBindContext::new_with_all(
+                                        AddressKey::new((param_len-1-i) as u64)
+                                        , addr_value), value_context));
+                                    } else if item.typ_attr_ref().is_ref() {
+                                        param_refs.push_front(PushParamRef::new_with_all(
+                                            addr_value.clone_with_scope_plus(1)));
+                                    } else {
+                                        unimplemented!();
+                                    }
                                 }
                             }
                         }
@@ -573,6 +601,10 @@ impl<'a, F: Compile> Compiler<'a, F> {
             }
         };
         self.cb.enter_scope();
+        while !param_refs.is_empty() {
+            let context = param_refs.remove(0).expect("should not happend");
+            self.cb.push_param_ref(context);
+        }
         while !address_bind_contexts.is_empty() {
             let (typ, typ_attr, mut address_bind_context, value_context) =
                 address_bind_contexts.remove(0);
@@ -586,7 +618,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
             let addr = self.process_param(
                 &typ, &typ_attr, address_bind_context.dst_addr_clone(), 0, value_context);
             *address_bind_context.dst_addr_mut() = addr;
-            self.cb.address_bind(address_bind_context);
+            // self.cb.address_bind(address_bind_context);
             /*
             self.process_param(
                 &typ, &typ_attr, addr_value, 0, value_context);

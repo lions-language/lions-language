@@ -118,6 +118,15 @@ pub struct FunctionDefineParamContext {
     param_no: usize
 }
 
+#[derive(Default, FieldGet, NewWithAll, FieldGetMove
+    , FieldGetClone)]
+pub struct FunctionDefineParamMutContext {
+    /*
+     * 引用参数序号
+     * */
+    ref_param_no: usize
+}
+
 #[derive(Debug, FieldGet, NewWithAll, FieldGetMove)]
 pub struct FunctionDefineReturnContext {
     typ_attr: TypeAttrubute,
@@ -194,7 +203,8 @@ pub trait Grammar {
          * */
         println!("named function define start");
     }
-    fn function_define_param(&mut self, context: FunctionDefineParamContext) {
+    fn function_define_param(&mut self, context: FunctionDefineParamContext
+        , _mut_context: &mut FunctionDefineParamMutContext) {
         context.name_token.print_token_type(Some("function param name:"));
         context.type_token.print_token_type(Some("function param type:"));
     }

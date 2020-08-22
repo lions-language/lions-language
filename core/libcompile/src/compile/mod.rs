@@ -4,6 +4,7 @@ use libgrammar::grammar::{Grammar, CallFuncScopeContext
     , ConstNumberContext, ConstStringContext
     , CallFunctionContext as GrammarCallFunctionContext
     , FunctionDefineParamContext
+    , FunctionDefineParamMutContext
     , FunctionDefineReturnContext
     , ReturnStmtContext as GrammarReturnStmtContext};
 use libgrammar::token::{TokenValue};
@@ -14,7 +15,9 @@ use libtype::function::{Function, CallFunctionParamAddr
     , FunctionParamDataItem
     , FunctionReturn
     , FunctionReturnDataAttr};
-use libtype::instruction::{Jump, RemoveOwnership};
+use libtype::instruction::{
+    Jump, RemoveOwnership
+    , PushParamRef};
 use libtypecontrol::function::FunctionControl;
 use libtype::module::Module;
 use libresult::*;
@@ -219,6 +222,10 @@ pub trait Compile {
     fn update_func_return_data_addr(&mut self, _: FunctionReturnDataAttr) {
         unimplemented!();
     }
+
+    fn push_param_ref(&mut self, _: PushParamRef) {
+        unimplemented!();
+    }
 }
 
 pub enum FileType {
@@ -293,8 +300,9 @@ impl<'a, F: Compile> Grammar for Compiler<'a, F> {
         self.handle_function_define_start();
     }
 
-    fn function_define_param(&mut self, context: FunctionDefineParamContext) {
-        self.handle_function_define_param(context);
+    fn function_define_param(&mut self, context: FunctionDefineParamContext
+        , mut_context: &mut FunctionDefineParamMutContext) {
+        self.handle_function_define_param(context, mut_context);
     }
 
     fn function_define_return(&mut self, context: FunctionDefineReturnContext) {
