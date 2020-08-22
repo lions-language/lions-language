@@ -85,6 +85,57 @@ impl TypeAttrubute {
         }
     }
 
+    pub fn is_ref_as_param(&self) -> bool {
+        /*
+         * 作为参数是否是引用的
+         * */
+        match self {
+            TypeAttrubute::Ref
+            | TypeAttrubute::MutRef
+            | TypeAttrubute::CreateRef => {
+                true
+            },
+            _ => {
+                false
+            }
+        }
+    }
+
+    pub fn is_ref_as_return(&self) -> bool {
+        match self {
+            TypeAttrubute::Ref
+            | TypeAttrubute::MutRef => {
+                true
+            },
+            _ => {
+                false
+            }
+        }
+    }
+
+    pub fn is_move_as_param(&self) -> bool {
+        match self {
+            TypeAttrubute::Move => {
+                true
+            },
+            _ => {
+                false
+            }
+        }
+    }
+
+    pub fn is_move_as_return(&self) -> bool {
+        match self {
+            TypeAttrubute::Move
+            | TypeAttrubute::CreateRef => {
+                true
+            },
+            _ => {
+                false
+            }
+        }
+    }
+
     pub fn to_str(&self) -> &'static str {
         match self {
             TypeAttrubute::Move => {

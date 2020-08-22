@@ -291,14 +291,12 @@ impl<'a, F: Compile> Compiler<'a, F> {
             value, item.typ_ref()
             , *item.is_auto_call_totype_ref()) {
             Ok(v) => {
-                /*
                 let ta = if value_typ_attr.is_ref() {
                     value_typ_attr
                 } else {
                     v.1
                 };
-                */
-                Ok((v.0, v.1, v.2, value_context))
+                Ok((v.0, ta, v.2, value_context))
             },
             Err(e) => {
                 Err(e)
@@ -404,25 +402,26 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                                 format!("expect typ attr: {:?}, but found {:?}"
                                                     , item.typ_attr_ref(), &typ_attr));
                                         }
+                                        if typ_attr.is_move() {
+                                            param_addrs.push_front(addr_value.clone());
+                                            // println!("{}", func.func_statement_ref().func_name_ref());
+                                            // println!("{:?}", addr_value);
+                                            address_bind_contexts.push((typ, typ_attr
+                                            , AddressBindContext::new_with_all(
+                                            AddressKey::new_with_all(start
+                                                , addr_value.offset_clone()
+                                                , param_len-1-i
+                                                , addr_value.scope_clone())
+                                            , addr_value), value_context));
+                                        } else if typ_attr.is_ref() {
+                                            param_refs.push_front(PushParamRef::new_with_all(
+                                                addr_value.clone_with_scope_plus(1)));
+                                        } else {
+                                            unimplemented!();
+                                        }
                                     } else {
-                                        param_typ_attrs.push_front(typ_attr.clone());
-                                    }
-                                    if typ_attr.is_move() {
-                                        param_addrs.push_front(addr_value.clone());
-                                        // println!("{}", func.func_statement_ref().func_name_ref());
-                                        // println!("{:?}", addr_value);
-                                        address_bind_contexts.push((typ, typ_attr
-                                        , AddressBindContext::new_with_all(
-                                        AddressKey::new_with_all(start
-                                            , addr_value.offset_clone()
-                                            , param_len-1-i
-                                            , addr_value.scope_clone())
-                                        , addr_value), value_context));
-                                    } else if typ_attr.is_ref() {
                                         param_refs.push_front(PushParamRef::new_with_all(
                                             addr_value.clone_with_scope_plus(1)));
-                                    } else {
-                                        unimplemented!();
                                     }
                                 }
                             },
