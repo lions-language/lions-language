@@ -608,11 +608,22 @@ impl<'a, F: Compile> Compiler<'a, F> {
                     TypeAttrubute::Ref
                     | TypeAttrubute::MutRef => {
                         match return_data.attr_ref() {
-                            FunctionReturnDataAttr::RefParamIndex(pos) => {
+                            FunctionReturnDataAttr::RefParamIndex(addr_value) => {
+                                let (addr_typ, addr_key) = addr_value.fields_move();
+                                let (index, offset, lengthen_offset, scope) =
+                                    addr_key.fields_move();
+                                let param_ref = &param_refs[*index+*lengthen_offset];
+                                let mut ak = param_ref.addr_clone();
+                                *ak.addr_mut().index_mut() += param_ref.addr_ref().index_clone();
+                                let addr = AddressValue::new(
+                                    param_ref.addr_typ_clone()
+                                    , ak);
+                                /*
                                 let (index, offset, lengthen_offset) = pos;
                                 let mut addr = param_addrs[*index+*lengthen_offset].clone();
                                 *addr.addr_mut().offset_mut() = *offset;
                                 // println!("{:?}", addr);
+                                */
                                 Address::new(addr)
                             },
                             _ => {

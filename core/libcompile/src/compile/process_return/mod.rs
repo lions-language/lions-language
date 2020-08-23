@@ -34,13 +34,14 @@ impl<'a, F: Compile> Compiler<'a, F> {
     }
 
     fn return_stmt_ref_process(&mut self, scope: usize
-        , mut func_return_ptr: RefPtr, addr: AddressKey) -> DescResult {
+        , mut func_return_ptr: RefPtr, addr: AddressValue) -> DescResult {
         /*
          * NOTE
          *  1. 如果引用的输入参数不是引用类型, 那么将报错
          *      因为, 如果返回了一个具有所有权的参数, 那么作用域结束的时候是会被释放的
          *      那么将导致内存访问错误
          * */
+        /*
         let (expr_addr_index, expr_addr_offset, expr_addr_lengthen_offset, _) = addr.fields_move();
         let expr_addr_index = expr_addr_index as usize;
         let func_return = func_return_ptr.as_mut::<FunctionReturn>();
@@ -84,6 +85,9 @@ impl<'a, F: Compile> Compiler<'a, F> {
             None => {
             }
         }
+        */
+        self.cb.update_func_return_data_addr(
+            FunctionReturnDataAttr::RefParamIndex(addr));
         DescResult::Success
     }
 
@@ -133,7 +137,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
              * */
             if func_return_ptr.as_ref::<FunctionReturn>().data_ref().typ_attr_ref().is_ref() {
                 match self.return_stmt_ref_process(scope, func_return_ptr.clone()
-                    , src_addr.addr()) {
+                    , src_addr) {
                     DescResult::Error(e) => {
                         return DescResult::Error(e);
                     },
