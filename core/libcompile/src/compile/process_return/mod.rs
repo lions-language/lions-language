@@ -126,6 +126,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
             } else {
                 unimplemented!();
             };
+            // println!("{:?}", find_src_addr);
             self.cb.return_stmt(ReturnStmtContext::new_with_all(
                     scope, find_src_addr));
             /*
@@ -170,6 +171,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
          * 所以, 这里将 Jump 指令的位置记录下来
          * */
         self.scope_context.last_n_mut_unchecked(scope).add_return_jump(jump_index);
+        /*
+        */
         DescResult::Success
     }
 }

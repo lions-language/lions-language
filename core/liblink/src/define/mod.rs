@@ -99,7 +99,7 @@ impl LinkDefine {
     }
 
     fn execute(&mut self, instruction: &mut Instruction, is_first: bool) {
-        // println!("{:?}", instruction);
+        println!("{:?}", instruction);
         match instruction {
             Instruction::CallFunction(value) => {
                 let ps = value.package_str_ref();
@@ -271,11 +271,13 @@ impl<'a> LinkDefineBlock<'a> {
     fn update_pos(&mut self, ins: &Instruction) -> Option<Instruction> {
         match ins {
             Instruction::Jump(jp) => {
+                // println!("{}", self.pos);
                 match jp.typ_ref() {
                     JumpType::Backward => {
                         self.pos += jp.index_clone();
+                        // println!("index: {}", jp.index_ref());
                         // self.pos += 1;
-                        // println!("{:?}", jp);
+                        // println!("{:?}", self.pos);
                     },
                     JumpType::Forward => {
                         self.pos -= jp.index_clone();
@@ -283,6 +285,11 @@ impl<'a> LinkDefineBlock<'a> {
                 }
                 match self.link_define.code_segment.get(self.pos) {
                     Some(v) => {
+                        /*
+                        println!("{}", self.pos);
+                        println!("before: {:?}, after: {:?}"
+                            , ins, v);
+                        */
                         return Some(v.clone());
                     },
                     None => {
@@ -308,15 +315,16 @@ impl<'a> Iterator for LinkDefineBlock<'a> {
         match self.link_define.code_segment.get(self.pos) {
             Some(v) => {
                 // self.pos += 1;
+                // println!("{:?}", v);
                 match self.update_pos(v) {
                     Some(ins) => {
+                        // println!("{:?}", ins);
                         Some(ins)
                     },
                     None => {
                         None
                     }
                 }
-                // println!("{:?}", v);
                 // Some(v.clone())
             },
             None => {

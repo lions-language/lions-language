@@ -136,6 +136,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                      * 所以需要对 offset 加1, 最终的结果才是 要跳转后的位置
                      * */
                     let jump_index = offset + 1;
+                    // println!("jump index: {}", jump_index);
                     /*
                      * 更新 jump 指令中的值
                      * */

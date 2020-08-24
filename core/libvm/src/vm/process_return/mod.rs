@@ -14,6 +14,7 @@ impl VirtualMachine {
          * */
         let data_addr = self.thread_context.current_mut_unchecked()
             .get_data_addr_unchecked(&addr_key).addr_value_clone();
+        // println!("{:?}", data_addr);
         /*
          * 2
         * */

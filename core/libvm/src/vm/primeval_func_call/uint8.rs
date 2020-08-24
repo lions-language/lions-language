@@ -59,11 +59,22 @@ impl VirtualMachine {
         /*
          * 返回值需要分配内存 => 将返回值写入到内存
          * */
+        /*
+        self.thread_context.current_mut_unchecked().print_current_addr_mapping();
+        self.thread_context.current_mut_unchecked().print_last_n_addr_mapping(1);
+        self.thread_context.current_mut_unchecked().print_stack_datas();
+        println!("{:?}", value.return_data.addr_value_ref());
+        */
         self.thread_context.current_mut_unchecked().alloc_and_write_data(
             &value.return_data.addr_value()
             , Data::new(DataValue::Primeval(
                     PrimevalData::Uint16(
                         Some(Uint16::new(result))))));
+        /*
+        self.thread_context.current_mut_unchecked().print_current_addr_mapping();
+        self.thread_context.current_mut_unchecked().print_last_n_addr_mapping(1);
+        self.thread_context.current_mut_unchecked().print_stack_datas();
+        */
     }
 
     pub fn ref_uint8_to_str(&mut self, value: CallPrimevalFunction) {

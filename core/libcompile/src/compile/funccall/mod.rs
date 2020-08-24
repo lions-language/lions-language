@@ -146,6 +146,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                 let a = self.scope_context.alloc_address(
                                     return_data.typ.to_address_type(), 1);
                                 self.scope_context.ref_counter_create(a.addr_ref().addr_clone());
+                                // println!("xxx: {:?}", a);
                                 a
                             },
                             _ => {
@@ -587,13 +588,13 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                         Ok(v) => v,
                                         Err(e) => return e
                                     };
-                                    if item.typ_attr_ref().is_move() {
+                                    if item.typ_attr_ref().is_move_as_param() {
                                         param_addrs.push_front(addr_value.clone());
                                         address_bind_contexts.push((typ, typ_attr
                                         , AddressBindContext::new_with_all(
                                         AddressKey::new((param_len-1-i) as u64)
                                         , addr_value), value_context));
-                                    } else if item.typ_attr_ref().is_ref() {
+                                    } else if item.typ_attr_ref().is_ref_as_param() {
                                         param_refs.push_front(PushParamRef::new_with_all(
                                             addr_value.clone_with_scope_plus(1)));
                                     } else {
@@ -645,8 +646,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                             addr_value.addr_ref().lengthen_offset_clone();
                                         let param_ref = &param_refs[index as usize+lengthen_offset];
                                         let mut ak = param_ref.addr_ref().addr_clone();
-                                        *ak.index_mut() +=
-                                            param_ref.addr_ref().addr_ref().index_clone();
+                                        *ak.index_mut() += index;
                                         let addr = AddressValue::new(
                                             param_ref.addr_ref().typ_clone()
                                             , ak);

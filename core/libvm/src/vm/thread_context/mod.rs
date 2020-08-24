@@ -64,6 +64,7 @@ impl ThreadScope {
 
     pub fn get_data_addr_unchecked(&self, addr: &AddressKey) -> &MemoryValue {
         let scope = addr.scope_clone();
+        // println!("{}", scope);
         self.scope_context.last_n_unchecked(scope).get_data_addr_unchecked(addr)
     }
 
@@ -125,12 +126,12 @@ impl ThreadScope {
         println!("*************************************************************");
     }
 
-    pub fn print_last_n_addr_mapping(&mut self, scope: usize) {
+    pub fn print_last_n_addr_mapping(&self, scope: usize) {
         if !self.scope_context.last_n_is_valid(scope) {
             return;
         }
         println!("**************** last {} scope addr mapping ******************", scope);
-        self.scope_context.last_n_mut_unchecked(scope).print_addr_mapping();
+        self.scope_context.last_n_unchecked(scope).print_addr_mapping();
         println!("**************************************************************");
     }
 
