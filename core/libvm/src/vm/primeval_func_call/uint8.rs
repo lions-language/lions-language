@@ -79,8 +79,16 @@ impl VirtualMachine {
         /*
          * 获取数据
          * */
+        // println!("{:?}", param_compile_addr);
+        /*
         let param_value = self.thread_context.current_unchecked().get_data_unchecked(
             &param_compile_addr, &self.link_static);
+        */
+        // println!("get param ref");
+        // self.thread_context.current_unchecked().
+        let data_addr = self.thread_context.current_unchecked().get_param_ref_unchecked(0);
+        let param_value = self.thread_context.current_unchecked().get_data_by_data_addr_unchecked(
+            data_addr, &self.link_static);
         let param_value = extract_primeval_number_ref!(param_value, Uint8);
         /*
          * 计算返回值

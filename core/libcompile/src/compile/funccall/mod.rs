@@ -6,6 +6,7 @@ use libtype::function::{FindFunctionContext, FindFunctionResult
     , OptcodeFunctionDefine, FunctionParamLengthenAttr
     , CallFunctionParamAddr, Function, splice::FunctionSplice
     , FunctionReturnDataAttr, FunctionParamDataItem
+    , FunctionReturnRefParam
     , CallFunctionReturnData};
 use libtype::instruction::{PushParamRef};
 use libtype::{AddressKey, AddressValue};
@@ -30,13 +31,14 @@ impl<'a, F: Compile> Compiler<'a, F> {
         -> Result<(Type, TypeAttrubute, AddressValue), DescResult> {
         // let input_typ = input_value.typ_ref();
         let (input_typ, input_addr, input_typ_attr, input_package_type
-            , input_package_str, _) = input_value.fields_move();
+            , input_package_str, input_value_context) = input_value.fields_move();
         if !is_auto_call_totype {
             /*
              * 不需要自动调用 to_#type => 直接返回输入的地址
              * */
-            return Ok((input_typ.clone(), input_typ_attr, input_addr.addr()));
+            return Ok((input_typ, input_typ_attr, input_addr.addr()));
         }
+        // println!("{:?}", input_addr);
         let et = expect_typ.typ_ref();
         let it = input_typ.typ_ref();
         if !et.is_any() {
@@ -91,8 +93,24 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 /*
                  * 将参数地址中的 scope 加1, 告诉虚拟机要从上一个作用域中查找
                  * */
+                /*
+                 * 参数可能是引用也可能是移动
+                 * */
+                let mut param_ref = None;
+                let mut param_move = None;
                 let param_addrs = vec![CallFunctionParamAddr::Fixed(
                     input_addr.addr_ref().clone_with_scope_plus(1))];
+                if input_typ_attr.is_move_as_param() {
+                    param_move = Some((input_typ.clone(), input_typ_attr.clone()
+                            , input_addr.addr_clone()
+                            , 0
+                            , input_value_context));
+                } else if input_typ_attr.is_ref_as_param() {
+                    param_ref = Some(PushParamRef::new_with_all(
+                        input_addr.addr_ref().clone_with_scope_plus(1)));
+                } else {
+                    unimplemented!();
+                }
                 let func_statement = func.func_statement_ref();
                 let return_data = &func_statement.func_return.data;
                 let mut scope: Option<usize> = None;
@@ -139,6 +157,16 @@ impl<'a, F: Compile> Compiler<'a, F> {
                         }
                     }
                 };
+                self.cb.enter_scope();
+                if let Some(context) = param_ref {
+                    self.cb.push_param_ref(context);
+                }
+                if let Some(context) = param_move {
+                    let (typ, typ_attr, src_addr, index, value_context)
+                        = context;
+                    let addr = self.process_param(
+                        &typ, &typ_attr, src_addr, index, value_context);
+                }
                 let call_context = CallFunctionContext {
                     package_str: input_package_str,
                     func: &func,
@@ -148,7 +176,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
                     return_data: CallFunctionReturnData::new_with_all(
                         return_addr.addr_clone(), return_is_alloc)
                 };
-                self.call_function_and_ctrl_scope(call_context);
+                self.cb.call_function(call_context);
+                self.cb.leave_scope();
                 /*
                  * 因为地址被修改, 所以返回修改后的地址 (调用 to_#type 后的 return 地址)
                  *  作用域结束之后, 如果之前修改过scope, 需要减掉
@@ -608,23 +637,32 @@ impl<'a, F: Compile> Compiler<'a, F> {
                     TypeAttrubute::Ref
                     | TypeAttrubute::MutRef => {
                         match return_data.attr_ref() {
-                            FunctionReturnDataAttr::RefParamIndex(addr_value) => {
-                                let (addr_typ, addr_key) = addr_value.fields_move();
-                                let (index, offset, lengthen_offset, scope) =
-                                    addr_key.fields_move();
-                                let param_ref = &param_refs[*index+*lengthen_offset];
-                                let mut ak = param_ref.addr_clone();
-                                *ak.addr_mut().index_mut() += param_ref.addr_ref().index_clone();
-                                let addr = AddressValue::new(
-                                    param_ref.addr_typ_clone()
-                                    , ak);
+                            FunctionReturnDataAttr::RefParam(ref_param) => {
+                                match ref_param {
+                                    FunctionReturnRefParam::Addr(addr_value) => {
+                                        let index = addr_value.addr_ref().index_clone();
+                                        let lengthen_offset =
+                                            addr_value.addr_ref().lengthen_offset_clone();
+                                        let param_ref = &param_refs[index as usize+lengthen_offset];
+                                        let mut ak = param_ref.addr_ref().addr_clone();
+                                        *ak.index_mut() +=
+                                            param_ref.addr_ref().addr_ref().index_clone();
+                                        let addr = AddressValue::new(
+                                            param_ref.addr_ref().typ_clone()
+                                            , ak);
+                                        // println!("{:?}, {:?}", addr_value, addr);
+                                        Address::new(addr.clone_with_scope_minus(1))
+                                    },
+                                    FunctionReturnRefParam::Index(_) => {
+                                        unimplemented!();
+                                    }
+                                }
                                 /*
                                 let (index, offset, lengthen_offset) = pos;
                                 let mut addr = param_addrs[*index+*lengthen_offset].clone();
                                 *addr.addr_mut().offset_mut() = *offset;
                                 // println!("{:?}", addr);
                                 */
-                                Address::new(addr)
                             },
                             _ => {
                                 panic!("should not happend");
@@ -642,6 +680,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
             let context = param_refs.remove(0).expect("should not happend");
             self.cb.push_param_ref(context);
         }
+        let mut move_index = 0;
         while !address_bind_contexts.is_empty() {
             let (typ, typ_attr, mut address_bind_context, value_context) =
                 address_bind_contexts.remove(0);
@@ -653,8 +692,9 @@ impl<'a, F: Compile> Compiler<'a, F> {
              *  如果不存在移动, 则返回输入的地址
              * */
             let addr = self.process_param(
-                &typ, &typ_attr, address_bind_context.dst_addr_clone(), 0, value_context);
+                &typ, &typ_attr, address_bind_context.dst_addr_clone(), move_index, value_context);
             *address_bind_context.dst_addr_mut() = addr;
+            move_index += 1;
             // self.cb.address_bind(address_bind_context);
             /*
             self.process_param(

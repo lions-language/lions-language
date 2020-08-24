@@ -53,6 +53,7 @@ impl Scope {
     }
 
     fn recycle_address(&mut self, addr: AddressValue) {
+        // println!("recycle_address");
         self.address_dispatch.recycle_addr(addr);
     }
 

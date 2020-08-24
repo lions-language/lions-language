@@ -5,7 +5,7 @@ use libtype::function::{FunctionStatement, Function
     , FunctionDefine, OptcodeFunctionDefine
     , FunctionParam, FunctionParamData, FunctionParamDataItem
     , FunctionReturn, FunctionReturnData
-    , FunctionReturnDataAttr
+    , FunctionReturnDataAttr, FunctionReturnRefParam
     };
 use libcommon::optcode::{OptCode};
 use phf::phf_map;
@@ -85,7 +85,7 @@ lazy_static!{
                         TypeValue::Primeval(Primeval::new(
                             PrimevalType::Str)))
                     , TypeAttrubute::MutRef
-                    , FunctionReturnDataAttr::RefParamIndex((0, 0, 0))
+                    , FunctionReturnDataAttr::RefParam(FunctionReturnRefParam::Index(0))
                     )
                 ),
             Some(Type::new_without_attr(TypeValue::Primeval(Primeval::new(
@@ -120,7 +120,7 @@ lazy_static!{
                         TypeValue::Primeval(Primeval::new(
                             PrimevalType::Str)))
                     , TypeAttrubute::MutRef
-                    , FunctionReturnDataAttr::RefParamIndex((0, 0, 0))
+                    , FunctionReturnDataAttr::RefParam(FunctionReturnRefParam::Index(0))
                     )
                 ),
             Some(Type::new_without_attr(TypeValue::Primeval(Primeval::new(
@@ -155,7 +155,7 @@ lazy_static!{
                         TypeValue::Primeval(Primeval::new(
                             PrimevalType::Str)))
                     , TypeAttrubute::MutRef
-                    , FunctionReturnDataAttr::RefParamIndex((0, 0, 0))
+                    , FunctionReturnDataAttr::RefParam(FunctionReturnRefParam::Index(0))
                     )
                 ),
             Some(Type::new_without_attr(TypeValue::Primeval(Primeval::new(

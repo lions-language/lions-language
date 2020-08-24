@@ -4,6 +4,7 @@ use libtype::{Type, TypeAttrubute};
 use libtype::function::{FunctionParamData, FunctionParamDataItem
         , splice::FunctionSplice, FindFunctionContext
         , FindFunctionResult, FunctionReturnDataAttr
+        , FunctionReturnRefParam
         , Function, CallFunctionParamAddr
         , CallFunctionReturnData};
 use libtype::{AddressType, AddressValue, TypeValue
@@ -239,19 +240,24 @@ impl<'a, F: Compile> Compiler<'a, F> {
                          * 然后对数据进行修改
                          * */
                         let param_addrs = vec![left_addr.clone(), right_addr.clone()];
-                        let (param_index, offset, lengthen_offset) =
-                            match &return_data.attr {
-                            FunctionReturnDataAttr::RefParamIndex(idx) => {
-                                idx
+                        match &return_data.attr {
+                            FunctionReturnDataAttr::RefParam(ref_param) => {
+                                match ref_param {
+                                    FunctionReturnRefParam::Index(index) => {
+                                        let ref_addr = &param_addrs[*index as usize];
+                                        ref_addr.clone()
+                                    },
+                                    FunctionReturnRefParam::Addr(addr) => {
+                                        Address::new(addr.clone())
+                                    }
+                                }
                             },
                             _ => {
                                 panic!("returns a reference, 
                                     but does not specify which input
                                     parameter of the reference");
                             }
-                        };
-                        let ref_addr = &param_addrs[*param_index as usize];
-                        ref_addr.clone()
+                        }
                     },
                     TypeAttrubute::MutRef => {
                         /*
@@ -259,19 +265,24 @@ impl<'a, F: Compile> Compiler<'a, F> {
                          * 然后对数据进行修改
                          * */
                         let param_addrs = vec![left_addr.clone(), right_addr.clone()];
-                        let (param_index, offset, lengthen_offset) =
-                            match &return_data.attr {
-                            FunctionReturnDataAttr::RefParamIndex(idx) => {
-                                idx
+                        match &return_data.attr {
+                            FunctionReturnDataAttr::RefParam(ref_param) => {
+                                match ref_param {
+                                    FunctionReturnRefParam::Index(index) => {
+                                        let ref_addr = &param_addrs[*index as usize];
+                                        ref_addr.clone()
+                                    },
+                                    FunctionReturnRefParam::Addr(addr) => {
+                                        Address::new(addr.clone())
+                                    }
+                                }
                             },
                             _ => {
                                 panic!("returns a reference, 
                                     but does not specify which input
                                     parameter of the reference");
                             }
-                        };
-                        let ref_addr = &param_addrs[*param_index as usize];
-                        ref_addr.clone()
+                        }
                     },
                     TypeAttrubute::Move => {
                         let param_addrs = vec![left_addr.addr_clone(), right_addr.addr_clone()];
@@ -296,12 +307,13 @@ impl<'a, F: Compile> Compiler<'a, F> {
                          * */
                         scope = Some(1);
                         let a = self.scope_context.alloc_address(return_data.typ.to_address_type(), 1);
+                        // println!("xxx: {:?}", a);
                         self.scope_context.ref_counter_create(a.addr_ref().addr_clone());
                         a
                     },
                     TypeAttrubute::CreateRef => {
                         /*
-                         * 所有权移动到这一层, 但是属性变成了 MoveRef, 之后就会调用 &move
+                         * 所有权移动到这一层, 但是属性变成了 MoveRef, 之后就会调用 &create
                          * 相关的方法
                          * */
                         return_is_alloc = true;

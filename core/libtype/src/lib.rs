@@ -352,6 +352,12 @@ pub struct AddressKey {
 }
 
 impl AddressKey {
+    pub fn clone_with_scope_plus(&self, scope: usize) -> Self {
+        let mut o = self.clone();
+        o.scope += scope;
+        o
+    }
+
     pub fn new(index: u64) -> Self {
         AddressKey::new_with_all(index, 0, 0, 0)
     }

@@ -11,10 +11,12 @@ impl AddressDispatch {
     pub fn alloc(&mut self, typ: AddressType
         , scope: usize) -> Address {
         if self.recycles.len() == 0 {
+            // println!("from recycles");
             let addr_key = AddressKey::new_with_scope(self.index, scope);
             self.index += 1;
             Address::new(AddressValue::new(typ, addr_key))
         } else {
+            // println!("from new");
             let mut addr_key = self.recycles.remove(0).addr();
             *addr_key.scope_mut() = scope;
             Address::new(AddressValue::new(typ, addr_key))

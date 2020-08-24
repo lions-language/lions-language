@@ -27,10 +27,12 @@ impl ThreadContext {
     }
 
     pub fn enter_thread_scope(&mut self) {
+        // println!("enter scope");
         self.current_mut_unchecked().scope_context_mut().enter();
     }
 
     pub fn leave_thread_scope(&mut self) {
+        // println!("leave scope");
         self.current_mut_unchecked().scope_context_mut().leave();
     }
     

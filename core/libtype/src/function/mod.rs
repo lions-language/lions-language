@@ -19,6 +19,12 @@ pub struct FunctionReturn {
 }
 
 #[derive(Debug, Clone)]
+pub enum FunctionReturnRefParam {
+    Index(usize),
+    Addr(AddressValue)
+}
+
+#[derive(Debug, Clone)]
 pub enum FunctionReturnDataAttr {
     /*
      * 元组第一个位置: 参数的位置索引
@@ -27,7 +33,7 @@ pub enum FunctionReturnDataAttr {
      *  将得到地址的偏移量
      * 元组第三个位置: 变长参数的偏移
      * */
-    RefParamIndex((usize, usize, usize)),
+    RefParam(FunctionReturnRefParam),
     MoveIndex(usize),
     Create,
     Empty

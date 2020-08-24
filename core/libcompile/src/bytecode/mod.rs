@@ -122,6 +122,7 @@ impl<'a, 'b, F: Writer> Compile for Bytecode<'a, 'b, F> {
 
     fn ownership_move(&mut self, context: OwnershipMoveContext) {
         // println!("{:?}", &context);
+        // println!("ownership move");
         let (dst_addr, src_addr) = context.fields_move();
         self.write(Instruction::OwnershipMove(OwnershipMove::new_with_all(
                     dst_addr, src_addr)));

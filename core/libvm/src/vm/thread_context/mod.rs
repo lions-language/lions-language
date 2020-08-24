@@ -119,9 +119,9 @@ impl ThreadScope {
         self.scope_context.current_unchecked().get_param_ref_unchecked(index)
     }
     
-    pub fn print_current_addr_mapping(&mut self) {
+    pub fn print_current_addr_mapping(&self) {
         println!("**************** current scope addr mapping ******************");
-        self.scope_context.last_n_mut_unchecked(0).print_addr_mapping();
+        self.scope_context.last_n_unchecked(0).print_addr_mapping();
         println!("*************************************************************");
     }
 
