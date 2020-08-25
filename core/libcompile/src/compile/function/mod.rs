@@ -57,6 +57,10 @@ impl<'a, F: Compile> Compiler<'a, F> {
         } else if typ_attr.is_ref() {
             let a = Address::new(AddressValue::new(
                     AddressType::ParamRef(mut_context.ref_param_no_clone())
+                    /*
+                     * TODO
+                     *  如果是复合类型, 这里的 AddressKey::default() 将是复合类型的地址
+                     * */
                     , AddressKey::default()));
             *mut_context.ref_param_no_mut() += 1;
             a

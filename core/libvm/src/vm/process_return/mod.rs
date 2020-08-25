@@ -25,12 +25,19 @@ impl VirtualMachine {
         /*
          * 2
         * */
+        // println!("{}, {:?}", scope, data_addr);
         self.thread_context.current_mut_unchecked()
             .set_result_data_addr(scope, data_addr);
         // println!("{}", scope);
+        /*
         if scope > 0 {
+            /*
+             * 如果 return 中是嵌套的, 那么此时将在嵌套的作用域中
+             * 这样无法和调用函数的作用域一致, 那么将导致映射找不到
+             * */
             self.thread_context.current_mut_unchecked()
                 .leave_scope_last_n(scope);
         }
+        */
     }
 }

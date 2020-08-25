@@ -9,7 +9,8 @@ use libtype::function::{FindFunctionContext, FindFunctionResult
     , FunctionReturnRefParam
     , CallFunctionReturnData};
 use libtype::instruction::{PushParamRef};
-use libtype::{AddressKey, AddressValue};
+use libtype::{AddressKey, AddressValue
+    , AddressType};
 use libtype::package::{PackageStr};
 use libgrammar::token::{TokenValue, TokenData};
 use libgrammar::grammar::{CallFuncScopeContext
@@ -588,6 +589,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                         Ok(v) => v,
                                         Err(e) => return e
                                     };
+                                    // println!("{:?}", addr_value);
                                     if item.typ_attr_ref().is_move_as_param() {
                                         param_addrs.push_front(addr_value.clone());
                                         address_bind_contexts.push((typ, typ_attr
@@ -641,12 +643,19 @@ impl<'a, F: Compile> Compiler<'a, F> {
                             FunctionReturnDataAttr::RefParam(ref_param) => {
                                 match ref_param {
                                     FunctionReturnRefParam::Addr(addr_value) => {
-                                        let index = addr_value.addr_ref().index_clone();
+                                        // let index = addr_value.addr_ref().index_clone();
+                                        let index = if let AddressType::ParamRef(idx)
+                                            = addr_value.typ_ref() {
+                                            idx.clone() as u64
+                                        } else {
+                                            panic!("should not happend");
+                                        };
+                                        // println!("{}", index);
                                         let lengthen_offset =
                                             addr_value.addr_ref().lengthen_offset_clone();
                                         let param_ref = &param_refs[index as usize+lengthen_offset];
                                         let mut ak = param_ref.addr_ref().addr_clone();
-                                        *ak.index_mut() += index;
+                                        *ak.index_mut() += addr_value.addr_ref().index_clone();
                                         /*
                                          * -1 的目的:
                                          *  因为 param_ref 的值是上面分析 参数引用时得到的
@@ -662,13 +671,11 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                          *   所以, 需要将差值给 addr, 运行时才能去相应的 scope
                                          *   中查找
                                          * */
-                                        // *ak.scope_mut() += addr_value.addr_ref().scope_clone();
-                                        /*
-                                         * 但是有更好的办法 => 在 return 的时候退出作用域
-                                         * */
+                                        *ak.scope_mut() += addr_value.addr_ref().scope_clone();
                                         let addr = AddressValue::new(
                                             param_ref.addr_ref().typ_clone()
                                             , ak);
+                                        // println!("{:?}", addr);
                                         // println!("{:?}, {:?}", addr_value, addr);
                                         // Address::new(addr.clone_with_scope_minus(1))
                                         // Address::new(addr.clone_with_scope_plus(1))
@@ -737,6 +744,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
         match scope {
             Some(n) => {
                 return_addr.addr_mut().addr_mut_with_scope_minus(n);
+                *return_addr.addr_mut() = return_addr.addr_ref().clone_with_scope_plus(1);
             },
             None => {
             }
