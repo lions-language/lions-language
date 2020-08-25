@@ -647,12 +647,32 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                         let param_ref = &param_refs[index as usize+lengthen_offset];
                                         let mut ak = param_ref.addr_ref().addr_clone();
                                         *ak.index_mut() += index;
+                                        /*
+                                         * -1 的目的:
+                                         *  因为 param_ref 的值是上面分析 参数引用时得到的
+                                         *   而, 计算参数引用的时候, 为了在函数调用的时候正确计算
+                                         *   所以, 在scope上加了1, 但是这里需要将其还原
+                                         * */
+                                        *ak.scope_mut() -= 1;
+                                        /*
+                                         * 加上 statement 中存储的 scope 目的:
+                                         *  运行时会将函数的指令集从代码段中读取并执行
+                                         *   那么, 如果函数中存在作用域, 那么运行时也会进入作用域
+                                         *   这样, 函数调用时的作用域和return时的作用域就有差值
+                                         *   所以, 需要将差值给 addr, 运行时才能去相应的 scope
+                                         *   中查找
+                                         * */
+                                        // *ak.scope_mut() += addr_value.addr_ref().scope_clone();
+                                        /*
+                                         * 但是有更好的办法 => 在 return 的时候退出作用域
+                                         * */
                                         let addr = AddressValue::new(
                                             param_ref.addr_ref().typ_clone()
                                             , ak);
                                         // println!("{:?}, {:?}", addr_value, addr);
                                         // Address::new(addr.clone_with_scope_minus(1))
-                                        Address::new(addr.clone_with_scope_plus(1))
+                                        // Address::new(addr.clone_with_scope_plus(1))
+                                        Address::new(addr.clone())
                                     },
                                     FunctionReturnRefParam::Index(_) => {
                                         unimplemented!();

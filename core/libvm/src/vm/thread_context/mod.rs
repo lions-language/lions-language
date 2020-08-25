@@ -119,6 +119,10 @@ impl ThreadScope {
     pub fn get_param_ref_unchecked(&self, index: usize) -> &MemoryValue {
         self.scope_context.current_unchecked().get_param_ref_unchecked(index)
     }
+
+    pub fn leave_scope_last_n(&mut self, n: usize) {
+        self.scope_context.leave_last_n(n);
+    }
     
     pub fn print_current_addr_mapping(&self) {
         println!("**************** current scope addr mapping ******************");

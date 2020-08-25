@@ -27,5 +27,10 @@ impl VirtualMachine {
         * */
         self.thread_context.current_mut_unchecked()
             .set_result_data_addr(scope, data_addr);
+        // println!("{}", scope);
+        if scope > 0 {
+            self.thread_context.current_mut_unchecked()
+                .leave_scope_last_n(scope);
+        }
     }
 }

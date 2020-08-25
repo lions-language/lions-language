@@ -88,6 +88,14 @@ impl<'a, F: Compile> Compiler<'a, F> {
             }
         }
         */
+            /*
+        let addr = if scope == 0 {
+            addr.clone_with_scope_minus(1)
+        } else {
+            addr.clone_with_scope_plus(scope)
+        };
+            */
+        // let addr = addr.clone_with_scope_minus(scope);
         self.cb.update_func_return_data_addr(
             FunctionReturnDataAttr::RefParam(
                 FunctionReturnRefParam::Addr(addr.clone())));

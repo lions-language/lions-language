@@ -14,6 +14,14 @@ impl ScopeContext {
         self.scopes.pop_back();
     }
 
+    pub fn leave_last_n(&mut self, n: usize) {
+        let mut i = n;
+        while i > 0 {
+            self.scopes.pop_back();
+            i -= 1;
+        }
+    }
+
     pub fn last_n_is_valid(&self, scope: usize) -> bool {
         let len = self.scopes.len();
         if len == 0 {
