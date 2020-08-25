@@ -122,6 +122,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
             let find_src_addr = if func_return.data_ref().typ_attr_ref().is_move_as_return() {
                 src_addr.addr_ref().clone()
             } else if func_return.data_ref().typ_attr_ref().is_ref_as_return() {
+                // println!("{}", scope);
                 src_addr.addr_ref().clone_with_scope_plus(1)
             } else {
                 unimplemented!();
@@ -145,6 +146,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
              * */
             if func_return_ptr.as_ref::<FunctionReturn>().data_ref()
                 .typ_attr_ref().is_move_as_return() {
+                // println!("remove ownership");
                 self.cb.remove_ownership(RemoveOwnership::new_with_all(
                         src_addr.addr_clone()));
             }

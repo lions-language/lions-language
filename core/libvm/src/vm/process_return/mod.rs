@@ -12,6 +12,13 @@ impl VirtualMachine {
         /*
          * 1
          * */
+        /*
+        self.thread_context.current_unchecked().print_current_addr_mapping();
+        self.thread_context.current_unchecked().print_last_n_addr_mapping(1);
+        self.thread_context.current_unchecked().print_last_n_addr_mapping(2);
+        self.thread_context.current_unchecked().print_stack_datas();
+        */
+        // println!("{:?}", addr_key);
         let data_addr = self.thread_context.current_mut_unchecked()
             .get_data_addr_unchecked(&addr_key).addr_value_clone();
         // println!("{:?}", data_addr);

@@ -99,7 +99,7 @@ impl LinkDefine {
     }
 
     fn execute(&mut self, instruction: &mut Instruction, is_first: bool) {
-        println!("{:?}", instruction);
+        // println!("{:?}", instruction);
         match instruction {
             Instruction::CallFunction(value) => {
                 let ps = value.package_str_ref();
@@ -237,6 +237,7 @@ impl LinkDefine {
     */
 
     pub fn read(&self, addr: &FunctionAddrValue) -> LinkDefineBlock {
+        // println!("read: {:?}", addr);
         let pos = addr.index_clone();
         let length = addr.length_clone() + pos;
         LinkDefineBlock {
@@ -274,6 +275,7 @@ impl<'a> LinkDefineBlock<'a> {
                 // println!("{}", self.pos);
                 match jp.typ_ref() {
                     JumpType::Backward => {
+                        // println!("{}, {:?}", self.pos, jp);
                         self.pos += jp.index_clone();
                         // println!("index: {}", jp.index_ref());
                         // self.pos += 1;
@@ -282,6 +284,9 @@ impl<'a> LinkDefineBlock<'a> {
                     JumpType::Forward => {
                         self.pos -= jp.index_clone();
                     }
+                }
+                if self.pos == self.length {
+                    return None;
                 }
                 match self.link_define.code_segment.get(self.pos) {
                     Some(v) => {
@@ -319,6 +324,7 @@ impl<'a> Iterator for LinkDefineBlock<'a> {
                 match self.update_pos(v) {
                     Some(ins) => {
                         // println!("{:?}", ins);
+                        // println!("{}, {:?}", self.pos, ins);
                         Some(ins)
                     },
                     None => {

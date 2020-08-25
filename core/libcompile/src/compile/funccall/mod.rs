@@ -651,7 +651,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                             param_ref.addr_ref().typ_clone()
                                             , ak);
                                         // println!("{:?}, {:?}", addr_value, addr);
-                                        Address::new(addr.clone_with_scope_minus(1))
+                                        // Address::new(addr.clone_with_scope_minus(1))
+                                        Address::new(addr.clone_with_scope_plus(1))
                                     },
                                     FunctionReturnRefParam::Index(_) => {
                                         unimplemented!();
