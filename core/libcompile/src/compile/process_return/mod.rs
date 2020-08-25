@@ -173,6 +173,12 @@ impl<'a, F: Compile> Compiler<'a, F> {
             }
         }
         /*
+         * 释放到 函数作用域
+         * */
+        for _ in 0..scope {
+            self.cb.leave_scope();
+        }
+        /*
          * 生成 Jump 指令
          * */
         let jump_index = self.cb.jump(Jump::default());

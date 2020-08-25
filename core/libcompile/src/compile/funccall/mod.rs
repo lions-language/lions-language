@@ -671,7 +671,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                          *   所以, 需要将差值给 addr, 运行时才能去相应的 scope
                                          *   中查找
                                          * */
-                                        *ak.scope_mut() += addr_value.addr_ref().scope_clone();
+                                        // *ak.scope_mut() += addr_value.addr_ref().scope_clone();
                                         let addr = AddressValue::new(
                                             param_ref.addr_ref().typ_clone()
                                             , ak);
@@ -744,7 +744,6 @@ impl<'a, F: Compile> Compiler<'a, F> {
         match scope {
             Some(n) => {
                 return_addr.addr_mut().addr_mut_with_scope_minus(n);
-                *return_addr.addr_mut() = return_addr.addr_ref().clone_with_scope_plus(1);
             },
             None => {
             }
