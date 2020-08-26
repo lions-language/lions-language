@@ -448,11 +448,15 @@ impl<'a, F: Compile> Compiler<'a, F> {
                             },
                             FunctionParamLengthenAttr::Fixed => {
                                 if param_len == 1 {
+                                    /*
                                     let (typ, typ_attr, addr_value, value_context)
                                         = match self.handle_call_function_get_top_addr(item) {
                                         Ok(v) => v,
                                         Err(e) => return e
                                     };
+                                    */
+                                    let (typ, typ_attr, addr_value, value_context)
+                                        = params.remove(0).unwrap();
                                     if item.typ_attr_ref().is_move() {
                                         move_param_contexts.push((typ, typ_attr
                                         , addr_value, value_context));
