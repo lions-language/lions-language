@@ -401,14 +401,26 @@ impl<'a, F: Compile> Compiler<'a, F> {
                  * */
                 match fp.data_ref() {
                     FunctionParamData::Single(item) => {
+                        let mut params = VecDeque::with_capacity(param_len);
+                        for _ in 0..param_len {
+                            params.push_front(
+                                match self.handle_call_function_get_top_addr(item) {
+                                Ok(v) => v,
+                                Err(e) => return e
+                            });
+                        }
                         match item.lengthen_attr_ref() {
                             FunctionParamLengthenAttr::Lengthen => {
                                 for _ in 0..param_len {
+                                    /*
                                     let (typ, typ_attr, addr_value, value_context)
                                         = match self.handle_call_function_get_top_addr(item) {
                                         Ok(v) => v,
                                         Err(e) => return e
                                     };
+                                    */
+                                    let (typ, typ_attr, addr_value, value_context) =
+                                        params.remove(0).unwrap();
                                     if item.is_check_func_call_param_typ_attr_clone() {
                                         /*
                                          * TODO
@@ -423,13 +435,13 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                             move_param_contexts.push((typ, typ_attr
                                             , addr_value, value_context));
                                         } else if typ_attr.is_ref() {
-                                            param_refs.push_front(PushParamRef::new_with_all(
+                                            param_refs.push_back(PushParamRef::new_with_all(
                                                 addr_value.clone_with_scope_plus(1)));
                                         } else {
                                             unimplemented!();
                                         }
                                     } else {
-                                        param_refs.push_front(PushParamRef::new_with_all(
+                                        param_refs.push_back(PushParamRef::new_with_all(
                                             addr_value.clone_with_scope_plus(1)));
                                     }
                                 }
@@ -445,7 +457,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                         move_param_contexts.push((typ, typ_attr
                                         , addr_value, value_context));
                                     } else if item.typ_attr_ref().is_ref() {
-                                        param_refs.push_front(PushParamRef::new_with_all(
+                                        param_refs.push_back(PushParamRef::new_with_all(
                                             addr_value.clone_with_scope_plus(1)));
                                     } else {
                                         unimplemented!();
@@ -498,18 +510,31 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                  * */
                                 if lengthen_param_len > 0 {
                                     let lengthen_param_start = fixed_param_len - 1;
+                                    let mut params = VecDeque::with_capacity(lengthen_param_len);
                                     for i in 0..lengthen_param_len {
                                         let item = items.get(lengthen_param_start+i).unwrap();
+                                        params.push_front(
+                                            match self.handle_call_function_get_top_addr(item) {
+                                            Ok(v) => v,
+                                            Err(e) => return e
+                                        });
+                                    }
+                                    for i in 0..lengthen_param_len {
+                                        let item = items.get(lengthen_param_start+i).unwrap();
+                                        /*
                                         let (typ, typ_attr, addr_value, value_context) = 
                                             match self.handle_call_function_get_top_addr(item) {
                                             Ok(v) => v,
                                             Err(e) => return e
                                         };
+                                        */
+                                        let (typ, typ_attr, addr_value, value_context) =
+                                            params.remove(0).unwrap();
                                         if item.typ_attr_ref().is_move() {
                                             move_param_contexts.push((typ, typ_attr
                                             , addr_value, value_context));
                                         } else if item.typ_attr_ref().is_ref() {
-                                            param_refs.push_front(PushParamRef::new_with_all(
+                                            param_refs.push_back(PushParamRef::new_with_all(
                                                 addr_value.clone_with_scope_plus(1)));
                                         } else {
                                             unimplemented!();
@@ -519,21 +544,36 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                 /*
                                  * 绑定固定参数
                                  * */
-                                for i in 0..fixed_param_len {
-                                    let item = items.get(i).unwrap();
-                                    let (typ, typ_attr, addr_value, value_context)
-                                        = match self.handle_call_function_get_top_addr(item) {
-                                        Ok(v) => v,
-                                        Err(e) => return e
-                                    };
-                                    if item.typ_attr_ref().is_move() {
-                                        move_param_contexts.push((typ, typ_attr
-                                        , addr_value, value_context));
-                                    } else if item.typ_attr_ref().is_ref() {
-                                        param_refs.push_front(PushParamRef::new_with_all(
-                                            addr_value.clone_with_scope_plus(1)));
-                                    } else {
-                                        unimplemented!();
+                                if fixed_param_len > 0 {
+                                    let mut params = VecDeque::with_capacity(lengthen_param_len);
+                                    for i in 0..fixed_param_len {
+                                        let item = items.get(i).unwrap();
+                                        params.push_front(
+                                            match self.handle_call_function_get_top_addr(item) {
+                                            Ok(v) => v,
+                                            Err(e) => return e
+                                        });
+                                    }
+                                    for i in 0..fixed_param_len {
+                                        let item = items.get(i).unwrap();
+                                        /*
+                                        let (typ, typ_attr, addr_value, value_context)
+                                            = match self.handle_call_function_get_top_addr(item) {
+                                            Ok(v) => v,
+                                            Err(e) => return e
+                                        };
+                                        */
+                                        let (typ, typ_attr, addr_value, value_context) =
+                                            params.remove(0).unwrap();
+                                        if item.typ_attr_ref().is_move() {
+                                            move_param_contexts.push((typ, typ_attr
+                                            , addr_value, value_context));
+                                        } else if item.typ_attr_ref().is_ref() {
+                                            param_refs.push_back(PushParamRef::new_with_all(
+                                                addr_value.clone_with_scope_plus(1)));
+                                        } else {
+                                            unimplemented!();
+                                        }
                                     }
                                 }
                             },
@@ -547,19 +587,33 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                     format!("expect {} param, but got {}"
                                         , statement_param_len, param_len));
                                 }
+                                let mut params = VecDeque::with_capacity(param_len);
                                 for i in 0..param_len {
                                     let item = items.get(i).unwrap();
+                                    params.push_front(match self.handle_call_function_get_top_addr(item) {
+                                        Ok(v) => v,
+                                        Err(e) => return e
+                                    });
+                                }
+                                for i in 0..param_len {
+                                    let item = items.get(i).unwrap();
+                                    /*
                                     let (typ, typ_attr, addr_value, value_context)
                                         = match self.handle_call_function_get_top_addr(item) {
                                         Ok(v) => v,
                                         Err(e) => return e
                                     };
+                                    */
+                                    let (typ, typ_attr, addr_value, value_context) =
+                                        params.remove(0).unwrap();
                                     // println!("{:?}", addr_value);
                                     if item.typ_attr_ref().is_move_as_param() {
+                                        // println!("move...");
                                         move_param_contexts.push((typ, typ_attr
                                         , addr_value, value_context));
                                     } else if item.typ_attr_ref().is_ref_as_param() {
-                                        param_refs.push_front(PushParamRef::new_with_all(
+                                        // println!("ref...");
+                                        param_refs.push_back(PushParamRef::new_with_all(
                                             addr_value.clone_with_scope_plus(1)));
                                     } else {
                                         unimplemented!();
@@ -606,6 +660,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                             FunctionReturnDataAttr::RefParam(ref_param) => {
                                 match ref_param {
                                     FunctionReturnRefParam::Addr(addr_value) => {
+                                        // println!("{:?}", addr_value);
                                         // let index = addr_value.addr_ref().index_clone();
                                         let index = if let AddressType::ParamRef(idx)
                                             = addr_value.typ_ref() {
@@ -613,10 +668,12 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                         } else {
                                             panic!("should not happend");
                                         };
+                                        // println!("{:?}", &param_refs);
                                         // println!("{}", index);
                                         let lengthen_offset =
                                             addr_value.addr_ref().lengthen_offset_clone();
                                         let param_ref = &param_refs[index as usize+lengthen_offset];
+                                        // println!("{:?}", param_ref);
                                         let mut ak = param_ref.addr_ref().addr_clone();
                                         *ak.index_mut() += addr_value.addr_ref().index_clone();
                                         /*
@@ -628,6 +685,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                          *  中的应该就是未进入函数调用作用域之前的作用域
                                          * */
                                         *ak.scope_mut() -= 1;
+                                        // println!("{:?}", ak);
                                         let addr = AddressValue::new(
                                             param_ref.addr_ref().typ_clone()
                                             , ak);
