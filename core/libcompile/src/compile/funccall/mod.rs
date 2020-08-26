@@ -171,7 +171,6 @@ impl<'a, F: Compile> Compiler<'a, F> {
                     func: &func,
                     param_addrs: Some(param_addrs),
                     call_param_len: 1,
-                    param_typ_attrs: None,
                     return_data: CallFunctionReturnData::new_with_all(
                         return_addr.addr_clone(), return_is_alloc)
                 };
@@ -394,9 +393,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
         let func = func_ptr.as_ref::<Function>();
         let func_statement = func.func_statement_ref();
         let mut move_param_contexts = Vec::new();
-        let mut param_addrs = VecDeque::new();
         let mut param_refs = VecDeque::new();
-        let mut param_typ_attrs = VecDeque::with_capacity(0);
         match func_statement.func_param_ref() {
             Some(fp) => {
                 /*
@@ -423,7 +420,6 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                                     , item.typ_attr_ref(), &typ_attr));
                                         }
                                         if typ_attr.is_move() {
-                                            param_addrs.push_front(addr_value.clone());
                                             move_param_contexts.push((typ, typ_attr
                                             , addr_value, value_context));
                                         } else if typ_attr.is_ref() {
@@ -446,7 +442,6 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                         Err(e) => return e
                                     };
                                     if item.typ_attr_ref().is_move() {
-                                        param_addrs.push_front(addr_value.clone());
                                         move_param_contexts.push((typ, typ_attr
                                         , addr_value, value_context));
                                     } else if item.typ_attr_ref().is_ref() {
@@ -511,7 +506,6 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                             Err(e) => return e
                                         };
                                         if item.typ_attr_ref().is_move() {
-                                            param_addrs.push_front(addr_value.clone());
                                             move_param_contexts.push((typ, typ_attr
                                             , addr_value, value_context));
                                         } else if item.typ_attr_ref().is_ref() {
@@ -533,7 +527,6 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                         Err(e) => return e
                                     };
                                     if item.typ_attr_ref().is_move() {
-                                        param_addrs.push_front(addr_value.clone());
                                         move_param_contexts.push((typ, typ_attr
                                         , addr_value, value_context));
                                     } else if item.typ_attr_ref().is_ref() {
@@ -563,7 +556,6 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                     };
                                     // println!("{:?}", addr_value);
                                     if item.typ_attr_ref().is_move_as_param() {
-                                        param_addrs.push_front(addr_value.clone());
                                         move_param_contexts.push((typ, typ_attr
                                         , addr_value, value_context));
                                     } else if item.typ_attr_ref().is_ref_as_param() {
@@ -683,7 +675,6 @@ impl<'a, F: Compile> Compiler<'a, F> {
             func: &func,
             param_addrs: None,
             call_param_len: param_len,
-            param_typ_attrs: if param_typ_attrs.is_empty() { None } else { Some(param_typ_attrs) },
             return_data: CallFunctionReturnData::new_with_all(
                 return_addr.addr_clone(), return_is_alloc)
         };

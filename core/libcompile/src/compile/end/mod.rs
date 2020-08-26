@@ -48,7 +48,6 @@ impl<'a, F: Compile> Compiler<'a, F> {
                             func: &func,
                             param_addrs: None,
                             call_param_len: 0,
-                            param_typ_attrs: None,
                             return_data: CallFunctionReturnData::default()
                         };
                         self.cb.call_function(call_context);

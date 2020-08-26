@@ -342,7 +342,6 @@ impl<'a, F: Compile> Compiler<'a, F> {
             param_addrs: Some(vec![CallFunctionParamAddr::Fixed(left_addr_value)
                 , CallFunctionParamAddr::Fixed(right_addr_value)]),
             call_param_len: 2,
-            param_typ_attrs: None,
             return_data: CallFunctionReturnData::new_with_all(
                 return_addr.addr_clone(), return_is_alloc)
         });
