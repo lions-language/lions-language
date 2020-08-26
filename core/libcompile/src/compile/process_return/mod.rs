@@ -123,21 +123,14 @@ impl<'a, F: Compile> Compiler<'a, F> {
             let src_addr = value.addr_ref().addr_clone();
             let func_return = self.scope_context.last_n_mut_unchecked(scope).func_return_mut()
                 .as_mut().expect("should not happend");
-            /*
-             * 如果是 引用, 那么查找返回值数据地址的时候, 在函数调用的上一层作用域中查找
-             * 如果是 移动, 就是在当前作用域中查找
-             * */
-            let find_src_addr = if func_return.data_ref().typ_attr_ref().is_move_as_return() {
-                src_addr.addr_ref().clone()
-            } else if func_return.data_ref().typ_attr_ref().is_ref_as_return() {
-                // println!("{}", scope);
-                src_addr.addr_ref().clone_with_scope_plus(1)
-            } else {
-                unimplemented!();
-            };
-            // println!("{:?}", find_src_addr);
-            self.cb.return_stmt(ReturnStmtContext::new_with_all(
-                    scope, find_src_addr));
+            if func_return.data_ref().typ_attr_ref().is_move_as_return() {
+                /*
+                 * 虚拟机处理 return_stmt: 将其写入到作用域中, 然后在函数调用的时候将其绑定
+                 * 所以: 只有在移动的时候才会需要绑定
+                 * */
+                self.cb.return_stmt(ReturnStmtContext::new_with_all(
+                        scope, src_addr.addr_clone()));
+            }
             /*
              * 检测表达式结果和函数声明是否一致
              * */
@@ -150,7 +143,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 _ => {}
             }
             /*
-             * 如果函数声明中的返回值是移动的, 需要返回地址
+             * 如果函数声明中的返回值是移动的, 需要将其从作用域中移除
              * */
             if func_return_ptr.as_ref::<FunctionReturn>().data_ref()
                 .typ_attr_ref().is_move_as_return() {
@@ -159,7 +152,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
                         src_addr.addr_clone()));
             }
             /*
-             * 如果函数声明中的返回值是引用, 需要查找与输入参数中的哪一个地址一致
+             * 如果函数声明中的返回值是引用, 需要将地址写入到声明中
+             * 便于在 func call 的时候和实际的参数地址进行计算
              * */
             if func_return_ptr.as_ref::<FunctionReturn>()
                 .data_ref().typ_attr_ref().is_ref_as_return() {
@@ -187,8 +181,6 @@ impl<'a, F: Compile> Compiler<'a, F> {
          * 所以, 这里将 Jump 指令的位置记录下来
          * */
         self.scope_context.last_n_mut_unchecked(scope).add_return_jump(jump_index);
-        /*
-        */
         DescResult::Success
     }
 }

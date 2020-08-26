@@ -1,28 +1,26 @@
-use libtype::{PackageType, PackageTypeValue
-    , TypeAttrubute, TypeValue
+use libtype::{
+    TypeAttrubute, TypeValue
     , Type};
 use libtype::function::{FindFunctionContext, FindFunctionResult
-    , FunctionDefine, FunctionParamData
-    , OptcodeFunctionDefine, FunctionParamLengthenAttr
+    , FunctionParamData
+    , FunctionParamLengthenAttr
     , CallFunctionParamAddr, Function, splice::FunctionSplice
     , FunctionReturnDataAttr, FunctionParamDataItem
     , FunctionReturnRefParam
     , CallFunctionReturnData};
 use libtype::instruction::{PushParamRef};
-use libtype::{AddressKey, AddressValue
+use libtype::{AddressValue
     , AddressType};
-use libtype::package::{PackageStr};
 use libgrammar::token::{TokenValue, TokenData};
 use libgrammar::grammar::{CallFuncScopeContext
     , CallFunctionContext as GrammarCallFunctionContext};
 use libresult::*;
 use libcommon::ptr::RefPtr;
-use crate::compile::{Compile, Compiler, FileType
+use crate::compile::{Compile, Compiler
     , CallFunctionContext, value_buffer::ValueBufferItem
     , value_buffer::ValueBufferItemContext
-    , AddressValueExpand, CompileContext
-    , AddressBindContext};
-use crate::compile::scope::{ScopeFuncCall, ScopeType};
+    , AddressValueExpand};
+use crate::compile::scope::{ScopeFuncCall};
 use crate::address::Address;
 use std::collections::VecDeque;
 
@@ -146,7 +144,6 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                 return_is_alloc = true;
                                 let a = self.scope_context.alloc_address(
                                     return_data.typ.to_address_type(), 1);
-                                self.scope_context.ref_counter_create(a.addr_ref().addr_clone());
                                 // println!("xxx: {:?}", a);
                                 a
                             },
@@ -166,7 +163,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 if let Some(context) = param_move {
                     let (typ, typ_attr, src_addr, index, value_context)
                         = context;
-                    let addr = self.process_param(
+                    self.process_param(
                         &typ, &typ_attr, src_addr, index, value_context);
                 }
                 let call_context = CallFunctionContext {
@@ -204,9 +201,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
         /*
          * 返回输入的地址
          * */
-        // Ok((input_typ, input_typ_attr, input_addr.addr()))
         Ok((input_typ, input_typ_attr, input_addr.addr()))
-        // Ok(input_value.addr_ref().addr_ref().clone_with_scope_plus(1))
     }
 
     pub fn handle_call_function_prepare(&mut self, call_scope_context: CallFuncScopeContext
@@ -242,7 +237,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
             call_context.set_func_ptr(func_ptr);
             call_context.set_package_str(call_scope_context.package_str());
         } else {
-            let (package_type, package_str, desc_ctx, typ) = call_scope_context.fields_move();
+            let (package_type, package_str, _, typ) = call_scope_context.fields_move();
             call_context.set_typ(typ);
             call_context.set_func_name(func_str);
             call_context.set_package_str(package_str);
@@ -352,10 +347,6 @@ impl<'a, F: Compile> Compiler<'a, F> {
             /*
              * prepare 阶没有找到函数声明 => 查找
              * */
-            /*
-            let (func_ptr, package_str, typ, func_name, param_typs)
-                = call_context.fields_move();
-            */
             let mut param_typs = call_context.param_typs_clone();
             let mut func_param_data = None;
             let param_typs_len = param_typs.len();
@@ -402,8 +393,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
         }
         let func = func_ptr.as_ref::<Function>();
         let func_statement = func.func_statement_ref();
-        // println!("{:?}", return_addr);
-        let mut address_bind_contexts = Vec::new();
+        let mut move_param_contexts = Vec::new();
         let mut param_addrs = VecDeque::new();
         let mut param_refs = VecDeque::new();
         let mut param_typ_attrs = VecDeque::with_capacity(0);
@@ -414,10 +404,9 @@ impl<'a, F: Compile> Compiler<'a, F> {
                  * */
                 match fp.data_ref() {
                     FunctionParamData::Single(item) => {
-                        let start = 0;
                         match item.lengthen_attr_ref() {
                             FunctionParamLengthenAttr::Lengthen => {
-                                for i in 0..param_len {
+                                for _ in 0..param_len {
                                     let (typ, typ_attr, addr_value, value_context)
                                         = match self.handle_call_function_get_top_addr(item) {
                                         Ok(v) => v,
@@ -435,15 +424,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                         }
                                         if typ_attr.is_move() {
                                             param_addrs.push_front(addr_value.clone());
-                                            // println!("{}", func.func_statement_ref().func_name_ref());
-                                            // println!("{:?}", addr_value);
-                                            address_bind_contexts.push((typ, typ_attr
-                                            , AddressBindContext::new_with_all(
-                                            AddressKey::new_with_all(start
-                                                , addr_value.offset_clone()
-                                                , param_len-1-i
-                                                , addr_value.scope_clone())
-                                            , addr_value), value_context));
+                                            move_param_contexts.push((typ, typ_attr
+                                            , addr_value, value_context));
                                         } else if typ_attr.is_ref() {
                                             param_refs.push_front(PushParamRef::new_with_all(
                                                 addr_value.clone_with_scope_plus(1)));
@@ -465,10 +447,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                     };
                                     if item.typ_attr_ref().is_move() {
                                         param_addrs.push_front(addr_value.clone());
-                                        address_bind_contexts.push((typ, typ_attr
-                                        , AddressBindContext::new_with_all(
-                                        AddressKey::new(start)
-                                        , addr_value), value_context));
+                                        move_param_contexts.push((typ, typ_attr
+                                        , addr_value, value_context));
                                     } else if item.typ_attr_ref().is_ref() {
                                         param_refs.push_front(PushParamRef::new_with_all(
                                             addr_value.clone_with_scope_plus(1)));
@@ -532,14 +512,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                         };
                                         if item.typ_attr_ref().is_move() {
                                             param_addrs.push_front(addr_value.clone());
-                                            address_bind_contexts.push((typ, typ_attr
-                                            , AddressBindContext::new_with_all(
-                                            AddressKey::new_with_all(
-                                                lengthen_param_start as u64
-                                                , addr_value.offset_clone()
-                                                , lengthen_param_len-1-i
-                                                , addr_value.scope_clone())
-                                            , addr_value), value_context));
+                                            move_param_contexts.push((typ, typ_attr
+                                            , addr_value, value_context));
                                         } else if item.typ_attr_ref().is_ref() {
                                             param_refs.push_front(PushParamRef::new_with_all(
                                                 addr_value.clone_with_scope_plus(1)));
@@ -560,10 +534,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                     };
                                     if item.typ_attr_ref().is_move() {
                                         param_addrs.push_front(addr_value.clone());
-                                        address_bind_contexts.push((typ, typ_attr
-                                        , AddressBindContext::new_with_all(
-                                        AddressKey::new((fixed_param_len-1-i) as u64)
-                                        , addr_value), value_context));
+                                        move_param_contexts.push((typ, typ_attr
+                                        , addr_value, value_context));
                                     } else if item.typ_attr_ref().is_ref() {
                                         param_refs.push_front(PushParamRef::new_with_all(
                                             addr_value.clone_with_scope_plus(1)));
@@ -592,10 +564,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                     // println!("{:?}", addr_value);
                                     if item.typ_attr_ref().is_move_as_param() {
                                         param_addrs.push_front(addr_value.clone());
-                                        address_bind_contexts.push((typ, typ_attr
-                                        , AddressBindContext::new_with_all(
-                                        AddressKey::new((param_len-1-i) as u64)
-                                        , addr_value), value_context));
+                                        move_param_contexts.push((typ, typ_attr
+                                        , addr_value, value_context));
                                     } else if item.typ_attr_ref().is_ref_as_param() {
                                         param_refs.push_front(PushParamRef::new_with_all(
                                             addr_value.clone_with_scope_plus(1)));
@@ -629,12 +599,13 @@ impl<'a, F: Compile> Compiler<'a, F> {
                          * 根据类型, 判断是在哪里分配地址
                          *  返回值地址中的 scope 需要分配为1,
                          *  因为返回值需要绑定到前一个作用域中
+                         *   因为该绑定在函数调用中进行, 那时候虚拟机并没有退出函数调用作用域
+                         *   所以, 需要将作用域加1
                          * */
                         scope = Some(1);
                         return_is_alloc = true;
                         let a = self.scope_context.alloc_address(
                             return_data.typ_ref().to_address_type(), 1);
-                        self.scope_context.ref_counter_create(a.addr_ref().addr_clone());
                         a
                     },
                     TypeAttrubute::Ref
@@ -661,36 +632,19 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                          *  因为 param_ref 的值是上面分析 参数引用时得到的
                                          *   而, 计算参数引用的时候, 为了在函数调用的时候正确计算
                                          *   所以, 在scope上加了1, 但是这里需要将其还原
+                                         *  返回值为引用的情况下, 写入到 value_buffer
+                                         *  中的应该就是未进入函数调用作用域之前的作用域
                                          * */
                                         *ak.scope_mut() -= 1;
-                                        /*
-                                         * 加上 statement 中存储的 scope 目的:
-                                         *  运行时会将函数的指令集从代码段中读取并执行
-                                         *   那么, 如果函数中存在作用域, 那么运行时也会进入作用域
-                                         *   这样, 函数调用时的作用域和return时的作用域就有差值
-                                         *   所以, 需要将差值给 addr, 运行时才能去相应的 scope
-                                         *   中查找
-                                         * */
-                                        // *ak.scope_mut() += addr_value.addr_ref().scope_clone();
                                         let addr = AddressValue::new(
                                             param_ref.addr_ref().typ_clone()
                                             , ak);
-                                        // println!("{:?}", addr);
-                                        // println!("{:?}, {:?}", addr_value, addr);
-                                        // Address::new(addr.clone_with_scope_minus(1))
-                                        // Address::new(addr.clone_with_scope_plus(1))
                                         Address::new(addr.clone())
                                     },
                                     FunctionReturnRefParam::Index(_) => {
                                         unimplemented!();
                                     }
                                 }
-                                /*
-                                let (index, offset, lengthen_offset) = pos;
-                                let mut addr = param_addrs[*index+*lengthen_offset].clone();
-                                *addr.addr_mut().offset_mut() = *offset;
-                                // println!("{:?}", addr);
-                                */
                             },
                             _ => {
                                 panic!("should not happend");
@@ -709,9 +663,9 @@ impl<'a, F: Compile> Compiler<'a, F> {
             self.cb.push_param_ref(context);
         }
         let mut move_index = 0;
-        while !address_bind_contexts.is_empty() {
-            let (typ, typ_attr, mut address_bind_context, value_context) =
-                address_bind_contexts.remove(0);
+        while !move_param_contexts.is_empty() {
+            let (typ, typ_attr, dst_addr, value_context) =
+                move_param_contexts.remove(0);
             /*
              * NOTE
              * 因为 process_param 中会让虚拟机执行移动操作
@@ -719,15 +673,9 @@ impl<'a, F: Compile> Compiler<'a, F> {
              * 如果 process_param 中存在移动, 则返回新的地址
              *  如果不存在移动, 则返回输入的地址
              * */
-            let addr = self.process_param(
-                &typ, &typ_attr, address_bind_context.dst_addr_clone(), move_index, value_context);
-            *address_bind_context.dst_addr_mut() = addr;
-            move_index += 1;
-            // self.cb.address_bind(address_bind_context);
-            /*
             self.process_param(
-                &typ, &typ_attr, addr_value, 0, value_context);
-            */
+                &typ, &typ_attr, dst_addr, move_index, value_context);
+            move_index += 1;
         }
         let desc_ctx = call_context.desc_ctx_clone();
         let cc = CallFunctionContext {
@@ -764,143 +712,6 @@ impl<'a, F: Compile> Compiler<'a, F> {
         // self.compile_context.reset();
         self.scope_context.leave_func_call();
         DescResult::Success
-        /*
-        let name_data = name.token_data().expect("should not happend");
-        let func_str = extract_token_data!(name_data, Id);
-        let find_func_context = FindFunctionContext {
-            typ: call_scope_context.typ_ref().as_ref(),
-            package_typ: call_scope_context.package_type_ref().as_ref(),
-            func_str: &func_str,
-            module_str: self.module_stack.current().name_ref()
-        };
-        let (exists, handle) = self.function_control.is_exists(&find_func_context);
-        if exists {
-            let mut return_is_alloc = false;
-            let h = Some(handle);
-            let func_res = self.function_control.find_function(&find_func_context, &h);
-            let func_ptr = match func_res {
-                FindFunctionResult::Success(r) => {
-                    RefPtr::from_ref(r.func)
-                },
-                FindFunctionResult::Panic(s) => {
-                    return DescResult::Error(s);
-                },
-                _ => {
-                    panic!("should not happend");
-                }
-            };
-            let func = func_ptr.as_ref::<Function>();
-            let func_statement = func.func_statement_ref();
-            let return_data = &func_statement.func_return.data;
-            let return_addr = match return_data.typ_ref().typ_ref() {
-                TypeValue::Empty => {
-                    /*
-                     * 如果返回值是空的, 那么就没有必要分配内存
-                     * (不过对于 plus 操作, 一定是要有返回值的, 不会到达这里)
-                     * */
-                    Address::new(AddressValue::new_invalid())
-                },
-                _ => {
-                    unimplemented!();
-                }
-            };
-            let param_addrs = match func_statement.func_param_ref() {
-                Some(fp) => {
-                    /*
-                     * 存在参数
-                     * */
-                    match fp.data_ref() {
-                        FunctionParamData::Single(item) => {
-                            let item_typ = item.typ_ref();
-                            /*
-                             * 只有一个参数, 判断该参数是不是变长参数
-                             * */
-                            match item.lengthen_attr_ref() {
-                                FunctionParamLengthenAttr::Lengthen => {
-                                    /*
-                                     * 函数需要一个变长的参数
-                                     * 将 param_len 个参数从 value_buffer 中取出
-                                     *  1. 因为只有一个参数,
-                                     *     所以调用时候所有的参数都是这个可变参数的值
-                                     * */
-                                    let mut params_addr = VecDeque::with_capacity(param_len);
-                                    for _ in 0..param_len {
-                                        let value = self.scope_context.take_top_from_value_buffer();
-                                        // let value_addr = value.addr_ref().addr_clone();
-                                        let value_addr = match self.binary_type_match(
-                                            value, item_typ
-                                            , *item.is_auto_call_totype_ref()) {
-                                            Ok(addr) => {
-                                                addr
-                                            },
-                                            Err(e) => {
-                                                return e;
-                                            }
-                                        };
-                                        /*
-                                         * 将参数地址中的 scope 加1,
-                                         * 告诉虚拟机要从上一个作用域中查找
-                                         * */
-                                        params_addr.push_front(
-                                        value_addr.clone_with_scope_plus(1));
-                                    }
-                                    Some(vec![CallFunctionParamAddr::Lengthen(params_addr)])
-                                },
-                                FunctionParamLengthenAttr::Fixed => {
-                                    /*
-                                     * 判断参数的类型是否和函数声明的一致
-                                     * */
-                                    let value = self.scope_context.take_top_from_value_buffer();
-                                    // let value_addr = value.addr_ref().addr_clone();
-                                    let value_addr = match self.binary_type_match(
-                                        value, item_typ
-                                        , *item.is_auto_call_totype_ref()) {
-                                        Ok(addr) => {
-                                            addr
-                                        },
-                                        Err(e) => {
-                                            return e;
-                                        }
-                                    };
-                                    /*
-                                     * 参数正确 => 构建参数地址列表
-                                     * */
-                                    Some(vec![CallFunctionParamAddr::Fixed(
-                                            value_addr.clone_with_scope_plus(1))])
-                                }
-                            }
-                        },
-                        FunctionParamData::Multi(_) => {
-                            unimplemented!();
-                        }
-                    }
-                },
-                None => {
-                    None
-                }
-            };
-            let call_context = CallFunctionContext {
-                package_str: call_scope_context.package_str(),
-                func: &func,
-                param_addrs: param_addrs,
-                return_data: CallFunctionReturnData::new_with_all(
-                    return_addr.addr_clone(), return_is_alloc)
-            };
-            self.call_function_and_ctrl_scope(call_context);
-            /*
-             * 获取返回类型, 将其写入到队列中
-             * */
-            if !return_addr.is_invalid() {
-                self.scope_context.push_with_addr_to_value_buffer(
-                    return_data.typ.clone()
-                    , return_addr);
-            }
-        } else {
-            return DescResult::Error(
-                String::from("the main function must exist in main.lions"));
-        }
-        DescResult::Success
-        */
     }
 }
 
