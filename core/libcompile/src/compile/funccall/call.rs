@@ -146,12 +146,19 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                         Err(e) => return e
                                     };
                                     */
-                                    let (typ, typ_attr, addr_value, value_context)
+                                    let (typ, typ_attr, mut addr_value, value_context)
                                         = params.remove(0).unwrap();
                                     if item.typ_attr_ref().is_move() {
                                         move_param_contexts.push((typ, typ_attr
                                         , addr_value, value_context));
                                     } else if item.typ_attr_ref().is_ref() {
+                                        /*
+                                        if let AddressType::ParamRef(_) =
+                                            addr_value.typ_ref() {
+                                            addr_value.addr_mut_with_scope_plus(1);
+                                        };
+                                        */
+                                        // addr_value.addr_mut_with_scope_plus(s);
                                         // println!("{:?}", addr_value.clone_with_scope_plus(1));
                                         param_refs.push_back(PushParamRef::new_with_all(
                                             addr_value.clone_with_scope_plus(1)));

@@ -71,6 +71,12 @@ impl LinkDefine {
         for index in self.define_seque.iter() {
             self.code_segment.append(ds.get_all_ins_mut_unchecked(index.clone()));
         }
+        /*
+         * print
+         * */
+        for (i, item) in self.code_segment.iter().enumerate() {
+            println!("{}: {:?}", i, item);
+        }
     }
 
     pub fn link_static(&mut self) -> &mut LinkStatic {
@@ -237,7 +243,7 @@ impl LinkDefine {
     */
 
     pub fn read(&self, addr: &FunctionAddrValue) -> LinkDefineBlock {
-        // println!("read: {:?}", addr);
+        println!("read: {:?}", addr);
         let pos = addr.index_clone();
         let length = addr.length_clone() + pos;
         LinkDefineBlock {

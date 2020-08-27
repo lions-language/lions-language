@@ -5,7 +5,7 @@ use libtype::{PackageType, PackageTypeValue
     , AddressType, TypeAttrubute};
 use libresult::DescResult;
 use libcommon::ptr::{RefPtr};
-use crate::compile::{Compile, Compiler};
+use crate::compile::{Compile, Compiler, AddressValueExpand};
 use crate::compile::value_buffer::{ValueBufferItemContext};
 
 impl<'a, F: Compile> Compiler<'a, F> {
@@ -25,6 +25,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                     format!("var: {:?} is undefine or be moved", &first));
             }
         };
+        // println!("load var {:?}", name);
         /*
          * 1. 添加 value buffer 中
          *  因为 variant 中记录的就是实际存储数据的地址, 所以需要将 variant 中的 addr 存储到
@@ -36,7 +37,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
         let buf_ctx = ValueBufferItemContext::Variant(
             RefPtr::from_ref(name));
         // println!("{:?}, name: {}", &buf_ctx, name);
-        let (var_addr, var_typ, var_typ_attr) = var.fields_move();
+        let (mut var_addr, var_typ, var_typ_attr) = var.fields_move();
         // println!("{:?}", var_addr);
         // println!("{:?}", &var_typ_attr);
         // println!("{:?}: {:?}", name, &typ_attr);
@@ -52,6 +53,13 @@ impl<'a, F: Compile> Compiler<'a, F> {
             typ_attr
         };
         // println!("{:?}, {:?}", name, at);
+        // println!("{:?}, {:?}", name, var_addr);
+        /*
+                                        if let AddressType::ParamRef(_) =
+                                            var_addr.addr_ref().typ_ref() {
+                                            var_addr.addr_mut().addr_mut_with_scope_plus(1);
+                                        };
+                                        */
         self.scope_context.push_with_addr_context_typattr_to_value_buffer(
             var_typ
             , var_addr, buf_ctx
