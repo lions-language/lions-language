@@ -136,7 +136,9 @@ trait AddressValueExpand {
     fn clone_with_scope_plus(&self, n: usize) -> AddressValue;
     fn clone_with_scope_minus(&self, n: usize) -> AddressValue;
     fn addr_with_scope_minus(self, n: usize) -> AddressValue;
+    fn addr_with_scope_plus(self, n: usize) -> AddressValue;
     fn addr_mut_with_scope_minus(&mut self, n: usize);
+    fn addr_mut_with_scope_plus(&mut self, n: usize);
 }
 
 trait TypeTokenExpand {

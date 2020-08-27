@@ -99,8 +99,17 @@ impl AddressValueExpand for AddressValue {
         self
     }
 
+    fn addr_with_scope_plus(mut self, n: usize) -> AddressValue {
+        *self.addr_mut().scope_mut() += n;
+        self
+    }
+
     fn addr_mut_with_scope_minus(&mut self, n: usize) {
         *self.addr_mut().scope_mut() -= n;
+    }
+
+    fn addr_mut_with_scope_plus(&mut self, n: usize) {
+        *self.addr_mut().scope_mut() += n;
     }
 }
 
