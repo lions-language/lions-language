@@ -182,6 +182,10 @@ impl Scope {
         &self.param_refs.get(index).expect("should not happend").data_addr
     }
 
+    pub fn print_ref_param_addr_mapping(&self) {
+        self.addr_mapping.print();
+    }
+
     pub fn print_addr_mapping(&self) {
         self.addr_mapping.print();
     }

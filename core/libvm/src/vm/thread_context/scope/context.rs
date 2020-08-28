@@ -76,6 +76,9 @@ impl ScopeContext {
         match addr.typ_ref() {
             AddressType::AddrRef => {
                 let sc = addr.scope_clone();
+                // self.current_unchecked().print_ref_param_addr_mapping();
+                // self.last_n_unchecked(1).print_ref_param_addr_mapping();
+                // println!("{:?}", sc);
                 let ref_addr = self.last_n_unchecked(sc).get_ref_param_addr_unchecked(
                     addr.addr_ref());
                 /*
@@ -84,7 +87,7 @@ impl ScopeContext {
                 self.last_n_unchecked(1).print_addr_mapping();
                 */
                 self.get_addr_ref_data_unchecked(ref_addr
-                    , link_static, memory, sc+ref_addr.addr_ref().scope_clone())
+                    , link_static, memory, scope+ref_addr.addr_ref().scope_clone())
             },
             _ => {
                 self.last_n_unchecked(scope).get_data_unchecked(

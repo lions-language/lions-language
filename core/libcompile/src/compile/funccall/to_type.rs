@@ -1,12 +1,12 @@
 use libtype::{
     TypeAttrubute, TypeValue
-    , Type};
+    , Type, AddressKey};
 use libtype::function::{FindFunctionContext, FindFunctionResult
     , FunctionParamData
     , CallFunctionParamAddr, Function, splice::FunctionSplice
     , FunctionReturnDataAttr, FunctionParamDataItem
     , CallFunctionReturnData};
-use libtype::instruction::{PushParamRef};
+use libtype::instruction::{PushParamRef, AddRefParamAddr};
 use libtype::{AddressValue};
 use libresult::*;
 use libcommon::ptr::RefPtr;
@@ -87,6 +87,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                  * 参数可能是引用也可能是移动
                  * */
                 let mut param_ref = None;
+                let mut ref_param_addr = None;
                 let mut param_move = None;
                 let param_addrs = vec![CallFunctionParamAddr::Fixed(
                     input_addr.addr_ref().clone_with_scope_plus(1))];
@@ -96,6 +97,10 @@ impl<'a, F: Compile> Compiler<'a, F> {
                             , 0
                             , input_value_context));
                 } else if input_typ_attr.is_ref_as_param() {
+                    ref_param_addr = Some(
+                        AddRefParamAddr::new_with_all(
+                        AddressKey::new_with_all(0, 0, 0, 0)
+                        , input_addr.addr_ref().clone_with_scope_plus(1)));
                     param_ref = Some(PushParamRef::new_with_all(
                         input_addr.addr_ref().clone_with_scope_plus(1)));
                 } else {
@@ -148,8 +153,13 @@ impl<'a, F: Compile> Compiler<'a, F> {
                     }
                 };
                 self.cb_enter_scope();
+                /*
                 if let Some(context) = param_ref {
                     self.cb.push_param_ref(context);
+                }
+                */
+                if let Some(context) = ref_param_addr {
+                    self.cb.add_ref_param_addr(context);
                 }
                 if let Some(context) = param_move {
                     let (typ, typ_attr, src_addr, index, value_context)

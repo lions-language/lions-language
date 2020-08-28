@@ -1,4 +1,6 @@
-use libtype::{Data, DataValue};
+use libtype::{Data, DataValue
+    , AddressValue, AddressKey
+    , AddressType};
 use libtype::primeval::{PrimevalData};
 use libtype::primeval::number::
     {uint8::Uint8, uint16::Uint16};
@@ -97,9 +99,15 @@ impl VirtualMachine {
         */
         // println!("get param ref");
         // self.thread_context.current_unchecked().
+        /*
         let data_addr = self.thread_context.current_unchecked().get_param_ref_unchecked(0);
         let param_value = self.thread_context.current_unchecked().get_data_by_data_addr_unchecked(
             data_addr, &self.link_static);
+        */
+        let param_compile_addr = AddressValue::new(
+            AddressType::AddrRef, AddressKey::new_with_all(0, 0, 0, 0));
+        let param_value = self.thread_context.current_unchecked().get_data_unchecked(
+            &param_compile_addr, &self.link_static);
         let param_value = extract_primeval_number_ref!(param_value, Uint8);
         /*
          * 计算返回值

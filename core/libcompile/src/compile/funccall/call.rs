@@ -453,11 +453,13 @@ impl<'a, F: Compile> Compiler<'a, F> {
             }
         };
         self.cb_enter_scope();
+        /*
         while !param_refs.is_empty() {
             let mut context = param_refs.remove(0).expect("param_refs.remove: should not happend");
             // *context.addr_mut().addr_mut().scope_mut() = self.vm_scope_value;
             self.cb.push_param_ref(context);
         }
+        */
         while !ref_param_addrs.is_empty() {
             let mut ref_param = ref_param_addrs.remove(0)
                 .expect("ref_param.remove: should not happend");
