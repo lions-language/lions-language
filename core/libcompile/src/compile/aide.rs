@@ -42,14 +42,10 @@ impl<'a, F: Compile> Compiler<'a, F> {
 
     pub fn cb_enter_scope(&mut self) {
         self.cb.enter_scope();
-        // println!("scope + 1");
-        self.vm_scope_value += 1;
     }
 
     pub fn cb_leave_scope(&mut self) {
         self.cb.leave_scope();
-        // println!("scope - 1");
-        self.vm_scope_value -= 1;
     }
 }
 

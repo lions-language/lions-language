@@ -55,11 +55,15 @@ impl<'a, F: Compile> Compiler<'a, F> {
             self.scope_context.alloc_address(
                 typ.to_address_type(), 0)
         } else if typ_attr.is_ref() {
+            /*
             let a = Address::new(AddressValue::new(
                     AddressType::ParamRef(mut_context.ref_param_no_clone())
                     , AddressKey::default()));
             *mut_context.ref_param_no_mut() += 1;
             a
+            */
+            self.scope_context.alloc_address(
+                AddressType::AddrRef, 0)
         } else {
             unimplemented!();
         };

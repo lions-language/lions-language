@@ -1,6 +1,7 @@
 use libtype::instruction::{CallPrimevalFunction};
 use libtype::function::{CallFunctionParamAddr};
-use libtype::{Data, DataValue, AddressKey};
+use libtype::{Data, DataValue, AddressKey
+    , AddressType, AddressValue};
 use libtype::primeval::{PrimevalData, string::StrValue};
 use crate::vm::VirtualMachine;
 use std::io::{self, Write};
@@ -38,10 +39,22 @@ impl VirtualMachine {
             let data_addr = self.thread_context.current_unchecked().get_data_addr_unchecked(
                 &param_compile_addr);
             */
+            /*
             let data_addr = self.thread_context.current_unchecked().get_param_ref_unchecked(i);
             // println!("{:?}", data_addr);
             let param_value = self.thread_context.current_unchecked().get_data_by_data_addr_unchecked(
                 data_addr, &self.link_static);
+            */
+            /*
+            let data = param_value.as_ref::<Data>();
+            */
+        self.thread_context.current_unchecked().print_current_addr_mapping();
+        self.thread_context.current_unchecked().print_last_n_addr_mapping(1);
+        self.thread_context.current_unchecked().print_last_n_addr_mapping(2);
+            let param_compile_addr = AddressValue::new(
+                AddressType::AddrRef, AddressKey::new_with_all(0, 0, i, 0));
+            let param_value = self.thread_context.current_unchecked().get_data_unchecked(
+                &param_compile_addr, &self.link_static);
             let data = param_value.as_ref::<Data>();
             if i > 0 {
                 stdout.write(b" ");

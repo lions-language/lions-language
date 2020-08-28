@@ -103,6 +103,11 @@ impl<'a, F: Compile> Compiler<'a, F> {
         self.cb.update_func_return_data_addr(
             FunctionReturnDataAttr::RefParam(
                 FunctionReturnRefParam::Addr(addr.clone())));
+        /*
+        self.cb.update_func_return_data_addr(
+            FunctionReturnDataAttr::RefParam(
+                FunctionReturnRefParam::Index(addr.addr_ref().index_clone() as usize)));
+        */
         DescResult::Success
     }
 

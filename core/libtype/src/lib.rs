@@ -377,6 +377,7 @@ pub enum AddressType {
     Stack,
     Heap,
     ParamRef(usize),
+    AddrRef,
     Invalid
 }
 

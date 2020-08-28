@@ -130,6 +130,13 @@ pub struct PushParamRef {
     addr: AddressValue
 }
 
+#[derive(Debug, Clone, FieldGet, NewWithAll
+    , FieldGetMove, FieldGetClone, Default)]
+pub struct AddRefParamAddr {
+    addr: AddressKey,
+    dst_addr: AddressValue
+}
+
 /*
  * 指令
  * */
@@ -150,6 +157,7 @@ pub enum Instruction {
     Jump(Jump),
     RemoveOwnership(RemoveOwnership),
     PushParamRef(PushParamRef),
+    AddRefParamAddr(AddRefParamAddr),
     EnterScope,
     LeaveScope,
     Invalid

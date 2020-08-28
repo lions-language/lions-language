@@ -89,6 +89,9 @@ impl VirtualMachine {
             Instruction::PushParamRef(v) => {
                 self.push_param_ref(v);
             },
+            Instruction::AddRefParamAddr(v) => {
+                self.add_ref_param_addr(v);
+            },
             Instruction::EnterScope => {
                 self.thread_context.enter_thread_scope();
             },

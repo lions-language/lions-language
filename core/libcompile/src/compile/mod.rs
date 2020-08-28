@@ -17,7 +17,8 @@ use libtype::function::{Function, CallFunctionParamAddr
     , FunctionReturnDataAttr};
 use libtype::instruction::{
     Jump, RemoveOwnership
-    , PushParamRef};
+    , PushParamRef
+    , AddRefParamAddr};
 use libtypecontrol::function::FunctionControl;
 use libtype::module::Module;
 use libresult::*;
@@ -227,6 +228,10 @@ pub trait Compile {
     }
 
     fn push_param_ref(&mut self, _: PushParamRef) {
+        unimplemented!();
+    }
+
+    fn add_ref_param_addr(&mut self, _: AddRefParamAddr) {
         unimplemented!();
     }
 }

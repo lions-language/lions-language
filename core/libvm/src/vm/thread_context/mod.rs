@@ -32,8 +32,7 @@ impl ThreadScope {
         /*
          * 获取作用域
          * */
-        let scope = addr.scope_clone();
-        self.scope_context.last_n_unchecked(scope).get_data_unchecked(
+        self.scope_context.get_data_unchecked(
             addr, link_static, &self.memory)
         /*
         self.scope_context.current_unchecked().get_data_unchecked(
@@ -95,6 +94,13 @@ impl ThreadScope {
         , src_addr: AddressValue) {
         let scope = addr.scope_clone();
         self.scope_context.last_n_mut_unchecked(scope).add_bind(
+            addr, src_addr);
+    }
+
+    pub fn add_ref_param_addr_bind(&mut self, addr: AddressKey
+        , src_addr: AddressValue) {
+        let scope = addr.scope_clone();
+        self.scope_context.last_n_mut_unchecked(scope).add_ref_param_addr_bind(
             addr, src_addr);
     }
 

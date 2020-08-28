@@ -8,8 +8,9 @@ use libtype::function::{FindFunctionContext, FindFunctionResult
     , FunctionReturnDataAttr, FunctionParamDataItem
     , FunctionReturnRefParam
     , CallFunctionReturnData};
-use libtype::instruction::{PushParamRef};
-use libtype::{AddressValue
+use libtype::instruction::{
+    PushParamRef, AddRefParamAddr};
+use libtype::{AddressValue, AddressKey
     , AddressType};
 use libgrammar::token::{TokenValue, TokenData};
 use libgrammar::grammar::{CallFuncScopeContext
@@ -53,7 +54,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 func_param_data = Some(FunctionParamData::Multi(items));
             }
             let func_str = FunctionSplice::get_function_without_return_string_by_type(
-                call_context.func_name_ref().as_ref().expect("should not happend").as_ref()
+                call_context.func_name_ref().as_ref().expect(
+                    "call_context.func_name_ref(): should not happend").as_ref()
                 , &func_param_data.as_ref(), &call_context.typ_ref().as_ref());
             let find_func_context = FindFunctionContext {
                 typ: call_context.typ_ref().as_ref(),
@@ -73,7 +75,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                         return DescResult::Error(s);
                     },
                     _ => {
-                        panic!("should not happend");
+                        panic!("find_function: should not happend");
                     }
                 };
             } else {
@@ -85,6 +87,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
         let func_statement = func.func_statement_ref();
         let mut move_param_contexts = Vec::new();
         let mut param_refs = VecDeque::new();
+        let mut ref_param_addrs = VecDeque::new();
         match func_statement.func_param_ref() {
             Some(fp) => {
                 /*
@@ -102,7 +105,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                         }
                         match item.lengthen_attr_ref() {
                             FunctionParamLengthenAttr::Lengthen => {
-                                for _ in 0..param_len {
+                                for i in 0..param_len {
                                     /*
                                     let (typ, typ_attr, addr_value, value_context)
                                         = match self.handle_call_function_get_top_addr(item) {
@@ -123,15 +126,23 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                                     , item.typ_attr_ref(), &typ_attr));
                                         }
                                         if typ_attr.is_move() {
-                                            move_param_contexts.push((typ, typ_attr
+                                            move_param_contexts.push((i, typ, typ_attr
                                             , addr_value, value_context));
                                         } else if typ_attr.is_ref() {
+                                            ref_param_addrs.push_back(
+                                                AddRefParamAddr::new_with_all(
+                                                AddressKey::new_with_all(0, 0, i, 0)
+                                                , addr_value.clone_with_scope_plus(1)));
                                             param_refs.push_back(PushParamRef::new_with_all(
                                                 addr_value.clone_with_scope_plus(1)));
                                         } else {
                                             unimplemented!();
                                         }
                                     } else {
+                                        ref_param_addrs.push_back(
+                                            AddRefParamAddr::new_with_all(
+                                            AddressKey::new_with_all(0, 0, i, 0)
+                                            , addr_value.clone_with_scope_plus(1)));
                                         param_refs.push_back(PushParamRef::new_with_all(
                                             addr_value.clone_with_scope_plus(1)));
                                     }
@@ -149,7 +160,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                     let (typ, typ_attr, mut addr_value, value_context)
                                         = params.remove(0).unwrap();
                                     if item.typ_attr_ref().is_move() {
-                                        move_param_contexts.push((typ, typ_attr
+                                        move_param_contexts.push((0, typ, typ_attr
                                         , addr_value, value_context));
                                     } else if item.typ_attr_ref().is_ref() {
                                         /*
@@ -162,6 +173,10 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                         // println!("{:?}", addr_value.clone_with_scope_plus(1));
                                         // let addr_value =
                                             // addr_value.addr_with_scope_plus(self.vm_scope_value);
+                                        ref_param_addrs.push_back(
+                                            AddRefParamAddr::new_with_all(
+                                            AddressKey::new_with_all(0, 0, 0, 0)
+                                            , addr_value.clone_with_scope_plus(1)));
                                         param_refs.push_back(PushParamRef::new_with_all(
                                             addr_value));
                                     } else {
@@ -213,8 +228,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                 /*
                                  * 绑定变长参数
                                  * */
+                                let lengthen_param_start = fixed_param_len - 1;
                                 if lengthen_param_len > 0 {
-                                    let lengthen_param_start = fixed_param_len - 1;
                                     let mut params = VecDeque::with_capacity(lengthen_param_len);
                                     for i in 0..lengthen_param_len {
                                         let item = items.get(lengthen_param_start+i).unwrap();
@@ -236,9 +251,13 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                         let (typ, typ_attr, addr_value, value_context) =
                                             params.remove(0).unwrap();
                                         if item.typ_attr_ref().is_move() {
-                                            move_param_contexts.push((typ, typ_attr
+                                            move_param_contexts.push((i, typ, typ_attr
                                             , addr_value, value_context));
-                                        } else if item.typ_attr_ref().is_ref() {
+                                        } else if item.typ_attr_ref().is_ref_as_param() {
+                                            ref_param_addrs.push_back(
+                                                AddRefParamAddr::new_with_all(
+                                                AddressKey::new_with_all(0, lengthen_param_start, i, 0)
+                                                , addr_value.clone_with_scope_plus(1)));
                                             param_refs.push_back(PushParamRef::new_with_all(
                                                 addr_value.clone_with_scope_plus(1)));
                                         } else {
@@ -271,9 +290,13 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                         let (typ, typ_attr, addr_value, value_context) =
                                             params.remove(0).unwrap();
                                         if item.typ_attr_ref().is_move() {
-                                            move_param_contexts.push((typ, typ_attr
+                                            move_param_contexts.push((i, typ, typ_attr
                                             , addr_value, value_context));
                                         } else if item.typ_attr_ref().is_ref() {
+                                            ref_param_addrs.push_back(
+                                                AddRefParamAddr::new_with_all(
+                                                AddressKey::new_with_all(i as u64, 0, 0, 0)
+                                                , addr_value.clone_with_scope_plus(1)));
                                             param_refs.push_back(PushParamRef::new_with_all(
                                                 addr_value.clone_with_scope_plus(1)));
                                         } else {
@@ -314,10 +337,15 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                     // println!("{:?}", addr_value);
                                     if item.typ_attr_ref().is_move_as_param() {
                                         // println!("move...");
-                                        move_param_contexts.push((typ, typ_attr
+                                        move_param_contexts.push((i, typ, typ_attr
                                         , addr_value, value_context));
                                     } else if item.typ_attr_ref().is_ref_as_param() {
                                         // println!("ref...");
+                                        // println!("{:?}", addr_value);
+                                        ref_param_addrs.push_back(
+                                            AddRefParamAddr::new_with_all(
+                                            AddressKey::new_with_all(i as u64, 0, 0, 0)
+                                            , addr_value.clone_with_scope_plus(1)));
                                         param_refs.push_back(PushParamRef::new_with_all(
                                             addr_value.clone_with_scope_plus(1)));
                                     } else {
@@ -365,13 +393,14 @@ impl<'a, F: Compile> Compiler<'a, F> {
                             FunctionReturnDataAttr::RefParam(ref_param) => {
                                 match ref_param {
                                     FunctionReturnRefParam::Addr(addr_value) => {
+                                        /*
                                         // println!("{:?}", addr_value);
                                         // let index = addr_value.addr_ref().index_clone();
                                         let index = if let AddressType::ParamRef(idx)
                                             = addr_value.typ_ref() {
                                             idx.clone() as u64
                                         } else {
-                                            panic!("should not happend");
+                                            panic!("return: should not happend");
                                         };
                                         // println!("{:?}", &param_refs);
                                         // println!("{}", index);
@@ -396,6 +425,16 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                             param_ref.addr_ref().typ_clone()
                                             , ak);
                                         Address::new(addr.clone())
+                                        */
+                                        let lengthen_offset =
+                                            addr_value.addr_ref().lengthen_offset_clone();
+                                        let addr = AddressValue::new(
+                                            addr_value.typ_clone()
+                                            , AddressKey::new_with_all(
+                                                addr_value.addr_ref().index_clone()
+                                                , 0, lengthen_offset
+                                                , addr_value.addr_ref().scope_clone()));
+                                        Address::new(addr)
                                     },
                                     FunctionReturnRefParam::Index(_) => {
                                         unimplemented!();
@@ -403,7 +442,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                 }
                             },
                             _ => {
-                                panic!("should not happend");
+                                panic!("return: should not happend");
                             }
                         }
                     },
@@ -415,13 +454,17 @@ impl<'a, F: Compile> Compiler<'a, F> {
         };
         self.cb_enter_scope();
         while !param_refs.is_empty() {
-            let mut context = param_refs.remove(0).expect("should not happend");
+            let mut context = param_refs.remove(0).expect("param_refs.remove: should not happend");
             // *context.addr_mut().addr_mut().scope_mut() = self.vm_scope_value;
             self.cb.push_param_ref(context);
         }
-        let mut move_index = 0;
+        while !ref_param_addrs.is_empty() {
+            let mut ref_param = ref_param_addrs.remove(0)
+                .expect("ref_param.remove: should not happend");
+            self.cb.add_ref_param_addr(ref_param);
+        }
         while !move_param_contexts.is_empty() {
-            let (typ, typ_attr, src_addr, value_context) =
+            let (move_index, typ, typ_attr, src_addr, value_context) =
                 move_param_contexts.remove(0);
             /*
              * NOTE
@@ -432,7 +475,6 @@ impl<'a, F: Compile> Compiler<'a, F> {
              * */
             self.process_param(
                 &typ, &typ_attr, src_addr, move_index, value_context);
-            move_index += 1;
         }
         let desc_ctx = call_context.desc_ctx_clone();
         let cc = CallFunctionContext {

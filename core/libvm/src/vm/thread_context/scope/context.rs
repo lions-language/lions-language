@@ -1,5 +1,9 @@
+use libtype::{
+    AddressValue, AddressType};
+use libcommon::ptr::{RefPtr};
 use super::{Scope};
 use std::collections::VecDeque;
+use crate::vm::thread_context::{ThreadMemory};
 
 pub struct ScopeContext {
     scopes: VecDeque<Scope>
@@ -63,6 +67,53 @@ impl ScopeContext {
         let len = self.scopes.len();
         let index = len - 1 - n;
         self.scopes.get_mut(index).expect(&format!("len: {}, index: {}", len, index))
+    }
+
+    fn get_addr_ref_data_unchecked(&self, addr: &AddressValue
+        , link_static: &RefPtr, memory: &ThreadMemory
+        , scope: usize)
+        -> RefPtr {
+        match addr.typ_ref() {
+            AddressType::AddrRef => {
+                let sc = addr.scope_clone();
+                let ref_addr = self.last_n_unchecked(sc).get_ref_param_addr_unchecked(
+                    addr.addr_ref());
+                /*
+                println!("{:?}", ref_addr);
+                self.current_unchecked().print_addr_mapping();
+                self.last_n_unchecked(1).print_addr_mapping();
+                */
+                self.get_addr_ref_data_unchecked(ref_addr
+                    , link_static, memory, sc+ref_addr.addr_ref().scope_clone())
+            },
+            _ => {
+                self.last_n_unchecked(scope).get_data_unchecked(
+                    addr, link_static, memory)
+            }
+        }
+    }
+
+    pub fn get_data_unchecked(&self, addr: &AddressValue
+        , link_static: &RefPtr, memory: &ThreadMemory)
+        -> RefPtr {
+        self.get_addr_ref_data_unchecked(
+            addr, link_static, memory, addr.addr_ref().scope_clone())
+        /*
+        let scope = addr.scope_clone();
+        match addr.typ_ref() {
+            AddressType::AddrRef => {
+                let ref_addr = self.last_n_unchecked(scope).get_ref_param_addr_unchecked(
+                    addr.addr_ref());
+                println!("{}, {:?}", scope, ref_addr);
+                self.get_data_unchecked(ref_addr
+                    , link_static, memory)
+            },
+            _ => {
+                self.last_n_unchecked(scope).get_data_unchecked(
+                    addr, link_static, memory)
+            }
+        }
+        */
     }
 
     pub fn new() -> Self {
