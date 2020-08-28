@@ -64,7 +64,9 @@ impl<'a, F: Compile> Compiler<'a, F> {
             | TypeAttrubute::CreateRef
             | TypeAttrubute::MutRef => {
                 /*
-                 * 将实际存储数据的地址存储到 Variant 对象中 (也就是 src_addr)
+                 * 将地址拷贝到作用域中
+                 * src: src_addr
+                 * dst: index 构建的地址
                  * */
             },
             TypeAttrubute::Pointer
@@ -328,7 +330,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
             }
         };
         // self.scope_context.leave();
-        self.cb.enter_scope();
+        self.cb_enter_scope();
         /*
          * TODO
          * */
@@ -345,7 +347,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
             return_data: CallFunctionReturnData::new_with_all(
                 return_addr.addr_clone(), return_is_alloc)
         });
-        self.cb.leave_scope();
+        self.cb_leave_scope();
         /*
          * 函数调用结束后, 如果之前为 scope 加过1, 需要将返回值地址中的 scope 减掉
          * */

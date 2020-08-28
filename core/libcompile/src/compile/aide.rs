@@ -34,10 +34,22 @@ impl<'a, F: Compile> Compiler<'a, F> {
 
     pub fn call_function_and_ctrl_scope(&mut self, context: CallFunctionContext) {
         // self.scope_context.enter();
-        self.cb.enter_scope();
+        self.cb_enter_scope();
         self.cb.call_function(context);
         // self.scope_context.leave();
+        self.cb_leave_scope();
+    }
+
+    pub fn cb_enter_scope(&mut self) {
+        self.cb.enter_scope();
+        // println!("scope + 1");
+        self.vm_scope_value += 1;
+    }
+
+    pub fn cb_leave_scope(&mut self) {
         self.cb.leave_scope();
+        // println!("scope - 1");
+        self.vm_scope_value -= 1;
     }
 }
 

@@ -160,8 +160,10 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                         */
                                         // addr_value.addr_mut_with_scope_plus(s);
                                         // println!("{:?}", addr_value.clone_with_scope_plus(1));
+                                        // let addr_value =
+                                            // addr_value.addr_with_scope_plus(self.vm_scope_value);
                                         param_refs.push_back(PushParamRef::new_with_all(
-                                            addr_value.clone_with_scope_plus(1)));
+                                            addr_value));
                                     } else {
                                         unimplemented!();
                                     }
@@ -387,7 +389,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                          *  返回值为引用的情况下, 写入到 value_buffer
                                          *  中的应该就是未进入函数调用作用域之前的作用域
                                          * */
-                                        *ak.scope_mut() -= 1;
+                                        // *ak.scope_mut() -= 1;
+                                        // *ak.scope_mut() -= self.vm_scope_value;
                                         // println!("{:?}", ak);
                                         let addr = AddressValue::new(
                                             param_ref.addr_ref().typ_clone()
@@ -410,14 +413,15 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 }
             }
         };
-        self.cb.enter_scope();
+        self.cb_enter_scope();
         while !param_refs.is_empty() {
-            let context = param_refs.remove(0).expect("should not happend");
+            let mut context = param_refs.remove(0).expect("should not happend");
+            // *context.addr_mut().addr_mut().scope_mut() = self.vm_scope_value;
             self.cb.push_param_ref(context);
         }
         let mut move_index = 0;
         while !move_param_contexts.is_empty() {
-            let (typ, typ_attr, dst_addr, value_context) =
+            let (typ, typ_attr, src_addr, value_context) =
                 move_param_contexts.remove(0);
             /*
              * NOTE
@@ -427,7 +431,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
              *  如果不存在移动, 则返回输入的地址
              * */
             self.process_param(
-                &typ, &typ_attr, dst_addr, move_index, value_context);
+                &typ, &typ_attr, src_addr, move_index, value_context);
             move_index += 1;
         }
         let desc_ctx = call_context.desc_ctx_clone();
@@ -440,7 +444,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 return_addr.addr_clone(), return_is_alloc)
         };
         self.cb.call_function(cc);
-        self.cb.leave_scope();
+        self.cb_leave_scope();
         match scope {
             Some(n) => {
                 return_addr.addr_mut().addr_mut_with_scope_minus(n);

@@ -271,6 +271,7 @@ pub struct Compiler<'a, F: Compile> {
     static_variant_dispatch: &'a mut StaticVariantDispatch<'a>,
     package_str: &'a str,
     compile_context: CompileContext,
+    vm_scope_value: usize,
     cb: F
 }
 
@@ -372,6 +373,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
             static_variant_dispatch: static_variant_dispatch,
             package_str: package_str,
             compile_context: CompileContext::default(),
+            vm_scope_value: 0,
             cb: cb
         }
     }

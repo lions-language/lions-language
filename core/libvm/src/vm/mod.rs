@@ -40,7 +40,7 @@ pub struct VirtualMachine {
     // memory_context: MemoryContext,
     thread_context: ThreadContext,
     link_define: RefPtr,
-    link_static: RefPtr
+    link_static: RefPtr,
 }
 
 impl VirtualMachine {

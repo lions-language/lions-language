@@ -147,7 +147,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                         }
                     }
                 };
-                self.cb.enter_scope();
+                self.cb_enter_scope();
                 if let Some(context) = param_ref {
                     self.cb.push_param_ref(context);
                 }
@@ -166,7 +166,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                         return_addr.addr_clone(), return_is_alloc)
                 };
                 self.cb.call_function(call_context);
-                self.cb.leave_scope();
+                self.cb_leave_scope();
                 /*
                  * 因为地址被修改, 所以返回修改后的地址 (调用 to_#type 后的 return 地址)
                  *  作用域结束之后, 如果之前修改过scope, 需要减掉

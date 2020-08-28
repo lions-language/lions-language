@@ -96,6 +96,10 @@ impl<'a, F: Compile> Compiler<'a, F> {
         };
             */
         // let addr = addr.clone_with_scope_minus(scope);
+        /*
+         * TODO
+         *  如果是复合类型, 写入 value_buffer 的时候已经记录进去了
+         * */
         self.cb.update_func_return_data_addr(
             FunctionReturnDataAttr::RefParam(
                 FunctionReturnRefParam::Addr(addr.clone())));
@@ -170,7 +174,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
          * 释放到 函数作用域
          * */
         for _ in 0..scope {
-            self.cb.leave_scope();
+            self.cb_leave_scope();
         }
         /*
          * 生成 Jump 指令
