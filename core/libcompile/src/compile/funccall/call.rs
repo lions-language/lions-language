@@ -136,6 +136,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                                 , addr_value.clone_with_scope_plus(1)));
                                             param_refs.push_back(PushParamRef::new_with_all(
                                                 addr_value.clone_with_scope_plus(1)));
+                                            return_ref_params.insert(i, addr_value);
                                         } else {
                                             unimplemented!();
                                         }
@@ -146,7 +147,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                             , addr_value.clone_with_scope_plus(1)));
                                         param_refs.push_back(PushParamRef::new_with_all(
                                             addr_value.clone_with_scope_plus(1)));
-                                        return_ref_params.insert(0, addr_value);
+                                        return_ref_params.insert(i, addr_value);
                                     }
                                 }
                             },
@@ -263,6 +264,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                                 , addr_value.clone_with_scope_plus(1)));
                                             param_refs.push_back(PushParamRef::new_with_all(
                                                 addr_value.clone_with_scope_plus(1)));
+                                            return_ref_params.insert(i, addr_value);
                                         } else {
                                             unimplemented!();
                                         }
@@ -302,6 +304,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                                 , addr_value.clone_with_scope_plus(1)));
                                             param_refs.push_back(PushParamRef::new_with_all(
                                                 addr_value.clone_with_scope_plus(1)));
+                                            return_ref_params.insert(i, addr_value);
                                         } else {
                                             unimplemented!();
                                         }
@@ -442,7 +445,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                         Address::new(addr)
                                         */
                                         let addr = return_ref_params.remove(
-                                            &(addr_value.addr_ref().index_clone() as usize))
+                                            &(addr_value.addr_ref().index_clone() as usize
+                                                + addr_value.addr_ref().lengthen_offset_clone()))
                                         .expect("should not happend");
                                         Address::new(addr)
                                     },
