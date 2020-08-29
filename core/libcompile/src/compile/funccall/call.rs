@@ -456,7 +456,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                 }
                             },
                             _ => {
-                                panic!("return: should not happend");
+                                panic!("return: should not happend, {:?}", return_data.attr_ref());
                             }
                         }
                     },
