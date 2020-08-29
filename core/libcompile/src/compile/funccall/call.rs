@@ -23,7 +23,7 @@ use crate::compile::{Compile, Compiler
     , AddressValueExpand};
 use crate::compile::scope::{ScopeFuncCall};
 use crate::address::Address;
-use std::collections::VecDeque;
+use std::collections::{VecDeque, HashMap};
 
 impl<'a, F: Compile> Compiler<'a, F> {
     pub fn handle_call_function(&mut self
@@ -88,6 +88,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
         let mut move_param_contexts = Vec::new();
         let mut param_refs = VecDeque::new();
         let mut ref_param_addrs = VecDeque::new();
+        let mut return_ref_params = HashMap::new();
         match func_statement.func_param_ref() {
             Some(fp) => {
                 /*
@@ -145,6 +146,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                             , addr_value.clone_with_scope_plus(1)));
                                         param_refs.push_back(PushParamRef::new_with_all(
                                             addr_value.clone_with_scope_plus(1)));
+                                        return_ref_params.insert(0, addr_value);
                                     }
                                 }
                             },
@@ -178,7 +180,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                             AddressKey::new_with_all(0, 0, 0, 0)
                                             , addr_value.clone_with_scope_plus(1)));
                                         param_refs.push_back(PushParamRef::new_with_all(
-                                            addr_value));
+                                            addr_value.clone_with_scope_plus(1)));
+                                        return_ref_params.insert(0, addr_value);
                                     } else {
                                         unimplemented!();
                                     }
@@ -348,6 +351,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                             , addr_value.clone_with_scope_plus(1)));
                                         param_refs.push_back(PushParamRef::new_with_all(
                                             addr_value.clone_with_scope_plus(1)));
+                                        return_ref_params.insert(i, addr_value);
                                     } else {
                                         unimplemented!();
                                     }
@@ -426,6 +430,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                             , ak);
                                         Address::new(addr.clone())
                                         */
+                                        /*
                                         let lengthen_offset =
                                             addr_value.addr_ref().lengthen_offset_clone();
                                         let addr = AddressValue::new(
@@ -434,6 +439,11 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                                 addr_value.addr_ref().index_clone()
                                                 , 0, lengthen_offset
                                                 , addr_value.addr_ref().scope_clone()));
+                                        Address::new(addr)
+                                        */
+                                        let addr = return_ref_params.remove(
+                                            &(addr_value.addr_ref().index_clone() as usize))
+                                        .expect("should not happend");
                                         Address::new(addr)
                                     },
                                     FunctionReturnRefParam::Index(_) => {
