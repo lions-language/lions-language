@@ -65,6 +65,7 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
     pub fn new_line_check(&mut self, c: char) -> bool {
         match c {
             '\r' => {
+                self.content.virtual_skip_next_one();
                 match self.content.lookup_next_one() {
                     Some(ch) => {
                         if ch == '\n' {
