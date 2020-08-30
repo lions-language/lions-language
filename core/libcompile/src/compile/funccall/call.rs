@@ -224,11 +224,18 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                  * */
                                 let (fixed_param_len, lengthen_param_len) =
                                     if param_len == statement_param_len - 1 {
+                                        /*
+                                         * 调用的参数小于定义的长度
+                                         * */
                                         (param_len, 0)
                                     } else {
-                                        (statement_param_len
+                                        /*
+                                         * 调用的参数大于等于定义的长度
+                                         * */
+                                        (statement_param_len - 1
                                             , param_len - statement_param_len + 1)
                                     };
+                                let mut index = 0;
                                 /*
                                  * 绑定变长参数
                                  * */
@@ -264,10 +271,11 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                                 , addr_value.clone_with_scope_plus(1)));
                                             param_refs.push_back(PushParamRef::new_with_all(
                                                 addr_value.clone_with_scope_plus(1)));
-                                            return_ref_params.insert(i, addr_value);
+                                            return_ref_params.insert(index, addr_value);
                                         } else {
                                             unimplemented!();
                                         }
+                                        index += 1
                                     }
                                 }
                                 /*
@@ -304,10 +312,11 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                                 , addr_value.clone_with_scope_plus(1)));
                                             param_refs.push_back(PushParamRef::new_with_all(
                                                 addr_value.clone_with_scope_plus(1)));
-                                            return_ref_params.insert(i, addr_value);
+                                            return_ref_params.insert(index, addr_value);
                                         } else {
                                             unimplemented!();
                                         }
+                                        index += 1
                                     }
                                 }
                             },
