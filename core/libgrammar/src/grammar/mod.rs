@@ -109,7 +109,7 @@ pub struct ConstStringContext {
 #[derive(FieldGet, NewWithAll, FieldGetMove)]
 pub struct FunctionDefineParamContext {
     name_token: TokenValue,
-    type_token: TokenValue,
+    type_token: TypeToken,
     typ_attr: TypeAttrubute,
     lengthen_attr: FunctionParamLengthenAttr,
     /*
@@ -205,8 +205,7 @@ pub trait Grammar {
     }
     fn function_define_param(&mut self, context: FunctionDefineParamContext
         , _mut_context: &mut FunctionDefineParamMutContext) {
-        context.name_token.print_token_type(Some("function param name:"));
-        context.type_token.print_token_type(Some("function param type:"));
+        unimplemented!();
     }
     fn function_define_return(&mut self, _context: FunctionDefineReturnContext) {
     }

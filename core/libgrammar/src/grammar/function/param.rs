@@ -2,7 +2,8 @@ use libtype::{TypeAttrubute};
 use libtype::function::{FunctionParamLengthenAttr};
 use super::{GrammarParser, Grammar
     , FunctionDefineParamContext};
-use crate::grammar::{FunctionDefineParamMutContext};
+use crate::grammar::{FunctionDefineParamMutContext
+    , TypeToken};
 use crate::lexical::{CallbackReturnStatus, TokenVecItem, TokenPointer};
 use crate::token::{TokenType};
 
@@ -127,6 +128,30 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
     }
 
     fn function_find_param_type_with_token(&mut self, t: TokenPointer) 
+        -> (TypeAttrubute, FunctionParamLengthenAttr, TypeToken) {
+        let token = t.as_ref::<T, CB>();
+        match token.context_ref().token_type() {
+            TokenType::Colon => {
+                /*
+                 * name: type 形式
+                 * */
+                self.skip_next_one();
+                let tp = self.expect_next_token(|_, _| {
+                }, "expect id / `*` / `&`").expect("should not happend");
+                /*
+                 * 查找 : 后面的 id
+                 * 如果不是 id => 语法错误
+                 * */
+                self.typ_parse_with_next(tp)
+            },
+            _ => {
+                self.typ_parse_with_next(t)
+            }
+        }
+    }
+
+    /*
+    fn function_find_param_type_with_token(&mut self, t: TokenPointer) 
         -> (TypeAttrubute, FunctionParamLengthenAttr) {
         /*
          * 支持 name type 的方式, 也支持 name: type 的方式
@@ -222,6 +247,25 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         // println!("{:?}", type_token.context_token_type());
         (typ_attr, lengthen_attr, type_token)
     }
+    */
+
+    fn function_find_param_type(&mut self, tp: Option<TokenPointer>)
+        -> (TypeAttrubute, FunctionParamLengthenAttr, TypeToken) {
+        /*
+         * 如果已经获取了next token, 那么直接传入 token
+         * 否则, 查看下一个, 再调用
+         * */
+        match tp {
+            Some(tp) => {
+                self.function_find_param_type_with_token(tp)
+            },
+            None => {
+                let tp = self.expect_next_token(|_, _| {
+                }, "type");
+                self.function_find_param_type_with_token(tp.expect("should not happend"))
+            }
+        }
+    }
 
     fn function_find_param(&mut self, param_no: usize
         , mut_context: &mut FunctionDefineParamMutContext) {
@@ -232,7 +276,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         let (typ_attr, lengthen_attr, type_token) = self.function_find_param_type(None);
         self.grammar_context().cb.function_define_param(
             FunctionDefineParamContext::new_with_all(
-                name_token.token_value(), type_token.token_value()
+                name_token.token_value(), type_token
                 , typ_attr, lengthen_attr, param_no), mut_context);
     }
 }

@@ -19,6 +19,7 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
                     /*
                      * ...
                      * */
+                    parser.content.skip_next_one();
                     parser.point_three();
                 },
                 _ => {

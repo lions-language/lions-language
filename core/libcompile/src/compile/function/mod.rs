@@ -1,7 +1,8 @@
 use libgrammar::token::{TokenValue, TokenData};
 use libgrammar::grammar::{FunctionDefineParamContext
     , FunctionDefineParamMutContext
-    , FunctionDefineReturnContext};
+    , FunctionDefineReturnContext
+    , TypeToken};
 use libtype::function::{AddFunctionContext
     , FunctionParamDataItem
     , FunctionReturnData, FunctionReturn
@@ -40,9 +41,16 @@ impl<'a, F: Compile> Compiler<'a, F> {
         let name = extract_token_data!(
            name_token.token_data().expect("should not happend")
            , Id);
-        let typ = extract_token_data!(
-            type_token.token_data().expect("should not happend")
-            , Id);
+        let typ = match type_token {
+            TypeToken::Single(tt) => {
+                extract_token_data!(
+                    tt.token_data().expect("should not happend")
+                    , Id)
+            },
+            _ => {
+                unimplemented!("{:?}", type_token);
+            }
+        };
         let typ = Type::from_str(&typ);
         /*
          * 为参数分配一个地址

@@ -42,14 +42,27 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
 
     pub fn typ_parse(&mut self)
         -> (TypeAttrubute, FunctionParamLengthenAttr, TypeToken) {
+        let tp = self.expect_next_token(|_, _| {
+        }, "id / & / * / ...");
+        self._typ_parse(&mut FunctionParamLengthenAttr::Fixed
+            , tp.expect("should not happend"))
+    }
+
+    pub fn typ_parse_with_next(&mut self, t: TokenPointer)
+        -> (TypeAttrubute, FunctionParamLengthenAttr, TypeToken) {
+        self._typ_parse(&mut FunctionParamLengthenAttr::Fixed
+            , t)
+    }
+
+    fn _typ_parse(&mut self, lengthen_attr: &mut FunctionParamLengthenAttr
+        , tp: TokenPointer)
+        -> (TypeAttrubute, FunctionParamLengthenAttr, TypeToken) {
         /*
          * 解析类型表达式
          * */
-        let tp = self.expect_next_token(|_, _| {
-        }, "id / & / * / ...");
         let mut typ_attr = TypeAttrubute::default();
-        let mut lengthen_attr = FunctionParamLengthenAttr::Fixed;
-        let token = tp.expect("should not happend").as_ref::<T, CB>();
+        // let mut lengthen_attr = FunctionParamLengthenAttr::Fixed;
+        let token = tp.as_ref::<T, CB>();
         match token.context_token_type() {
             TokenType::Id => {
                 typ_attr = TypeAttrubute::Move;
@@ -57,6 +70,13 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
             TokenType::Multiplication => {
                 typ_attr = TypeAttrubute::Pointer;
                 self.skip_next_one();
+            },
+            TokenType::ThreePoint => {
+                *lengthen_attr = FunctionParamLengthenAttr::Lengthen;
+                self.skip_next_one();
+                let tp = self.expect_next_token(|_, _| {
+                }, "expect id / `*` / `&`").expect("should not happend");
+                return self._typ_parse(lengthen_attr, tp);
             },
             TokenType::And => {
                 typ_attr = TypeAttrubute::Ref;
@@ -82,9 +102,9 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                 self.typ_startwith_parenthese()
             },
             _ => {
-                panic!("should not happend");
+                panic!("should not happend: {:?}", token.context_token_type());
             }
         };
-        (typ_attr, lengthen_attr, type_token)
+        (typ_attr, lengthen_attr.clone(), type_token)
     }
 }
