@@ -235,7 +235,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                         (statement_param_len - 1
                                             , param_len - statement_param_len + 1)
                                     };
-                                let mut index = 0;
+                                let mut index = param_len - 1;
                                 /*
                                  * 绑定变长参数
                                  * */
@@ -275,7 +275,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                         } else {
                                             unimplemented!();
                                         }
-                                        index += 1
+                                        index -= 1;
                                     }
                                 }
                                 /*
@@ -316,7 +316,9 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                         } else {
                                             unimplemented!();
                                         }
-                                        index += 1
+                                        if index > 0 {
+                                            index -= 1;
+                                        }
                                     }
                                 }
                             },
