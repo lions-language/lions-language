@@ -77,6 +77,10 @@ pub enum TokenType {
     Comma,
     // .
     Point,
+    // ..
+    TwoPoint,
+    // ...
+    ThreePoint,
     // &
     And,
     // 注释
