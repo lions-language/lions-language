@@ -26,7 +26,8 @@ pub enum PrimevalType {
     Int64,
     Float32,
     Float64,
-    Str
+    Str,
+    OrderSeque
 }
 
 #[derive(Debug, Clone, FieldGet)]
@@ -53,6 +54,59 @@ pub enum PrimevalData {
      * 自身没有存储数据, 只是存储了字符串中的位置信息
      * */
     StrSlice(StrSlice),
+}
+
+impl PrimevalType {
+    pub fn is_integer(&self) -> bool {
+        match self {
+            PrimevalType::Float32
+            | PrimevalType::Float64
+            | PrimevalType::Str
+            | PrimevalType::OrderSeque => {
+            },
+            _ => {
+                return true;
+            }
+        }
+        false
+    }
+}
+
+impl PrimevalData {
+    pub fn fetch_number_to_usize(&self) -> usize {
+        match self {
+            PrimevalData::Uint8(v) => {
+                v.as_ref().expect("should not happend").to_std_clone() as usize
+            },
+            PrimevalData::Uint16(v) => {
+                v.as_ref().expect("should not happend").to_std_clone() as usize
+            },
+            PrimevalData::Uint32(v) => {
+                v.as_ref().expect("should not happend").to_std_clone() as usize
+            },
+            PrimevalData::Uint64(v) => {
+                v.as_ref().expect("should not happend").to_std_clone() as usize
+            },
+            PrimevalData::Int8(v) => {
+                v.as_ref().expect("should not happend").to_std_clone() as usize
+            },
+            PrimevalData::Int16(v) => {
+                v.as_ref().expect("should not happend").to_std_clone() as usize
+            },
+            PrimevalData::Int32(v) => {
+                v.as_ref().expect("should not happend").to_std_clone() as usize
+            },
+            PrimevalData::Int64(v) => {
+                v.as_ref().expect("should not happend").to_std_clone() as usize
+            },
+            PrimevalData::Float32(_)
+            | PrimevalData::Float64(_)
+            | PrimevalData::Str(_)
+            | PrimevalData::StrSlice(_) => {
+                panic!("should not happend");
+            }
+        }
+    }
 }
 
 pub mod number;

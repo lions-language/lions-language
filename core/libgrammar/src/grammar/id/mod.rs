@@ -6,13 +6,26 @@ use super::{GrammarParser, Grammar
     , CallFuncScopeContext, LoadVariantContext
     , DescContext};
 use crate::lexical::{CallbackReturnStatus};
-use crate::token::{TokenType};
+use crate::token::{TokenType, TokenData};
 
 impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, CB> {
     pub fn id_process_id(&mut self, desc_ctx: DescContext) {
         let mut token_value = self.take_next_one().token_value();
         let context = LoadVariantContext::new_with_all(
-            token_value, None, desc_ctx.typ_attr);
+            token_value, None, desc_ctx.typ_attr.clone());
+        match self.lookup_next_one_ptr() {
+            Some(tp) => {
+                /*
+                 * 查看下一个 token
+                 * */
+                let token = tp.as_ref::<T, CB>();
+                if let TokenType::ThreePoint = token.context_token_type() {
+                    self.id_process_three_point(desc_ctx);
+                };
+            },
+            None => {
+            }
+        }
         match self.grammar_context().cb.load_variant(context) {
             DescResult::Error(e) => {
                 self.panic(&e);
@@ -20,6 +33,36 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
             _ => {
             }
         }
+    }
+
+    pub fn id_process_three_point(&mut self, desc_ctx: DescContext) {
+        /*
+         * 跳过 ...
+         * */
+        self.skip_next_one();
+        /*
+         * 取出 ... 后面的 `[index]`
+         * */
+        self.expect_and_take_next_token(TokenType::LeftSquareBrackets);
+        /*
+         * 查找 数值
+         * */
+        let tp = self.expect_next_token_unchecked(|_, _| {
+        }, "integer");
+        let token = tp.as_ref::<T, CB>();
+        if !token.context_token_type().is_integer() {
+            self.panic(&format!("expect integer, but meet: {:?}"
+                    , token.context_token_type()));
+        }
+        let next = self.take_next_one();
+        let primeval_data = extract_token_data!(
+            next.token_value().token_data().unwrap(), Const);
+        let lengthen_index = primeval_data.fetch_number_to_usize();
+        /*
+         * 查找闭合的 `]`
+         * */
+        let v = self.expect_and_take_next_token(TokenType::RightSquareBrackets);
+        println!("{:?}", lengthen_index);
     }
 
     pub fn id_process(&mut self, desc_ctx: DescContext) {

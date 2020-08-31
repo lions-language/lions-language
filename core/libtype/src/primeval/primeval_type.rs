@@ -35,6 +35,9 @@ impl PrimevalType {
             },
             PrimevalType::Str => {
                 "str"
+            },
+            PrimevalType::OrderSeque => {
+                "orderseque"
             }
         }
     }

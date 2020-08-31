@@ -40,6 +40,10 @@ pub fn number_to_std_macro(input: TokenStream) -> TokenStream {
             pub fn to_std_ref(&self) -> &#typ {
                 &self.value
             }
+
+            pub fn to_std_clone(&self) -> #typ {
+                self.value.clone()
+            }
         }
     };  
     expanded.into()

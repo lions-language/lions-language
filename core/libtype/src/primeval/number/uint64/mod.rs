@@ -1,4 +1,6 @@
-#[derive(Debug, Clone)]
+use libmacro::NumberToStd;
+
+#[derive(Debug, Clone, NumberToStd)]
 pub struct Uint64 {
     pub value: u64
 }

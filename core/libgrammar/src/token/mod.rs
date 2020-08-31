@@ -90,6 +90,19 @@ pub enum TokenType {
     PrimevalType(PrimevalType)
 }
 
+impl TokenType {
+    pub fn is_integer(&self) -> bool {
+        match self {
+            TokenType::Const(t) => {
+                t.is_integer()
+            },
+            _ => {
+                false
+            }
+        }
+    }
+}
+
 #[derive(Debug)]
 pub enum TokenData {
     Annotate(Vec<u8>),
@@ -103,6 +116,7 @@ impl Default for TokenType {
     }
 }
 
+#[derive(Debug)]
 pub enum TokenOperType {
     NoOperate,
     Operand,
@@ -117,6 +131,7 @@ pub fn default_token_attrubute() -> &'static TokenAttrubute {
     return &*DEFAULT_TOKEN_ATTRUBUTE;
 }
 
+#[derive(Debug)]
 pub struct TokenAttrubute {
     pub bp: &'static u8,
     pub oper_type: &'static TokenOperType
@@ -230,7 +245,7 @@ pub trait Token<T: FnMut() -> CallbackReturnStatus, CB: Grammar> {
 }
 */
 
-#[derive(Default)]
+#[derive(Debug, Default)]
 pub struct TokenContext {
     // 所在行号
     pub line: u64,

@@ -383,6 +383,12 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         }
     }
 
+    fn expect_next_token_unchecked<F>(&mut self, f: F
+        , token_prompt: &'static str) -> TokenPointer
+        where F: FnMut(&mut GrammarParser<T, CB>, TokenPointer) {
+        self.expect_next_token(f, token_prompt).expect("should not happend")
+    }
+
     fn expect_next_token<F>(&mut self, mut f: F, token_prompt: &'static str) -> Option<TokenPointer>
         /*
          * 注意: 该方法会先去除全部的空白
@@ -407,7 +413,8 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         Some(tp)
     }
 
-    fn virtual_expect_next_token<F>(&mut self, mut f: F, token_prompt: &'static str) -> Option<TokenPointer>
+    fn virtual_expect_next_token<F>(&mut self
+        , mut f: F, token_prompt: &'static str) -> Option<TokenPointer>
         where F: FnMut(&mut GrammarParser<T, CB>, TokenPointer) {
         let tp = match self.virtual_skip_white_space_token() {
             Some(tp) => {
