@@ -11,17 +11,22 @@ use crate::token::{TokenType, TokenData};
 impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, CB> {
     pub fn id_process_id(&mut self, desc_ctx: DescContext) {
         let mut token_value = self.take_next_one().token_value();
+        // println!("before: {:?}", &token_value);
         let context = LoadVariantContext::new_with_all(
             token_value, None, desc_ctx.typ_attr.clone());
-        match self.lookup_next_one_ptr() {
+        match self.skip_white_space_token() {
             Some(tp) => {
                 /*
                  * 查看下一个 token
                  * */
+                /*
                 let token = tp.as_ref::<T, CB>();
                 if let TokenType::ThreePoint = token.context_token_type() {
                     self.id_process_three_point(desc_ctx);
                 };
+                */
+                let token = tp.as_ref::<T, CB>();
+                // println!("after: {:?}", token.context_ref().token_type());
             },
             None => {
             }

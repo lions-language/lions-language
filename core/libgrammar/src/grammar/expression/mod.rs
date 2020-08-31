@@ -62,13 +62,22 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
 
     pub fn expression_end_block(grammar: &mut GrammarParser<T, CB>
         , token: &TokenVecItem<T, CB>) -> TokenMethodResult {
+        // println!("{:?}", token.context_ref().token_type());
         // println!("normal end ... ");
         match token.context_ref().token_type() {
             TokenType::Semicolon
-            | TokenType::NewLine
-            | TokenType::RightBigParenthese => {
+            | TokenType::NewLine => {
                 grammar.skip_next_one();
                 return TokenMethodResult::StmtEnd;
+            },
+            TokenType::RightBigParenthese => {
+                /*
+                 * NOTE
+                 * 这里不能跳过 `}`
+                 * 因为 block 需要检测 `}` 作为结束
+                 * 
+                 * */
+                return TokenMethodResult::StmtEnd;z
             },
             _ => {
             }

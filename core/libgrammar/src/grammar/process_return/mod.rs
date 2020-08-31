@@ -10,7 +10,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
          * 跳过 return 关键字
          * */
         self.skip_next_one();
-        let tp = match self.lookup_next_one_ptr() {
+        let tp = match self.skip_white_space_token() {
             Some(tp) => tp,
             None => {
                 /*
