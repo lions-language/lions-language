@@ -191,7 +191,7 @@ impl FunctionParamDataItem {
 /*
  * 函数声明
  * */
-#[derive(Debug, Clone, FieldGet)]
+#[derive(Debug, Clone, FieldGet, FieldGetClone)]
 pub struct FunctionStatement {
     pub func_name: String,
     pub func_param: Option<FunctionParam>,
@@ -331,10 +331,18 @@ pub struct AddFunctionContext<'a> {
     /*
      * 通过typ 区别应该存储在哪个对象中
      * */
+    pub func_name: String,
     pub typ: Option<&'a Type>,
     pub package_typ: Option<&'a PackageType>,
     pub func_str: String,
-    pub module_str: String
+    pub module_str: String,
+    /*
+     * 是否支持重载(不检测参数类型)
+     *  1. 默认是 true, 也就是支持重载, 只有特殊标记的函数才被设置为 false
+     *  2. 如果函数参数中含有变长参数, 将无法进行重载, 所以当检测到含有变长参数时,
+     *     该参数一定是false
+     * */
+    pub is_overload: bool
 }
 
 pub type FindFunctionHandle = RefPtr;

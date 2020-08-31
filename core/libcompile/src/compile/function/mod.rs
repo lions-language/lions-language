@@ -2,6 +2,7 @@ use libgrammar::token::{TokenValue, TokenData};
 use libgrammar::grammar::{FunctionDefineParamContext
     , FunctionDefineParamMutContext
     , FunctionDefineReturnContext
+    , FunctionDefineContext
     , TypeToken};
 use libtype::function::{AddFunctionContext
     , FunctionParamDataItem
@@ -115,19 +116,23 @@ impl<'a, F: Compile> Compiler<'a, F> {
         self.cb.function_define_start();
     }
 
-    pub fn handle_function_define_end(&mut self) {
+    pub fn handle_function_define_end(&mut self
+        , define_context: &FunctionDefineContext) {
         self.fill_return_jumps();
         // println!("{:?}", self.scope_context.get_current_func_return_ref());
         let func = self.cb.function_define_end();
         // println!("{:?}", func.func_statement_ref().statement_full_str());
         let package_typ = PackageType::new(PackageTypeValue::Crate);
         let context = AddFunctionContext{
+            func_name: func.func_statement_ref().func_name_clone(),
             typ: None,
             package_typ: Some(&package_typ),
             module_str: self.module_stack.current().to_str().to_string(),
             // func_str: func.func_statement_ref().func_name.clone()
-            func_str: func.func_statement_ref().statement_full_str().to_string()
+            func_str: func.func_statement_ref().statement_full_str().to_string(),
+            is_overload: if define_context.has_lengthen_param_clone() {false} else {true}
         };
+        // println!("{:?}", context);
         // println!("{:?}", func);
         self.function_control.add_function(context, None, func);
         self.scope_context.leave();

@@ -1,9 +1,11 @@
 use super::{GrammarParser, Grammar};
 use crate::lexical::{CallbackReturnStatus};
 use crate::token::{TokenType, TokenValue};
+use crate::grammar::{FunctionDefineContext};
   
 impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, CB> {
     pub fn function_object_method(&mut self) {
+        let mut context = FunctionDefineContext::new_with_all(false);
         /*
          * 读取 object name
          * */
@@ -33,7 +35,9 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                     parser.skip_next_one();
                 },
                 _ => {
-                    parser.panic(&format!("expect a `]`, and make `[` closed, but found {:?}", token.context_ref().token_type()));
+                    parser.panic(
+                        &format!("expect a `]`, and make `[` closed, but found {:?}"
+                            , token.context_ref().token_type()));
                 }
             }
         }, "a `]`, and make `[` closed");
@@ -55,8 +59,8 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         let function_name = self.take_next_one();
         self.cb().function_object_method_stmt(object_name.token_value()
             , typ, function_name.token_value());
-        self.function_parse_param_list();
-        self.function_parse_block();
+        self.function_parse_param_list(&mut context);
+        self.function_parse_block(&mut context);
     }
 
     pub fn function_struct_method(&mut self) {

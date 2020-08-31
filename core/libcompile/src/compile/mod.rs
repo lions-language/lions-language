@@ -6,6 +6,7 @@ use libgrammar::grammar::{Grammar, CallFuncScopeContext
     , FunctionDefineParamContext
     , FunctionDefineParamMutContext
     , FunctionDefineReturnContext
+    , FunctionDefineContext
     , ReturnStmtContext as GrammarReturnStmtContext};
 use libgrammar::token::{TokenValue};
 use libtype::{Type, Data
@@ -178,7 +179,7 @@ pub trait Compile {
     fn function_set_return_to_statement(&mut self
         , _item: FunctionReturn) {
     }
-    
+
     fn function_define_start(&mut self) {
         println!("function define start");
     }
@@ -318,8 +319,9 @@ impl<'a, F: Compile> Grammar for Compiler<'a, F> {
         self.handle_function_define_return(context);
     }
 
-    fn function_define_end(&mut self, _value: TokenValue) {
-        self.handle_function_define_end();
+    fn function_define_end(&mut self, _value: TokenValue
+        , define_context: &FunctionDefineContext) {
+        self.handle_function_define_end(define_context);
     }
 
     fn call_function_prepare(&mut self, scope_context: CallFuncScopeContext

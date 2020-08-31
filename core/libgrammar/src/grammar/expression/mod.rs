@@ -77,7 +77,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                  * 因为 block 需要检测 `}` 作为结束
                  * 
                  * */
-                return TokenMethodResult::StmtEnd;z
+                return TokenMethodResult::StmtEnd;
             },
             _ => {
             }

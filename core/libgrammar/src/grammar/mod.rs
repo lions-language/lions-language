@@ -134,6 +134,12 @@ pub struct FunctionDefineReturnContext {
     type_token: TypeToken
 }
 
+#[derive(Debug, Default, FieldGet, NewWithAll, FieldGetMove
+    , FieldGetClone)]
+pub struct FunctionDefineContext {
+    has_lengthen_param: bool
+}
+
 #[derive(Debug)]
 pub enum TypeToken {
     Single(TokenValue),
@@ -209,7 +215,8 @@ pub trait Grammar {
     }
     fn function_define_return(&mut self, _context: FunctionDefineReturnContext) {
     }
-    fn function_define_end(&mut self, _value: TokenValue) {
+    fn function_define_end(&mut self, _value: TokenValue
+        , _define_context: &FunctionDefineContext) {
         /*
          * 命名函数函数体结束
          * */

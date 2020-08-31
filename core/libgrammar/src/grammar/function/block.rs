@@ -1,9 +1,11 @@
 use super::{GrammarParser, Grammar};
 use crate::lexical::{CallbackReturnStatus};
 use crate::token::{TokenType};
+use crate::grammar::{FunctionDefineContext};
 
 impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, CB> {
-    pub fn function_parse_block(&mut self) {
+    pub fn function_parse_block(&mut self
+        , define_context: &mut FunctionDefineContext) {
         /*
          * 查找 {
          * */
@@ -123,7 +125,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
          * 到达这里说明 next token 是 } => 表达式结束
          * */
         let t = self.take_next_one();
-        self.grammar_context().cb.function_define_end(t.token_value());
+        self.grammar_context().cb.function_define_end(t.token_value(), define_context);
     }
 }
 

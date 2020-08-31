@@ -3,7 +3,7 @@ use libtype::function::{FunctionParamLengthenAttr};
 use super::{GrammarParser, Grammar
     , FunctionDefineParamContext};
 use crate::grammar::{FunctionDefineParamMutContext
-    , TypeToken};
+    , TypeToken, FunctionDefineContext};
 use crate::lexical::{CallbackReturnStatus, TokenVecItem, TokenPointer};
 use crate::token::{TokenType};
 
@@ -16,7 +16,7 @@ enum FunctionType {
 }
 
 impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, CB> {
-    pub fn function_parse_param_list(&mut self) {
+    pub fn function_parse_param_list(&mut self, define_context: &mut FunctionDefineContext) {
         /*
          * 查找 (
          * */
@@ -46,7 +46,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         let next = tp.as_ref::<T, CB>();
         match next.context_ref().token_type() {
             TokenType::Id => {
-                self.function_find_params();
+                self.function_find_params(define_context);
             },
             TokenType::RightParenthese => {
                 /*
@@ -59,17 +59,20 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                 /*
                  * 既不是 ) 也不是 id => 语法错误
                  * */
-                self.panic(&format!("expect `)` or id, after `(`, but found: {:?}", next.context_ref().token_type()));
+                self.panic(
+                    &format!(
+                        "expect `)` or id, after `(`, but found: {:?}"
+                        , next.context_ref().token_type()));
                 return;
             }
         }
     }
 
-    fn function_find_params(&mut self) {
+    fn function_find_params(&mut self, define_context: &mut FunctionDefineContext) {
         let mut param_no = 0;
         let mut mut_context = FunctionDefineParamMutContext::default();
         loop {
-            self.function_find_param(param_no, &mut mut_context);
+            self.function_find_param(param_no, &mut mut_context, define_context);
             param_no += 1;
             let tp = match self.lookup_next_one_ptr() {
                 Some(tp) => {
@@ -268,12 +271,16 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
     }
 
     fn function_find_param(&mut self, param_no: usize
-        , mut_context: &mut FunctionDefineParamMutContext) {
+        , mut_context: &mut FunctionDefineParamMutContext
+        , define_context: &mut FunctionDefineContext) {
         /*
          * 查找 name id
          * */
         let name_token = self.function_find_param_name();
         let (typ_attr, lengthen_attr, type_token) = self.function_find_param_type(None);
+        if let FunctionParamLengthenAttr::Lengthen = lengthen_attr {
+            *define_context.has_lengthen_param_mut() = true;
+        };
         self.grammar_context().cb.function_define_param(
             FunctionDefineParamContext::new_with_all(
                 name_token.token_value(), type_token

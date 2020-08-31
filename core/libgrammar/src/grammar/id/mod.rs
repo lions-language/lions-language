@@ -11,7 +11,6 @@ use crate::token::{TokenType, TokenData};
 impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, CB> {
     pub fn id_process_id(&mut self, desc_ctx: DescContext) {
         let mut token_value = self.take_next_one().token_value();
-        // println!("before: {:?}", &token_value);
         let context = LoadVariantContext::new_with_all(
             token_value, None, desc_ctx.typ_attr.clone());
         match self.skip_white_space_token() {
@@ -19,14 +18,10 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                 /*
                  * 查看下一个 token
                  * */
-                /*
                 let token = tp.as_ref::<T, CB>();
                 if let TokenType::ThreePoint = token.context_token_type() {
                     self.id_process_three_point(desc_ctx);
                 };
-                */
-                let token = tp.as_ref::<T, CB>();
-                // println!("after: {:?}", token.context_ref().token_type());
             },
             None => {
             }
@@ -67,7 +62,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
          * 查找闭合的 `]`
          * */
         let v = self.expect_and_take_next_token(TokenType::RightSquareBrackets);
-        println!("{:?}", lengthen_index);
+        // println!("{:?}", lengthen_index);
     }
 
     pub fn id_process(&mut self, desc_ctx: DescContext) {
