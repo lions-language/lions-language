@@ -31,9 +31,30 @@ impl<'a, F: Compile> Compiler<'a, F> {
         /*
          * 1. 查找函数声明
          * */
-        let name_data = name.token_data().expect("should not happend");
-        let func_str = extract_token_data!(name_data, Id);
+        // let name_data = name.token_data().expect("should not happend");
+        // let func_str = extract_token_data!(name_data, Id);
+        let mut param_typs = call_context.param_typs_clone();
+        let mut func_param_data = None;
+        let param_typs_len = param_typs.len();
+        if param_typs_len == 1 {
+            let (typ, typ_attr) = param_typs.remove(0);
+            func_param_data = Some(FunctionParamData::Single(
+                FunctionParamDataItem::new(typ, typ_attr)));
+        } else if param_typs_len > 1 {
+            let mut items = Vec::new();
+            while !param_typs.is_empty() {
+                let (typ, typ_attr) = param_typs.remove(0);
+                items.push(FunctionParamDataItem::new(typ, typ_attr));
+            }
+            func_param_data = Some(FunctionParamData::Multi(items));
+        }
+        let func_name = call_context.func_name_ref().as_ref().expect(
+            "call_context.func_name_ref(): should not happend").as_ref();
+        let func_str = FunctionSplice::get_function_without_return_string_by_type(
+            func_name
+            , &func_param_data.as_ref(), &call_context.typ_ref().as_ref());
         let find_func_context = FindFunctionContext {
+            func_name: func_name,
             typ: call_scope_context.typ_ref().as_ref(),
             package_typ: call_scope_context.package_type_ref().as_ref(),
             func_str: &func_str,

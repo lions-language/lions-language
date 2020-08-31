@@ -55,6 +55,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                  * 查找方法
                  * */
                 let find_func_context = FindFunctionContext {
+                    func_name: &func_name,
                     typ: Some(&input_typ),
                     package_typ: input_package_type.as_ref(),
                     func_str: &expect_func_str,

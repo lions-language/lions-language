@@ -28,7 +28,11 @@ impl Handler {
 
     pub fn add_function(&mut self, context: AddFunctionContext
         , handle: Option<FindFunctionHandle>, func: Function) -> AddFunctionResult {
-        self.container.add(context.module_str, context.func_str, handle, func);
+        if context.is_overload.clone() {
+            self.container.add(context.module_str, context.func_str, handle, func);
+        } else {
+            self.container.add(context.module_str, context.func_name, handle, func);
+        }
         AddFunctionResult::Success
     }
 

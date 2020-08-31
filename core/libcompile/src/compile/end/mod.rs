@@ -17,6 +17,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
              * */
             let package_typ = PackageType::new(PackageTypeValue::Crate);
             let context = FindFunctionContext{
+                func_name: "main",
                 typ: None,
                 package_typ: Some(&package_typ),
                 func_str: "main()",

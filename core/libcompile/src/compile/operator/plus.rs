@@ -163,6 +163,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
          * 查找方法声明
          * */
         let func_ptr = match self.function_control.find_function(&FindFunctionContext{
+            func_name: consts::OPERATOR_PLUS_FUNCTION_NAME,
             typ: Some(&left_type),
             package_typ: None,
             func_str: &statement_str,

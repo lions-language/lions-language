@@ -41,7 +41,8 @@ pub enum LoadVariantContextValue {
 pub struct LoadVariantContext {
     first: TokenValue,
     other: Option<Vec<TokenValue>>,
-    typ_attr: TypeAttrubute
+    typ_attr: TypeAttrubute,
+    lengthen_offset: usize
 }
 
 #[derive(Debug, FieldGet, FieldGetClone

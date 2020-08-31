@@ -314,6 +314,7 @@ pub enum AddFunctionResult {
  * */
 #[derive(Debug)]
 pub struct FindFunctionContext<'a> {
+    pub func_name: &'a str,
     pub typ: Option<&'a Type>,
     pub package_typ: Option<&'a PackageType>,
     pub func_str: &'a str,
