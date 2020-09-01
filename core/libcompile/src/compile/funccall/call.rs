@@ -464,10 +464,18 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                                 , addr_value.addr_ref().scope_clone()));
                                         Address::new(addr)
                                         */
+                                        let func_define_lengthen_offset =
+                                            addr_value.addr_ref().lengthen_offset_clone();
+                                        let lengthen_offset = if lengthen_param_length > 0
+                                            && func_define_lengthen_offset > 0 {
+                                            lengthen_param_length - 1 - func_define_lengthen_offset
+                                        } else {
+                                            0
+                                        };
+                                        println!("{}", lengthen_offset);
                                         let addr = match return_ref_params.remove(
                                             &(addr_value.addr_ref().index_clone() as usize
-                                                + (lengthen_param_length - 1
-                                                    - addr_value.addr_ref().lengthen_offset_clone()))) {
+                                                + lengthen_offset)) {
                                             Some(addr) => {
                                                 addr
                                             },
