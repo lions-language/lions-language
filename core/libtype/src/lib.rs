@@ -2,18 +2,16 @@ use libcommon::ptr::RefPtr;
 use libmacro::{FieldGet, FieldGetClone
     , FieldGetMove, NewWithAll};
 use crate::primeval::{PrimevalType, PrimevalData};
-use crate::structure::{StructureData};
+use crate::structure::{StructureData, StructDefine};
 use std::cmp::{PartialEq, Eq};
 use std::hash::Hash;
 
-#[derive(Debug)]
-pub struct StructObject {
-    pub name: String
-}
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct StructObject(RefPtr);
 
 impl StructObject {
-    pub fn name_str(&self) -> &str {
-        &self.name
+    pub fn as_ref(&self) -> &StructDefine {
+        self.0.as_ref::<StructDefine>()
     }
 }
 
@@ -28,13 +26,13 @@ pub struct Structure {
      *  compile 阶段会通过 mod1 从 struct_control 中找到 StructObject 指针, 然后通过这个指针, 构造
      *  Type对象, 调用 function_control 获取方法定义
      * */
-    struct_obj_ptr: RefPtr
+    struct_obj: StructObject
 }
 
 impl Structure {
-    pub fn new(struct_obj_ptr: RefPtr) -> Self {
+    pub fn new(struct_obj: StructObject) -> Self {
         Self {
-            struct_obj_ptr: struct_obj_ptr
+            struct_obj: struct_obj
         }
     }
 }

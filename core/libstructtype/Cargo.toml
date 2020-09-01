@@ -1,0 +1,16 @@
+# 宿主语言实现的类型
+
+[package]
+name = "libstructtype"
+version = "0.1.0"
+authors = ["lions-language <lions_language@163.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+phf = { version = "0.7.24", features = ["macros"] }
+lazy_static = { version = "1.1.1" }
+libmacro = { path = "../libmacro" }
+libcommon = { path = "../libcommon" }
+libtype = { path = "../libtype" }
