@@ -122,6 +122,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                     },
                     FunctionParamData::Multi(items) => {
                         let param_len = func_statement.get_func_param_len();
+                        // unimplemented!();
                         /*
                          * 如果 index > param_len => 说明最后一个是变长参数
                          * 那么当 index < param_len 的时候, 按照 items[index] 进行计算

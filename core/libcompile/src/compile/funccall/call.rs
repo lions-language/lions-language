@@ -89,6 +89,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
         let mut param_refs = VecDeque::new();
         let mut ref_param_addrs = VecDeque::new();
         let mut return_ref_params = HashMap::new();
+        let mut lengthen_param_length = 0;
         match func_statement.func_param_ref() {
             Some(fp) => {
                 /*
@@ -106,6 +107,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                         }
                         match item.lengthen_attr_ref() {
                             FunctionParamLengthenAttr::Lengthen => {
+                                lengthen_param_length = param_len;
                                 for i in 0..param_len {
                                     /*
                                     let (typ, typ_attr, addr_value, value_context)
@@ -235,6 +237,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                         (statement_param_len - 1
                                             , param_len - statement_param_len + 1)
                                     };
+                                lengthen_param_length = lengthen_param_len;
                                 let mut index = param_len - 1;
                                 /*
                                  * 绑定变长参数
@@ -242,8 +245,13 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                 let lengthen_param_start = fixed_param_len - 1;
                                 if lengthen_param_len > 0 {
                                     let mut params = VecDeque::with_capacity(lengthen_param_len);
-                                    for i in 0..lengthen_param_len {
-                                        let item = items.get(lengthen_param_start+i).unwrap();
+                                    for _ in 0..lengthen_param_len {
+                                        // let item = items.get(lengthen_param_start+i).unwrap();
+                                        /*
+                                         * 因为只有最后一个参数才可能是变长的,
+                                         * 所以 item 一定是最后一个
+                                         * */
+                                        let item = items.last().unwrap();
                                         params.push_front(
                                             match self.handle_call_function_get_top_addr(item) {
                                             Ok(v) => v,
@@ -251,7 +259,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                         });
                                     }
                                     for i in 0..lengthen_param_len {
-                                        let item = items.get(lengthen_param_start+i).unwrap();
+                                        // let item = items.get(lengthen_param_start+i).unwrap();
+                                        let item = items.last().unwrap();
                                         /*
                                         let (typ, typ_attr, addr_value, value_context) = 
                                             match self.handle_call_function_get_top_addr(item) {
@@ -455,10 +464,18 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                                 , addr_value.addr_ref().scope_clone()));
                                         Address::new(addr)
                                         */
-                                        let addr = return_ref_params.remove(
+                                        let addr = match return_ref_params.remove(
                                             &(addr_value.addr_ref().index_clone() as usize
-                                                + addr_value.addr_ref().lengthen_offset_clone()))
-                                        .expect("should not happend");
+                                                + (lengthen_param_length - 1
+                                                    - addr_value.addr_ref().lengthen_offset_clone()))) {
+                                            Some(addr) => {
+                                                addr
+                                            },
+                                            None => {
+                                                return DescResult::Error(format!(
+                                                        "variable length parameter out of bounds"));
+                                            }
+                                        };
                                         Address::new(addr)
                                     },
                                     FunctionReturnRefParam::Index(_) => {

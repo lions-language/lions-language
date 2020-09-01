@@ -19,7 +19,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                  * */
                 let token = tp.as_ref::<T, CB>();
                 if let TokenType::ThreePoint = token.context_token_type() {
-                    self.id_process_three_point(desc_ctx.clone());
+                    lengthen_offset = self.id_process_three_point();
                 };
             },
             None => {
@@ -36,7 +36,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         }
     }
 
-    pub fn id_process_three_point(&mut self, desc_ctx: DescContext) {
+    pub fn id_process_three_point(&mut self) -> usize {
         /*
          * 跳过 ...
          * */
@@ -58,12 +58,12 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         let next = self.take_next_one();
         let primeval_data = extract_token_data!(
             next.token_value().token_data().unwrap(), Const);
-        let lengthen_index = primeval_data.fetch_number_to_usize();
+        let lengthen_offset = primeval_data.fetch_number_to_usize();
         /*
          * 查找闭合的 `]`
          * */
-        let v = self.expect_and_take_next_token(TokenType::RightSquareBrackets);
-        // println!("{:?}", lengthen_index);
+        self.expect_and_take_next_token(TokenType::RightSquareBrackets);
+        lengthen_offset
     }
 
     pub fn id_process(&mut self, desc_ctx: DescContext) {
