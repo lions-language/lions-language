@@ -53,13 +53,11 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 }
                 func_param_data = Some(FunctionParamData::Multi(items));
             }
-            let func_name = call_context.func_name_ref().as_ref().expect(
-                "call_context.func_name_ref(): should not happend").as_ref();
             let func_str = FunctionSplice::get_function_without_return_string_by_type(
-                func_name
+                call_context.func_name_ref_unchecked()
                 , &func_param_data.as_ref(), &call_context.typ_ref().as_ref());
             let find_func_context = FindFunctionContext {
-                func_name: func_name,
+                func_name: call_context.func_name_ref_unchecked(),
                 typ: call_context.typ_ref().as_ref(),
                 package_typ: call_context.package_typ_ref().as_ref(),
                 func_str: &func_str,

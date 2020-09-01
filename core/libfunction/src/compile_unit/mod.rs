@@ -11,12 +11,14 @@ pub struct Handler {
 
 impl Handler {
     pub fn is_exists(&self, context: &FindFunctionContext) -> (bool, FindFunctionHandle) {
-        self.container.is_exists(&context.module_str, &context.func_str)
+        self.container.is_exists(&context.module_str
+            , &context.func_name, &context.func_str)
     }
 
     pub fn find_function<'a>(&'a self, context: &FindFunctionContext
         , handle: &'a Option<FindFunctionHandle>) -> FindFunctionResult {
-        match self.container.find(&context.module_str, &context.func_str, handle) {
+        match self.container.find(&context.module_str, &context.func_name
+            , &context.func_str, handle) {
             Some(f) => {
                 FindFunctionResult::Success(FindFuncSuccess::new(f))
             },

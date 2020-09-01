@@ -61,15 +61,29 @@ impl std::convert::Into<u8> for HandleType {
 }
 
 impl Container {
-    pub fn is_exists(&self, module_str: &str, func_str: &str) -> (bool, FindFunctionHandle) {
+    pub fn is_exists(&self, module_str: &str, func_name: &str
+        , func_str: &str) -> (bool, FindFunctionHandle) {
         match self.mods.get(module_str) {
             Some(m) => {
-                match m.funcs.get(func_str) {
+                match m.funcs.get(func_name) {
                     Some(f) => {
-                        (true, FindFunctionHandle::from_ref_typ::<Function>(f, HandleType::Function.into()))
+                        (true
+                         , FindFunctionHandle::from_ref_typ::<Function>(
+                             f, HandleType::Function.into()))
                     },
                     None => {
-                        (false, FindFunctionHandle::from_ref_typ::<FunctionSet>(m, HandleType::FunctionSet.into()))
+                        match m.funcs.get(func_str) {
+                            Some(f) => {
+                                (true
+                                 , FindFunctionHandle::from_ref_typ::<Function>(
+                                     f, HandleType::Function.into()))
+                            },
+                            None => {
+                                (false
+                                 , FindFunctionHandle::from_ref_typ::<FunctionSet>(
+                                     m, HandleType::FunctionSet.into()))
+                            }
+                        }
                     }
                 }
             },
@@ -79,7 +93,8 @@ impl Container {
         }
     }
 
-    pub fn find<'a, 'b: 'a>(&'b self, module_str: &str, func_str: &str
+    pub fn find<'a, 'b: 'a>(&'b self, module_str: &str, func_name: &str
+        , func_str: &str
         , handle: &'a Option<FindFunctionHandle>) -> Option<&'a Function> {
         match handle {
             Some(h) => {
@@ -99,7 +114,18 @@ impl Container {
             None => {
                 match self.mods.get(module_str) {
                     Some(m) => {
-                        m.funcs.get(func_str)
+                        /*
+                         * 首先通过 func_name 查找
+                         * 保证可以找到那些不需要重载的函数被找到
+                         * */
+                        match m.funcs.get(func_name) {
+                            Some(f) => {
+                                Some(f)
+                            },
+                            None => {
+                                m.funcs.get(func_str)
+                            }
+                        }
                     },
                     None => {
                         None

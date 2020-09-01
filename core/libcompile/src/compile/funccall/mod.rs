@@ -26,7 +26,7 @@ use std::collections::VecDeque;
 
 impl<'a, F: Compile> Compiler<'a, F> {
     pub fn handle_call_function_prepare(&mut self, call_scope_context: CallFuncScopeContext
-        , name: TokenValue, call_context: &mut GrammarCallFunctionContext) -> DescResult {
+        , call_context: &mut GrammarCallFunctionContext) -> DescResult {
         self.scope_context.enter_func_call();
         /*
          * 1. 查找函数声明
@@ -48,19 +48,17 @@ impl<'a, F: Compile> Compiler<'a, F> {
             }
             func_param_data = Some(FunctionParamData::Multi(items));
         }
-        let func_name = call_context.func_name_ref().as_ref().expect(
-            "call_context.func_name_ref(): should not happend").as_ref();
         let func_str = FunctionSplice::get_function_without_return_string_by_type(
-            func_name
+            call_context.func_name_ref_unchecked()
             , &func_param_data.as_ref(), &call_context.typ_ref().as_ref());
+        call_context.set_desc_ctx(call_scope_context.desc_ctx_clone());
         let find_func_context = FindFunctionContext {
-            func_name: func_name,
+            func_name: call_context.func_name_ref_unchecked(),
             typ: call_scope_context.typ_ref().as_ref(),
             package_typ: call_scope_context.package_type_ref().as_ref(),
             func_str: &func_str,
             module_str: self.module_stack.current().name_ref()
         };
-        call_context.set_desc_ctx(call_scope_context.desc_ctx_clone());
         let (exists, handle) = self.function_control.is_exists(&find_func_context);
         if exists {
             let h = Some(handle);
@@ -81,7 +79,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
         } else {
             let (package_type, package_str, _, typ) = call_scope_context.fields_move();
             call_context.set_typ(typ);
-            call_context.set_func_name(func_str);
+            // call_context.set_func_name(func_str);
             call_context.set_package_str(package_str);
             call_context.set_package_typ(package_type);
             /*
@@ -99,8 +97,10 @@ impl<'a, F: Compile> Compiler<'a, F> {
             return;
         }
         /*
-         * 在当前函数被调用的时候, 只有内置函数才能找到函数的声明
-         * 因为内置函数只检测函数名, 而不检测函数参数
+         * 在当前函数被调用的时候, 如下几种将被找到
+         *  1. is_overload 为 false 的函数 (只检测函数名)
+         *  2. 没有参数的函数
+         *  3. 内置函数 (只查找函数名, 不管参数)
          * */
         let func = func_ptr.as_ref::<Function>();
         let func_statement = func.func_statement_ref();

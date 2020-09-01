@@ -325,8 +325,8 @@ impl<'a, F: Compile> Grammar for Compiler<'a, F> {
     }
 
     fn call_function_prepare(&mut self, scope_context: CallFuncScopeContext
-        , name: TokenValue, call_context: &mut GrammarCallFunctionContext) -> DescResult {
-        self.handle_call_function_prepare(scope_context, name, call_context)
+        , call_context: &mut GrammarCallFunctionContext) -> DescResult {
+        self.handle_call_function_prepare(scope_context, call_context)
     }
 
     fn call_function_param_before_expr(&mut self, index: usize

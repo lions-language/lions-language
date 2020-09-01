@@ -16,8 +16,11 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
          * */
         let token = self.take_next_one();
         let name = token.token_value();
+        let name_data = name.token_data().expect("should not happend");
+        let func_name = extract_token_data!(name_data, Id);
+        call_context.func_name = Some(func_name);
         if let DescResult::Error(s) = self.cb().call_function_prepare(scope_context
-            , name, &mut call_context) {
+            , &mut call_context) {
             self.panic(&s);
         };
         /*

@@ -81,6 +81,9 @@ impl CallFunctionContext {
     pub fn set_desc_ctx(&mut self, desc_ctx: DescContext) {
         *&mut self.desc_ctx = desc_ctx;
     }
+    pub fn func_name_ref_unchecked(&self) -> &str {
+        self.func_name.as_ref().expect("CallFunctionContext func_name_ref_unchecked should not happend")
+    }
 }
 
 #[derive(Debug, FieldGet, NewWithAll, FieldGetMove
@@ -224,7 +227,7 @@ pub trait Grammar {
         println!("named function define end");
     }
     fn call_function_prepare(&mut self, _context: CallFuncScopeContext
-        , _name: TokenValue, _: &mut CallFunctionContext) -> DescResult {
+        , _: &mut CallFunctionContext) -> DescResult {
         DescResult::Success
     }
     fn call_function_param_before_expr(&mut self, _index: usize
