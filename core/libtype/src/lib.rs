@@ -18,7 +18,8 @@ impl StructObject {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq
+    , FieldGet, FieldGetClone)]
 pub struct Structure {
     /*
      * 因为每一个结构的类型信息在整个系统中只有一份, 所以这里将结构的内存指针存储下来
