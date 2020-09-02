@@ -8,7 +8,7 @@ pub struct StructMethod {
 }
 
 #[derive(Debug, FieldGet
-    , FieldGetMove)]
+    , FieldGetMove, Clone)]
 pub struct StructField {
     index: usize
 }
@@ -17,12 +17,11 @@ pub struct StructField {
     , FieldGetMove)]
 pub struct StructMember {
     index: usize,
-    order: Vec<String>,
     members: HashMap<String, StructField>
 }
 
 #[derive(Debug, FieldGet
-    , FieldGetMove)]
+    , FieldGetMove, NewWithAll)]
 pub struct StructDefine {
     name: String,
     member: StructMember
@@ -33,4 +32,5 @@ pub struct StructureData {
 }
 
 mod member;
+mod field;
 

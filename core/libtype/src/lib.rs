@@ -10,6 +10,9 @@ use std::hash::Hash;
 pub struct StructObject(RefPtr);
 
 impl StructObject {
+    pub fn from_ref(define: &StructDefine) -> Self {
+        Self(RefPtr::from_ref::<StructDefine>(define))
+    }
     pub fn as_ref(&self) -> &StructDefine {
         self.0.as_ref::<StructDefine>()
     }

@@ -10,7 +10,7 @@ impl Type {
                 v.typ.to_str()
             },
             TypeValue::Structure(sp) => {
-                sp.struct_obj_ptr.as_ref::<StructDefine>().name_ref()
+                sp.struct_obj.as_ref().name_ref()
             },
             TypeValue::Any => {
                 consts::ANY_TYPE
