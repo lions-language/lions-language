@@ -24,7 +24,14 @@ impl StructMember {
                  * 将结构体展开
                  * */
                 let struct_define = s.struct_obj.as_ref();
-                let members = struct_define.member_ref().members_ref();
+                let members = match struct_define.member_ref() {
+                    Some(ms) => {
+                        ms.members_ref()
+                    },
+                    None => {
+                        return;
+                    }
+                };
                 for (sub_name, field) in members.iter() {
                     let n = format!("{}.{}", name, sub_name);
                     self.members.insert(n
@@ -91,8 +98,8 @@ mod test {
                     TypeValue::Primeval(Primeval::new(PrimevalType::Uint64))
                     , TypeAttrubute::Empty));
         }
-        let cert_define = StructDefine::new_with_all(String::from("cert")
-            , cert_m);
+        let cert_define = StructDefine::new_with_all(String::from("user_info")
+            , Some(cert_m));
         /*
          * add root
          * */

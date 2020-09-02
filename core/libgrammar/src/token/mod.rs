@@ -49,6 +49,8 @@ pub enum TokenType {
     Var,
     // return
     Return,
+    // struct
+    Structure,
     // ->
     RightArrow,
     // (

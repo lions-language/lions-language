@@ -24,7 +24,7 @@ pub struct StructMember {
     , FieldGetMove, NewWithAll)]
 pub struct StructDefine {
     name: String,
-    member: StructMember
+    member: Option<StructMember>
 }
 
 #[derive(Debug, Clone)]

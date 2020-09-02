@@ -76,6 +76,13 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
         self.id_push_keyword_token(TokenType::Return);
     }
 
+    fn id_kw_struct(&mut self) {
+        /*
+         * struct
+         * */
+        self.id_push_keyword_token(TokenType::Structure);
+    }
+
     fn id_primeval_type(&mut self, typ: PrimevalType) {
         self.push_nooperate_nodata_token_to_token_buffer(TokenType::PrimevalType(typ));
     }
@@ -123,6 +130,28 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
             "func"|"fn" => {
                 self.id_kw_func();
             },
+            "let" => {
+                self.id_kw_let();
+            },
+            "var" => {
+                self.id_kw_var();
+            },
+            "return" => {
+                self.id_kw_return();
+            },
+            "struct" => {
+                self.id_kw_struct();
+            },
+            _ => {
+                self.id(&s);
+            }
+        }
+    }
+}
+
+mod strfmt;
+mod id;
+
             /*
             "i8"|"int8" => {
                 self.id_primeval_type(PrimevalType::Int8);
@@ -158,22 +187,4 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
                 self.id_primeval_type(PrimevalType::Str);
             },
             */
-            "let" => {
-                self.id_kw_let();
-            },
-            "var" => {
-                self.id_kw_var();
-            },
-            "return" => {
-                self.id_kw_return();
-            },
-            _ => {
-                self.id(&s);
-            }
-        }
-    }
-}
-
-mod strfmt;
-mod id;
 

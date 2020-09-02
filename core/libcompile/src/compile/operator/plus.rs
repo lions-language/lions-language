@@ -117,6 +117,9 @@ impl<'a, F: Compile> Compiler<'a, F> {
             }
         };
         // let left_expect_type = self.compile_context.expect_type_ref().clone();
+        let (left_type, left_typ_attr, left_addr_value) = self.fetch_value_buffer(
+            left, &expect_type);
+        /*
         let (left_type, left_typ_attr, left_addr_value) = match self.binary_type_match(
             left, &expect_type
             , is_auto_call_totype) {
@@ -127,6 +130,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 return e;
             }
         };
+        */
         let left_typ_attr = if value_left_typ_attr.is_ref() {
             value_left_typ_attr
         } else {
@@ -134,6 +138,9 @@ impl<'a, F: Compile> Compiler<'a, F> {
         };
         // let left_addr_value = left_addr_value.clone_with_scope_plus(1);
         // let right_expect_type = self.compile_context.expect_type_ref().clone();
+        let (right_type, right_typ_attr, right_addr_value) = self.fetch_value_buffer(
+            right, &expect_type);
+        /*
         let (right_type, right_typ_attr, right_addr_value) = match self.binary_type_match(
             right, &expect_type
             , is_auto_call_totype) {
@@ -144,6 +151,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 return e;
             }
         };
+        */
         let right_typ_attr = if value_right_typ_attr.is_ref() {
             value_right_typ_attr
         } else {
