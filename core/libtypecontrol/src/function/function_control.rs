@@ -55,7 +55,7 @@ impl FunctionControl {
                     let package_typ = package_typ.expect("must be specify package type");
                     match package_typ.typ_ref() {
                         PackageTypeValue::Crate => {
-                            &mut self.function_control
+                            &mut self.notype_function_control
                         },
                         _ => {
                             /*
@@ -90,7 +90,7 @@ impl FunctionControl {
                 let package_typ = package_typ.expect("must be specify package type");
                 match package_typ.typ_ref() {
                     PackageTypeValue::Crate => {
-                        &mut self.function_control
+                        &mut self.notype_function_control
                     },
                     _ => {
                         unimplemented!();
@@ -104,7 +104,7 @@ impl FunctionControl {
         Self {
             primeval_control: PrimevalControl::new(),
             primeval_func_control: PrimevalFuncControl::new(),
-            function_control: NotypeFunctionControl::new()
+            notype_function_control: NotypeFunctionControl::new()
         }
     }
 }

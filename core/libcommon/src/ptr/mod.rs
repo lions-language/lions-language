@@ -1,6 +1,7 @@
 use std::cmp::{PartialEq, Eq};
+use std::hash::Hash;
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct RefPtr{
     ptr: usize,
     typ: u8
