@@ -1,25 +1,25 @@
 use libtype::{TypeAttrubute};
 use libtype::function::{FunctionParamLengthenAttr};
-use super::{GrammarParser, Grammar
-    , FunctionDefineParamContext};
+use super::{GrammarParser, Grammar};
 use crate::grammar::{FunctionDefineParamMutContext
-    , TypeToken, FunctionDefineContext};
+    , TypeToken, StructDefineContext};
 use crate::lexical::{CallbackReturnStatus, TokenVecItem, TokenPointer};
 use crate::token::{TokenType};
 
 impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, CB> {
-    pub fn function_parse_param_list(&mut self, define_context: &mut FunctionDefineContext) {
+    pub fn struct_parse_field_list(&mut self, define_context: &mut StructDefineContext) {
         /*
          * 查找 (
          * */
         self.expect_next_token(|parser, t| {
             let token = t.as_ref::<T, CB>();
             match token.context_token_type() {
-                TokenType::LeftParenthese => {
+                TokenType::LeftBigParenthese => {
                     parser.skip_next_one();
                 },
                 _ => {
-                    parser.panic(&format!("expect `(`, but found {:?}", token.context_token_type()));
+                    parser.panic(&format!(
+                            "expect `{}`, but found {:?}", "{", token.context_token_type()));
                 }
             }
         }, "`(`");
@@ -31,16 +31,16 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                 tp
             },
             None => {
-                self.panic("expect `)` or params, but arrive IO EOF");
+                self.panic("expect `}` or fields, but arrive IO EOF");
                 return;
             }
         };
         let next = tp.as_ref::<T, CB>();
         match next.context_ref().token_type() {
             TokenType::Id => {
-                self.function_find_params(define_context);
+                self.struct_find_fields(define_context);
             },
-            TokenType::RightParenthese => {
+            TokenType::RightBigParenthese => {
                 /*
                  * 方法没有参数
                  * 跳过 )
@@ -53,19 +53,18 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                  * */
                 self.panic(
                     &format!(
-                        "expect `)` or id, after `(`, but found: {:?}"
+                        "expect `{}` or id, after `{}`, but found: {:?}"
+                        , "}", "{"
                         , next.context_ref().token_type()));
                 return;
             }
         }
     }
 
-    fn function_find_params(&mut self, define_context: &mut FunctionDefineContext) {
-        let mut param_no = 0;
+    fn struct_find_fields(&mut self, define_context: &mut StructDefineContext) {
         let mut mut_context = FunctionDefineParamMutContext::default();
         loop {
-            self.function_find_param(param_no, &mut mut_context, define_context);
-            param_no += 1;
+            self.struct_find_field(&mut mut_context, define_context);
             let tp = match self.lookup_next_one_ptr() {
                 Some(tp) => {
                     tp
@@ -75,7 +74,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                      * id as type 后面是 ) 或者 ,
                      * 但是遇到了 IO EOF => 语法错误
                      * */
-                    self.panic("expect `,` or `)`, but arrive IO EOF");
+                    self.panic("expect `,` or `}`, but arrive IO EOF");
                     return;
                 }
             };
@@ -88,7 +87,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                     self.skip_next_one();
                     continue;
                 },
-                TokenType::RightParenthese => {
+                TokenType::RightBigParenthese => {
                     /*
                      * name type)
                      * */
@@ -101,7 +100,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         }
     }
 
-    fn function_find_param_name(&mut self) -> TokenVecItem<T, CB> {
+    fn struct_find_field_name(&mut self) -> TokenVecItem<T, CB> {
         /*
          * 查找 name id
          * */
@@ -114,15 +113,17 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                     /*
                      * 期望一个id作为参数名, 但是token不是id => 语法错误
                      * */
-                    parser.panic(&format!("expect id as param name, but found {:?}", token.context_ref().token_type()));
+                    parser.panic(&format!(
+                            "expect id as field name, but found {:?}"
+                            , token.context_ref().token_type()));
                     return;
                 }
             }
-        }, "id as param name");
+        }, "id as field name");
         self.take_next_one()
     }
 
-    fn function_find_param_type_with_token(&mut self, t: TokenPointer) 
+    fn struct_find_field_type_with_token(&mut self, t: TokenPointer) 
         -> (TypeAttrubute, FunctionParamLengthenAttr, TypeToken) {
         let token = t.as_ref::<T, CB>();
         match token.context_ref().token_type() {
@@ -145,7 +146,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         }
     }
 
-    fn function_find_param_type(&mut self, tp: Option<TokenPointer>)
+    fn struct_find_field_type(&mut self, tp: Option<TokenPointer>)
         -> (TypeAttrubute, FunctionParamLengthenAttr, TypeToken) {
         /*
          * 如果已经获取了next token, 那么直接传入 token
@@ -153,31 +154,33 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
          * */
         match tp {
             Some(tp) => {
-                self.function_find_param_type_with_token(tp)
+                self.struct_find_field_type_with_token(tp)
             },
             None => {
                 let tp = self.expect_next_token(|_, _| {
                 }, "type");
-                self.function_find_param_type_with_token(tp.expect("should not happend"))
+                self.struct_find_field_type_with_token(tp.expect("should not happend"))
             }
         }
     }
 
-    fn function_find_param(&mut self, param_no: usize
+    fn struct_find_field(&mut self
         , mut_context: &mut FunctionDefineParamMutContext
-        , define_context: &mut FunctionDefineContext) {
+        , define_context: &mut StructDefineContext) {
         /*
          * 查找 name id
          * */
-        let name_token = self.function_find_param_name();
-        let (typ_attr, lengthen_attr, type_token) = self.function_find_param_type(None);
+        let name_token = self.struct_find_field_name();
+        let (typ_attr, lengthen_attr, type_token) = self.struct_find_field_type(None);
         if let FunctionParamLengthenAttr::Lengthen = lengthen_attr {
-            *define_context.has_lengthen_param_mut() = true;
+            // *define_context.has_lengthen_param_mut() = true;
         };
-        self.grammar_context().cb.function_define_param(
+        /*
+        self.grammar_context().cb.struct_define_field(
             FunctionDefineParamContext::new_with_all(
                 name_token.token_value(), type_token
                 , typ_attr, lengthen_attr, param_no), mut_context);
+        */
     }
 }
 

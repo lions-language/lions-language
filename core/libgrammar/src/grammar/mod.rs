@@ -144,6 +144,11 @@ pub struct FunctionDefineContext {
     has_lengthen_param: bool
 }
 
+#[derive(Debug, Default, FieldGet, NewWithAll, FieldGetMove
+    , FieldGetClone)]
+pub struct StructDefineContext {
+}
+
 #[derive(Debug)]
 pub enum TypeToken {
     Single(TokenValue),
@@ -265,8 +270,7 @@ pub trait Grammar {
 
 enum NextToken<T: FnMut() -> CallbackReturnStatus, CB: Grammar> {
     True(TokenVecItem<T, CB>),
-    False(TokenPointer),
-    None
+    False(TokenPointer)
 }
 
 pub struct GrammarContext<CB>
@@ -373,6 +377,23 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         }
     }
 
+    fn expect_and_take_next_token_unchecked(&mut self, token_type: TokenType)
+        -> TokenVecItem<T, CB> {
+        let tt = token_type.clone();
+        match self.expect_and_take_next_token(token_type) {
+            NextToken::<T, CB>::True(t) => {
+                t
+            },
+            NextToken::<T, CB>::False(tp) => {
+                let t = tp.as_ref::<T, CB>();
+                self.panic(&format!(
+                        "expect {:?}, but meet: {:?}"
+                        , tt, t.context_token_type()));
+                panic!();
+            }
+        }
+    }
+
     fn expect_and_take_next_token(&mut self, token_type: TokenType) -> NextToken<T, CB> {
         /*
          * 注意: 该方法会先去除全部的空白
@@ -386,7 +407,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                  * 期望下一个 token, 但是遇到了 IO EOF => 语法错误
                  * */
                 self.panic(&format!("expect {:?}, but arrive IO EOF", &token_type));
-                return NextToken::<T, CB>::None;
+                panic!();
             }
         };
         let next = tp.as_ref::<T, CB>();
