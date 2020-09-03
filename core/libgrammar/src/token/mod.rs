@@ -226,6 +226,10 @@ impl TokenValue {
         self.token_type.clone()
     }
 
+    pub fn token_data_unchecked(self) -> TokenData {
+        self.token_data.expect("should not happend")
+    }
+
     pub fn new(typ: TokenType, data: Option<TokenData>) -> Self {
         TokenValue::new_with_all(typ, data)
     }

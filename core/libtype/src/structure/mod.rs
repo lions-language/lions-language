@@ -8,20 +8,23 @@ pub struct StructMethod {
 }
 
 #[derive(Debug, FieldGet
-    , FieldGetMove, Clone)]
+    , FieldGetMove, Clone
+    , Default)]
 pub struct StructField {
     index: usize
 }
 
 #[derive(Debug, FieldGet
-    , FieldGetMove)]
+    , FieldGetMove
+    , Default)]
 pub struct StructMember {
     index: usize,
     members: HashMap<String, StructField>
 }
 
 #[derive(Debug, FieldGet
-    , FieldGetMove, NewWithAll)]
+    , FieldGetMove, NewWithAll
+    , Default)]
 pub struct StructDefine {
     name: String,
     member: Option<StructMember>

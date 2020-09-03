@@ -12,5 +12,6 @@ libhosttype = { path = "../libhosttype" }
 libcommon = { path = "../libcommon" }
 libtype = { path = "../libtype" }
 libtypecontrol = { path = "../libtypecontrol" }
+libstructtype = { path = "../libstructtype" }
 libresult = { path = "../libresult" }
 libmacro = { path = "../libmacro" }

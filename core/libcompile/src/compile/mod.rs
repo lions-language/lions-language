@@ -7,6 +7,7 @@ use libgrammar::grammar::{Grammar, CallFuncScopeContext
     , FunctionDefineParamMutContext
     , FunctionDefineReturnContext
     , FunctionDefineContext
+    , StructDefineFieldContext
     , ReturnStmtContext as GrammarReturnStmtContext};
 use libgrammar::token::{TokenValue};
 use libtype::{Type, Data
@@ -16,6 +17,7 @@ use libtype::function::{Function, CallFunctionParamAddr
     , FunctionParamDataItem
     , FunctionReturn
     , FunctionReturnDataAttr};
+use libtype::structure::{StructDefine};
 use libtype::instruction::{
     Jump, RemoveOwnership
     , PushParamRef
@@ -25,6 +27,7 @@ use libtype::module::Module;
 use libresult::*;
 use libtype::{AddressKey, AddressValue};
 use libtype::package::{PackageStr};
+use libstructtype::structure::{StructControl};
 use libmacro::{FieldGet, FieldGetClone, FieldGetMove, NewWithAll};
 use crate::address;
 use crate::address::PackageIndex;
@@ -270,6 +273,7 @@ impl InputContext {
 
 pub struct Compiler<'a, F: Compile> {
     function_control: FunctionControl,
+    struct_control: StructControl,
     module_stack: module_stack::ModuleStack,
     scope_context: ScopeContext,
     input_context: InputContext,
@@ -364,6 +368,19 @@ impl<'a, F: Compile> Grammar for Compiler<'a, F> {
     fn anonymous_block_end(&mut self) {
         self.process_anonymous_block_end();
     }
+
+    fn struct_define_start(&mut self, define: &mut StructDefine) {
+        self.process_struct_define_start(define);
+    }
+
+    fn struct_define_field(&mut self, context: StructDefineFieldContext
+        , define: &mut StructDefine) {
+        self.process_struct_define_field(context, define);
+    }
+
+    fn struct_define_end(&mut self, define: StructDefine) {
+        self.process_struct_define_end(define);
+    }
 }
 
 impl<'a, F: Compile> Compiler<'a, F> {
@@ -373,6 +390,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
         , package_str: &'a str) -> Self {
         Self {
             function_control: FunctionControl::new(),
+            struct_control: StructControl::new(),
             module_stack: module_stack::ModuleStack::new(module),
             scope_context: ScopeContext::new(),
             input_context: input_context,
@@ -404,6 +422,7 @@ mod process_var;
 mod process_return;
 mod variant;
 mod block;
+mod structure;
 
 #[cfg(test)]
 mod test {

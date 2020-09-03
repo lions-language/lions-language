@@ -1,13 +1,16 @@
 use libtype::{TypeAttrubute};
 use libtype::function::{FunctionParamLengthenAttr};
+use libtype::structure::{StructDefine};
 use super::{GrammarParser, Grammar};
 use crate::grammar::{FunctionDefineParamMutContext
+    , StructDefineFieldContext
     , TypeToken, StructDefineContext};
 use crate::lexical::{CallbackReturnStatus, TokenVecItem, TokenPointer};
 use crate::token::{TokenType};
 
 impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, CB> {
-    pub fn struct_parse_field_list(&mut self, define_context: &mut StructDefineContext) {
+    pub fn struct_parse_field_list(&mut self, define_context: &mut StructDefineContext
+        , define: &mut StructDefine) {
         /*
          * 查找 (
          * */
@@ -38,7 +41,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         let next = tp.as_ref::<T, CB>();
         match next.context_ref().token_type() {
             TokenType::Id => {
-                self.struct_find_fields(define_context);
+                self.struct_find_fields(define_context, define);
             },
             TokenType::RightBigParenthese => {
                 /*
@@ -61,10 +64,12 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         }
     }
 
-    fn struct_find_fields(&mut self, define_context: &mut StructDefineContext) {
+    fn struct_find_fields(&mut self, define_context: &mut StructDefineContext
+        , define: &mut StructDefine) {
         let mut mut_context = FunctionDefineParamMutContext::default();
         loop {
-            self.struct_find_field(&mut mut_context, define_context);
+            self.struct_find_field(&mut mut_context, define_context
+                , define);
             let tp = match self.lookup_next_one_ptr() {
                 Some(tp) => {
                     tp
@@ -166,7 +171,8 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
 
     fn struct_find_field(&mut self
         , mut_context: &mut FunctionDefineParamMutContext
-        , define_context: &mut StructDefineContext) {
+        , define_context: &mut StructDefineContext
+        , define: &mut StructDefine) {
         /*
          * 查找 name id
          * */
@@ -175,12 +181,10 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         if let FunctionParamLengthenAttr::Lengthen = lengthen_attr {
             // *define_context.has_lengthen_param_mut() = true;
         };
-        /*
         self.grammar_context().cb.struct_define_field(
-            FunctionDefineParamContext::new_with_all(
+            StructDefineFieldContext::new_with_all(
                 name_token.token_value(), type_token
-                , typ_attr, lengthen_attr, param_no), mut_context);
-        */
+                , typ_attr), define);
     }
 }
 

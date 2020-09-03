@@ -2,7 +2,8 @@ use crate::lexical::{LexicalParser, CallbackReturnStatus, TokenVecItem, TokenPoi
 use crate::token::{TokenType, TokenValue, TokenMethodResult};
 use libcommon::ptr::RefPtr;
 use libtype::{Type, PackageType, TypeAttrubute
-    , function::FunctionParamLengthenAttr};
+    , function::FunctionParamLengthenAttr
+    , structure::StructDefine};
 use libtype::function::{FindFunctionHandle};
 use libresult::*;
 use libtype::package::PackageStr;
@@ -254,10 +255,14 @@ pub trait Grammar {
         -> DescResult {
         DescResult::Success
     }
-    fn struct_define_start(&mut self, _: TokenValue) {
+    fn struct_define_start(&mut self, _: &mut StructDefine) {
         unimplemented!();
     }
-    fn struct_define_field(&mut self, _: StructDefineFieldContext) {
+    fn struct_define_field(&mut self, _: StructDefineFieldContext
+        , _: &mut StructDefine) {
+        unimplemented!();
+    }
+    fn struct_define_end(&mut self, _: StructDefine) {
         unimplemented!();
     }
     fn var_stmt_start(&mut self) {
