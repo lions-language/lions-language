@@ -35,7 +35,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
             /*
              * 不是 any 的情况下才需要判断类型
              * */
-            if it != et {
+            if !(it == et) {
                 /*
                  * 类型不匹配
                  *  查找需要转换的函数是否存在

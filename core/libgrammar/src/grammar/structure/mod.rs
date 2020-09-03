@@ -13,6 +13,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
          * 匹配 id (结构体名称)
          * */
         let name_token = self.expect_and_take_next_token_unchecked(TokenType::Id);
+        self.cb().struct_define_start(name_token.token_value());
         let mut define_context = StructDefineContext::default();
         self.struct_parse_field_list(&mut define_context);
     }

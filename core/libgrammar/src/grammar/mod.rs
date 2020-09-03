@@ -149,6 +149,13 @@ pub struct FunctionDefineContext {
 pub struct StructDefineContext {
 }
 
+#[derive(FieldGet, NewWithAll, FieldGetMove)]
+pub struct StructDefineFieldContext {
+    name_token: TokenValue,
+    type_token: TypeToken,
+    typ_attr: TypeAttrubute
+}
+
 #[derive(Debug)]
 pub enum TypeToken {
     Single(TokenValue),
@@ -246,6 +253,12 @@ pub trait Grammar {
         , _: CallFunctionContext)
         -> DescResult {
         DescResult::Success
+    }
+    fn struct_define_start(&mut self, _: TokenValue) {
+        unimplemented!();
+    }
+    fn struct_define_field(&mut self, _: StructDefineFieldContext) {
+        unimplemented!();
     }
     fn var_stmt_start(&mut self) {
         println!("var stmt start");
