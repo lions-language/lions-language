@@ -79,21 +79,11 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                                 , nt.context_token_type());
                         }
                     }
-                    match self.skip_white_space_token() {
-                        Some(tp) => {
-                            self.cb().call_function_param_before_expr(param_len, &mut call_context);
-                            self.expression_process(&tp, &ExpressContext::new(
-                                    GrammarParser::<T, CB>::expression_end_param_list));
-                            self.cb().call_function_param_after_expr(param_len, &mut call_context);
-                            param_len += 1;
-                        },
-                        None => {
-                            /*
-                             * 没有遇到闭合的 `)`, 就到达了文件 结尾 => 语法错误
-                             * */
-                            self.panic("expect expression, but found arrive IOEOF");
-                        }
-                    }
+                    self.cb().call_function_param_before_expr(param_len, &mut call_context);
+                    self.expression_process_without_token(&ExpressContext::new(
+                            GrammarParser::<T, CB>::expression_end_param_list));
+                    self.cb().call_function_param_after_expr(param_len, &mut call_context);
+                    param_len += 1;
                 }
                 // println!("param len: {}", param_len);
             }

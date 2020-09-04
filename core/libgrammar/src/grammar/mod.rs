@@ -165,6 +165,11 @@ pub struct StructDefineFieldContext {
     typ_attr: TypeAttrubute
 }
 
+#[derive(FieldGet, NewWithAll, FieldGetMove)]
+pub struct StructInitFieldContext {
+    name_token: TokenValue
+}
+
 #[derive(Debug)]
 pub enum TypeToken {
     Single(TokenValue),
@@ -271,6 +276,14 @@ pub trait Grammar {
         unimplemented!();
     }
     fn struct_define_end(&mut self, _: StructDefine) {
+        unimplemented!();
+    }
+    fn struct_init_field_before_expr(&mut self, _: &mut StructInitContext
+        , _: &StructInitFieldContext) {
+        unimplemented!();
+    }
+    fn struct_init_field_after_expr(&mut self, _: &mut StructInitContext
+        , _: StructInitFieldContext) {
         unimplemented!();
     }
     fn var_stmt_start(&mut self) {

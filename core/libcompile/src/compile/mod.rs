@@ -3,6 +3,8 @@ use libgrammar::grammar::{Grammar, CallFuncScopeContext
     , VarStmtContext, LoadVariantContext as GrammarLoadVariantContext
     , ConstNumberContext, ConstStringContext
     , CallFunctionContext as GrammarCallFunctionContext
+    , StructInitContext as GrammarStructInitContext
+    , StructInitFieldContext
     , FunctionDefineParamContext
     , FunctionDefineParamMutContext
     , FunctionDefineReturnContext
@@ -381,6 +383,16 @@ impl<'a, F: Compile> Grammar for Compiler<'a, F> {
     fn struct_define_end(&mut self, define: StructDefine) {
         self.process_struct_define_end(define);
     }
+
+    fn struct_init_field_before_expr(&mut self, init_context: &mut GrammarStructInitContext
+        , field_context: &StructInitFieldContext) {
+        self.process_struct_init_field_before_expr(init_context, field_context);
+    }
+
+    fn struct_init_field_after_expr(&mut self, init_context: &mut GrammarStructInitContext
+        , field_context: StructInitFieldContext) {
+        self.process_struct_init_field_after_expr(init_context, field_context);
+    }
 }
 
 impl<'a, F: Compile> Compiler<'a, F> {
@@ -423,6 +435,7 @@ mod process_return;
 mod variant;
 mod block;
 mod structure;
+mod structinit;
 
 #[cfg(test)]
 mod test {

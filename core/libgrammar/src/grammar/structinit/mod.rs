@@ -1,7 +1,7 @@
 use libresult::*;
 use super::{Grammar, GrammarParser
     , ExpressContext, CallFuncScopeContext
-    , StructInitContext
+    , StructInitContext, StructInitFieldContext
     , DescContext};
 use crate::lexical::{CallbackReturnStatus
     , TokenPointer, TokenVecItem};
@@ -72,7 +72,9 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
          * 查找 name
          * */
         let name_token = self.expect_and_take_next_token_unchecked(TokenType::Id);
-        let field_name = extract_token_data!(name_token.token_value().token_data_unchecked(), Id);
+        // let field_name = extract_token_data!(name_token.token_value().token_data_unchecked(), Id);
+        let field_conext = StructInitFieldContext::new_with_all(
+            name_token.token_value());
         /*
          * 查找 :
          * */
@@ -80,8 +82,12 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         /*
          * expr
          * */
+        self.cb().struct_init_field_before_expr(init_context
+            , &field_conext);
         self.expression_process_without_token(&ExpressContext::new(
                 GrammarParser::<T, CB>::expression_end_structinit_list));
+        self.cb().struct_init_field_after_expr(init_context
+            , field_conext);
     }
 }
 
