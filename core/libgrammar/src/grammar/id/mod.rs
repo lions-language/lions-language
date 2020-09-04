@@ -88,6 +88,11 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                         self.funccall_process(bl, scope_context);
                         return;
                     },
+                    TokenType::LeftBigParenthese => {
+                        let bl = self.restore_from_backtrack_point();
+                        self.structinit_process(bl, scope_context);
+                        return;
+                    },
                     TokenType::Point => {
                         unimplemented!();
                     },

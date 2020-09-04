@@ -87,6 +87,14 @@ impl CallFunctionContext {
     }
 }
 
+#[derive(Debug, FieldGet, FieldGetClone
+    , NewWithAll, FieldGetMove
+    , Default)]
+pub struct StructInitContext {
+    struct_name: String,
+    desc_ctx: DescContext
+}
+
 #[derive(Debug, FieldGet, NewWithAll, FieldGetMove
     , Clone, Default)]
 pub struct DescContext {
@@ -605,6 +613,7 @@ mod number;
 mod string;
 mod typ;
 mod structure;
+mod structinit;
 
 #[cfg(test)]
 mod test {
