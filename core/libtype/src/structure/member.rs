@@ -4,12 +4,12 @@ use std::collections::HashMap;
 
 impl StructMember {
     pub fn add(&mut self, name: String
-        , typ: &Type) {
+        , typ: Type) {
         /*
          * 该函数被调用之前, typ 已经被计算好(如果是第三方包,
          * 会先被加载到内存, 然后将引用地址写入到 Type::Structure g)
          * */
-        match typ.typ_ref() {
+        match typ.typ_clone() {
             TypeValue::Structure(s) => {
                 /*
                  * 是一个结构体
@@ -19,7 +19,7 @@ impl StructMember {
                 /*
                  * 将自身写入
                  * */
-                self.add_field(name.clone());
+                self.add_field(name.clone(), typ);
                 /*
                  * 将结构体展开
                  * */
@@ -43,14 +43,16 @@ impl StructMember {
                 /*
                  * 非嵌套类型 => 直接写入
                  * */
-                self.add_field(name);
+                self.add_field(name, typ);
             }
         }
     }
 
-    fn add_field(&mut self, name: String) {
+    fn add_field(&mut self, name: String
+        , typ: Type) {
         let field = StructField {
-            index: self.index
+            index: self.index,
+            typ: typ
         };
         self.add_field_with_field(name, field);
     }

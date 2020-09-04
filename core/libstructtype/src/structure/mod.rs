@@ -11,7 +11,7 @@ impl DefineContainer {
         self.defines.insert(name, define);
     }
 
-    pub fn find_define(&self, name: &String) -> Option<&StructDefine> {
+    pub fn find_define(&self, name: &str) -> Option<&StructDefine> {
         self.defines.get(name)
     }
 
@@ -52,8 +52,8 @@ impl StructControl {
         }
     }
 
-    pub fn find_define(&self, module_str: &String
-        , name: &String) -> Option<&StructDefine> {
+    pub fn find_define(&self, module_str: &str
+        , name: &str) -> Option<&StructDefine> {
         match self.defines.get(module_str) {
             Some(c) => {
                 c.find_define(name)

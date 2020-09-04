@@ -1,35 +1,19 @@
+use libstructtype::structure::{StructControl};
 use libgrammar::token::{TokenType, TokenValue, TokenData};
+use libcommon::ptr::{RefPtr};
 use libgrammar::grammar::TypeToken;
 use libtype::{Type, Data, TypeValue
     , Primeval, TypeAttrubute
-    , DataValue, AddressValue};
+    , DataValue, AddressValue
+    , TypeAddrType, Structure
+    , StructObject};
 use super::{Compiler, Compile, TokenValueExpand
     , CallFunctionContext, AddressValueExpand
     , TypeTokenExpand};
 
 impl<'a, F: Compile> Compiler<'a, F> {
-    pub fn tokentype_to_type(&self, typ: TokenType) -> Type {
-        match typ {
-            TokenType::Const(pt) => {
-                Type::new(TypeValue::Primeval(Primeval::new(
-                        pt)), TypeAttrubute::Ref)
-            },
-            _ => {
-                unimplemented!();
-            }
-        }
-    }
-
-    pub fn consttoken_to_type(&self, value: &TokenValue) -> Type {
-        match value.token_type_clone() {
-            TokenType::Const(t) => {
-                Type::new(TypeValue::Primeval(Primeval::new(
-                            t)), TypeAttrubute::Ref)
-            },
-            _ => {
-                panic!("should not happend");
-            }
-        }
+    pub fn to_type(&self, typ: TypeToken) -> Type {
+        typ.to_type::<F>(RefPtr::from_ref(self))
     }
 
     pub fn call_function_and_ctrl_scope(&mut self, context: CallFunctionContext) {
@@ -122,12 +106,31 @@ impl AddressValueExpand for AddressValue {
 }
 
 impl TypeTokenExpand for TypeToken {
-    fn to_type(self) -> Type {
+    fn to_type<F: Compile>(self, cp: RefPtr) -> Type {
         match self {
             TypeToken::Single(tv) => {
                 let token_data = tv.token_data().expect("should not happend");
                 let t = extract_token_data!(token_data, Id);
-                Type::from_str(&t)
+                match Type::from_str(&t) {
+                    Some(typ) => {
+                        typ
+                    },
+                    None => {
+                        let compiler = cp.as_ref::<Compiler<F>>();
+                        match compiler.struct_control.find_define(
+                            compiler.module_stack.current().name_ref()
+                            , &t) {
+                            Some(sd) => {
+                                Type::new_with_addrtyp(
+                                    TypeValue::Structure(Structure::new(StructObject::from_ref(sd)))
+                                    , TypeAddrType::Stack)
+                            },
+                            None => {
+                                unimplemented!("unknow type: {:?}", t);
+                            }
+                        }
+                    }
+                }
             },
             _ => {
                 unimplemented!();

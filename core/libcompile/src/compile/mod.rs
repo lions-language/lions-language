@@ -147,7 +147,7 @@ trait AddressValueExpand {
 }
 
 trait TypeTokenExpand {
-    fn to_type(self) -> Type;
+    fn to_type<F: Compile>(self, compiler: RefPtr) -> Type;
 }
 
 pub trait Compile {

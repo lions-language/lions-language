@@ -24,46 +24,50 @@ impl Type {
         }
     }
 
-    pub fn from_str(typ: &str) -> Type {
+    pub fn from_str(typ: &str) -> Option<Type> {
         Type::from_str_with_addrtyp(
             typ, TypeAddrType::Stack)
     }
 
     pub fn from_str_with_addrtyp(typ: &str
-        , addr_typ: TypeAddrType) -> Type {
+        , addr_typ: TypeAddrType) -> Option<Type> {
+        /*
+         * 原生类型才可以在这里被匹配
+         * 否则返回 None
+         * */
         match typ {
             "uint8"|"u8" => {
-                Type::new_with_addrtyp(TypeValue::Primeval(
+                Some(Type::new_with_addrtyp(TypeValue::Primeval(
                         Primeval::new(
                             PrimevalType::Uint8))
-                    , addr_typ)
+                    , addr_typ))
             },
             "uint16"|"u16" => {
-                Type::new_with_addrtyp(TypeValue::Primeval(
+                Some(Type::new_with_addrtyp(TypeValue::Primeval(
                         Primeval::new(
                             PrimevalType::Uint16))
-                    , addr_typ)
+                    , addr_typ))
             },
             "uint32"|"u32" => {
-                Type::new_with_addrtyp(TypeValue::Primeval(
+                Some(Type::new_with_addrtyp(TypeValue::Primeval(
                         Primeval::new(
                             PrimevalType::Uint32))
-                    , addr_typ)
+                    , addr_typ))
             },
             "uint64"|"u64" => {
-                Type::new_with_addrtyp(TypeValue::Primeval(
+                Some(Type::new_with_addrtyp(TypeValue::Primeval(
                         Primeval::new(
                             PrimevalType::Uint64))
-                    , addr_typ)
+                    , addr_typ))
             },
-            "str"|"utf8" => {
-                Type::new_with_addrtyp(TypeValue::Primeval(
+            "str"|"utf8"|"string" => {
+                Some(Type::new_with_addrtyp(TypeValue::Primeval(
                         Primeval::new(
                             PrimevalType::Str))
-                    , addr_typ)
+                    , addr_typ))
             },
             _ => {
-                unimplemented!("from {} to Type", typ);
+                None
             }
         }
     }

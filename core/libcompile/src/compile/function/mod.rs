@@ -42,17 +42,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
         let name = extract_token_data!(
            name_token.token_data().expect("should not happend")
            , Id);
-        let typ = match type_token {
-            TypeToken::Single(tt) => {
-                extract_token_data!(
-                    tt.token_data().expect("should not happend")
-                    , Id)
-            },
-            _ => {
-                unimplemented!("{:?}", type_token);
-            }
-        };
-        let typ = Type::from_str(&typ);
+        let typ = self.to_type(type_token);
         /*
          * 为参数分配一个地址
          *  只是分配一个地址, 不做其他事情 (就是增加地址分配器的索引,
@@ -106,7 +96,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
     pub fn handle_function_define_return(&mut self, context: FunctionDefineReturnContext) {
         let (typ_attr, _, type_token) = context.fields_move();
         let func_return_data = FunctionReturnData::new(
-            type_token.to_type(), typ_attr);
+            self.to_type(type_token), typ_attr);
         let func_return = FunctionReturn::new(func_return_data);
         self.scope_context.set_current_func_return(func_return.clone());
         self.cb.function_set_return_to_statement(func_return);

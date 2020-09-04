@@ -20,6 +20,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         self.cb().struct_define_start(&mut define);
         let mut define_context = StructDefineContext::default();
         self.struct_parse_field_list(&mut define_context, &mut define);
+        self.cb().struct_define_end(define);
     }
 }
 
