@@ -385,13 +385,12 @@ impl<'a, F: Compile> Grammar for Compiler<'a, F> {
     }
 
     fn struct_init_field_before_expr(&mut self, init_context: &mut GrammarStructInitContext
-        , field_context: &StructInitFieldContext) {
+        , field_context: StructInitFieldContext) {
         self.process_struct_init_field_before_expr(init_context, field_context);
     }
 
-    fn struct_init_field_after_expr(&mut self, init_context: &mut GrammarStructInitContext
-        , field_context: StructInitFieldContext) {
-        self.process_struct_init_field_after_expr(init_context, field_context);
+    fn struct_init_field_after_expr(&mut self, init_context: &mut GrammarStructInitContext) {
+        self.process_struct_init_field_after_expr(init_context);
     }
 }
 

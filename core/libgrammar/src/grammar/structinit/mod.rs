@@ -83,11 +83,10 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
          * expr
          * */
         self.cb().struct_init_field_before_expr(init_context
-            , &field_conext);
+            , field_conext);
         self.expression_process_without_token(&ExpressContext::new(
                 GrammarParser::<T, CB>::expression_end_structinit_list));
-        self.cb().struct_init_field_after_expr(init_context
-            , field_conext);
+        self.cb().struct_init_field_after_expr(init_context);
     }
 }
 

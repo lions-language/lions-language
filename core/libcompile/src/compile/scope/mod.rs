@@ -44,7 +44,8 @@ pub struct Scope {
     func_param_addr_index: Option<Vec<(usize, TypeAttrubute)>>,
     /* 记录 return 语句 的跳转指令索引
      * */
-    return_jumps: Option<Vec<usize>>
+    return_jumps: Option<Vec<usize>>,
+    structinit_field_stack: Option<VecDeque<String>>
 }
 
 impl Scope {
@@ -174,6 +175,58 @@ impl Scope {
         &self.func_param_addr_index
     }
 
+    pub fn enter_structinit_field_stack(&mut self, name: String) {
+        match &mut self.structinit_field_stack {
+            Some(v) => {
+                v.push_back(name);
+            },
+            None => {
+                let mut vec = VecDeque::new();
+                vec.push_back(name);
+                self.structinit_field_stack = Some(vec);
+            }
+        }
+    }
+
+    pub fn leave_structinit_field_stack(&mut self) -> Option<String> {
+        match &mut self.structinit_field_stack {
+            Some(v) => {
+                v.pop_back()
+            },
+            None => {
+                None
+            }
+        }
+    }
+
+    pub fn get_structinit_field_stack_len(&self) -> usize {
+        match &self.structinit_field_stack {
+            Some(v) => {
+                v.len()
+            },
+            None => {
+                0
+            }
+        }
+    }
+
+    pub fn get_last_n_structinit_field_stack(&self, n: usize) -> Option<&String> {
+        let stack = match &self.structinit_field_stack {
+            Some(v) => {
+                v
+            },
+            None => {
+                return None;
+            }
+        };
+        let len = stack.len();
+        if len == 0 || len - 1 < n {
+            return None;
+        }
+        let index = len - 1 - n;
+        stack.get(index)
+    }
+
     pub fn new_with_addr_start(start: usize, scope_typ: ScopeType) -> Self {
         Self {
             scope_typ: scope_typ,
@@ -184,7 +237,8 @@ impl Scope {
             func_return: None,
             func_call_stack: VecDeque::new(),
             func_param_addr_index: None,
-            return_jumps: None
+            return_jumps: None,
+            structinit_field_stack: None
         }
     }
 
