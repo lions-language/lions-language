@@ -12,7 +12,7 @@ impl AddressDispatch {
         , scope: usize) -> Address {
         if self.recycles.len() == 0 {
             // println!("from recycles");
-            let addr_key = AddressKey::new_with_scope(self.index, scope);
+            let addr_key = AddressKey::new_with_scope_single(self.index, scope);
             self.index += 1;
             Address::new(AddressValue::new(typ, addr_key))
         } else {
@@ -38,7 +38,7 @@ impl AddressDispatch {
 
     pub fn new_with_start(start: usize) -> Self {
         Self {
-            addr_key: AddressKey::new(start as u64),
+            addr_key: AddressKey::new_single(start as u64),
             recycles: Vec::new(),
             index: 0
         }

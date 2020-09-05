@@ -54,8 +54,12 @@ impl Scope {
                 /*
                  * 需要加上 变长参数的偏移
                  * */
+                /*
                 let data_addr = self.get_param_ref_unchecked(
                     *index+addr.addr_ref().lengthen_offset_clone());
+                */
+                let data_addr = self.get_param_ref_unchecked(
+                    *index);
                 self.get_data_by_data_addr_unchecked(&data_addr, link_static, memory)
             },
             _ => {

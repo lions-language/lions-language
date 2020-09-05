@@ -105,7 +105,7 @@ impl VirtualMachine {
             data_addr, &self.link_static);
         */
         let param_compile_addr = AddressValue::new(
-            AddressType::AddrRef, AddressKey::new_with_all(0, 0, 0, 0));
+            AddressType::AddrRef, AddressKey::new_with_all(0, 0, 0, 0, 0));
         let param_value = self.thread_context.current_unchecked().get_data_unchecked(
             &param_compile_addr, &self.link_static);
         let param_value = extract_primeval_number_ref!(param_value, Uint8);

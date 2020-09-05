@@ -54,7 +54,7 @@ impl VirtualMachine {
             self.thread_context.current_unchecked().print_last_n_addr_mapping(2);
             */
             let param_compile_addr = AddressValue::new(
-                AddressType::AddrRef, AddressKey::new_with_all(0, 0, i, 0));
+                AddressType::AddrRef, AddressKey::new_with_all(0, 0, i, 0, 0));
             let param_value = self.thread_context.current_unchecked().get_data_unchecked(
                 &param_compile_addr, &self.link_static);
             let data = param_value.as_ref::<Data>();

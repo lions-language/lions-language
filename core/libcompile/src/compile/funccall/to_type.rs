@@ -100,7 +100,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 } else if input_typ_attr.is_ref_as_param() {
                     ref_param_addr = Some(
                         AddRefParamAddr::new_with_all(
-                        AddressKey::new_with_all(0, 0, 0, 0)
+                        AddressKey::new_with_all(0, 0, 0, 0, 0)
                         , input_addr.addr_ref().clone_with_scope_plus(1)));
                     param_ref = Some(PushParamRef::new_with_all(
                         input_addr.addr_ref().clone_with_scope_plus(1)));

@@ -9,7 +9,7 @@ impl<'a> StaticVariantDispatch<'a> {
         let index = self.index;
         self.static_stream.push(data);
         self.index += 1;
-        AddressKey::new(index)
+        AddressKey::new_single(index)
     }
 
     pub fn new(static_stream: &'a mut StaticStream) -> Self {

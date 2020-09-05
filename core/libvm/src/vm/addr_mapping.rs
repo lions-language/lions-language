@@ -9,7 +9,7 @@ struct Key(usize, usize, usize);
 
 impl From<AddressKey> for Key {
     fn from(v: AddressKey) -> Self {
-        let (index, offset, lengthen_offset, _) = v.fields_move();
+        let (index, offset, lengthen_offset, _, length) = v.fields_move();
         Key(index as usize, offset, lengthen_offset)
     }
 }

@@ -350,7 +350,8 @@ pub struct AddressKey {
      * */
     offset: usize,
     lengthen_offset: usize,
-    scope: usize
+    scope: usize,
+    length: usize
 }
 
 impl AddressKey {
@@ -360,16 +361,28 @@ impl AddressKey {
         o
     }
 
-    pub fn new(index: u64) -> Self {
-        AddressKey::new_with_all(index, 0, 0, 0)
+    pub fn new_single(index: u64) -> Self {
+        AddressKey::new_with_all(index, 0, 0, 0, 0)
     }
 
-    pub fn new_with_scope(index: u64, scope: usize) -> Self {
-        AddressKey::new_with_all(index, 0, 0, scope)
+    pub fn new_with_scope_single(index: u64, scope: usize) -> Self {
+        AddressKey::new_with_all(index, 0, 0, scope, 0)
     }
 
-    pub fn new_with_offset(index: u64, offset: usize) -> Self {
-        AddressKey::new_with_all(index, offset, 0, 0)
+    pub fn new_with_offset_single(index: u64, offset: usize) -> Self {
+        AddressKey::new_with_all(index, offset, 0, 0, 0)
+    }
+
+    pub fn new_multi(index: u64, length: usize) -> Self {
+        AddressKey::new_with_all(index, 0, 0, 0, length)
+    }
+
+    pub fn new_with_scope_multi(index: u64, scope: usize, length: usize) -> Self {
+        AddressKey::new_with_all(index, 0, 0, scope, length)
+    }
+
+    pub fn new_with_offset_multi(index: u64, offset: usize, length: usize) -> Self {
+        AddressKey::new_with_all(index, offset, 0, 0, length)
     }
 }
 

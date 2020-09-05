@@ -19,7 +19,7 @@ impl<T> Rand<T> for RandStack<T> {
             self.datas.insert(self.index, data);
             let k = MemoryValue::new(
                 AddressValue::new(addr_typ
-                    , AddressKey::new(self.index as u64)));
+                    , AddressKey::new_single(self.index as u64)));
             self.index += 1;
             k
         } else {
@@ -31,7 +31,7 @@ impl<T> Rand<T> for RandStack<T> {
             // println!("get: {}", index);
             MemoryValue::new(
                 AddressValue::new(addr_typ,
-                    AddressKey::new(index as u64)))
+                    AddressKey::new_single(index as u64)))
         }
     }
 

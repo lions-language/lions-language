@@ -134,7 +134,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                         } else if typ_attr.is_ref() {
                                             ref_param_addrs.push_back(
                                                 AddRefParamAddr::new_with_all(
-                                                AddressKey::new_with_all(0, 0, i, 0)
+                                                AddressKey::new_with_all(0, 0, i, 0, 0)
                                                 , addr_value.clone_with_scope_plus(1)));
                                             param_refs.push_back(PushParamRef::new_with_all(
                                                 addr_value.clone_with_scope_plus(1)));
@@ -145,7 +145,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                     } else {
                                         ref_param_addrs.push_back(
                                             AddRefParamAddr::new_with_all(
-                                            AddressKey::new_with_all(0, 0, i, 0)
+                                            AddressKey::new_with_all(0, 0, i, 0, 0)
                                             , addr_value.clone_with_scope_plus(1)));
                                         param_refs.push_back(PushParamRef::new_with_all(
                                             addr_value.clone_with_scope_plus(1)));
@@ -180,7 +180,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                             // addr_value.addr_with_scope_plus(self.vm_scope_value);
                                         ref_param_addrs.push_back(
                                             AddRefParamAddr::new_with_all(
-                                            AddressKey::new_with_all(0, 0, 0, 0)
+                                            AddressKey::new_with_all(0, 0, 0, 0, 0)
                                             , addr_value.clone_with_scope_plus(1)));
                                         param_refs.push_back(PushParamRef::new_with_all(
                                             addr_value.clone_with_scope_plus(1)));
@@ -276,7 +276,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                         } else if item.typ_attr_ref().is_ref_as_param() {
                                             ref_param_addrs.push_back(
                                                 AddRefParamAddr::new_with_all(
-                                                AddressKey::new_with_all(0, lengthen_param_start, i, 0)
+                                                AddressKey::new_with_all(0, lengthen_param_start, i, 0, 0)
                                                 , addr_value.clone_with_scope_plus(1)));
                                             param_refs.push_back(PushParamRef::new_with_all(
                                                 addr_value.clone_with_scope_plus(1)));
@@ -317,7 +317,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                         } else if item.typ_attr_ref().is_ref() {
                                             ref_param_addrs.push_back(
                                                 AddRefParamAddr::new_with_all(
-                                                AddressKey::new_with_all(i as u64, 0, 0, 0)
+                                                AddressKey::new_with_all(i as u64, 0, 0, 0, 0)
                                                 , addr_value.clone_with_scope_plus(1)));
                                             param_refs.push_back(PushParamRef::new_with_all(
                                                 addr_value.clone_with_scope_plus(1)));
@@ -370,7 +370,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                         // println!("{:?}", addr_value);
                                         ref_param_addrs.push_back(
                                             AddRefParamAddr::new_with_all(
-                                            AddressKey::new_with_all(i as u64, 0, 0, 0)
+                                            AddressKey::new_with_all(i as u64, 0, 0, 0, 0)
                                             , addr_value.clone_with_scope_plus(1)));
                                         param_refs.push_back(PushParamRef::new_with_all(
                                             addr_value.clone_with_scope_plus(1)));
@@ -472,7 +472,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                         } else {
                                             0
                                         };
-                                        println!("{}", lengthen_offset);
+                                        // println!("{}", lengthen_offset);
                                         let addr = match return_ref_params.remove(
                                             &(addr_value.addr_ref().index_clone() as usize
                                                 + lengthen_offset)) {
