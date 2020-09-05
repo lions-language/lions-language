@@ -1,4 +1,6 @@
 use libresult::*;
+use libcommon::ptr::RefPtr;
+use libtype::structure::{StructDefine};
 use super::{Grammar, GrammarParser
     , ExpressContext, CallFuncScopeContext
     , StructInitContext, StructInitFieldContext
@@ -17,8 +19,16 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         let token = self.take_next_one();
         let name_data = token.token_value().token_data_unchecked();
         let struct_name = extract_token_data!(name_data, Id);
+        let struct_define = StructDefine::default();
         let mut init_context = StructInitContext::new_with_all(
-            struct_name, DescContext::default());
+            struct_name, RefPtr::new_null(), DescContext::default());
+        match self.cb().struct_init_start(&mut init_context) {
+            DescResult::Error(e) => {
+                self.panic(&e);
+            },
+            _ => {
+            }
+        }
         /*
          * 因为在之前的 virtual lookup 的时候已经判断了到达这里一定是结构体初始化
          * 为了效率, 这里不再依次判断, 应该直接跳过, 直到 `(` 之后的 token

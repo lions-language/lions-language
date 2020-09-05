@@ -63,6 +63,10 @@ impl StructMember {
         self.index += 1;
     }
 
+    pub fn find_field(&self, name: &str) -> Option<&StructField> {
+        self.members.get(name)
+    }
+
     pub fn print_members(&self) {
         for item in self.members.iter() {
             println!("{:?}", item);

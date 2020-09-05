@@ -384,6 +384,10 @@ impl<'a, F: Compile> Grammar for Compiler<'a, F> {
         self.process_struct_define_end(define);
     }
 
+    fn struct_init_start(&mut self, init_context: &mut GrammarStructInitContext) -> DescResult {
+        self.process_struct_init_start(init_context)
+    }
+
     fn struct_init_field_before_expr(&mut self, init_context: &mut GrammarStructInitContext
         , field_context: StructInitFieldContext) {
         self.process_struct_init_field_before_expr(init_context, field_context);

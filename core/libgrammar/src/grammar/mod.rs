@@ -87,11 +87,12 @@ impl CallFunctionContext {
     }
 }
 
-#[derive(Debug, FieldGet, FieldGetClone
+#[derive(Debug, FieldGet
     , NewWithAll, FieldGetMove
     , Default)]
 pub struct StructInitContext {
     struct_name: String,
+    define: RefPtr,
     desc_ctx: DescContext
 }
 
@@ -276,6 +277,9 @@ pub trait Grammar {
         unimplemented!();
     }
     fn struct_define_end(&mut self, _: StructDefine) {
+        unimplemented!();
+    }
+    fn struct_init_start(&mut self, _: &mut StructInitContext) -> DescResult {
         unimplemented!();
     }
     fn struct_init_field_before_expr(&mut self, _: &mut StructInitContext

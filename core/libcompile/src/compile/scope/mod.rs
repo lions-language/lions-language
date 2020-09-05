@@ -53,6 +53,10 @@ impl Scope {
         self.address_dispatch.alloc(addr_typ, scope)
     }
 
+    pub fn next_new_addr_index(&self) -> usize {
+        self.address_dispatch.next_new_addr_index()
+    }
+
     fn recycle_address(&mut self, addr: AddressValue) {
         // println!("recycle_address");
         self.address_dispatch.recycle_addr(addr);

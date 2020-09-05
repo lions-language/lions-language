@@ -24,6 +24,10 @@ impl AddressDispatch {
         // println!("{:?}", &addr_key);
     }
 
+    pub fn next_new_addr_index(&self) -> usize {
+        self.index as usize
+    }
+
     pub fn alloc_static(&mut self, scope: usize) -> Address {
         self.alloc(AddressType::Static, scope)
     }
