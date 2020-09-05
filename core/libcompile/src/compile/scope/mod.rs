@@ -26,6 +26,15 @@ pub struct ScopeFuncCall {
     expect_type: Type
 }
 
+#[derive(Default, FieldGet, NewWithAll
+    , FieldGetClone, FieldGetMove
+    , Clone)]
+pub struct StructInitField {
+    name: String,
+    define: RefPtr,
+    count: usize
+}
+
 #[derive(FieldGet, FieldGetMove)]
 pub struct Scope {
     scope_typ: ScopeType,
@@ -45,7 +54,8 @@ pub struct Scope {
     /* 记录 return 语句 的跳转指令索引
      * */
     return_jumps: Option<Vec<usize>>,
-    structinit_field_stack: Option<VecDeque<String>>
+    structinit_field_stack: Option<VecDeque<StructInitField>>,
+    structinit_stack: Option<VecDeque<usize>>
 }
 
 impl Scope {
@@ -179,7 +189,7 @@ impl Scope {
         &self.func_param_addr_index
     }
 
-    pub fn enter_structinit_field_stack(&mut self, name: String) {
+    pub fn enter_structinit_field_stack(&mut self, name: StructInitField) {
         match &mut self.structinit_field_stack {
             Some(v) => {
                 v.push_back(name);
@@ -192,7 +202,7 @@ impl Scope {
         }
     }
 
-    pub fn leave_structinit_field_stack(&mut self) -> Option<String> {
+    pub fn leave_structinit_field_stack(&mut self) -> Option<StructInitField> {
         match &mut self.structinit_field_stack {
             Some(v) => {
                 v.pop_back()
@@ -214,8 +224,8 @@ impl Scope {
         }
     }
 
-    pub fn get_last_n_structinit_field_stack(&self, n: usize) -> Option<&String> {
-        let stack = match &self.structinit_field_stack {
+    pub fn get_last_n_mut_structinit_field_stack(&mut self, n: usize) -> Option<&mut StructInitField> {
+        let stack = match &mut self.structinit_field_stack {
             Some(v) => {
                 v
             },
@@ -228,7 +238,42 @@ impl Scope {
             return None;
         }
         let index = len - 1 - n;
-        stack.get(index)
+        stack.get_mut(index)
+    }
+
+    pub fn enter_structinit_stack(&mut self) {
+        match &mut self.structinit_stack {
+            Some(v) => {
+                v.push_back(0);
+            },
+            None => {
+                let mut vec = VecDeque::new();
+                vec.push_back(0);
+                self.structinit_stack = Some(vec);
+            }
+        }
+    }
+
+    pub fn leave_structinit_stack(&mut self) -> Option<usize> {
+        match &mut self.structinit_stack {
+            Some(v) => {
+                v.pop_back()
+            },
+            None => {
+                None
+            }
+        }
+    }
+
+    pub fn get_current_mut_structinit_stack(&mut self) -> Option<&mut usize> {
+        match &mut self.structinit_stack {
+            Some(v) => {
+                v.back_mut()
+            },
+            None => {
+                None
+            }
+        }
     }
 
     pub fn new_with_addr_start(start: usize, scope_typ: ScopeType) -> Self {
@@ -242,7 +287,8 @@ impl Scope {
             func_call_stack: VecDeque::new(),
             func_param_addr_index: None,
             return_jumps: None,
-            structinit_field_stack: None
+            structinit_field_stack: None,
+            structinit_stack: None
         }
     }
 

@@ -87,7 +87,7 @@ impl CallFunctionContext {
     }
 }
 
-#[derive(Debug, FieldGet
+#[derive(Debug, FieldGet, FieldGetClone
     , NewWithAll, FieldGetMove
     , Default)]
 pub struct StructInitContext {
@@ -286,7 +286,11 @@ pub trait Grammar {
         , _: StructInitFieldContext) {
         unimplemented!();
     }
-    fn struct_init_field_after_expr(&mut self, _: &mut StructInitContext) {
+    fn struct_init_field_after_expr(&mut self, _: &mut StructInitContext)
+        -> DescResult {
+        unimplemented!();
+    }
+    fn struct_init_end(&mut self, _: &mut StructInitContext) -> DescResult {
         unimplemented!();
     }
     fn var_stmt_start(&mut self) {

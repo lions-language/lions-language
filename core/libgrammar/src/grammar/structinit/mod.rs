@@ -71,6 +71,13 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                 }
             }
         }
+        match self.cb().struct_init_end(&mut init_context) {
+            DescResult::Error(e) => {
+                self.panic(&e);
+            },
+            _ => {
+            }
+        }
     }
 
     fn structinit_single_field(&mut self
@@ -96,7 +103,9 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
             , field_conext);
         self.expression_process_without_token(&ExpressContext::new(
                 GrammarParser::<T, CB>::expression_end_structinit_list));
-        self.cb().struct_init_field_after_expr(init_context);
+        if let DescResult::Error(e) = self.cb().struct_init_field_after_expr(init_context) {
+            self.panic(&e);
+        };
     }
 }
 
