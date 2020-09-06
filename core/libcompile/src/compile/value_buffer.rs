@@ -10,6 +10,7 @@ use std::collections::{VecDeque};
 #[derive(Debug, Clone)]
 pub enum ValueBufferItemContext {
     Variant(RefPtr),
+    Structure,
     Null
 }
 

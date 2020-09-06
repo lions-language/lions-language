@@ -282,59 +282,6 @@ impl PackageType {
     }
 }
 
-impl Type {
-    /*
-     * 创建 非 堆 类型
-     * */
-    pub fn new(typ: TypeValue, attr: TypeAttrubute) -> Self {
-        Type::_new(typ, attr, TypeAddrType::Stack)
-    }
-
-    pub fn new_without_attr(typ: TypeValue) -> Self {
-        Type::new(typ, TypeAttrubute::Empty)
-    }
-
-    pub fn new_with_addrtyp(typ: TypeValue
-        , addr_typ: TypeAddrType) -> Self {
-        Type::_new(typ, TypeAttrubute::Empty, addr_typ)
-    }
-
-    pub fn new_heap(typ: TypeValue, attr: TypeAttrubute) -> Self {
-        Type::_new(typ, attr, TypeAddrType::Heap)
-    }
-
-    pub fn new_empty() -> Self {
-        Type::_new(TypeValue::Empty, TypeAttrubute::Empty, TypeAddrType::Stack)
-    }
-
-    pub fn new_null() -> Self {
-        Type::_new(TypeValue::Null, TypeAttrubute::Empty, TypeAddrType::Stack)
-    }
-
-    pub fn set_type_attribute(&mut self, attr: TypeAttrubute) {
-        *&mut self.attr = attr;
-    }
-
-    pub fn to_address_type(&self) -> AddressType {
-        match &self.addr_typ {
-            TypeAddrType::Stack => {
-                AddressType::Stack
-            },
-            TypeAddrType::Heap => {
-                AddressType::Heap
-            }
-        }
-    }
-
-    fn _new(typ: TypeValue, attr: TypeAttrubute, addr_typ: TypeAddrType) -> Self {
-        Self {
-            typ: typ,
-            attr: attr,
-            addr_typ: addr_typ
-        }
-    }
-}
-
 impl Default for Type {
     fn default() -> Self {
         Type::new(TypeValue::Empty, TypeAttrubute::Move)

@@ -97,6 +97,7 @@ pub struct StructInitContext {
 }
 
 #[derive(Debug, FieldGet, NewWithAll, FieldGetMove
+    , FieldGetClone
     , Clone, Default)]
 pub struct DescContext {
     typ_attr: TypeAttrubute

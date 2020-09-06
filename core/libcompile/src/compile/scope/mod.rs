@@ -31,8 +31,15 @@ pub struct ScopeFuncCall {
     , Clone)]
 pub struct StructInitField {
     name: String,
-    define: RefPtr,
     count: usize
+}
+
+#[derive(Default, FieldGet, NewWithAll
+    , FieldGetClone, FieldGetMove
+    , Clone)]
+pub struct StructInit {
+    define: RefPtr,
+    addr_index: usize
 }
 
 #[derive(FieldGet, FieldGetMove)]
@@ -55,7 +62,7 @@ pub struct Scope {
      * */
     return_jumps: Option<Vec<usize>>,
     structinit_field_stack: Option<VecDeque<StructInitField>>,
-    structinit_stack: Option<VecDeque<usize>>
+    structinit_stack: Option<VecDeque<StructInit>>
 }
 
 impl Scope {
@@ -245,20 +252,20 @@ impl Scope {
         stack.get_mut(index)
     }
 
-    pub fn enter_structinit_stack(&mut self, addr_index: usize) {
+    pub fn enter_structinit_stack(&mut self, value: StructInit) {
         match &mut self.structinit_stack {
             Some(v) => {
-                v.push_back(addr_index);
+                v.push_back(value);
             },
             None => {
                 let mut vec = VecDeque::new();
-                vec.push_back(addr_index);
+                vec.push_back(value);
                 self.structinit_stack = Some(vec);
             }
         }
     }
 
-    pub fn leave_structinit_stack(&mut self) -> Option<usize> {
+    pub fn leave_structinit_stack(&mut self) -> Option<StructInit> {
         match &mut self.structinit_stack {
             Some(v) => {
                 v.pop_back()
@@ -288,7 +295,7 @@ impl Scope {
         }
     }
 
-    pub fn get_current_mut_structinit_stack(&mut self) -> Option<&mut usize> {
+    pub fn get_current_mut_structinit_stack(&mut self) -> Option<&mut StructInit> {
         match &mut self.structinit_stack {
             Some(v) => {
                 v.back_mut()
@@ -299,8 +306,8 @@ impl Scope {
         }
     }
 
-    pub fn get_structinit_stack_top_item_unchecked(&self) -> usize {
-        self.structinit_stack.as_ref().unwrap().front().unwrap().clone()
+    pub fn get_structinit_stack_top_item_unchecked(&self) -> &StructInit {
+        self.structinit_stack.as_ref().unwrap().front().unwrap()
     }
 
     pub fn new_with_addr_start(start: usize, scope_typ: ScopeType) -> Self {
