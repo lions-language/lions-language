@@ -21,31 +21,29 @@ impl<'a, F: Compile> Compiler<'a, F> {
             }
         };
         *init_context.define_mut() = RefPtr::from_ref(define);
-        self.scope_context.current_mut_unchecked().enter_structinit_stack();
+        let addr_index =
+            if self.scope_context.current_mut_unchecked().structinit_is_empty() {
+            /*
+             * 最顶级 struct init
+             * */
+            let member_length = define.member_length();
+            let start_addr_index =
+                self.scope_context.alloc_continuous_address(1+member_length);
+            println!("{:?}, {}", member_length, start_addr_index+1);
+            /*
+             * 为最外层struct分配地址
+             * */
+            start_addr_index+1
+        } else {
+            0
+        };
+        self.scope_context.current_mut_unchecked().enter_structinit_stack(addr_index);
         DescResult::Success
     }
 
     pub fn process_struct_init_end(&mut self
         , init_context: &mut StructInitContext) -> DescResult {
-        match self.scope_context.current_mut_unchecked()
-            .leave_structinit_stack() {
-            Some(v) => {
-                match self.scope_context.current_mut_unchecked()
-                    .get_current_mut_structinit_stack() {
-                    Some(va) => {
-                        *va += v;
-                    },
-                    None => {
-                        /*
-                         * 到达最外层
-                         * */
-                        println!("{:?}", v);
-                    }
-                }
-            },
-            None => {
-            }
-        }
+        self.scope_context.current_mut_unchecked().leave_structinit_stack();
         DescResult::Success
     }
 
@@ -66,6 +64,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
         self.process_struct_init_splice_full_fieldname(
             &mut full_name);
         // println!("{:?}", full_name);
+        let start_addr_index = self.scope_context.current_mut_unchecked()
+            .get_structinit_stack_top_item_unchecked();
         /*
         let start_addr_index = self.scope_context.current_unchecked().next_new_addr_index();
         let define = init_context.define_ref().as_ref::<StructDefine>();
@@ -92,18 +92,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
          * 根据 field_index 为字段分配地址
          * */
         let s = self.scope_context.current_mut_unchecked().leave_structinit_field_stack();
-        println!("{:?}, {}", full_name, s.unwrap().count_ref());
-        /*
-         * 添加最外层
-         * */
-        match self.scope_context.current_mut_unchecked()
-            .get_current_mut_structinit_stack() {
-            Some(va) => {
-                *va += 1;
-            },
-            None => {
-            }
-        }
+        println!("{:?}, {}, {}", full_name, s.unwrap().count_ref(), start_addr_index);
         /*
         if s.as_ref().unwrap().count_ref() > &0 {
             println!("{:?}, {}", full_name, s.unwrap().count_ref());

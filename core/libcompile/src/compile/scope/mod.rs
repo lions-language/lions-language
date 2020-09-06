@@ -63,6 +63,10 @@ impl Scope {
         self.address_dispatch.alloc(addr_typ, scope)
     }
 
+    fn alloc_continuous_address(&mut self, length: usize) -> usize {
+        self.address_dispatch.alloc_continuous(length)
+    }
+
     pub fn next_new_addr_index(&self) -> usize {
         self.address_dispatch.next_new_addr_index()
     }
@@ -241,14 +245,14 @@ impl Scope {
         stack.get_mut(index)
     }
 
-    pub fn enter_structinit_stack(&mut self) {
+    pub fn enter_structinit_stack(&mut self, addr_index: usize) {
         match &mut self.structinit_stack {
             Some(v) => {
-                v.push_back(0);
+                v.push_back(addr_index);
             },
             None => {
                 let mut vec = VecDeque::new();
-                vec.push_back(0);
+                vec.push_back(addr_index);
                 self.structinit_stack = Some(vec);
             }
         }
@@ -265,6 +269,25 @@ impl Scope {
         }
     }
 
+    pub fn get_structinit_stack_len(&self) -> usize {
+        match &self.structinit_stack {
+            Some(v) => {
+                v.len()
+            },
+            None => {
+                0
+            }
+        }
+    }
+
+    pub fn structinit_is_empty(&self) -> bool {
+        if self.get_structinit_stack_len() == 0 {
+            true
+        } else {
+            false
+        }
+    }
+
     pub fn get_current_mut_structinit_stack(&mut self) -> Option<&mut usize> {
         match &mut self.structinit_stack {
             Some(v) => {
@@ -274,6 +297,10 @@ impl Scope {
                 None
             }
         }
+    }
+
+    pub fn get_structinit_stack_top_item_unchecked(&self) -> usize {
+        self.structinit_stack.as_ref().unwrap().front().unwrap().clone()
     }
 
     pub fn new_with_addr_start(start: usize, scope_typ: ScopeType) -> Self {

@@ -67,6 +67,10 @@ impl StructMember {
         self.members.get(name)
     }
 
+    pub fn length(&self) -> usize {
+        self.members.len()
+    }
+
     pub fn print_members(&self) {
         for item in self.members.iter() {
             println!("{:?}", item);

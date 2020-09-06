@@ -24,6 +24,12 @@ impl AddressDispatch {
         // println!("{:?}", &addr_key);
     }
 
+    pub fn alloc_continuous(&mut self, length: usize) -> usize {
+        let start = self.index;
+        self.index += length as u64;
+        start as usize
+    }
+
     pub fn next_new_addr_index(&self) -> usize {
         self.index as usize
     }

@@ -41,6 +41,10 @@ impl ScopeContext {
         // self.get_back_mut_n_unchecked(scope).alloc_address(addr_typ, scope)
     }
 
+    pub fn alloc_continuous_address(&mut self, length: usize) -> usize {
+        self.current_mut_unchecked().alloc_continuous_address(length)
+    }
+
     pub fn alloc_address_last_n(&mut self, addr_typ: AddressType
         , scope: usize) -> Address {
         /*
