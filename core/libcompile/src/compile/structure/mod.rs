@@ -16,11 +16,11 @@ impl<'a, F: Compile> Compiler<'a, F> {
         let name = extract_token_data!(name_data, Id);
         match define.member_mut() {
             Some(m) => {
-                m.add(name, self.to_type(type_token));
+                m.add(name, self.to_type(type_token), typ_attr);
             },
             None => {
                 let mut m = StructMember::new();
-                m.add(name, self.to_type(type_token));
+                m.add(name, self.to_type(type_token), typ_attr);
                 *define.member_mut() = Some(m);
             }
         }

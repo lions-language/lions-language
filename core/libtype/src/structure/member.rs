@@ -1,10 +1,10 @@
-use crate::{Type, TypeValue};
+use crate::{Type, TypeValue, TypeAttrubute};
 use super::{StructMember, StructField};
 use std::collections::HashMap;
 
 impl StructMember {
     pub fn add(&mut self, name: String
-        , typ: Type) {
+        , typ: Type, typ_attr: TypeAttrubute) {
         /*
          * 该函数被调用之前, typ 已经被计算好(如果是第三方包,
          * 会先被加载到内存, 然后将引用地址写入到 Type::Structure g)
@@ -19,7 +19,7 @@ impl StructMember {
                 /*
                  * 将自身写入
                  * */
-                self.add_field(name.clone(), typ);
+                self.add_field(name.clone(), typ, typ_attr);
                 /*
                  * 将结构体展开
                  * */
@@ -43,16 +43,17 @@ impl StructMember {
                 /*
                  * 非嵌套类型 => 直接写入
                  * */
-                self.add_field(name, typ);
+                self.add_field(name, typ, typ_attr);
             }
         }
     }
 
     fn add_field(&mut self, name: String
-        , typ: Type) {
+        , typ: Type, typ_attr: TypeAttrubute) {
         let field = StructField {
             index: self.index,
-            typ: typ
+            typ: typ,
+            typ_attr: typ_attr
         };
         self.add_field_with_field(name, field);
     }
