@@ -7,7 +7,8 @@ use libtype::{Type, TypeAddrType
 use libtype::structure::{StructDefine
     , StructField};
 use libresult::{DescResult};
-use crate::compile::{Compile, Compiler};
+use crate::compile::{Compile, Compiler
+    , OwnershipMoveContext, AddRefParamAddr};
 use crate::compile::address::Address;
 use crate::compile::scope::{StructInitField
     , StructInit};
@@ -131,17 +132,60 @@ impl<'a, F: Compile> Compiler<'a, F> {
          * 2. 对得到的struct_field地址索引进行赋值操作
          * */
         let field_index = struct_field.index_clone();
-        let field_addr = start_addr_index + 1 + field_index;
+        let field_addr_index = start_addr_index + 1 + field_index;
+        let field_typ = struct_field.typ_clone();
+        let field_typ_attr = struct_field.typ_attr_clone();
+        let addr = Address::new(AddressValue::new(
+            field_typ.to_address_type(), AddressKey::new_with_all(
+                field_addr_index as u64, 0, 0, 0, field_typ.addr_length())));
         let value_item = self.scope_context.take_top_from_value_buffer();
         // println!("{:?}", &value);
-        let typ = value_item.typ_ref().clone();
-        let typ_attr = value_item.typ_attr_ref().clone();
-        let src_addr = value_item.addr_ref().addr_clone();
+        let value_typ = value_item.typ_ref().clone();
+        let value_typ_attr = value_item.typ_attr_clone();
+        let value_addr = value_item.addr_ref().addr_clone();
+        let value_context = value_item.context_clone();
+        /*
+         * 检测typ attr是否匹配
+         * */
+        if field_typ_attr != value_typ_attr {
+            return DescResult::Error(
+                format!("left typ_attr is {:?}, right typ_attr is {:?}"
+                    , field_typ_attr, value_typ_attr));
+        }
+        if let ValueBufferItemContext::Structure = &value_context {
+        } else {
+            if field_typ_attr.is_move() {
+                /*
+                 * 移动
+                 * */
+                // println!("move: {:?} <= {:?}", addr.addr_ref(), value_addr);
+                self.cb.ownership_move(OwnershipMoveContext::new_with_all(
+                    addr.addr().addr(), value_addr.clone()));
+            } else if field_typ_attr.is_ref() {
+                // println!("add_ref: {:?} <= {:?}", addr.addr_ref(), value_addr);
+                self.cb.add_ref_param_addr(
+                    AddRefParamAddr::new_with_all(
+                        addr.addr().addr(), value_addr.clone()));
+            } else {
+                unimplemented!();
+            }
+        }
+        match &value_context {
+            ValueBufferItemContext::Variant(v) => {
+                let var_name = v.as_ref::<String>();
+                self.scope_context.remove_variant_unchecked(
+                    value_addr.addr_ref().scope_clone()
+                    , var_name);
+            },
+            _ => {
+            }
+        }
         /*
          * 根据 field_index 为字段分配地址
          * */
-        let s = self.scope_context.current_mut_unchecked().leave_structinit_field_stack();
-        println!("{:?}: {:?}, {:?}", s.unwrap().name_ref(), field_addr, src_addr);
+        self.scope_context.current_mut_unchecked().leave_structinit_field_stack();
+        // let s = self.scope_context.current_mut_unchecked().leave_structinit_field_stack();
+        // println!("{:?}: {:?}, {:?}", s.unwrap().name_ref(), field_addr_index, value_addr);
         DescResult::Success
     }
     

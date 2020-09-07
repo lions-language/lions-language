@@ -27,6 +27,17 @@ impl Type {
         }
     }
 
+    pub fn addr_length(&self) -> usize {
+        match self.typ_ref() {
+            TypeValue::Structure(dp) => {
+                dp.struct_obj_ref().as_ref().member_length()
+            },
+            _ => {
+                0
+            }
+        }
+    }
+
     pub fn from_struct(define: &StructDefine
         , addr_typ: TypeAddrType) -> Self {
         Type::new_with_addrtyp(TypeValue::Structure(

@@ -284,7 +284,7 @@ pub trait Grammar {
         unimplemented!();
     }
     fn struct_init_field_before_expr(&mut self, _: &mut StructInitContext
-        , _: StructInitFieldContext) {
+        , _: StructInitFieldContext) -> DescResult {
         unimplemented!();
     }
     fn struct_init_field_after_expr(&mut self, _: &mut StructInitContext)
