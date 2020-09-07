@@ -4,7 +4,8 @@ use libgrammar::grammar::{StructInitContext
 use libgrammar::token::{TokenData};
 use libtype::{Type, TypeAddrType
     , AddressKey, AddressValue};
-use libtype::structure::{StructDefine};
+use libtype::structure::{StructDefine
+    , StructField};
 use libresult::{DescResult};
 use crate::compile::{Compile, Compiler};
 use crate::compile::address::Address;
@@ -26,17 +27,18 @@ impl<'a, F: Compile> Compiler<'a, F> {
             }
         };
         *init_context.define_mut() = RefPtr::from_ref(define);
+        let member_length = define.member_length();
         let addr_index =
             if self.scope_context.current_mut_unchecked().structinit_is_empty() {
             /*
              * 最顶级 struct init
              * */
-            let member_length = define.member_length();
             let start_addr_index =
                 self.scope_context.alloc_continuous_address(1+member_length);
             // println!("{:?}, {}", member_length, start_addr_index+1);
             /*
-             * 为最外层struct分配地址, 并将其写入到 value buffer 中
+            /*
+             * 为struct分配地址
              * */
             let typ = Type::from_struct(define, TypeAddrType::Stack);
             let addr = Address::new(AddressValue::new(
@@ -46,37 +48,49 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 typ
                 , addr, ValueBufferItemContext::Structure
                 , init_context.desc_ctx_ref().typ_attr_clone());
-            start_addr_index+1
+            */
+            start_addr_index
         } else {
-            0
+            let index = self.scope_context.current_unchecked()
+                .get_current_structinit_field_stack_unchecked()
+                .field_ref().as_ref::<StructField>().index_clone();
+            let value = self.scope_context.current_mut_unchecked()
+                .get_structinit_stack_top_item_unchecked();
+            value.addr_index_clone() + 1 + index
         };
+        // println!("{}, {}", addr_index, member_length);
         self.scope_context.current_mut_unchecked().enter_structinit_stack(
-            StructInit::new_with_all(RefPtr::from_ref(define), addr_index));
+            StructInit::new_with_all(RefPtr::from_ref(define), addr_index, member_length));
         DescResult::Success
     }
 
     pub fn process_struct_init_end(&mut self
-        , _init_context: &mut StructInitContext) -> DescResult {
-        self.scope_context.current_mut_unchecked().leave_structinit_stack();
+        , init_context: &mut StructInitContext) -> DescResult {
+        let value = self.scope_context.current_mut_unchecked().leave_structinit_stack().unwrap();
+        let typ = Type::from_struct(value.define_ref().as_ref::<StructDefine>(), TypeAddrType::Stack);
+        let addr = Address::new(AddressValue::new(
+            typ.to_address_type(), AddressKey::new_with_all(
+                value.addr_index_clone() as u64, 0, 0, 0, value.addr_length_clone())));
+        // println!("{:?}", addr);
+        self.scope_context.push_with_addr_context_typattr_to_value_buffer(
+            typ
+            , addr, ValueBufferItemContext::Structure
+            , init_context.desc_ctx_ref().typ_attr_clone());
         DescResult::Success
     }
 
     pub fn process_struct_init_field_before_expr(&mut self
         , init_context: &mut StructInitContext
-        , field_context: StructInitFieldContext) {
+        , field_context: StructInitFieldContext) -> DescResult {
         let field_name = extract_token_data!(field_context.name_token().token_data_unchecked(), Id);
         let len = self.scope_context.current_unchecked().get_structinit_field_stack_len();
         self.scope_context.current_mut_unchecked().enter_structinit_field_stack(
             StructInitField::new_with_all(
-                field_name, 0));
-    }
-
-    pub fn process_struct_init_field_after_expr(&mut self
-        , init_context: &mut StructInitContext) -> DescResult {
+                field_name, RefPtr::new_null()));
         let mut full_name = String::new();
         self.process_struct_init_splice_full_fieldname(
             &mut full_name);
-        // println!("{:?}", full_name);
+        // println!("{}", full_name);
         let value = self.scope_context.current_mut_unchecked()
             .get_structinit_stack_top_item_unchecked();
         let start_addr_index = value.addr_index_clone();
@@ -98,27 +112,41 @@ impl<'a, F: Compile> Compiler<'a, F> {
                         , full_name));
             }
         };
-        // println!("{:?}", field);
-        let field_index = field.index_ref();
+        *self.scope_context.current_mut_unchecked()
+            .get_current_mut_structinit_field_stack_unchecked()
+            .field_mut() = RefPtr::from_ref(field);
+        DescResult::Success
+    }
+
+    pub fn process_struct_init_field_after_expr(&mut self
+        , init_context: &mut StructInitContext) -> DescResult {
+        let value = self.scope_context.current_mut_unchecked()
+            .get_structinit_stack_top_item_unchecked();
+        let start_addr_index = value.addr_index_clone();
+        let struct_field = self.scope_context.current_unchecked()
+            .get_current_structinit_field_stack_unchecked()
+            .field_ref().as_ref::<StructField>();
+        /*
+         * 1. 从 value buffer 中获取数据
+         * 2. 对得到的struct_field地址索引进行赋值操作
+         * */
+        let field_index = struct_field.index_clone();
+        let field_addr = start_addr_index + 1 + field_index;
+        let value_item = self.scope_context.take_top_from_value_buffer();
+        // println!("{:?}", &value);
+        let typ = value_item.typ_ref().clone();
+        let typ_attr = value_item.typ_attr_ref().clone();
+        let src_addr = value_item.addr_ref().addr_clone();
         /*
          * 根据 field_index 为字段分配地址
          * */
         let s = self.scope_context.current_mut_unchecked().leave_structinit_field_stack();
-        println!("{:?}, {}, {}", full_name, s.unwrap().count_ref(), start_addr_index);
-        /*
-        if s.as_ref().unwrap().count_ref() > &0 {
-            println!("{:?}, {}", full_name, s.unwrap().count_ref());
-        }
-        */
-        // let len = self.scope_context.current_unchecked().get_structinit_field_stack_len();
-        // println!("{:?}, {}", s, len);
+        println!("{:?}: {:?}, {:?}", s.unwrap().name_ref(), field_addr, src_addr);
         DescResult::Success
     }
     
     fn process_struct_init_splice_full_fieldname(
         &mut self, full_name: &mut String) {
-        // println!("{}", self.scope_context.current_unchecked()
-        //     .get_last_n_structinit_field_stack(0).unwrap());
         self.process_struct_init_splice_full_fieldname_inner(
             "", 0, true, full_name);
     }
@@ -144,7 +172,6 @@ impl<'a, F: Compile> Compiler<'a, F> {
         /*
          * 每次递归向上查找的时候, 需要将每一级的 count 都加上1
          * */
-        *v.count_mut() += 1;
         // println!("{}, {:?}", n-1, name);
         full_name.push('.');
         full_name.push_str(name);

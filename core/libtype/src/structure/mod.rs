@@ -8,7 +8,7 @@ use std::collections::{HashMap};
 pub struct StructMethod {
 }
 
-#[derive(Debug, FieldGet
+#[derive(Debug, FieldGet, FieldGetClone
     , FieldGetMove, Clone
     , Default)]
 pub struct StructField {

@@ -31,7 +31,7 @@ pub struct ScopeFuncCall {
     , Clone)]
 pub struct StructInitField {
     name: String,
-    count: usize
+    field: RefPtr
 }
 
 #[derive(Default, FieldGet, NewWithAll
@@ -39,7 +39,8 @@ pub struct StructInitField {
     , Clone)]
 pub struct StructInit {
     define: RefPtr,
-    addr_index: usize
+    addr_index: usize,
+    addr_length: usize
 }
 
 #[derive(FieldGet, FieldGetMove)]
@@ -231,6 +232,36 @@ impl Scope {
             },
             None => {
                 0
+            }
+        }
+    }
+
+    pub fn get_current_mut_structinit_field_stack_unchecked(&mut self) -> &mut StructInitField {
+        self.get_current_mut_structinit_field_stack().expect("should not happend")
+    }
+
+    pub fn get_current_mut_structinit_field_stack(&mut self) -> Option<&mut StructInitField> {
+        match &mut self.structinit_field_stack {
+            Some(v) => {
+                v.back_mut()
+            },
+            None => {
+                None
+            }
+        }
+    }
+
+    pub fn get_current_structinit_field_stack_unchecked(&self) -> &StructInitField {
+        self.get_current_structinit_field_stack().expect("should not happend")
+    }
+
+    pub fn get_current_structinit_field_stack(&self) -> Option<&StructInitField> {
+        match &self.structinit_field_stack {
+            Some(v) => {
+                v.back()
+            },
+            None => {
+                None
             }
         }
     }
