@@ -3,6 +3,7 @@ use libtype::{PackageType, PackageTypeValue
 use libtype::package::{PackageStr};
 use libresult::DescResult;
 use super::{GrammarParser, Grammar
+    , ExpressContext
     , CallFuncScopeContext, LoadVariantContext
     , DescContext};
 use crate::lexical::{CallbackReturnStatus};
@@ -66,6 +67,33 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         lengthen_offset
     }
 
+    pub fn id_process_point(&mut self, backtrack_len: usize
+        , scope_context: CallFuncScopeContext) {
+        let token = self.take_next_one();
+        let name = token.token_value();
+        let name_data = name.token_data().expect("should not happend");
+        let first_name = extract_token_data!(name_data, Id);
+        self.skip_next_n(backtrack_len+1);
+        /*
+         * 解析表达式
+         * */
+        self.expression_process_without_token(&ExpressContext::new(
+                GrammarParser::expression_end_normal));
+        while let Some(p) = self.skip_white_space_token() {
+            let nt = p.as_ref::<T, CB>();
+            match nt.context_token_type() {
+                TokenType::Point => {
+                    self.skip_next_one();
+                    self.expression_process_without_token(&ExpressContext::new(
+                            GrammarParser::expression_end_normal));
+                },
+                _ => {
+                    break;
+                }
+            }
+        }
+    }
+
     pub fn id_process(&mut self, desc_ctx: DescContext) {
         /*
          * 1. 判断是否是函数调用
@@ -94,7 +122,9 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                         return;
                     },
                     TokenType::Point => {
-                        unimplemented!();
+                        let bl = self.restore_from_backtrack_point();
+                        self.id_process_point(bl, scope_context);
+                        return;
                     },
                     TokenType::ColonColon => {
                         unimplemented!();
