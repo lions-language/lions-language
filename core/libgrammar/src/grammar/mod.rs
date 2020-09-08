@@ -313,6 +313,12 @@ pub trait Grammar {
     fn end(&mut self) -> DescResult {
         DescResult::Success
     }
+    fn enter_point_access(&mut self) {
+        unimplemented!();
+    }
+    fn leave_point_access(&mut self) {
+        unimplemented!();
+    }
 }
 
 enum NextToken<T: FnMut() -> CallbackReturnStatus, CB: Grammar> {

@@ -10,6 +10,18 @@ use crate::compile::value_buffer::{ValueBufferItemContext};
 
 impl<'a, F: Compile> Compiler<'a, F> {
     pub fn handle_load_variant(&mut self, context: LoadVariantContext) -> DescResult {
+        if self.scope_context.current_unchecked().get_is_point_access() {
+            self.handle_load_variant_without_point_access(context)
+        } else {
+            self.handle_load_variant_no_point_access(context)
+        }
+    }
+
+    fn handle_load_variant_without_point_access(&mut self, context: LoadVariantContext) -> DescResult {
+        DescResult::Success
+    }
+
+    fn handle_load_variant_no_point_access(&mut self, context: LoadVariantContext) -> DescResult {
         /*
          * 1. 从作用域中递归查找变量名对应的地址
          * */

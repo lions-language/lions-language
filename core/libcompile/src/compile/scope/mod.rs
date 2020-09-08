@@ -43,12 +43,6 @@ pub struct StructInit {
     addr_length: usize
 }
 
-#[derive(Default, FieldGet, NewWithAll
-    , FieldGetClone, FieldGetMove
-    , Clone)]
-pub struct PointAccess {
-}
-
 #[derive(FieldGet, FieldGetMove)]
 pub struct Scope {
     scope_typ: ScopeType,
@@ -74,7 +68,7 @@ pub struct Scope {
     /*
      * . 操作符
      * */
-    pointaccess_stack: Option<VecDeque<PointAccess>>
+    is_point_access: bool
 }
 
 impl Scope {
@@ -352,6 +346,14 @@ impl Scope {
         self.structinit_stack.as_ref().unwrap().front().unwrap()
     }
 
+    pub fn set_is_point_access(&mut self, is_point_access: bool) {
+        self.is_point_access = is_point_access;
+    }
+
+    pub fn get_is_point_access(&self) -> bool {
+        return self.is_point_access;
+    }
+
     pub fn new_with_addr_start(start: usize, scope_typ: ScopeType) -> Self {
         Self {
             scope_typ: scope_typ,
@@ -365,7 +367,7 @@ impl Scope {
             return_jumps: None,
             structinit_field_stack: None,
             structinit_stack: None,
-            pointaccess_stack: None
+            is_point_access: false
         }
     }
 

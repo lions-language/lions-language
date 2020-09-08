@@ -401,6 +401,14 @@ impl<'a, F: Compile> Grammar for Compiler<'a, F> {
     fn struct_init_end(&mut self, init_context: &mut GrammarStructInitContext) -> DescResult {
         self.process_struct_init_end(init_context)
     }
+
+    fn enter_point_access(&mut self) {
+        self.process_enter_point_access();
+    }
+
+    fn leave_point_access(&mut self) {
+        self.process_leave_point_access();
+    }
 }
 
 impl<'a, F: Compile> Compiler<'a, F> {
@@ -444,6 +452,7 @@ mod variant;
 mod block;
 mod structure;
 mod structinit;
+mod point_access;
 
 #[cfg(test)]
 mod test {
