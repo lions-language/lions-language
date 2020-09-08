@@ -43,6 +43,12 @@ pub struct StructInit {
     addr_length: usize
 }
 
+#[derive(Default, FieldGet, NewWithAll
+    , FieldGetClone, FieldGetMove
+    , Clone)]
+pub struct PointAccess {
+}
+
 #[derive(FieldGet, FieldGetMove)]
 pub struct Scope {
     scope_typ: ScopeType,
@@ -59,11 +65,16 @@ pub struct Scope {
      * 记录函数传入参数的地址索引, 用于 return 语句的时候, 如果是引用类型, 判断引用的是哪个输入参数
      * */
     func_param_addr_index: Option<Vec<(usize, TypeAttrubute)>>,
-    /* 记录 return 语句 的跳转指令索引
+    /* 
+     * 记录 return 语句 的跳转指令索引
      * */
     return_jumps: Option<Vec<usize>>,
     structinit_field_stack: Option<VecDeque<StructInitField>>,
-    structinit_stack: Option<VecDeque<StructInit>>
+    structinit_stack: Option<VecDeque<StructInit>>,
+    /*
+     * . 操作符
+     * */
+    pointaccess_stack: Option<VecDeque<PointAccess>>
 }
 
 impl Scope {
@@ -353,7 +364,8 @@ impl Scope {
             func_param_addr_index: None,
             return_jumps: None,
             structinit_field_stack: None,
-            structinit_stack: None
+            structinit_stack: None,
+            pointaccess_stack: None
         }
     }
 
