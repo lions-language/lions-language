@@ -74,6 +74,12 @@ impl AddressValueExpand for AddressValue {
         *addr.scope_mut() += n;
     }
 
+    fn clone_with_index_plus(&self, n: usize) -> AddressValue {
+        let mut value = self.clone();
+        *value.addr_mut().index_mut() += n as u64;
+        value
+    }
+
     fn clone_with_scope_plus(&self, n: usize) -> AddressValue {
         let mut value = self.clone();
         *value.addr_mut().scope_mut() += n;
@@ -121,8 +127,16 @@ impl TypeTokenExpand for TypeToken {
                             compiler.module_stack.current().name_ref()
                             , &t) {
                             Some(sd) => {
+                                // println!("--- {:?}, {:?}", sd, StructObject::from_ref(sd));
+                                // println!("name: {}", t);
+                                // sd.member_ref().as_ref().unwrap().print_members();
+                                let struct_obj = StructObject::from_ref(sd);
+                                /*
+                                println!("xxxxxxxxxxxxx {:?}", struct_obj);
+                                struct_obj.as_ref().name_ref();
+                                */
                                 Type::new_with_addrtyp(
-                                    TypeValue::Structure(Structure::new(StructObject::from_ref(sd)))
+                                    TypeValue::Structure(Structure::new(struct_obj))
                                     , TypeAddrType::Stack)
                             },
                             None => {

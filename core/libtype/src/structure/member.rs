@@ -5,6 +5,7 @@ use std::collections::HashMap;
 impl StructMember {
     pub fn add(&mut self, name: String
         , typ: Type, typ_attr: TypeAttrubute) {
+        // println!("add {}, typ: {:?}", name, typ);
         /*
          * 该函数被调用之前, typ 已经被计算好(如果是第三方包,
          * 会先被加载到内存, 然后将引用地址写入到 Type::Structure g)
@@ -75,6 +76,19 @@ impl StructMember {
     pub fn print_members(&self) {
         for item in self.members.iter() {
             println!("{:?}", item);
+        }
+    }
+
+    pub fn print_members_struct_fields(&self) {
+        use crate::TypeValue;
+        for (name, field) in self.members.iter() {
+            match field.typ_ref().typ_ref() {
+                TypeValue::Structure(s) => {
+                    let struct_obj = s.struct_obj_ref();
+                    println!("{:?}", struct_obj.as_ref());
+                },
+                _ => {}
+            }
         }
     }
 

@@ -1,12 +1,14 @@
 use libgrammar::token::{TokenValue, TokenData};
 use libgrammar::grammar::{LoadVariantContext};
 use libtype::function::{AddFunctionContext};
+use libtype::structure::{StructDefine};
 use libtype::{PackageType, PackageTypeValue
     , AddressType, TypeAttrubute, TypeValue};
 use libresult::DescResult;
 use libcommon::ptr::{RefPtr};
 use crate::compile::{Compile, Compiler, AddressValueExpand};
 use crate::compile::value_buffer::{ValueBufferItemContext};
+use crate::address::Address;
 
 impl<'a, F: Compile> Compiler<'a, F> {
     pub fn handle_load_variant(&mut self, context: LoadVariantContext) -> DescResult {
@@ -44,6 +46,52 @@ impl<'a, F: Compile> Compiler<'a, F> {
                             format!("not found {}, in {:?}", first, struct_define.name_ref()));
                     }
                 };
+                member.print_members();
+                /*
+                println!("{}"
+                    , self.struct_control.define_length(self.module_stack.current().name_ref()));
+                println!("xxxxxxxxxxxxxxx, {:?}", field);
+                */
+                match field.typ_ref().typ_ref() {
+                    TypeValue::Structure(s) => {
+                        println!("{:?}", s);
+                        let struct_define = s.struct_obj_ref().as_ref();
+                        println!("--- {:?} ---", struct_define);
+                        // println!("{}", struct_define.name_ref());
+                        let member = match struct_define.member_ref() {
+                            Some(m) => m,
+                            None => {
+                                return DescResult::Error(
+                                    format!("not found {}, in {:?}", first, struct_define.name_ref()));
+                            }
+                        };
+                        // println!("{:?}, {:?}", RefPtr::from_ref(struct_define), RefPtr::from_ref(member));
+                        // println!("name: {}, {:?}", struct_define.name_ref(), RefPtr::from_ref(member));
+                        /*
+                        let field = match member.find_field(&first) {
+                            Some(f) => f,
+                            None => {
+                                return DescResult::Error(
+                                    format!("not found {}, in {:?}", first, struct_define.name_ref()));
+                            }
+                        };
+                        */
+                    },
+                    _ => {
+                    }
+                }
+                /*
+                let at = if var_typ_attr.is_ref() {
+                    var_typ_attr
+                } else {
+                    typ_attr
+                };
+                */
+                self.scope_context.push_with_addr_context_typattr_to_value_buffer(
+                    field.typ_clone()
+                    , Address::new(value_addr.clone_with_index_plus(field.index_clone()))
+                    , value_context
+                    , field.typ_attr_clone());
                 println!("{:?}", field);
             },
             _ => {

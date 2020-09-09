@@ -140,6 +140,7 @@ trait TokenValueExpand {
 
 trait AddressValueExpand {
     fn add_scope(&mut self, n: usize);
+    fn clone_with_index_plus(&self, n: usize) -> AddressValue;
     fn clone_with_scope_plus(&self, n: usize) -> AddressValue;
     fn clone_with_scope_minus(&self, n: usize) -> AddressValue;
     fn addr_with_scope_minus(self, n: usize) -> AddressValue;

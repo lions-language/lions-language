@@ -1,3 +1,4 @@
+use libtype::{TypeValue};
 use libtype::structure::{StructDefine
     , StructMember};
 use libgrammar::grammar::{StructDefineFieldContext};
@@ -16,7 +17,16 @@ impl<'a, F: Compile> Compiler<'a, F> {
         let name = extract_token_data!(name_data, Id);
         match define.member_mut() {
             Some(m) => {
-                m.add(name, self.to_type(type_token), typ_attr);
+                let typ = self.to_type(type_token);
+                /*
+                if let TypeValue::Structure(s) = typ.typ_ref() {
+                    let struct_obj = s.struct_obj_ref();
+                    println!("{:?}", struct_obj);
+                    let d = struct_obj.as_ref().name_ref();
+                    println!("{:?}", struct_obj.as_ref());
+                };
+                */
+                m.add(name, typ, typ_attr);
             },
             None => {
                 let mut m = StructMember::new();
@@ -32,6 +42,14 @@ impl<'a, F: Compile> Compiler<'a, F> {
             self.module_stack.current().name_clone()
             , define.name_ref().clone()
             , define);
+        /*
+        println!("*****************************");
+        self.struct_control.print_defines();
+        println!("*****************************");
+        */
+        println!("*****************************");
+        self.struct_control.print_members_struct_fields();
+        println!("*****************************");
     }
 }
 

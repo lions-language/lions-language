@@ -15,6 +15,27 @@ impl DefineContainer {
         self.defines.get(name)
     }
 
+    pub fn length(&self) -> usize {
+        self.defines.len()
+    }
+    
+    pub fn print_defines(&self) {
+        for define in self.defines.iter() {
+            println!("{:?}", define);
+        }
+    }
+
+    pub fn print_members_struct_fields(&self) {
+        for (_, define) in self.defines.iter() {
+            match define.member_ref() {
+                Some(m) => {
+                    m.print_members_struct_fields();
+                },
+                None => {}
+            }
+        }
+    }
+
     pub fn new() -> Self {
         Self {
             defines: HashMap::new()
@@ -61,6 +82,29 @@ impl StructControl {
             None => {
                 None
             }
+        }
+    }
+
+    pub fn define_length(&self, module_str: &str) -> usize {
+        match self.defines.get(module_str) {
+            Some(c) => {
+                c.length()
+            },
+            None => {
+                0
+            }
+        }
+    }
+
+    pub fn print_defines(&self) {
+        for (_, define) in self.defines.iter() {
+            define.print_defines();
+        }
+    }
+
+    pub fn print_members_struct_fields(&self) {
+        for (_, define) in self.defines.iter() {
+            define.print_members_struct_fields();
         }
     }
 

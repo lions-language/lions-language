@@ -94,6 +94,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
         // println!("{}", full_name);
         let value = self.scope_context.current_mut_unchecked()
             .get_structinit_stack_top_item_unchecked();
+        // println!("{}: {:?}", full_name, value.define_ref());
         let start_addr_index = value.addr_index_clone();
         let define = value.define_ref().as_ref::<StructDefine>();
         let member = match define.member_ref() {
