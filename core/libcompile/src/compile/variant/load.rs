@@ -2,7 +2,7 @@ use libgrammar::token::{TokenValue, TokenData};
 use libgrammar::grammar::{LoadVariantContext};
 use libtype::function::{AddFunctionContext};
 use libtype::{PackageType, PackageTypeValue
-    , AddressType, TypeAttrubute};
+    , AddressType, TypeAttrubute, TypeValue};
 use libresult::DescResult;
 use libcommon::ptr::{RefPtr};
 use crate::compile::{Compile, Compiler, AddressValueExpand};
@@ -18,6 +18,39 @@ impl<'a, F: Compile> Compiler<'a, F> {
     }
 
     fn handle_load_variant_without_point_access(&mut self, context: LoadVariantContext) -> DescResult {
+        let (first, _, typ_attr, lengthen_offset) = context.fields_move();
+        let first_data = first.token_data().expect("should not happend");
+        let first = extract_token_data!(first_data, Id);
+        let value_item = self.scope_context.take_top_from_value_buffer();
+        // println!("{:?}", &value);
+        let value_typ = value_item.typ_ref().clone();
+        let value_typ_attr = value_item.typ_attr_clone();
+        let value_addr = value_item.addr_ref().addr_clone();
+        let value_context = value_item.context_clone();
+        match value_typ.typ_ref() {
+            TypeValue::Structure(s) => {
+                let struct_define = s.struct_obj_ref().as_ref();
+                let member = match struct_define.member_ref() {
+                    Some(m) => m,
+                    None => {
+                        return DescResult::Error(
+                            format!("not found {}, in {:?}", first, struct_define.name_ref()));
+                    }
+                };
+                let field = match member.find_field(&first) {
+                    Some(f) => f,
+                    None => {
+                        return DescResult::Error(
+                            format!("not found {}, in {:?}", first, struct_define.name_ref()));
+                    }
+                };
+                println!("{:?}", field);
+            },
+            _ => {
+                return DescResult::Error(
+                    format!("not found {}, in {:?}", first, value_typ));
+            }
+        }
         DescResult::Success
     }
 
