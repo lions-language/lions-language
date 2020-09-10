@@ -1,5 +1,11 @@
 use super::{HeapPtr, Heap};
 
+/*
+pub struct HeapGet<T> {
+    value: Heap<T>
+}
+*/
+
 impl HeapPtr {
     pub fn alloc<T>(value: T) -> Self {
         let b = Heap::new(value);
@@ -19,6 +25,15 @@ impl HeapPtr {
         unsafe{Heap::from_raw(self.ptr as *mut T)}
     }
 
+    /*
+    pub fn get<T>(&self) -> HeapGet<T> {
+        let b = unsafe{Heap::from_raw(self.ptr as *mut T)};
+        HeapGet::<T>{
+            value: b
+        }
+    }
+    */
+
     pub fn pop<T>(&self) -> Heap<T> {
         unsafe{Heap::from_raw(self.ptr as *mut T)}
     }
@@ -37,7 +52,28 @@ impl HeapPtr {
         let b = unsafe{Heap::from_raw(self.ptr as *mut T)};
         std::mem::drop(b);
     }
+
+    pub fn new_null() -> Self {
+        Self {
+            ptr: 0
+        }
+    }
 }
+
+impl Default for HeapPtr {
+    fn default() -> Self {
+        Self::default()
+    }
+}
+
+/*
+impl<T> Drop for HeapGet<T> {
+    fn drop(&mut self) {
+        let bp = Heap::into_raw(self.value);
+        std::mem::forget(self.value);
+    }
+}
+*/
 
 #[cfg(test)]
 mod test {

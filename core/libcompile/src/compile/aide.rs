@@ -130,7 +130,7 @@ impl TypeTokenExpand for TypeToken {
                                 // println!("--- {:?}, {:?}", sd, StructObject::from_ref(sd));
                                 // println!("name: {}", t);
                                 // sd.member_ref().as_ref().unwrap().print_members();
-                                let struct_obj = StructObject::from_ref(sd);
+                                let struct_obj = StructObject::new(sd.clone());
                                 /*
                                 println!("xxxxxxxxxxxxx {:?}", struct_obj);
                                 struct_obj.as_ref().name_ref();

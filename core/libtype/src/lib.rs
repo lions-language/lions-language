@@ -1,4 +1,4 @@
-use libcommon::ptr::RefPtr;
+use libcommon::ptr::{RefPtr, HeapPtr, Heap};
 use libmacro::{FieldGet, FieldGetClone
     , FieldGetMove, NewWithAll};
 use crate::primeval::{PrimevalType, PrimevalData};
@@ -7,14 +7,17 @@ use std::cmp::{PartialEq, Eq};
 use std::hash::Hash;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct StructObject(RefPtr);
+pub struct StructObject(HeapPtr);
 
 impl StructObject {
-    pub fn from_ref(define: &StructDefine) -> Self {
-        Self(RefPtr::from_ref::<StructDefine>(define))
+    pub fn pop(&self) -> Heap<StructDefine> {
+        self.0.pop()
     }
-    pub fn as_ref(&self) -> &StructDefine {
-        self.0.as_ref::<StructDefine>()
+    pub fn push(&self, v: Heap<StructDefine>) {
+        self.0.push(v);
+    }
+    pub fn new(p: HeapPtr) -> Self {
+        Self(p)
     }
 }
 

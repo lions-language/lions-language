@@ -1,4 +1,4 @@
-use libcommon::ptr::RefPtr;
+use libcommon::ptr::{HeapPtr, RefPtr};
 use libmacro::{FieldGet, FieldGetMove
     , FieldGetClone, NewWithAll};
 use libtype::{AddressType, AddressValue, AddressKey
@@ -38,7 +38,7 @@ pub struct StructInitField {
     , FieldGetClone, FieldGetMove
     , Clone)]
 pub struct StructInit {
-    define: RefPtr,
+    define: HeapPtr,
     addr_index: usize,
     addr_length: usize
 }

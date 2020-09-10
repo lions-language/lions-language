@@ -1,4 +1,4 @@
-use libcommon::ptr::RefPtr;
+use libcommon::ptr::{HeapPtr, RefPtr};
 use libgrammar::grammar::{StructInitContext
     , StructInitFieldContext};
 use libgrammar::token::{TokenData};
@@ -17,7 +17,7 @@ use crate::compile::value_buffer::{ValueBufferItemContext};
 impl<'a, F: Compile> Compiler<'a, F> {
     pub fn process_struct_init_start(&mut self
         , init_context: &mut StructInitContext) -> DescResult {
-        let define = match self.struct_control.find_define(
+        let de = match self.struct_control.find_define(
             self.module_stack.current().name_ref(), init_context.struct_name_ref()) {
             Some(define) => {
                 define
@@ -27,7 +27,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
                     format!("struct: {:?} not define", init_context.struct_name_ref()));
             }
         };
-        *init_context.define_mut() = RefPtr::from_ref(define);
+        *init_context.define_mut() = de.clone();
+        let define = de.pop::<StructDefine>();
         let member_length = define.member_length();
         let addr_index =
             if self.scope_context.current_mut_unchecked().structinit_is_empty() {
@@ -61,14 +62,15 @@ impl<'a, F: Compile> Compiler<'a, F> {
         };
         // println!("{}, {}", addr_index, member_length);
         self.scope_context.current_mut_unchecked().enter_structinit_stack(
-            StructInit::new_with_all(RefPtr::from_ref(define), addr_index, member_length));
+            StructInit::new_with_all(de.clone(), addr_index, member_length));
+        de.push(define);
         DescResult::Success
     }
 
     pub fn process_struct_init_end(&mut self
         , init_context: &mut StructInitContext) -> DescResult {
         let value = self.scope_context.current_mut_unchecked().leave_structinit_stack().unwrap();
-        let typ = Type::from_struct(value.define_ref().as_ref::<StructDefine>(), TypeAddrType::Stack);
+        let typ = Type::from_struct(value.define_clone(), TypeAddrType::Stack);
         let addr = Address::new(AddressValue::new(
             typ.to_address_type(), AddressKey::new_with_all(
                 value.addr_index_clone() as u64, 0, 0, 0, value.addr_length_clone())));
@@ -96,7 +98,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
             .get_structinit_stack_top_item_unchecked();
         // println!("{}: {:?}", full_name, value.define_ref());
         let start_addr_index = value.addr_index_clone();
-        let define = value.define_ref().as_ref::<StructDefine>();
+        let define = value.define_ref().pop::<StructDefine>();
         let member = match define.member_ref() {
             Some(m) => m,
             None => {
@@ -114,9 +116,11 @@ impl<'a, F: Compile> Compiler<'a, F> {
                         , full_name));
             }
         };
+        let field_ptr = RefPtr::from_ref(field);
+        value.define_ref().push(define);
         *self.scope_context.current_mut_unchecked()
             .get_current_mut_structinit_field_stack_unchecked()
-            .field_mut() = RefPtr::from_ref(field);
+            .field_mut() = field_ptr;
         DescResult::Success
     }
 

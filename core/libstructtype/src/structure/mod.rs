@@ -1,17 +1,25 @@
 use libtype::structure::{StructDefine};
 use std::collections::HashMap;
+use libcommon::ptr::{HeapPtr, Heap};
 
+/*
+ * NOTE NOTE NOTE
+ * 这里不能将 StructDefine 存储到 value 中
+ * 因为HashMap扩容的原因, 将导致写入 Type 中的地址变为无效的
+ * 所以, 当是 Structure 的时候, Type 中存储 HeapPtr 而不是 RefPtr
+ * */
 struct DefineContainer {
-    defines: HashMap<String, StructDefine>
+    defines: HashMap<String, HeapPtr>
 }
 
 impl DefineContainer {
     pub fn add_define(&mut self, name: String
         , define: StructDefine) {
-        self.defines.insert(name, define);
+        let hp = HeapPtr::alloc(define);
+        self.defines.insert(name, hp);
     }
 
-    pub fn find_define(&self, name: &str) -> Option<&StructDefine> {
+    pub fn find_define(&self, name: &str) -> Option<&HeapPtr> {
         self.defines.get(name)
     }
 
@@ -20,19 +28,29 @@ impl DefineContainer {
     }
     
     pub fn print_defines(&self) {
-        for define in self.defines.iter() {
-            println!("{:?}", define);
+        for (name, define) in self.defines.iter() {
+            let v = define.pop::<StructDefine>();
+            println!("{}: {:?}", name, v);
+            define.push(v);
         }
     }
 
     pub fn print_members_struct_fields(&self) {
-        for (_, define) in self.defines.iter() {
+        for (_, de) in self.defines.iter() {
+            let define = de.pop::<StructDefine>();
             match define.member_ref() {
                 Some(m) => {
                     m.print_members_struct_fields();
                 },
                 None => {}
             }
+            de.push(define);
+        }
+    }
+
+    pub fn print_define_ptr(&self) {
+        for (name, define) in self.defines.iter() {
+            println!("{}: {:?}", name, define);
         }
     }
 
@@ -74,7 +92,7 @@ impl StructControl {
     }
 
     pub fn find_define(&self, module_str: &str
-        , name: &str) -> Option<&StructDefine> {
+        , name: &str) -> Option<&HeapPtr> {
         match self.defines.get(module_str) {
             Some(c) => {
                 c.find_define(name)
@@ -105,6 +123,13 @@ impl StructControl {
     pub fn print_members_struct_fields(&self) {
         for (_, define) in self.defines.iter() {
             define.print_members_struct_fields();
+        }
+    }
+
+    pub fn print_define_ptr(&self) {
+        for (name, define) in self.defines.iter() {
+            println!("{}", name);
+            define.print_define_ptr();
         }
     }
 

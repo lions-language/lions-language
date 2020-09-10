@@ -18,14 +18,6 @@ impl<'a, F: Compile> Compiler<'a, F> {
         match define.member_mut() {
             Some(m) => {
                 let typ = self.to_type(type_token);
-                /*
-                if let TypeValue::Structure(s) = typ.typ_ref() {
-                    let struct_obj = s.struct_obj_ref();
-                    println!("{:?}", struct_obj);
-                    let d = struct_obj.as_ref().name_ref();
-                    println!("{:?}", struct_obj.as_ref());
-                };
-                */
                 m.add(name, typ, typ_attr);
             },
             None => {
@@ -37,19 +29,10 @@ impl<'a, F: Compile> Compiler<'a, F> {
     }
 
     pub fn process_struct_define_end(&mut self, define: StructDefine) {
-        // define.print();
         self.struct_control.add_define(
             self.module_stack.current().name_clone()
             , define.name_ref().clone()
             , define);
-        /*
-        println!("*****************************");
-        self.struct_control.print_defines();
-        println!("*****************************");
-        */
-        println!("*****************************");
-        self.struct_control.print_members_struct_fields();
-        println!("*****************************");
     }
 }
 

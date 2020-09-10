@@ -24,7 +24,7 @@ impl StructMember {
                 /*
                  * 将结构体展开
                  * */
-                let struct_define = s.struct_obj.as_ref();
+                let struct_define = s.struct_obj.pop();
                 let members = match struct_define.member_ref() {
                     Some(ms) => {
                         ms.members_ref()
@@ -39,6 +39,7 @@ impl StructMember {
                         , field.clone_with_index_plus(self.index));
                 }
                 self.index += members.len();
+                s.struct_obj_ref().push(struct_define);
             },
             _ => {
                 /*
@@ -85,7 +86,9 @@ impl StructMember {
             match field.typ_ref().typ_ref() {
                 TypeValue::Structure(s) => {
                     let struct_obj = s.struct_obj_ref();
-                    println!("{:?}", struct_obj.as_ref());
+                    let v = struct_obj.pop();
+                    println!("{:?}", v);
+                    struct_obj.push(v);
                 },
                 _ => {}
             }

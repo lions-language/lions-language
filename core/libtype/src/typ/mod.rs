@@ -1,3 +1,4 @@
+use libcommon::ptr::{HeapPtr};
 use crate::{Type, TypeValue
     , Primeval, TypeAddrType
     , TypeAttrubute
@@ -13,7 +14,13 @@ impl Type {
                 v.typ.to_str()
             },
             TypeValue::Structure(sp) => {
-                sp.struct_obj.as_ref().name_ref()
+                /*
+                let v = sp.struct_obj.pop();
+                let name = v.name_ref();
+                sp.struct_obj_ref().push(v);
+                name
+                */
+                unimplemented!("struct Type::to_str");
             },
             TypeValue::Any => {
                 consts::ANY_TYPE
@@ -30,7 +37,10 @@ impl Type {
     pub fn addr_length(&self) -> usize {
         match self.typ_ref() {
             TypeValue::Structure(dp) => {
-                dp.struct_obj_ref().as_ref().member_length()
+                let v = dp.struct_obj_ref().pop();
+                let len = v.member_length();
+                dp.struct_obj_ref().push(v);
+                len
             },
             _ => {
                 0
@@ -38,11 +48,11 @@ impl Type {
         }
     }
 
-    pub fn from_struct(define: &StructDefine
+    pub fn from_struct(define: HeapPtr
         , addr_typ: TypeAddrType) -> Self {
         Type::new_with_addrtyp(TypeValue::Structure(
                 Structure::new(
-                    StructObject::from_ref(define)))
+                    StructObject::new(define)))
             , addr_typ)
     }
 

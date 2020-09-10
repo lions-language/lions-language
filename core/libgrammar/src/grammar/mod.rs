@@ -1,6 +1,6 @@
 use crate::lexical::{LexicalParser, CallbackReturnStatus, TokenVecItem, TokenPointer};
 use crate::token::{TokenType, TokenValue, TokenMethodResult};
-use libcommon::ptr::RefPtr;
+use libcommon::ptr::{RefPtr, HeapPtr};
 use libtype::{Type, PackageType, TypeAttrubute
     , function::FunctionParamLengthenAttr
     , structure::StructDefine};
@@ -92,7 +92,7 @@ impl CallFunctionContext {
     , Default)]
 pub struct StructInitContext {
     struct_name: String,
-    define: RefPtr,
+    define: HeapPtr,
     desc_ctx: DescContext
 }
 

@@ -31,7 +31,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
         let value_context = value_item.context_clone();
         match value_typ.typ_ref() {
             TypeValue::Structure(s) => {
-                let struct_define = s.struct_obj_ref().as_ref();
+                let struct_define = s.struct_obj_ref().pop();
                 let member = match struct_define.member_ref() {
                     Some(m) => m,
                     None => {
@@ -46,40 +46,6 @@ impl<'a, F: Compile> Compiler<'a, F> {
                             format!("not found {}, in {:?}", first, struct_define.name_ref()));
                     }
                 };
-                member.print_members();
-                /*
-                println!("{}"
-                    , self.struct_control.define_length(self.module_stack.current().name_ref()));
-                println!("xxxxxxxxxxxxxxx, {:?}", field);
-                */
-                match field.typ_ref().typ_ref() {
-                    TypeValue::Structure(s) => {
-                        println!("{:?}", s);
-                        let struct_define = s.struct_obj_ref().as_ref();
-                        println!("--- {:?} ---", struct_define);
-                        // println!("{}", struct_define.name_ref());
-                        let member = match struct_define.member_ref() {
-                            Some(m) => m,
-                            None => {
-                                return DescResult::Error(
-                                    format!("not found {}, in {:?}", first, struct_define.name_ref()));
-                            }
-                        };
-                        // println!("{:?}, {:?}", RefPtr::from_ref(struct_define), RefPtr::from_ref(member));
-                        // println!("name: {}, {:?}", struct_define.name_ref(), RefPtr::from_ref(member));
-                        /*
-                        let field = match member.find_field(&first) {
-                            Some(f) => f,
-                            None => {
-                                return DescResult::Error(
-                                    format!("not found {}, in {:?}", first, struct_define.name_ref()));
-                            }
-                        };
-                        */
-                    },
-                    _ => {
-                    }
-                }
                 /*
                 let at = if var_typ_attr.is_ref() {
                     var_typ_attr
@@ -93,6 +59,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                     , value_context
                     , field.typ_attr_clone());
                 println!("{:?}", field);
+                s.struct_obj_ref().push(struct_define);
             },
             _ => {
                 return DescResult::Error(
