@@ -13,13 +13,13 @@ use crate::address::Address;
 impl<'a, F: Compile> Compiler<'a, F> {
     pub fn handle_load_variant(&mut self, context: LoadVariantContext) -> DescResult {
         if self.scope_context.current_unchecked().get_is_point_access() {
-            self.handle_load_variant_without_point_access(context)
+            self.handle_load_variant_with_point_access(context)
         } else {
             self.handle_load_variant_no_point_access(context)
         }
     }
 
-    fn handle_load_variant_without_point_access(&mut self, context: LoadVariantContext) -> DescResult {
+    fn handle_load_variant_with_point_access(&mut self, context: LoadVariantContext) -> DescResult {
         let (first, _, typ_attr, lengthen_offset) = context.fields_move();
         let first_data = first.token_data().expect("should not happend");
         let first = extract_token_data!(first_data, Id);
@@ -50,15 +50,20 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 let at = if var_typ_attr.is_ref() {
                     var_typ_attr
                 } else {
-                    typ_attr
+                    field.typ_attr_clone()
                 };
                 */
+                // println!("{:?}", value_addr);
                 self.scope_context.push_with_addr_context_typattr_to_value_buffer(
                     field.typ_clone()
-                    , Address::new(value_addr.clone_with_index_plus(field.index_clone()))
+                    , Address::new(field.addr_ref().clone_with_index_plus(field.index_clone()+1))
                     , value_context
                     , field.typ_attr_clone());
-                println!("{:?}", field);
+                /*
+                println!("{:?}"
+                    , Address::new(value_addr.clone_with_index_plus(field.index_clone()+1)));
+                */
+                // println!("{:?}", field);
                 s.struct_obj_ref().push(struct_define);
             },
             _ => {
@@ -107,6 +112,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
          *  如果变量前面没有 `&`, 那么是否是 引用 决定于 被指向的数据
          *  (可能存在 var b = &1; var a = b; 那么 a 应该是引用, 而不是 移动)
          * */
+        // println!("{:?}", var_addr);
         let at = if var_typ_attr.is_ref() {
             var_typ_attr
         } else {

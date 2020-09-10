@@ -3,12 +3,14 @@ use libgrammar::grammar::{StructInitContext
     , StructInitFieldContext};
 use libgrammar::token::{TokenData};
 use libtype::{Type, TypeAddrType
-    , AddressKey, AddressValue};
+    , AddressKey, AddressValue
+    , Data, DataValue};
 use libtype::structure::{StructDefine
-    , StructField};
+    , StructField, StructureData};
 use libresult::{DescResult};
 use crate::compile::{Compile, Compiler
-    , OwnershipMoveContext, AddRefParamAddr};
+    , OwnershipMoveContext, AddRefParamAddr
+    , LoadStackContext};
 use crate::compile::address::Address;
 use crate::compile::scope::{StructInitField
     , StructInit};
@@ -75,6 +77,14 @@ impl<'a, F: Compile> Compiler<'a, F> {
             typ.to_address_type(), AddressKey::new_with_all(
                 value.addr_index_clone() as u64, 0, 0, 0, value.addr_length_clone())));
         // println!("{:?}", addr);
+        if self.scope_context.current_mut_unchecked().structinit_is_empty() {
+            /*
+             * 为顶级分配空间
+             * */
+            let context = LoadStackContext::new_with_all(
+                addr.addr_clone(), Data::new(DataValue::Structure(StructureData::new())));
+            self.cb.load_stack(context);
+        }
         self.scope_context.push_with_addr_context_typattr_to_value_buffer(
             typ
             , addr, ValueBufferItemContext::Structure

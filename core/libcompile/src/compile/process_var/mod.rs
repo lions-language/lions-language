@@ -47,6 +47,15 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 Address::new(src_addr.clone()), typ, typ_attr));
         */
         // println!("{:?}", typ_attr);
+        match value.context_ref() {
+            ValueBufferItemContext::Structure => {
+                self.scope_context.add_variant(name
+                    , Variant::new_with_all(
+                        Address::new(src_addr), typ, typ_attr));
+                return;
+            },
+            _ => {}
+        }
         match &typ_attr {
             TypeAttrubute::Move
             | TypeAttrubute::CreateRef => {
@@ -56,6 +65,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                  * 这样虚拟机在作用域结束的时候就可以通过这个标识找到地址, 然后进行释放
                  * */
                 let addr = self.scope_context.alloc_address(typ.to_address_type(), 0);
+                // println!("alloc addr: {:?}", addr);
                 self.scope_context.add_variant(name
                     , Variant::new_with_all(
                         Address::new(addr.addr_clone()), typ, typ_attr));
