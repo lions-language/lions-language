@@ -1,13 +1,38 @@
 use libmacro::{FieldGet, FieldGetMove, NewWithAll};
-use libtype::{Type, TypeAttrubute};
+use libtype::{Type, TypeAttrubute, AddressKey};
 use crate::address::Address;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
-#[derive(FieldGet, FieldGetMove, NewWithAll)]
+#[derive(FieldGet, FieldGetMove)]
 pub struct Variant {
     addr: Address,
     typ: Type,
-    typ_attr: TypeAttrubute
+    typ_attr: TypeAttrubute,
+    /*
+     * 连续地址
+     * */
+    consecutive_addr: Option<HashSet<AddressKey>>
+}
+
+impl Variant {
+    pub fn new(addr: Address, typ: Type, typ_attr: TypeAttrubute) -> Self {
+        let length = addr.addr_ref().addr_ref().length_clone();
+        let consecutive_addr = if length == 0 {
+            None
+        } else {
+            let mut s = HashSet::with_capacity(length);
+            for i in 1..=length {
+                s.insert(addr.addr_ref().addr_ref().clone_with_index_plus(i));
+            }
+            Some(s)
+        };
+        Self {
+            addr: addr,
+            typ: typ,
+            typ_attr: typ_attr,
+            consecutive_addr: consecutive_addr
+        }
+    }
 }
 
 pub struct Variants {

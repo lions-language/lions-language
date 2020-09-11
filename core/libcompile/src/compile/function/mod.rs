@@ -78,7 +78,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
          *  地址是参数的序号
          * */
         self.scope_context.add_variant(name
-            , Variant::new_with_all(
+            , Variant::new(
                 /*
                 Address::new(AddressValue::new(typ.to_address_type()
                         , AddressKey::new(param_no as u64)))

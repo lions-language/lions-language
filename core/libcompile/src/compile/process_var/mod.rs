@@ -24,7 +24,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
            , Id);
         if !is_exist_equal {
             self.scope_context.add_variant(name
-                , Variant::new_with_all(
+                , Variant::new(
                     Address::new(AddressValue::new_invalid())
                     , Type::new_null()
                     , TypeAttrubute::default()));
@@ -50,7 +50,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
         match value.context_ref() {
             ValueBufferItemContext::Structure => {
                 self.scope_context.add_variant(name
-                    , Variant::new_with_all(
+                    , Variant::new(
                         Address::new(src_addr), typ, typ_attr));
                 return;
             },
@@ -67,7 +67,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 let addr = self.scope_context.alloc_address(typ.to_address_type(), 0);
                 // println!("alloc addr: {:?}", addr);
                 self.scope_context.add_variant(name
-                    , Variant::new_with_all(
+                    , Variant::new(
                         Address::new(addr.addr_clone()), typ, typ_attr));
                 self.cb.ownership_move(OwnershipMoveContext::new_with_all(
                     addr.addr().addr(), src_addr.clone()));
@@ -95,7 +95,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                  * 将实际存储数据的地址存储到 Variant 对象中 (也就是 src_addr)
                  * */
                 self.scope_context.add_variant(name
-                    , Variant::new_with_all(
+                    , Variant::new(
                         Address::new(src_addr), typ, typ_attr));
             },
             TypeAttrubute::Pointer
