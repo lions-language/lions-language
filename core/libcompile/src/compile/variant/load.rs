@@ -3,7 +3,8 @@ use libgrammar::grammar::{LoadVariantContext};
 use libtype::function::{AddFunctionContext};
 use libtype::structure::{StructDefine};
 use libtype::{PackageType, PackageTypeValue
-    , AddressType, TypeAttrubute, TypeValue};
+    , AddressType, TypeAttrubute, TypeValue
+    , AddressKey, AddressValue};
 use libresult::DescResult;
 use libcommon::ptr::{RefPtr};
 use crate::compile::{Compile, Compiler, AddressValueExpand};
@@ -54,15 +55,18 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 };
                 */
                 // println!("{:?}", value_addr);
+                let addr = Address::new(AddressValue::new(
+                        field.addr_type_clone()
+                        , AddressKey::new_with_all(
+                            (value_addr.addr_ref().index_clone() as usize + field.index_clone() + 1)
+                            as u64
+                            , 0, 0, 0, field.length())));
+                println!("{:?}", addr);
                 self.scope_context.push_with_addr_context_typattr_to_value_buffer(
                     field.typ_clone()
-                    , Address::new(field.addr_ref().clone_with_index_plus(field.index_clone()+1))
+                    , addr
                     , value_context
                     , field.typ_attr_clone());
-                /*
-                println!("{:?}"
-                    , Address::new(value_addr.clone_with_index_plus(field.index_clone()+1)));
-                */
                 // println!("{:?}", field);
                 s.struct_obj_ref().push(struct_define);
             },

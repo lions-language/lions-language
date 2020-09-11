@@ -139,9 +139,9 @@ impl<'a, F: Compile> Compiler<'a, F> {
         let value = self.scope_context.current_mut_unchecked()
             .get_structinit_stack_top_item_unchecked();
         let start_addr_index = value.addr_index_clone();
-        let struct_field = self.scope_context.current_unchecked()
-            .get_current_structinit_field_stack_unchecked()
-            .field_ref().as_ref::<StructField>();
+        let struct_field = self.scope_context.current_mut_unchecked()
+            .get_current_mut_structinit_field_stack_unchecked()
+            .field_mut().as_mut::<StructField>();
         /*
          * 1. 从 value buffer 中获取数据
          * 2. 对得到的struct_field地址索引进行赋值操作

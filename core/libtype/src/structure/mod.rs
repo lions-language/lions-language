@@ -1,6 +1,7 @@
 use libmacro::{FieldGet, FieldGetClone
     , FieldGetMove, NewWithAll};
-use crate::{Type, TypeAttrubute};
+use crate::{Type, TypeAttrubute
+    , AddressType};
 use std::collections::{HashMap};
 
 #[derive(Debug, FieldGet
@@ -14,7 +15,8 @@ pub struct StructMethod {
 pub struct StructField {
     index: usize,
     typ: Type,
-    typ_attr: TypeAttrubute
+    typ_attr: TypeAttrubute,
+    addr_type: AddressType
 }
 
 #[derive(Debug, FieldGet

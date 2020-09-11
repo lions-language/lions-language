@@ -187,7 +187,7 @@ impl Scope {
     }
 
     pub fn print_ref_param_addr_mapping(&self) {
-        self.addr_mapping.print();
+        self.ref_param_addr_mapping.print();
     }
 
     pub fn print_addr_mapping(&self) {

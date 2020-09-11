@@ -90,6 +90,7 @@ impl ScopeContext {
                     , link_static, memory, scope+ref_addr.addr_ref().scope_clone())
             },
             _ => {
+                // self.last_n_unchecked(1).print_ref_param_addr_mapping();
                 self.last_n_unchecked(scope).get_data_unchecked(
                     addr, link_static, memory)
             }
