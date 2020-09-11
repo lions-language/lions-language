@@ -80,6 +80,7 @@ mod test {
     use super::*;
 
     #[test]
+    #[ignore]
     fn heap_ptr_test() {
         let p = HeapPtr::alloc(String::from("hello"));
         let value = p.pop::<String>();
