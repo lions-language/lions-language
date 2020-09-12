@@ -41,6 +41,10 @@ impl ScopeContext {
         // self.get_back_mut_n_unchecked(scope).alloc_address(addr_typ, scope)
     }
 
+    pub fn addr_is_valid(&self, addr: &AddressKey) -> bool {
+        self.current_unchecked().addr_is_valid(addr)
+    }
+
     pub fn alloc_continuous_address(&mut self, length: usize) -> usize {
         self.current_mut_unchecked().alloc_continuous_address(length)
     }

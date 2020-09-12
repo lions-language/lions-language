@@ -61,7 +61,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                             (value_addr.addr_ref().index_clone() as usize + field.index_clone() + 1)
                             as u64
                             , 0, 0, 0, field.length())));
-                println!("{:?}", addr);
+                // println!("{:?}", addr);
                 self.scope_context.push_with_addr_context_typattr_to_value_buffer(
                     field.typ_clone()
                     , addr

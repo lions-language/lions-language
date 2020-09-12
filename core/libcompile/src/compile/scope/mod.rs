@@ -76,6 +76,10 @@ impl Scope {
         self.address_dispatch.alloc(addr_typ, scope)
     }
 
+    fn addr_is_valid(&self, addr: &AddressKey) -> bool {
+        self.address_dispatch.addr_is_valid(addr)
+    }
+
     fn alloc_continuous_address(&mut self, length: usize) -> usize {
         self.address_dispatch.alloc_continuous(length)
     }

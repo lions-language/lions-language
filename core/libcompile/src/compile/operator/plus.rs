@@ -47,7 +47,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 match value_context {
                     ValueBufferItemContext::Variant(v) => {
                         let var_name = v.as_ref::<String>();
-                        println!("remove: {}", var_name);
+                        // println!("remove: {}", var_name);
                         self.scope_context.remove_variant_unchecked(
                             src_addr.addr_ref().scope_clone()
                             , var_name, src_addr.addr_ref());
