@@ -13,7 +13,7 @@ use crate::address::Address;
 
 impl<'a, F: Compile> Compiler<'a, F> {
     pub fn handle_load_variant(&mut self, context: LoadVariantContext) -> DescResult {
-        if self.scope_context.current_unchecked().get_is_point_access() {
+        if self.scope_context.current_unchecked().is_point_access() {
             self.handle_load_variant_with_point_access(context)
         } else {
             self.handle_load_variant_no_point_access(context)
@@ -52,13 +52,13 @@ impl<'a, F: Compile> Compiler<'a, F> {
                             format!("not found {}, in {:?}", first, struct_define.name_ref()));
                     }
                 };
-                /*
+                let var_typ_attr = self.scope_context.current_unchecked()
+                    .point_access_top_unchecked().typ_attr_clone();
                 let at = if var_typ_attr.is_ref() {
                     var_typ_attr
                 } else {
                     field.typ_attr_clone()
                 };
-                */
                 // println!("{:?}", value_addr);
                 let addr = Address::new(AddressValue::new(
                         field.addr_type_clone()
@@ -71,7 +71,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                     field.typ_clone()
                     , addr
                     , value_context
-                    , field.typ_attr_clone());
+                    , at);
                 // println!("{:?}", field);
                 s.struct_obj_ref().push(struct_define);
             },

@@ -44,6 +44,13 @@ pub struct StructInit {
     addr_length: usize
 }
 
+#[derive(Default, FieldGet, NewWithAll
+    , FieldGetClone, FieldGetMove
+    , Clone)]
+pub struct PointAccess {
+    typ_attr: TypeAttrubute
+}
+
 #[derive(FieldGet, FieldGetMove)]
 pub struct Scope {
     scope_typ: ScopeType,
@@ -69,7 +76,7 @@ pub struct Scope {
     /*
      * . 操作符
      * */
-    is_point_access: bool
+    point_access: Option<VecDeque<PointAccess>>
 }
 
 impl Scope {
@@ -355,12 +362,52 @@ impl Scope {
         self.structinit_stack.as_ref().unwrap().front().unwrap()
     }
 
-    pub fn set_is_point_access(&mut self, is_point_access: bool) {
-        self.is_point_access = is_point_access;
+    pub fn enter_point_access(&mut self, v: PointAccess) {
+        match &mut self.point_access {
+            Some(pa) => {
+                pa.push_back(v);
+            },
+            None => {
+                let mut vec = VecDeque::new();
+                vec.push_back(v);
+                *&mut self.point_access = Some(vec);
+            }
+        }
     }
 
-    pub fn get_is_point_access(&self) -> bool {
-        return self.is_point_access;
+    pub fn leave_point_access(&mut self) {
+        match &mut self.point_access {
+            Some(pa) => {
+                pa.pop_back();
+                if pa.is_empty() {
+                    *&mut self.point_access = None;
+                }
+            },
+            None => {
+            }
+        }
+    }
+
+    pub fn is_point_access(&self) -> bool {
+        match &self.point_access {
+            Some(_) => {
+                true
+            },
+            None => {
+                false
+            }
+        }
+    }
+
+    pub fn point_access_top_unchecked(&self) -> &PointAccess {
+        match &self.point_access {
+            Some(pa) => {
+                pa.front().expect("should not append")
+            },
+            None => {
+                panic!("should not happend");
+            }
+        }
     }
 
     pub fn new_with_addr_start(start: usize, scope_typ: ScopeType) -> Self {
@@ -376,7 +423,7 @@ impl Scope {
             return_jumps: None,
             structinit_field_stack: None,
             structinit_stack: None,
-            is_point_access: false
+            point_access: None
         }
     }
 

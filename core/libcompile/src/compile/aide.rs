@@ -5,11 +5,12 @@ use libgrammar::grammar::TypeToken;
 use libtype::{Type, Data, TypeValue
     , Primeval, TypeAttrubute
     , DataValue, AddressValue
+    , AddressKey
     , TypeAddrType, Structure
     , StructObject};
 use super::{Compiler, Compile, TokenValueExpand
     , CallFunctionContext, AddressValueExpand
-    , TypeTokenExpand};
+    , TypeTokenExpand, OwnershipMoveContext};
 
 impl<'a, F: Compile> Compiler<'a, F> {
     pub fn to_type(&self, typ: TypeToken) -> Type {

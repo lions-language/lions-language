@@ -181,6 +181,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 // println!("move: {:?} <= {:?}", addr.addr_ref(), value_addr);
                 self.cb.ownership_move(OwnershipMoveContext::new_with_all(
                     addr.addr().addr(), value_addr.clone()));
+                self.scope_context.recycle_address(value_addr.clone());
             } else if field_typ_attr.is_ref() {
                 // println!("add_ref: {:?} <= {:?}", addr.addr_ref(), value_addr);
                 self.cb.add_ref_param_addr(

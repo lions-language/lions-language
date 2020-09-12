@@ -1,14 +1,18 @@
 use crate::compile::{Compile, Compiler};
+use crate::compile::scope::{PointAccess};
 
 impl<'a, F: Compile> Compiler<'a, F> {
     pub fn process_enter_point_access(&mut self) {
+        let value = self.scope_context.top_n_with_panic_from_value_buffer(1);
+        let typ_attr = value.typ_attr.clone();
         self.scope_context.current_mut_unchecked()
-            .set_is_point_access(true);
+            .enter_point_access(PointAccess::new_with_all(
+                    typ_attr));
     }
 
     pub fn process_leave_point_access(&mut self) {
         self.scope_context.current_mut_unchecked()
-            .set_is_point_access(false);
+            .leave_point_access();
     }
 }
 
