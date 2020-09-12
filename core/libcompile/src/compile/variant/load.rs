@@ -24,7 +24,12 @@ impl<'a, F: Compile> Compiler<'a, F> {
         let (first, _, typ_attr, lengthen_offset) = context.fields_move();
         let first_data = first.token_data().expect("should not happend");
         let first = extract_token_data!(first_data, Id);
-        let value_item = self.scope_context.take_top_from_value_buffer();
+        let value_item = match self.scope_context.take_top_from_value_buffer() {
+            Ok(v) => v,
+            Err(e) => {
+                return e;
+            }
+        };
         // println!("{:?}", &value);
         let value_typ = value_item.typ_ref().clone();
         let value_typ_attr = value_item.typ_attr_clone();

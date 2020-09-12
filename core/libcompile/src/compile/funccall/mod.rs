@@ -152,7 +152,12 @@ impl<'a, F: Compile> Compiler<'a, F> {
     pub fn handle_call_function_get_top_addr(&mut self
         , item: &FunctionParamDataItem)
          -> Result<(Type, TypeAttrubute, AddressValue, ValueBufferItemContext), DescResult> {
-        let value = self.scope_context.take_top_from_value_buffer();
+        let value = match self.scope_context.take_top_from_value_buffer() {
+            Ok(v) => v,
+            Err(e) => {
+                return Err(e);
+            }
+        };
         let value_context = value.context_clone();
         // let value_addr = value.addr_ref().addr_clone();
         let value_typ_attr = value.typ_attr_clone();

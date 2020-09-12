@@ -90,8 +90,18 @@ impl<'a, F: Compile> Compiler<'a, F> {
         /*
          * 取出前两个token, 查找第一个函数的 plus 方法
          * */
-        let right = self.scope_context.take_top_from_value_buffer();
-        let left = self.scope_context.take_top_from_value_buffer();
+        let right = match self.scope_context.take_top_from_value_buffer() {
+            Ok(v) => v,
+            Err(e) => {
+                return e;
+            }
+        };
+        let left = match self.scope_context.take_top_from_value_buffer() {
+            Ok(v) => v,
+            Err(e) => {
+                return e;
+            }
+        };
         let left_typ = left.typ_clone();
         let right_typ = right.typ_clone();
         let left_addr = left.addr_clone();

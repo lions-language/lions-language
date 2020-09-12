@@ -1,3 +1,4 @@
+use libresult::{DescResult};
 use libtype::{AddressType, AddressValue
     , AddressKey, Type, TypeAttrubute};
 use libtype::function::{FunctionReturn};
@@ -41,7 +42,7 @@ impl ScopeContext {
         // self.get_back_mut_n_unchecked(scope).alloc_address(addr_typ, scope)
     }
 
-    pub fn addr_is_valid(&self, addr: &AddressKey) -> bool {
+    pub fn addr_is_valid(&self, addr: &AddressValue) -> bool {
         self.current_unchecked().addr_is_valid(addr)
     }
 
@@ -94,7 +95,7 @@ impl ScopeContext {
         self.current_unchecked().top_n_from_value_buffer(n)
     }
 
-    pub fn take_top_from_value_buffer(&mut self) -> ValueBufferItem {
+    pub fn take_top_from_value_buffer(&mut self) -> Result<ValueBufferItem, DescResult> {
         self.current_mut_unchecked().take_top_from_value_buffer()
     }
 

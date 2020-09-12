@@ -22,9 +22,6 @@ impl<'a, F: Compile> Compiler<'a, F> {
         // let input_typ = input_value.typ_ref();
         let (input_typ, input_addr, input_typ_attr, input_package_type
             , input_package_str, input_value_context) = input_value.fields_move();
-        if !self.scope_context.addr_is_valid(input_addr.addr_ref().addr_ref()) {
-            return Err(DescResult::Error(format!("be moved")));
-        }
         if !is_auto_call_totype {
             /*
              * 不需要自动调用 to_#type => 直接返回输入的地址

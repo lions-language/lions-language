@@ -126,7 +126,12 @@ impl<'a, F: Compile> Compiler<'a, F> {
             /*
              * 存在表达式
              * */
-            let value = self.scope_context.take_top_from_value_buffer();
+            let value = match self.scope_context.take_top_from_value_buffer() {
+                Ok(v) => v,
+                Err(e) => {
+                    return e;
+                }
+            };
             let typ = value.typ_ref().clone();
             let typ_attr = value.typ_attr_ref().clone();
             let src_addr = value.addr_ref().addr_clone();

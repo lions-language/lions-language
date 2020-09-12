@@ -1,3 +1,4 @@
+use libresult::{DescResult};
 use super::{GrammarParser, Grammar, NextToken, ExpressContext
     , VarStmtContext};
 use crate::lexical::{CallbackReturnStatus, TokenVecItem, TokenPointer};
@@ -33,7 +34,9 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                 /*
                  * var a [EOF]
                  * */
-                self.cb().var_stmt_end(context);
+                if let DescResult::Error(e) = self.cb().var_stmt_end(context) {
+                    self.panic(&e);
+                };
                 return;
             }
         };

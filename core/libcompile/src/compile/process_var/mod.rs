@@ -1,3 +1,4 @@
+use libresult::{DescResult};
 use libgrammar::token::{TokenValue, TokenData};
 use libtype::function::{AddFunctionContext};
 use libtype::{PackageType, PackageTypeValue
@@ -13,7 +14,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
     pub fn handle_var_stmt_start(&mut self) {
     }
 
-    pub fn handle_var_stmt_end(&mut self, context: VarStmtContext) {
+    pub fn handle_var_stmt_end(&mut self, context: VarStmtContext) -> DescResult {
         let is_exist_equal = *context.is_exist_equal_ref();
         /*
          * 1. 为变量在栈上分配一个空的地址 (如果存在`=`, 再改变该地址)
@@ -28,7 +29,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                     Address::new(AddressValue::new_invalid())
                     , Type::new_null()
                     , TypeAttrubute::default()));
-            return;
+            return DescResult::Success;
         }
         /*
          * 存在 `=` (赋予初始值)
@@ -36,7 +37,12 @@ impl<'a, F: Compile> Compiler<'a, F> {
          *  2. 判断等号的右边的计算结果是否是变量, 如果是变量, 需要更新 vars 中对应的值为 Move
          *      读取变量的时候, 如果值为 Move, 需要报错
          * */
-        let value = self.scope_context.take_top_from_value_buffer();
+        let value = match self.scope_context.take_top_from_value_buffer() {
+            Ok(v) => v,
+            Err(e) => {
+                return e;
+            }
+        };
         // println!("{:?}", &value);
         let typ = value.typ_ref().clone();
         let typ_attr = value.typ_attr_ref().clone();
@@ -52,7 +58,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 self.scope_context.add_variant(name
                     , Variant::new(
                         Address::new(src_addr), typ, typ_attr));
-                return;
+                return DescResult::Success;
             },
             _ => {}
         }
@@ -103,5 +109,6 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 unimplemented!();
             }
         }
+        DescResult::Success
     }
 }

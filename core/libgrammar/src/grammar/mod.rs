@@ -297,8 +297,8 @@ pub trait Grammar {
     fn var_stmt_start(&mut self) {
         println!("var stmt start");
     }
-    fn var_stmt_end(&mut self, _context: VarStmtContext) {
-        println!("var stmt end");
+    fn var_stmt_end(&mut self, _context: VarStmtContext) -> DescResult {
+        unimplemented!("var stmt end");
     }
     fn return_stmt(&mut self, _context: ReturnStmtContext) -> DescResult {
         println!("return stmt");

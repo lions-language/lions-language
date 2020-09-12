@@ -4,6 +4,11 @@ use std::collections::{HashSet};
 
 pub struct AddressDispatch {
     pub addr_key: AddressKey,
+    /*
+     * TODO
+     *  将回收机制去掉, 如果存在回收机制, 当前作用域将无法使用地址进行唯一标识
+     *  那么将导致检测地址有效性出现错误
+     * */
     pub recycles: Vec<AddressValue>,
     used_addr_index: HashSet<usize>,
     index: u64
@@ -12,6 +17,11 @@ pub struct AddressDispatch {
 impl AddressDispatch {
     pub fn alloc(&mut self, typ: AddressType
         , scope: usize) -> Address {
+        let addr_key = AddressKey::new_with_scope_single(self.index, scope);
+        self.used_addr_index.insert(self.index as usize);
+        self.index += 1;
+        Address::new(AddressValue::new(typ, addr_key))
+        /*
         if self.recycles.len() == 0 {
             // println!("from recycles");
             let addr_key = AddressKey::new_with_scope_single(self.index, scope);
@@ -26,6 +36,7 @@ impl AddressDispatch {
             Address::new(AddressValue::new(typ, addr_key))
         }
         // println!("{:?}", &addr_key);
+        */
     }
 
     pub fn alloc_continuous(&mut self, length: usize) -> usize {
@@ -37,9 +48,16 @@ impl AddressDispatch {
         start as usize
     }
 
-    pub fn addr_is_valid(&self, addr: &AddressKey) -> bool {
-        match self.used_addr_index.get(&(addr.index_clone() as usize)) {
+    pub fn addr_is_valid(&self, addr: &AddressValue) -> bool {
+        match &addr.typ_ref() {
+            AddressType::Static => {
+                return true;
+            },
+            _ => {}
+        }
+        match self.used_addr_index.get(&(addr.addr_ref().index_clone() as usize)) {
             Some(_) => {
+                // println!("{:?}", addr);
                 true
             },
             None => {
@@ -61,7 +79,9 @@ impl AddressDispatch {
     }
 
     pub fn recycle_addr(&mut self, addr: AddressValue) {
+        // println!("{}",self.used_addr_index.len());
         self.used_addr_index.remove(&(addr.addr_ref().index_clone() as usize));
+        // println!("{}",self.used_addr_index.len());
         self.recycles.push(addr);
     }
 

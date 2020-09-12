@@ -355,8 +355,8 @@ impl<'a, F: Compile> Grammar for Compiler<'a, F> {
         self.handle_var_stmt_start();
     }
 
-    fn var_stmt_end(&mut self, context: VarStmtContext) {
-        self.handle_var_stmt_end(context);
+    fn var_stmt_end(&mut self, context: VarStmtContext) -> DescResult {
+        self.handle_var_stmt_end(context)
     }
 
     fn return_stmt(&mut self, context: GrammarReturnStmtContext) -> DescResult {
