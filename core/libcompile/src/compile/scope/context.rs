@@ -127,8 +127,8 @@ impl ScopeContext {
         self.current_mut_unchecked().add_variant(name, var);
     }
 
-    pub fn remove_variant_unchecked(&mut self, scope: usize, name: &String) {
-        self.get_back_mut_n_unchecked(scope).remove_variant(name);
+    pub fn remove_variant_unchecked(&mut self, scope: usize, name: &str, addr: &AddressKey) {
+        self.get_back_mut_n_unchecked(scope).remove_variant(name, addr);
     }
 
     fn get_back_mut_n_unchecked(&mut self, n: usize) -> &mut Scope {

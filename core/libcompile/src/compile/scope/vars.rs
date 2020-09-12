@@ -15,6 +15,48 @@ pub struct Variant {
 }
 
 impl Variant {
+    fn remove(&mut self, addr: &AddressKey) {
+        /*
+         * 如果连续地址队列为空, 则将 name 从变量中移除, 否则将其从连续地址中移除
+         * */
+        match &mut self.consecutive_addr {
+            Some(ks) => {
+                ks.remove(addr);
+            },
+            None => {
+            }
+        }
+    }
+
+    fn consecutive_addr_is_empty(&self) -> bool {
+        match &self.consecutive_addr {
+            Some(ks) => {
+                ks.is_empty()
+            },
+            None => {
+                true
+            }
+        }
+    }
+
+    pub fn addr_is_valid(&self, addr: &AddressKey) -> bool {
+        match &self.consecutive_addr {
+            Some(ks) => {
+                match ks.get(addr) {
+                    Some(_) => {
+                        true
+                    },
+                    None => {
+                        false
+                    }
+                }
+            },
+            None => {
+                false
+            }
+        }
+    }
+
     pub fn new(addr: Address, typ: Type, typ_attr: TypeAttrubute) -> Self {
         let length = addr.addr_ref().addr_ref().length_clone();
         let consecutive_addr = if length == 0 {
@@ -46,8 +88,17 @@ impl Variants {
         // k
     }
 
-    pub fn remove(&mut self, name: &String) {
-        self.vars.remove(name);
+    pub fn remove(&mut self, name: &str, addr: &AddressKey) {
+        match self.vars.get_mut(name) {
+            Some(vs) => {
+                vs.remove(addr);
+                if vs.consecutive_addr_is_empty() {
+                    self.vars.remove(name);
+                }
+            },
+            None => {
+            }
+        }
     }
 
     pub fn get(&self, name: &str) -> Option<&Variant> {

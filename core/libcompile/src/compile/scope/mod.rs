@@ -138,8 +138,8 @@ impl Scope {
         self.vars.add(name, var);
     }
 
-    fn remove_variant(&mut self, name: &String) {
-        self.vars.remove(name);
+    fn remove_variant(&mut self, name: &str, addr: &AddressKey) {
+        self.vars.remove(name, addr);
     }
 
     fn get_variant(&self, name: &str) -> Option<&vars::Variant> {

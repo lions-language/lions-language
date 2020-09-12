@@ -190,7 +190,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 let var_name = v.as_ref::<String>();
                 self.scope_context.remove_variant_unchecked(
                     value_addr.addr_ref().scope_clone()
-                    , var_name);
+                    , var_name, value_addr.addr_ref());
             },
             _ => {
             }

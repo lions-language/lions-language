@@ -50,7 +50,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                         println!("remove: {}", var_name);
                         self.scope_context.remove_variant_unchecked(
                             src_addr.addr_ref().scope_clone()
-                            , var_name);
+                            , var_name, src_addr.addr_ref());
                     },
                     _ => {}
                 }
