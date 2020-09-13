@@ -38,6 +38,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 // let addr = self.scope_context.alloc_address(AddressType::Stack, 0);
                 let addr = AddressValue::new(typ.to_address_type()
                     , AddressKey::new_with_scope_single(index as u64, 0));
+                self.scope_context.use_addr(&addr);
                 // println!("{:?} => {:?}", &addr, src_addr.clone_with_scope_plus(1));
                 self.cb.ownership_move(OwnershipMoveContext::new_with_all(
                     addr.addr_clone(), src_addr.clone_with_scope_plus(1)));

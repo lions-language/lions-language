@@ -40,6 +40,10 @@ impl AddressDispatch {
         */
     }
 
+    pub fn use_addr(&mut self, addr: &AddressKey) {
+        self.used_addr_index.insert(addr.index_clone() as usize);
+    }
+
     pub fn alloc_continuous(&mut self, length: usize) -> usize {
         let start = self.index;
         for i in (start as usize)..length {

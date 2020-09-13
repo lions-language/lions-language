@@ -88,6 +88,10 @@ impl Scope {
         self.address_dispatch.addr_is_valid(addr)
     }
 
+    pub fn use_addr(&mut self, addr: &AddressKey) {
+        self.address_dispatch.use_addr(addr);
+    }
+
     fn alloc_continuous_address(&mut self, length: usize) -> usize {
         self.address_dispatch.alloc_continuous(length)
     }

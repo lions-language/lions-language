@@ -47,6 +47,11 @@ impl ScopeContext {
         self.get_back_n_unchecked(scope).addr_is_valid(addr)
     }
 
+    pub fn use_addr(&mut self, addr: &AddressValue) {
+        let scope = *addr.addr_ref().scope_ref();
+        self.get_back_mut_n_unchecked(scope).use_addr(addr.addr_ref());
+    }
+
     pub fn alloc_continuous_address(&mut self, length: usize) -> usize {
         self.current_mut_unchecked().alloc_continuous_address(length)
     }

@@ -179,6 +179,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                  * 移动
                  * */
                 // println!("move: {:?} <= {:?}", addr.addr_ref(), value_addr);
+                self.scope_context.use_addr(addr.addr_ref());
                 self.cb.ownership_move(OwnershipMoveContext::new_with_all(
                     addr.addr().addr(), value_addr.clone()));
                 self.scope_context.recycle_address(value_addr.clone());
