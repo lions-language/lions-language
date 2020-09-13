@@ -126,12 +126,6 @@ pub struct Jump {
 
 #[derive(Debug, Clone, FieldGet, NewWithAll
     , FieldGetMove, FieldGetClone, Default)]
-pub struct PushParamRef {
-    addr: AddressValue
-}
-
-#[derive(Debug, Clone, FieldGet, NewWithAll
-    , FieldGetMove, FieldGetClone, Default)]
 pub struct AddRefParamAddr {
     addr: AddressKey,
     dst_addr: AddressValue
@@ -156,7 +150,6 @@ pub enum Instruction {
     ReturnStmt(ReturnStmt),
     Jump(Jump),
     RemoveOwnership(RemoveOwnership),
-    PushParamRef(PushParamRef),
     AddRefParamAddr(AddRefParamAddr),
     EnterScope,
     LeaveScope,

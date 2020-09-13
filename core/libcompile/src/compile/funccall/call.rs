@@ -9,7 +9,7 @@ use libtype::function::{FindFunctionContext, FindFunctionResult
     , FunctionReturnRefParam
     , CallFunctionReturnData};
 use libtype::instruction::{
-    PushParamRef, AddRefParamAddr};
+    AddRefParamAddr};
 use libtype::{AddressValue, AddressKey
     , AddressType};
 use libgrammar::token::{TokenValue, TokenData};
@@ -86,7 +86,6 @@ impl<'a, F: Compile> Compiler<'a, F> {
         let func = func_ptr.as_ref::<Function>();
         let func_statement = func.func_statement_ref();
         let mut move_param_contexts = Vec::new();
-        let mut param_refs = VecDeque::new();
         let mut ref_param_addrs = VecDeque::new();
         let mut return_ref_params = HashMap::new();
         let mut lengthen_param_length = 0;
@@ -136,8 +135,6 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                                 AddRefParamAddr::new_with_all(
                                                 AddressKey::new_with_all(0, 0, i, 0, 0)
                                                 , addr_value.clone_with_scope_plus(1)));
-                                            param_refs.push_back(PushParamRef::new_with_all(
-                                                addr_value.clone_with_scope_plus(1)));
                                             return_ref_params.insert(i, addr_value);
                                         } else {
                                             unimplemented!();
@@ -147,8 +144,6 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                             AddRefParamAddr::new_with_all(
                                             AddressKey::new_with_all(0, 0, i, 0, 0)
                                             , addr_value.clone_with_scope_plus(1)));
-                                        param_refs.push_back(PushParamRef::new_with_all(
-                                            addr_value.clone_with_scope_plus(1)));
                                         return_ref_params.insert(i, addr_value);
                                     }
                                 }
@@ -182,8 +177,6 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                             AddRefParamAddr::new_with_all(
                                             AddressKey::new_with_all(0, 0, 0, 0, 0)
                                             , addr_value.clone_with_scope_plus(1)));
-                                        param_refs.push_back(PushParamRef::new_with_all(
-                                            addr_value.clone_with_scope_plus(1)));
                                         return_ref_params.insert(0, addr_value);
                                     } else {
                                         unimplemented!();
@@ -278,8 +271,6 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                                 AddRefParamAddr::new_with_all(
                                                 AddressKey::new_with_all(0, lengthen_param_start, i, 0, 0)
                                                 , addr_value.clone_with_scope_plus(1)));
-                                            param_refs.push_back(PushParamRef::new_with_all(
-                                                addr_value.clone_with_scope_plus(1)));
                                             return_ref_params.insert(index, addr_value);
                                         } else {
                                             unimplemented!();
@@ -319,8 +310,6 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                                 AddRefParamAddr::new_with_all(
                                                 AddressKey::new_with_all(i as u64, 0, 0, 0, 0)
                                                 , addr_value.clone_with_scope_plus(1)));
-                                            param_refs.push_back(PushParamRef::new_with_all(
-                                                addr_value.clone_with_scope_plus(1)));
                                             return_ref_params.insert(index, addr_value);
                                         } else {
                                             unimplemented!();
@@ -372,8 +361,6 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                             AddRefParamAddr::new_with_all(
                                             AddressKey::new_with_all(i as u64, 0, 0, 0, 0)
                                             , addr_value.clone_with_scope_plus(1)));
-                                        param_refs.push_back(PushParamRef::new_with_all(
-                                            addr_value.clone_with_scope_plus(1)));
                                         return_ref_params.insert(i, addr_value);
                                     } else {
                                         unimplemented!();

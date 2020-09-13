@@ -1,6 +1,5 @@
 use libtype::instruction::{
     CallFunction
-    , PushParamRef
     , AddRefParamAddr};
 use libcommon::optcode::{OptCode};
 use libcommon::address::{FunctionAddrValue, FunctionAddress};
@@ -48,21 +47,6 @@ impl VirtualMachine {
          * 离开作用域
          * */
         // self.thread_context.leave_thread_scope();
-    }
-
-    pub fn push_param_ref(&mut self, value: PushParamRef) {
-        /*
-         * 获取地址对应的数据地址
-         * */
-        // println!("push param ref: {:?}", value);
-        /*
-        self.thread_context.current_unchecked().print_current_addr_mapping();
-        self.thread_context.current_unchecked().print_last_n_addr_mapping(1);
-        self.thread_context.current_unchecked().print_last_n_addr_mapping(2);
-        */
-        let data_addr = self.thread_context.current_unchecked().get_data_addr_unchecked(
-            value.addr_ref().addr_ref()).clone();
-        self.thread_context.current_mut_unchecked().push_current_param_ref(data_addr);
     }
 
     pub fn add_ref_param_addr(&mut self, value: AddRefParamAddr) {

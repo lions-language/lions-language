@@ -86,9 +86,6 @@ impl VirtualMachine {
             Instruction::ReadStaticVariant(v) => {
                 self.read_static_variant(v);
             },
-            Instruction::PushParamRef(v) => {
-                self.push_param_ref(v);
-            },
             Instruction::AddRefParamAddr(v) => {
                 self.add_ref_param_addr(v);
             },

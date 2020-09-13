@@ -6,7 +6,7 @@ use libtype::function::{FindFunctionContext, FindFunctionResult
     , CallFunctionParamAddr, Function, splice::FunctionSplice
     , FunctionReturnDataAttr, FunctionParamDataItem
     , CallFunctionReturnData};
-use libtype::instruction::{PushParamRef, AddRefParamAddr};
+use libtype::instruction::{AddRefParamAddr};
 use libtype::{AddressValue};
 use libresult::*;
 use libcommon::ptr::RefPtr;
@@ -87,7 +87,6 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 /*
                  * 参数可能是引用也可能是移动
                  * */
-                let mut param_ref = None;
                 let mut ref_param_addr = None;
                 let mut param_move = None;
                 let param_addrs = vec![CallFunctionParamAddr::Fixed(
@@ -102,8 +101,6 @@ impl<'a, F: Compile> Compiler<'a, F> {
                         AddRefParamAddr::new_with_all(
                         AddressKey::new_with_all(0, 0, 0, 0, 0)
                         , input_addr.addr_ref().clone_with_scope_plus(1)));
-                    param_ref = Some(PushParamRef::new_with_all(
-                        input_addr.addr_ref().clone_with_scope_plus(1)));
                 } else {
                     unimplemented!();
                 }

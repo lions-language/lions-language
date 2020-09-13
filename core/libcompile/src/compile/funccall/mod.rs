@@ -8,7 +8,6 @@ use libtype::function::{FindFunctionContext, FindFunctionResult
     , FunctionReturnDataAttr, FunctionParamDataItem
     , FunctionReturnRefParam
     , CallFunctionReturnData};
-use libtype::instruction::{PushParamRef};
 use libtype::{AddressValue
     , AddressType};
 use libgrammar::token::{TokenValue, TokenData};

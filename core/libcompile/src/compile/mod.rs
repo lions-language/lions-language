@@ -22,7 +22,6 @@ use libtype::function::{Function, CallFunctionParamAddr
 use libtype::structure::{StructDefine};
 use libtype::instruction::{
     Jump, RemoveOwnership
-    , PushParamRef
     , AddRefParamAddr};
 use libtypecontrol::function::FunctionControl;
 use libtype::module::Module;
@@ -231,10 +230,6 @@ pub trait Compile {
     }
 
     fn update_func_return_data_addr(&mut self, _: FunctionReturnDataAttr) {
-        unimplemented!();
-    }
-
-    fn push_param_ref(&mut self, _: PushParamRef) {
         unimplemented!();
     }
 
