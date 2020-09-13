@@ -80,6 +80,30 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         };
         self.set_backtrack_point();
         self.virtual_skip_next_one();
+        match self.lookup_next_one_ptr() {
+            Some(tp) => {
+                let token = tp.as_ref::<T, CB>();
+                match token.context_token_type() {
+                    TokenType::LeftBigParenthese => {
+                        let bl = self.restore_from_backtrack_point();
+                        self.structinit_process(bl, scope_context);
+                        return;
+                    },
+                    TokenType::NewLine => {
+                        self.restore_from_backtrack_point();
+                        self.id_process_id(desc_ctx);
+                        return;
+                    },
+                    _ => {
+                    }
+                }
+            },
+            None => {
+                self.restore_from_backtrack_point();
+                self.id_process_id(desc_ctx);
+                return;
+            }
+        }
         match self.virtual_skip_white_space_token() {
             Some(tp) => {
                 let token = tp.as_ref::<T, CB>();
