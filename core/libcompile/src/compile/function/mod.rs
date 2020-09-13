@@ -61,6 +61,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
             *mut_context.ref_param_no_mut() += 1;
             a
             */
+            // println!("alloc addr, name: {}", name);
             self.scope_context.alloc_address(
                 AddressType::AddrRef, 0)
         } else {
@@ -77,6 +78,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
          * 其中:
          *  地址是参数的序号
          * */
+        // println!("add: {}, typ_attr: {:?}", name, typ_attr);
         self.scope_context.add_variant(name
             , Variant::new(
                 /*

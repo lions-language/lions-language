@@ -18,6 +18,7 @@ impl AddressDispatch {
     pub fn alloc(&mut self, typ: AddressType
         , scope: usize) -> Address {
         let addr_key = AddressKey::new_with_scope_single(self.index, scope);
+        // println!("alloc addr, {:?}", addr_key);
         self.used_addr_index.insert(self.index as usize);
         self.index += 1;
         Address::new(AddressValue::new(typ, addr_key))

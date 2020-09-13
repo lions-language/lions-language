@@ -43,7 +43,8 @@ impl ScopeContext {
     }
 
     pub fn addr_is_valid(&self, addr: &AddressValue) -> bool {
-        self.current_unchecked().addr_is_valid(addr)
+        let scope = *addr.addr_ref().scope_ref();
+        self.get_back_n_unchecked(scope).addr_is_valid(addr)
     }
 
     pub fn alloc_continuous_address(&mut self, length: usize) -> usize {
@@ -96,7 +97,11 @@ impl ScopeContext {
     }
 
     pub fn take_top_from_value_buffer(&mut self) -> Result<ValueBufferItem, DescResult> {
-        self.current_mut_unchecked().take_top_from_value_buffer()
+        let item = self.current_mut_unchecked().take_top_from_value_buffer();
+        if !self.addr_is_valid(item.addr_ref().addr_ref()) {
+            return Err(DescResult::Error(format!("be moved")));
+        }
+        Ok(item)
     }
 
     pub fn push_with_addr_to_value_buffer(&mut self, typ: Type, addr: Address) {
@@ -140,6 +145,12 @@ impl ScopeContext {
         let len = self.scopes.len();
         // println!("{}, {}", len, n);
         self.scopes.get_mut(len - 1 - n).expect(&format!("len: {}, n: {}", len, n))
+    }
+
+    fn get_back_n_unchecked(&self, n: usize) -> &Scope {
+        let len = self.scopes.len();
+        // println!("{}, {}", len, n);
+        self.scopes.get(len - 1 - n).expect(&format!("len: {}, n: {}", len, n))
     }
 
     /*

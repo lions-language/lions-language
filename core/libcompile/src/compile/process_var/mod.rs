@@ -47,7 +47,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
         let typ = value.typ_ref().clone();
         let typ_attr = value.typ_attr_ref().clone();
         let src_addr = value.addr_ref().addr_clone();
-        println!("{:?}", typ_attr);
+        // println!("{:?}", typ_attr);
         /*
         self.scope_context.add_variant(name
             , Variant::new_with_all(
@@ -84,6 +84,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 match value.context_ref() {
                     ValueBufferItemContext::Variant(v) => {
                         let var_name = v.as_ref::<String>();
+                        // println!("remove {}", var_name);
                         self.scope_context.remove_variant_unchecked(
                             value.addr_ref().addr_ref().addr_ref().scope_clone()
                             , var_name, src_addr.addr_ref());
@@ -101,7 +102,6 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 /*
                  * 将实际存储数据的地址存储到 Variant 对象中 (也就是 src_addr)
                  * */
-                println!("xxxxxxxxxxxxx, {}", name);
                 self.scope_context.add_variant(name
                     , Variant::new(
                         Address::new(src_addr), typ, typ_attr));

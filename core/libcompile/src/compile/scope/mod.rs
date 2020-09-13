@@ -117,12 +117,8 @@ impl Scope {
         self.value_buffer.top_n(n)
     }
 
-    fn take_top_from_value_buffer(&mut self) -> Result<ValueBufferItem, DescResult> {
-        let item = self.value_buffer.take_top();
-        if !self.address_dispatch.addr_is_valid(item.addr_ref().addr_ref()) {
-            return Err(DescResult::Error(format!("be moved")));
-        }
-        Ok(item)
+    fn take_top_from_value_buffer(&mut self) -> ValueBufferItem {
+        self.value_buffer.take_top()
     }
 
     fn push_with_addr_to_value_buffer(&mut self, typ: Type, addr: Address) {
