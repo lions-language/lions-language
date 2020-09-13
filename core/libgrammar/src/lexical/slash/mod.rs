@@ -43,6 +43,11 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
             match self.content.lookup_next_one() {
                 Some(c) => {
                     if self.new_line_check(c) {
+                        /*
+                         * 因为 遇到 \r \n 的时候, self.lines 就会加1, 所以对于单行注释,
+                         * 不需要再加1
+                         * */
+                        self.line -= 1;
                         break;
                     } else {
                         content.push(c as u8);
