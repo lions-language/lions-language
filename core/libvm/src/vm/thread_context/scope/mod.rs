@@ -18,7 +18,6 @@ pub struct Scope {
      * 记录当前作用域的结果 数据地址
      * */
     result_data_addr: AddressValue,
-    param_refs: Vec<ParamRef>
 }
 
 impl Scope {
@@ -49,18 +48,6 @@ impl Scope {
                 let stack_addr = self.addr_mapping.get_unwrap(addr.addr_ref());
                 let data = memory.stack_data_ref().get_unwrap(stack_addr);
                 RefPtr::from_ref::<Data>(data)
-            },
-            AddressType::ParamRef(index) => {
-                /*
-                 * 需要加上 变长参数的偏移
-                 * */
-                /*
-                let data_addr = self.get_param_ref_unchecked(
-                    *index+addr.addr_ref().lengthen_offset_clone());
-                */
-                let data_addr = self.get_param_ref_unchecked(
-                    *index);
-                self.get_data_by_data_addr_unchecked(&data_addr, link_static, memory)
             },
             _ => {
                 unimplemented!("{:?}", addr.typ_ref());
@@ -175,17 +162,6 @@ impl Scope {
         &self.result_data_addr
     }
 
-    pub fn push_param_ref(&mut self, data_addr: MemoryValue) {
-        self.param_refs.push(
-            ParamRef{
-                data_addr: data_addr
-            });
-    }
-
-    pub fn get_param_ref_unchecked(&self, index: usize) -> &MemoryValue {
-        &self.param_refs.get(index).expect("should not happend").data_addr
-    }
-
     pub fn print_ref_param_addr_mapping(&self) {
         self.ref_param_addr_mapping.print();
     }
@@ -198,8 +174,7 @@ impl Scope {
         Self {
             addr_mapping: AddressMapping::new(),
             ref_param_addr_mapping: AddressMapping::new(),
-            result_data_addr: AddressValue::new_invalid(),
-            param_refs: Vec::new()
+            result_data_addr: AddressValue::new_invalid()
         }
     }
 }

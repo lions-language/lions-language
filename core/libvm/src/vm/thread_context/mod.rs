@@ -118,14 +118,6 @@ impl ThreadScope {
         self.scope_context.current_unchecked().get_result_data_addr()
     }
 
-    pub fn push_current_param_ref(&mut self, data_addr: MemoryValue) {
-        self.scope_context.current_mut_unchecked().push_param_ref(data_addr);
-    }
-
-    pub fn get_param_ref_unchecked(&self, index: usize) -> &MemoryValue {
-        self.scope_context.current_unchecked().get_param_ref_unchecked(index)
-    }
-
     pub fn leave_scope_last_n(&mut self, n: usize) {
         self.scope_context.leave_last_n(n);
     }
