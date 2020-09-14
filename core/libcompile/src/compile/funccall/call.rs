@@ -398,7 +398,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
                         scope = Some(1);
                         return_is_alloc = true;
                         let a = self.scope_context.alloc_address(
-                            return_data.typ_ref().to_address_type(), 1);
+                            return_data.typ_ref().to_address_type(), 1
+                            , return_data.typ_ref().addr_length());
                         a
                     },
                     TypeAttrubute::Ref

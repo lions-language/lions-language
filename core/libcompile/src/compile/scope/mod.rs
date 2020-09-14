@@ -80,8 +80,9 @@ pub struct Scope {
 }
 
 impl Scope {
-    fn alloc_address(&mut self, addr_typ: AddressType, scope: usize) -> Address {
-        self.address_dispatch.alloc(addr_typ, scope)
+    fn alloc_address(&mut self, addr_typ: AddressType, scope: usize
+        , length: usize) -> Address {
+        self.address_dispatch.alloc(addr_typ, scope, length)
     }
 
     pub fn alloc_with_index(&mut self, typ: AddressType

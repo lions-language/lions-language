@@ -52,7 +52,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
          * */
         let addr = if typ_attr.is_move() {
             self.scope_context.alloc_address(
-                typ.to_address_type(), 0)
+                typ.to_address_type(), 0
+                , typ.addr_length())
         } else if typ_attr.is_ref() {
             /*
             let a = Address::new(AddressValue::new(
@@ -63,7 +64,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
             */
             // println!("alloc addr, name: {}", name);
             self.scope_context.alloc_address(
-                AddressType::AddrRef, 0)
+                AddressType::AddrRef, 0
+                , typ.addr_length())
         } else {
             unimplemented!();
         };

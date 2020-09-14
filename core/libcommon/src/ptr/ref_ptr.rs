@@ -60,7 +60,7 @@ mod test {
     fn ref_ptr_test() {
         /*
         let s = "123";
-        let rp = RefPtr::from_ref::<String>(&s);
+        let rp = RefPtr::from_ref(s);
         rp.as_ref::<String>();
         */
     }

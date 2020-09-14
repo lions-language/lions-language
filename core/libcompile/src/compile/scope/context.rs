@@ -34,11 +34,11 @@ impl ScopeContext {
     }
 
     pub fn alloc_address(&mut self, addr_typ: AddressType
-        , scope: usize) -> Address {
+        , scope: usize, length: usize) -> Address {
         /*
          * 即使是最外层的函数进入的时候也一定需要调用 enter, 所以栈中一定存在元素
          * */
-        self.current_mut_unchecked().alloc_address(addr_typ, scope)
+        self.current_mut_unchecked().alloc_address(addr_typ, scope, length)
         // self.get_back_mut_n_unchecked(scope).alloc_address(addr_typ, scope)
     }
 
@@ -66,11 +66,11 @@ impl ScopeContext {
     }
 
     pub fn alloc_address_last_n(&mut self, addr_typ: AddressType
-        , scope: usize) -> Address {
+        , scope: usize, length: usize) -> Address {
         /*
          * 即使是最外层的函数进入的时候也一定需要调用 enter, 所以栈中一定存在元素
          * */
-        self.get_back_mut_n_unchecked(scope).alloc_address(addr_typ, 0)
+        self.get_back_mut_n_unchecked(scope).alloc_address(addr_typ, 0, length)
     }
 
     pub fn recycle_address(&mut self, addr: AddressValue) {

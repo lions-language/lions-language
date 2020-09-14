@@ -309,7 +309,9 @@ impl<'a, F: Compile> Compiler<'a, F> {
                          *  => 所以这里的作用域应该要加1
                          * */
                         scope = Some(1);
-                        let a = self.scope_context.alloc_address(return_data.typ.to_address_type(), 1);
+                        let a = self.scope_context.alloc_address(
+                            return_data.typ.to_address_type(), 1
+                            , return_data.typ.addr_length());
                         // println!("xxx: {:?}", a);
                         self.scope_context.ref_counter_create(a.addr_ref().addr_clone());
                         a
@@ -321,7 +323,9 @@ impl<'a, F: Compile> Compiler<'a, F> {
                          * */
                         return_is_alloc = true;
                         scope = Some(1);
-                        let a = self.scope_context.alloc_address(return_data.typ.to_address_type(), 1);
+                        let a = self.scope_context.alloc_address(
+                            return_data.typ.to_address_type(), 1
+                            , return_data.typ.addr_length());
                         a
                     },
                     _ => {

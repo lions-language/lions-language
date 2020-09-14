@@ -23,7 +23,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
         /*
          * 在当前作用域中分配一个地址, 提供给虚拟机进行绑定
          * */
-        let addr = self.scope_context.alloc_address(AddressType::Static, 0);
+        let addr = self.scope_context.alloc_address(AddressType::Static, 0, 0);
         /*
          * 将地址写入到编译期的计算栈中, 为之后的运算做准备
          * */

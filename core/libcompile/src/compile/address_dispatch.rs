@@ -16,11 +16,16 @@ pub struct AddressDispatch {
 
 impl AddressDispatch {
     pub fn alloc(&mut self, typ: AddressType
-        , scope: usize) -> Address {
-        let addr_key = AddressKey::new_with_scope_single(self.index as u64, scope);
+        , scope: usize, length: usize) -> Address {
+        let addr_key = AddressKey::new_with_all(self.index as u64, 0, 0, scope, length);
         // println!("alloc addr, {:?}", addr_key);
-        self.used_addr_index.insert(self.index as usize);
-        self.index += 1;
+        /*
+         * length + 1 => 本身加length
+         * */
+        for _ in 0..(length+1) {
+            self.used_addr_index.insert(self.index as usize);
+            self.index += 1;
+        }
         Address::new(AddressValue::new(typ, addr_key))
         /*
         if self.recycles.len() == 0 {
@@ -43,8 +48,8 @@ impl AddressDispatch {
     pub fn alloc_with_index(&mut self, typ: AddressType
         , index: usize, scope: usize, length: usize) -> Address {
         let addr_key = AddressKey::new_with_all(index as u64, 0, 0, scope, length);
-        self.used_addr_index.insert(index);
-        if index > self.index {
+        for _ in 0..(length+1) {
+            self.used_addr_index.insert(index);
             self.index = index + 1;
         }
         Address::new(AddressValue::new(typ, addr_key))
@@ -89,12 +94,12 @@ impl AddressDispatch {
         self.index as usize
     }
 
-    pub fn alloc_static(&mut self, scope: usize) -> Address {
-        self.alloc(AddressType::Static, scope)
+    pub fn alloc_static(&mut self, scope: usize, length: usize) -> Address {
+        self.alloc(AddressType::Static, scope, length)
     }
 
-    pub fn alloc_stack(&mut self, scope: usize) -> Address {
-        self.alloc(AddressType::Stack, scope)
+    pub fn alloc_stack(&mut self, scope: usize, length: usize) -> Address {
+        self.alloc(AddressType::Stack, scope, length)
     }
 
     pub fn recycle_addr(&mut self, addr: AddressValue) {

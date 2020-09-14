@@ -21,7 +21,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
         /*
          * 在栈上分配一个地址
          * */
-        let addr = self.scope_context.alloc_address(AddressType::Stack, 0);
+        let addr = self.scope_context.alloc_address(AddressType::Stack, 0, 0);
         /*
          * 将地址写入到编译期的计算栈中, 为之后的运算做准备
          * */
