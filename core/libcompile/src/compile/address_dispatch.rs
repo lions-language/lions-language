@@ -11,13 +11,13 @@ pub struct AddressDispatch {
      * */
     pub recycles: Vec<AddressValue>,
     used_addr_index: HashSet<usize>,
-    index: u64
+    index: usize
 }
 
 impl AddressDispatch {
     pub fn alloc(&mut self, typ: AddressType
         , scope: usize) -> Address {
-        let addr_key = AddressKey::new_with_scope_single(self.index, scope);
+        let addr_key = AddressKey::new_with_scope_single(self.index as u64, scope);
         // println!("alloc addr, {:?}", addr_key);
         self.used_addr_index.insert(self.index as usize);
         self.index += 1;
@@ -40,6 +40,20 @@ impl AddressDispatch {
         */
     }
 
+    pub fn alloc_with_index(&mut self, typ: AddressType
+        , index: usize, scope: usize, length: usize) -> Address {
+        let addr_key = AddressKey::new_with_all(index as u64, 0, 0, scope, length);
+        self.used_addr_index.insert(index);
+        if index > self.index {
+            self.index = index + 1;
+        }
+        Address::new(AddressValue::new(typ, addr_key))
+    }
+
+    pub fn update_addr_index(&mut self, index: usize) {
+        self.index = index;
+    }
+
     pub fn use_addr(&mut self, addr: &AddressKey) {
         self.used_addr_index.insert(addr.index_clone() as usize);
     }
@@ -49,7 +63,7 @@ impl AddressDispatch {
         for i in (start as usize)..length {
             self.used_addr_index.insert(i);
         }
-        self.index += length as u64;
+        self.index += length;
         start as usize
     }
 
