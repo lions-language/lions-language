@@ -54,7 +54,7 @@ impl FunctionStatement {
         match typ {
             Some(t) => {
                 s.push_str(t.to_attrubute_str());
-                s.push_str(t.to_str());
+                s.push_str(&t.to_str());
                 s.push(':');
             },
             None => {
@@ -73,7 +73,7 @@ impl FunctionStatement {
                 match &param.data {
                     FunctionParamData::Single(p) => {
                         s.push_str(p.typ.to_attrubute_str());
-                        s.push_str(p.typ.to_str());
+                        s.push_str(&p.typ.to_str());
                     },
                     FunctionParamData::Multi(ps) => {
                         for (i, p) in ps.iter().enumerate() {
@@ -81,7 +81,7 @@ impl FunctionStatement {
                                 s.push(',');
                             }
                             s.push_str(p.typ.to_attrubute_str());
-                            s.push_str(p.typ.to_str());
+                            s.push_str(&p.typ.to_str());
                         }
                     }
                 }
@@ -95,7 +95,7 @@ impl FunctionStatement {
          * */
         s.push_str("->");
         s.push_str(func_return.data.typ.to_attrubute_str());
-        s.push_str(func_return.data.typ.to_str());
+        s.push_str(&func_return.data.typ.to_str());
         s
     }
 }

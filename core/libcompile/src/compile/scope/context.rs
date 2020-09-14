@@ -113,7 +113,7 @@ impl ScopeContext {
     pub fn take_top_from_value_buffer(&mut self) -> Result<ValueBufferItem, DescResult> {
         let item = self.current_mut_unchecked().take_top_from_value_buffer();
         if !self.addr_is_valid(item.addr_ref().addr_ref()) {
-            return Err(DescResult::Error(format!("be moved")));
+            return Err(DescResult::Error(format!("be moved: {:?}", item.addr_ref())));
         }
         Ok(item)
     }

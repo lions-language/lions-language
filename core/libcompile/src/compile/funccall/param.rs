@@ -24,17 +24,25 @@ impl<'a, F: Compile> Compiler<'a, F> {
                  * 这样虚拟机在作用域结束的时候就可以通过这个标识找到地址, 然后进行释放
                  * */
                 // let addr = self.scope_context.alloc_address(AddressType::Stack, 0);
-                /*
                 let addr = AddressValue::new(typ.to_address_type()
                     , AddressKey::new_with_scope_single(index as u64, 0));
                 self.scope_context.use_addr(&addr);
-                */
+                /*
                 let length = typ.addr_length();
                 let addr = self.scope_context.alloc_address_with_index(
                     typ.to_address_type(), index, 0, length);
-                // println!("{:?} => {:?}", &addr, src_addr.clone_with_scope_plus(1));
-                self.cb.ownership_move(OwnershipMoveContext::new_with_all(
-                    addr.addr_ref().addr_clone(), src_addr.clone_with_scope_plus(1)));
+                */
+                // println!("{:?} <= {:?}", &addr, src_addr.clone_with_scope_plus(1));
+                for i in 0..(src_addr.addr_ref().length_clone()+1) {
+                    let src = src_addr.clone_with_index_scope_plus(i, 1);
+                    let dst = addr.addr_ref().clone_with_index_plus(i);
+                    self.cb.ownership_move(OwnershipMoveContext::new_with_all(
+                        dst, src));
+                    /*
+                     * 编译期, funccall 并没有进入一个新的作用域, 所以不需要加 scope
+                     * */
+                    self.scope_context.recycle_address(src_addr.clone_with_index_plus(i));
+                }
                 /*
                  * 如果是移动的变量, 需要将被移动的变量从变量列表中移除
                  * */
@@ -52,8 +60,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
                  * 回收索引
                  * */
                 // println!("{:?}", src_addr);
-                self.scope_context.recycle_address(src_addr.clone());
-                return addr.addr();
+                // self.scope_context.recycle_address(src_addr.clone());
+                return addr;
             },
             TypeAttrubute::Ref
             | TypeAttrubute::CreateRef

@@ -18,10 +18,11 @@ impl AddressDispatch {
     pub fn alloc(&mut self, typ: AddressType
         , scope: usize, length: usize) -> Address {
         let addr_key = AddressKey::new_with_all(self.index as u64, 0, 0, scope, length);
-        // println!("alloc addr, {:?}", addr_key);
         /*
          * length + 1 => 本身加length
          * */
+        self.used_addr_index.insert(self.index as usize);
+        self.index += 1;
         for _ in 0..(length+1) {
             self.used_addr_index.insert(self.index as usize);
             self.index += 1;
@@ -48,6 +49,9 @@ impl AddressDispatch {
     pub fn alloc_with_index(&mut self, typ: AddressType
         , index: usize, scope: usize, length: usize) -> Address {
         let addr_key = AddressKey::new_with_all(index as u64, 0, 0, scope, length);
+        // println!("use: {}", index);
+        self.used_addr_index.insert(index);
+        self.index = index + 1;
         for _ in 0..(length+1) {
             self.used_addr_index.insert(index);
             self.index = index + 1;
@@ -103,9 +107,7 @@ impl AddressDispatch {
     }
 
     pub fn recycle_addr(&mut self, addr: AddressValue) {
-        // println!("{}",self.used_addr_index.len());
         self.used_addr_index.remove(&(addr.addr_ref().index_clone() as usize));
-        // println!("{}",self.used_addr_index.len());
         self.recycles.push(addr);
     }
 

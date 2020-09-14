@@ -8,28 +8,25 @@ use crate::structure::{StructDefine};
 use crate::primeval::{PrimevalType};
 
 impl Type {
-    pub fn to_str(&self) -> &str {
+    pub fn to_str(&self) -> String {
         match self.typ_ref() {
             TypeValue::Primeval(v) => {
-                v.typ.to_str()
+                v.typ.to_str().to_string()
             },
             TypeValue::Structure(sp) => {
-                /*
                 let v = sp.struct_obj.pop();
-                let name = v.name_ref();
+                let name = v.name_ref().to_string();
                 sp.struct_obj_ref().push(v);
                 name
-                */
-                unimplemented!("struct Type::to_str");
             },
             TypeValue::Any => {
-                consts::ANY_TYPE
+                consts::ANY_TYPE.to_string()
             },
             TypeValue::Empty => {
-                consts::EMPTY_TYPE
+                consts::EMPTY_TYPE.to_string()
             },
             TypeValue::Null => {
-                consts::NULL_TYPE
+                consts::NULL_TYPE.to_string()
             }
         }
     }

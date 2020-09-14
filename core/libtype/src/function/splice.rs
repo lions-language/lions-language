@@ -12,7 +12,7 @@ impl FunctionSplice {
     }
 
     pub fn get_to_type_by_type(typ: &Type) -> String {
-        FunctionSplice::get_to_type_by_str(typ.to_str())
+        FunctionSplice::get_to_type_by_str(&typ.to_str())
     }
 
     pub fn get_function_without_return_string_by_type(
@@ -41,7 +41,7 @@ impl FunctionSplice {
             Some(t) => {
                 // s.push_str(t.to_attrubute_str());
                 // s.push_str(typ_attr.to_str());
-                s.push_str(t.to_str());
+                s.push_str(&t.to_str());
                 s.push(':');
             },
             None => {
@@ -61,7 +61,7 @@ impl FunctionSplice {
                     FunctionParamData::Single(p) => {
                         // s.push_str(p.typ.to_attrubute_str());
                         s.push_str(p.typ_attr.to_str());
-                        s.push_str(p.typ.to_str());
+                        s.push_str(&p.typ.to_str());
                     },
                     FunctionParamData::Multi(ps) => {
                         for (i, p) in ps.iter().enumerate() {
@@ -70,7 +70,7 @@ impl FunctionSplice {
                             }
                             // s.push_str(p.typ.to_attrubute_str());
                             s.push_str(p.typ_attr.to_str());
-                            s.push_str(p.typ.to_str());
+                            s.push_str(&p.typ.to_str());
                         }
                     }
                 }
@@ -86,8 +86,8 @@ impl FunctionSplice {
             Some(ret) => {
                 s.push_str("->");
                 // s.push_str(ret.typ.to_attrubute_str());
-                s.push_str(ret.typ.to_str());
-                s.push_str(ret.typ.to_str());
+                s.push_str(&ret.typ.to_str());
+                s.push_str(&ret.typ.to_str());
             },
             None => {
             }
