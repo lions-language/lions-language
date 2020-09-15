@@ -26,7 +26,6 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 // let addr = self.scope_context.alloc_address(AddressType::Stack, 0);
                 let addr = AddressValue::new(typ.to_address_type()
                     , AddressKey::new_with_scope_single(index as u64, 0));
-                self.scope_context.use_addr(&addr);
                 /*
                 let length = typ.addr_length();
                 let addr = self.scope_context.alloc_address_with_index(
@@ -34,6 +33,10 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 */
                 // println!("{:?} <= {:?}", &addr, src_addr.clone_with_scope_plus(1));
                 for i in 0..(src_addr.addr_ref().length_clone()+1) {
+                    /*
+                     * TODO:
+                     *  owner => 此操作和AddressKey 中的length无关(ownership指令换成index)
+                     * */
                     let src = src_addr.clone_with_index_scope_plus(i, 1);
                     let dst = addr.addr_ref().clone_with_index_plus(i);
                     self.cb.ownership_move(OwnershipMoveContext::new_with_all(

@@ -180,13 +180,17 @@ impl<'a, F: Compile> Compiler<'a, F> {
                     , field_typ_attr, value_typ_attr));
         }
         if let ValueBufferItemContext::Structure = &value_context {
+            /*
+             * 如果value buffer得到的 value 是 struct => 则不需要处理
+             * 因为已经处理过了
+             * */
         } else {
             if field_typ_attr.is_move() {
                 /*
                  * 移动
                  * */
                 // println!("move: {:?} <= {:?}", addr.addr_ref(), value_addr);
-                self.scope_context.use_addr(addr.addr_ref());
+                // self.scope_context.use_addr(addr.addr_ref());
                 self.cb.ownership_move(OwnershipMoveContext::new_with_all(
                     addr.addr().addr(), value_addr.clone()));
                 self.scope_context.recycle_address(value_addr.clone());

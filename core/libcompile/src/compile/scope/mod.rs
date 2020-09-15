@@ -85,10 +85,12 @@ impl Scope {
         self.address_dispatch.alloc(addr_typ, scope, length)
     }
 
+    /*
     pub fn alloc_with_index(&mut self, typ: AddressType
         , index: usize, scope: usize, length: usize) -> Address {
         self.address_dispatch.alloc_with_index(typ, index, scope, length)
     }
+    */
 
     pub fn update_addr_index(&mut self, index: usize) {
         self.address_dispatch.update_addr_index(index);

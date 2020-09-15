@@ -42,10 +42,12 @@ impl ScopeContext {
         // self.get_back_mut_n_unchecked(scope).alloc_address(addr_typ, scope)
     }
 
+    /*
     pub fn alloc_address_with_index(&mut self, typ: AddressType
         , index: usize, scope: usize, length: usize) -> Address {
         self.current_mut_unchecked().alloc_with_index(typ, index, scope, length)
     }
+    */
 
     pub fn update_addr_index(&mut self, index: usize) {
         self.current_mut_unchecked().update_addr_index(index);

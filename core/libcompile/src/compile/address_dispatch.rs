@@ -46,6 +46,7 @@ impl AddressDispatch {
         */
     }
 
+    /*
     pub fn alloc_with_index(&mut self, typ: AddressType
         , index: usize, scope: usize, length: usize) -> Address {
         let addr_key = AddressKey::new_with_all(index as u64, 0, 0, scope, length);
@@ -58,6 +59,7 @@ impl AddressDispatch {
         }
         Address::new(AddressValue::new(typ, addr_key))
     }
+    */
 
     pub fn update_addr_index(&mut self, index: usize) {
         self.index = index;
