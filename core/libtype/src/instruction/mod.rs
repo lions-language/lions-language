@@ -102,7 +102,7 @@ pub struct LoadStack {
     , FieldGetMove, FieldGetClone)]
 pub struct ReturnStmt {
     scope: usize,
-    addr_key: AddressKey
+    addr_value: AddressValue
 }
 
 #[derive(Debug, Clone)]

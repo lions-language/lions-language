@@ -77,9 +77,6 @@ impl VirtualMachine {
             Instruction::RemoveOwnership(v) => {
                 self.remove_ownership(v);
             },
-            Instruction::AddressBind(v) => {
-                self.address_bind(v);
-            },
             Instruction::ReturnStmt(v) => {
                 self.process_return_stmt(v);
             },

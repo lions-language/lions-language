@@ -17,7 +17,7 @@ impl VirtualMachine {
         */
         let (dst_addr, src_addr) = value.fields_move();
         let src_data_addr = self.thread_context.current_mut_unchecked()
-            .get_data_addr_unchecked(src_addr.addr_ref()).addr_value_clone();
+            .get_data_addr_unchecked(&src_addr).addr_value_clone();
         // println!("--- {:?}", src_data_addr);
         /*
          * 绑定

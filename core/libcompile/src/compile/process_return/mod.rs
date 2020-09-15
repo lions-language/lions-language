@@ -143,7 +143,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                  * 所以: 只有在移动的时候才会需要绑定
                  * */
                 self.cb.return_stmt(ReturnStmtContext::new_with_all(
-                        scope, src_addr.addr_clone()));
+                        scope, src_addr.clone()));
             }
             /*
              * 检测表达式结果和函数声明是否一致

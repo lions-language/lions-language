@@ -1,8 +1,9 @@
-use libtype::{Type, TypeAttrubute};
+use libtype::{Type, TypeAttrubute, TypeValue};
 use libtype::{AddressValue
-    , AddressKey};
+    , AddressKey, AddressType};
 use crate::compile::{Compile, Compiler
-    , AddressValueExpand, OwnershipMoveContext};
+    , AddressValueExpand, OwnershipMoveContext
+    , AddRefParamAddr};
 use crate::compile::value_buffer::{ValueBufferItemContext};
 
 impl<'a, F: Compile> Compiler<'a, F> {
@@ -32,19 +33,59 @@ impl<'a, F: Compile> Compiler<'a, F> {
                     typ.to_address_type(), index, 0, length);
                 */
                 // println!("{:?} <= {:?}", &addr, src_addr.clone_with_scope_plus(1));
-                for i in 0..(src_addr.addr_ref().length_clone()+1) {
-                    /*
-                     * TODO:
-                     *  owner => 此操作和AddressKey 中的length无关(ownership指令换成index)
-                     * */
-                    let src = src_addr.clone_with_index_scope_plus(i, 1);
-                    let dst = addr.addr_ref().clone_with_index_plus(i);
-                    self.cb.ownership_move(OwnershipMoveContext::new_with_all(
-                        dst, src));
-                    /*
-                     * 编译期, funccall 并没有进入一个新的作用域, 所以不需要加 scope
-                     * */
-                    self.scope_context.recycle_address(src_addr.clone_with_index_plus(i));
+                match typ.typ_ref() {
+                    TypeValue::Structure(s) => {
+                        /*
+                         * 移动 自身
+                         * */
+                        let src = src_addr.clone_with_scope_plus(1);
+                        let dst = addr.addr_ref().clone();
+                        self.cb.ownership_move(OwnershipMoveContext::new_with_all(
+                            dst, src));
+                        self.scope_context.recycle_address(src_addr.clone());
+                        /*
+                         * 移动 成员
+                         * */
+                        let so = s.struct_obj_ref().pop();
+                        if let Some(member) = so.member_ref() {
+                            let fields = member.index_field_mapping();
+                            for i in 0..(src_addr.addr_ref().length_clone()) {
+                                /*
+                                 * TODO:
+                                 *  owner => 此操作和AddressKey 中的length无关(ownership指令换成index)
+                                 * */
+                                let mut src = src_addr.clone_with_index_scope_plus(i+1, 1);
+                                let dst = addr.addr_ref().clone_with_index_plus(i+1);
+                                let field = fields.get(&i).unwrap();
+                                if field.typ_attr_ref().is_ref() {
+                                    *src.typ_mut() = AddressType::AddrRef;
+                                    println!("{:?}, {:?}", src, dst);
+                                    self.cb.add_ref_param_addr(
+                                        AddRefParamAddr::new_with_all(
+                                            dst, src));
+                                } else if field.typ_attr_ref().is_move() {
+                                    *src.typ_mut() = field.typ_ref().to_address_type();
+                                    self.cb.ownership_move(OwnershipMoveContext::new_with_all(
+                                        dst, src));
+                                    /*
+                                     * 编译期, funccall 并没有进入一个新的作用域, 所以不需要加 scope
+                                     * */
+                                    self.scope_context.recycle_address(
+                                        src_addr.clone_with_index_plus(i+1));
+                                } else {
+                                    unimplemented!();
+                                }
+                            }
+                        }
+                        s.struct_obj_ref().push(so);
+                    },
+                    _ => {
+                        let src = src_addr.clone_with_scope_plus(1);
+                        let dst = addr.addr_ref().clone();
+                        self.cb.ownership_move(OwnershipMoveContext::new_with_all(
+                            dst, src));
+                        self.scope_context.recycle_address(src_addr.clone());
+                    }
                 }
                 /*
                  * 如果是移动的变量, 需要将被移动的变量从变量列表中移除

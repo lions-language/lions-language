@@ -4,6 +4,7 @@ use libcommon::ptr::{RefPtr};
 use super::{Scope};
 use std::collections::VecDeque;
 use crate::vm::thread_context::{ThreadMemory};
+use crate::memory::{MemoryValue};
 
 pub struct ScopeContext {
     scopes: VecDeque<Scope>
@@ -73,13 +74,12 @@ impl ScopeContext {
         , link_static: &RefPtr, memory: &ThreadMemory
         , scope: usize)
         -> RefPtr {
+        // println!("scope: {}, addr_typ: {:?}", scope, addr.typ_ref());
         match addr.typ_ref() {
             AddressType::AddrRef => {
-                let sc = addr.scope_clone();
                 // self.current_unchecked().print_ref_param_addr_mapping();
                 // self.last_n_unchecked(1).print_ref_param_addr_mapping();
-                // println!("{:?}", sc);
-                let ref_addr = self.last_n_unchecked(sc).get_ref_param_addr_unchecked(
+                let ref_addr = self.last_n_unchecked(scope).get_ref_param_addr_unchecked(
                     addr.addr_ref());
                 /*
                 println!("{:?}", ref_addr);
@@ -102,22 +102,25 @@ impl ScopeContext {
         -> RefPtr {
         self.get_addr_ref_data_unchecked(
             addr, link_static, memory, addr.addr_ref().scope_clone())
-        /*
-        let scope = addr.scope_clone();
+    }
+
+    pub fn get_addr_ref_data_addr_unchecked(&self, addr: &AddressValue
+        , scope: usize) -> &MemoryValue {
         match addr.typ_ref() {
             AddressType::AddrRef => {
                 let ref_addr = self.last_n_unchecked(scope).get_ref_param_addr_unchecked(
                     addr.addr_ref());
-                println!("{}, {:?}", scope, ref_addr);
-                self.get_data_unchecked(ref_addr
-                    , link_static, memory)
+                self.get_addr_ref_data_addr_unchecked(ref_addr
+                    , scope+ref_addr.addr_ref().scope_clone())
             },
             _ => {
-                self.last_n_unchecked(scope).get_data_unchecked(
-                    addr, link_static, memory)
+                self.last_n_unchecked(scope).get_data_addr_unchecked(addr.addr_ref())
             }
         }
-        */
+    }
+
+    pub fn get_data_addr_unchecked(&self, addr: &AddressValue) -> &MemoryValue {
+        self.get_addr_ref_data_addr_unchecked(addr, addr.addr_ref().scope_clone())
     }
 
     pub fn new() -> Self {

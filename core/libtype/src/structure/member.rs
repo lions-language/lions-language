@@ -99,6 +99,14 @@ impl StructMember {
         }
     }
 
+    pub fn index_field_mapping(&self) -> HashMap<usize, &StructField>{
+        let mut ms = HashMap::new();
+        for (_, v) in self.members.iter() {
+            ms.insert(v.index_clone() as usize, v);
+        }
+        ms
+    }
+
     pub fn new() -> Self {
         Self {
             index: 0,

@@ -83,7 +83,11 @@ impl<'a, F: Compile> Compiler<'a, F> {
         let addr = Address::new(AddressValue::new(
             typ.to_address_type(), AddressKey::new_with_all(
                 value.addr_index_clone() as u64, 0, 0, 0, value.addr_length_clone())));
-        // println!("{:?}", addr);
+        println!("{:?}", addr);
+            let context = LoadStackContext::new_with_all(
+                addr.addr_clone(), Data::new(DataValue::Structure(StructureData::new())));
+            self.cb.load_stack(context);
+        /*
         if self.scope_context.current_mut_unchecked().structinit_is_empty() {
             /*
              * 为顶级分配空间
@@ -92,6 +96,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 addr.addr_clone(), Data::new(DataValue::Structure(StructureData::new())));
             self.cb.load_stack(context);
         }
+        */
         self.scope_context.push_with_addr_context_typattr_to_value_buffer(
             typ
             , addr, ValueBufferItemContext::Structure
@@ -179,6 +184,25 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 format!("left typ_attr is {:?}, right typ_attr is {:?}"
                     , field_typ_attr, value_typ_attr));
         }
+        /*
+            if field_typ_attr.is_move() {
+                /*
+                 * 移动
+                 * */
+                // println!("move: {:?} <= {:?}", addr.addr_ref(), value_addr);
+                // self.scope_context.use_addr(addr.addr_ref());
+                self.cb.ownership_move(OwnershipMoveContext::new_with_all(
+                    addr.addr().addr(), value_addr.clone()));
+                self.scope_context.recycle_address(value_addr.clone());
+            } else if field_typ_attr.is_ref() {
+                // println!("add_ref: {:?} <= {:?}", addr.addr_ref(), value_addr);
+                self.cb.add_ref_param_addr(
+                    AddRefParamAddr::new_with_all(
+                        addr.addr().addr(), value_addr.clone()));
+            } else {
+                unimplemented!();
+            }
+        */
         if let ValueBufferItemContext::Structure = &value_context {
             /*
              * 如果value buffer得到的 value 是 struct => 则不需要处理
@@ -203,6 +227,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 unimplemented!();
             }
         }
+        /*
+        */
         match &value_context {
             ValueBufferItemContext::Variant(v) => {
                 let var_name = v.as_ref::<String>();

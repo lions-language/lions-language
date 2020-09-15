@@ -4,7 +4,7 @@ use crate::vm::VirtualMachine;
 
 impl VirtualMachine {
     pub fn process_return_stmt(&mut self, value: ReturnStmt) {
-        let (scope, addr_key) = value.fields_move();
+        let (scope, addr_value) = value.fields_move();
         /*
          * 1. 找到数据地址
          * 2. 将数据地址写入到指定的作用域中
@@ -20,7 +20,7 @@ impl VirtualMachine {
         */
         // println!("{:?}", addr_key);
         let data_addr = self.thread_context.current_mut_unchecked()
-            .get_data_addr_unchecked(&addr_key).addr_value_clone();
+            .get_data_addr_unchecked(&addr_value).addr_value_clone();
         // println!("{:?}", data_addr);
         /*
          * 2

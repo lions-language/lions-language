@@ -134,9 +134,9 @@ impl<'a, 'b, F: Writer> Compile for Bytecode<'a, 'b, F> {
     }
 
     fn return_stmt(&mut self, context: ReturnStmtContext) {
-        let (scope, addr_key) = context.fields_move();
+        let (scope, addr_value) = context.fields_move();
         self.write(Instruction::ReturnStmt(ReturnStmt::new_with_all(
-                    scope, addr_key)));
+                    scope, addr_value)));
     }
 
     fn jump(&mut self, context: Jump) -> usize {

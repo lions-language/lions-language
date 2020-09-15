@@ -61,10 +61,13 @@ impl ThreadScope {
             addr, link_static, &mut self.memory)
     }
 
-    pub fn get_data_addr_unchecked(&self, addr: &AddressKey) -> &MemoryValue {
+    pub fn get_data_addr_unchecked(&self, addr: &AddressValue) -> &MemoryValue {
+        self.scope_context.get_data_addr_unchecked(addr)
+        /*
         let scope = addr.scope_clone();
         // println!("{}", scope);
         self.scope_context.last_n_unchecked(scope).get_data_addr_unchecked(addr)
+        */
     }
 
     pub fn alloc_and_write_data(&mut self, addr: &AddressValue
