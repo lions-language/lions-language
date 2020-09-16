@@ -118,10 +118,6 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                     let (typ, typ_attr, addr_value, value_context) =
                                         params.remove(0).unwrap();
                                     if item.is_check_func_call_param_typ_attr_clone() {
-                                        /*
-                                         * TODO
-                                         *  临时方案, 这里是对 println 的特殊处理
-                                         * */
                                         if item.typ_attr_ref() != &typ_attr {
                                             return DescResult::Error(
                                                 format!("expect typ attr: {:?}, but found {:?}"
@@ -131,19 +127,27 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                             move_param_contexts.push((i, typ, typ_attr
                                             , addr_value, value_context));
                                         } else if typ_attr.is_ref() {
+                                            let mut ia = addr_value.clone_with_scope_plus(1);
+                                            // *ia.typ_mut() = AddressType::AddrRef;
                                             ref_param_addrs.push_back(
                                                 AddRefParamAddr::new_with_all(
                                                 AddressKey::new_with_all(0, 0, i, 0, 0)
-                                                , addr_value.clone_with_scope_plus(1)));
+                                                , ia));
                                             return_ref_params.insert(i, addr_value);
                                         } else {
                                             unimplemented!();
                                         }
                                     } else {
+                                        /*
+                                         * TODO
+                                         *  临时方案, 这里是对 println 的特殊处理
+                                         * */
+                                        let mut ia = addr_value.clone_with_scope_plus(1);
+                                        // *ia.typ_mut() = AddressType::AddrRef;
                                         ref_param_addrs.push_back(
                                             AddRefParamAddr::new_with_all(
                                             AddressKey::new_with_all(0, 0, i, 0, 0)
-                                            , addr_value.clone_with_scope_plus(1)));
+                                            , ia));
                                         return_ref_params.insert(i, addr_value);
                                     }
                                 }
@@ -173,10 +177,12 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                         // println!("{:?}", addr_value.clone_with_scope_plus(1));
                                         // let addr_value =
                                             // addr_value.addr_with_scope_plus(self.vm_scope_value);
+                                        let mut ia = addr_value.clone_with_scope_plus(1);
+                                        // *ia.typ_mut() = AddressType::AddrRef;
                                         ref_param_addrs.push_back(
                                             AddRefParamAddr::new_with_all(
                                             AddressKey::new_with_all(0, 0, 0, 0, 0)
-                                            , addr_value.clone_with_scope_plus(1)));
+                                            , ia));
                                         move_param_contexts.push((0, typ, typ_attr
                                         , addr_value.clone(), value_context));
                                         return_ref_params.insert(0, addr_value);
@@ -463,7 +469,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                             0
                                         };
                                         // println!("{}", lengthen_offset);
-                                        let addr = match return_ref_params.remove(
+                                        let mut addr = match return_ref_params.remove(
                                             &(addr_value.addr_ref().index_clone() as usize
                                                 + lengthen_offset)) {
                                             Some(addr) => {
@@ -474,6 +480,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                                         "variable length parameter out of bounds"));
                                             }
                                         };
+                                        // *addr.typ_mut() = AddressType::AddrRef;
                                         Address::new(addr)
                                     },
                                     FunctionReturnRefParam::Index(_) => {

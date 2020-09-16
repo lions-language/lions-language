@@ -146,6 +146,7 @@ impl Scope {
 
     pub fn add_ref_param_addr_bind(&mut self, addr: AddressKey
         , src_addr: AddressValue) {
+        // println!("{:?} {:?}", addr, src_addr);
         self.ref_param_addr_mapping.bind(addr
             , MemoryValue::new(src_addr));
     }

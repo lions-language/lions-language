@@ -59,6 +59,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 } else {
                     field.typ_attr_clone()
                 };
+                // println!("{:?}", at);
                 // println!("{:?}", value_addr);
                 let addr = Address::new(AddressValue::new(
                         field.addr_type_clone()

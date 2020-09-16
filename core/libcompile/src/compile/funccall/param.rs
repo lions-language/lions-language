@@ -114,7 +114,6 @@ impl<'a, F: Compile> Compiler<'a, F> {
                  * src: src_addr
                  * dst: index 构建的地址
                  * */
-                println!("xxxxxxxxxxxxxxxxxxxxxx");
                 let addr = AddressValue::new(AddressType::AddrRef
                     , AddressKey::new_with_scope_single(index as u64, 0));
                 match typ.typ_ref() {
@@ -127,7 +126,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                          * */
                         let so = s.struct_obj_ref().pop();
                         if let Some(member) = so.member_ref() {
-                            // let fields = member.index_field_mapping();
+                            let fields = member.index_field_mapping();
                             for i in 0..(src_addr.addr_ref().length_clone()) {
                                 /*
                                  * TODO:
@@ -135,9 +134,15 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                  * */
                                 let mut src = src_addr.clone_with_index_scope_plus(i+1, 1);
                                 let dst = addr.addr_ref().clone_with_index_plus(i+1);
-                                // let field = fields.get(&i).unwrap();
+                                let field = fields.get(&i).unwrap();
+                                /*
+                                if field.typ_attr_ref().is_ref_as_param() {
+                                    *src.typ_mut() = AddressType::AddrRef;
+                                } else {
+                                    *src.typ_mut() = field.typ_ref().to_address_type();
+                                }
+                                */
                                 *src.typ_mut() = AddressType::AddrRef;
-                                println!("dst: {:?}", dst);
                                 self.cb.add_ref_param_addr(
                                     AddRefParamAddr::new_with_all(
                                         dst, src));
