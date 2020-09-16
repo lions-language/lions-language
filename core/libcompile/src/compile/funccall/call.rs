@@ -177,6 +177,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                             AddRefParamAddr::new_with_all(
                                             AddressKey::new_with_all(0, 0, 0, 0, 0)
                                             , addr_value.clone_with_scope_plus(1)));
+                                        move_param_contexts.push((0, typ, typ_attr
+                                        , addr_value.clone(), value_context));
                                         return_ref_params.insert(0, addr_value);
                                     } else {
                                         unimplemented!();

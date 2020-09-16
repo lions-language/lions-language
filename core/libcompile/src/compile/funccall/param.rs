@@ -114,6 +114,43 @@ impl<'a, F: Compile> Compiler<'a, F> {
                  * src: src_addr
                  * dst: index 构建的地址
                  * */
+                println!("xxxxxxxxxxxxxxxxxxxxxx");
+                let addr = AddressValue::new(AddressType::AddrRef
+                    , AddressKey::new_with_scope_single(index as u64, 0));
+                match typ.typ_ref() {
+                    TypeValue::Structure(s) => {
+                        /*
+                         * TODO 添加 自身
+                         * */
+                        /*
+                         * 添加 成员
+                         * */
+                        let so = s.struct_obj_ref().pop();
+                        if let Some(member) = so.member_ref() {
+                            // let fields = member.index_field_mapping();
+                            for i in 0..(src_addr.addr_ref().length_clone()) {
+                                /*
+                                 * TODO:
+                                 *  owner => 此操作和AddressKey 中的length无关(ownership指令换成index)
+                                 * */
+                                let mut src = src_addr.clone_with_index_scope_plus(i+1, 1);
+                                let dst = addr.addr_ref().clone_with_index_plus(i+1);
+                                // let field = fields.get(&i).unwrap();
+                                *src.typ_mut() = AddressType::AddrRef;
+                                println!("dst: {:?}", dst);
+                                self.cb.add_ref_param_addr(
+                                    AddRefParamAddr::new_with_all(
+                                        dst, src));
+                            }
+                        }
+                        s.struct_obj_ref().push(so);
+                    },
+                    _ => {
+                        /*
+                         * TODO 添加 自身
+                         * */
+                    }
+                }
             },
             TypeAttrubute::Pointer
             | TypeAttrubute::Empty => {
