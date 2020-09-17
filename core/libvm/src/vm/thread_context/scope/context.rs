@@ -72,7 +72,7 @@ impl ScopeContext {
 
     fn get_addr_ref_data_unchecked(&self, addr: &AddressValue
         , link_static: &RefPtr, memory: &ThreadMemory
-        , scope: usize)
+        , index: usize, scope: usize)
         -> RefPtr {
         // println!("scope: {}, addr_typ: {:?}", scope, addr.typ_ref());
         match addr.typ_ref() {
@@ -87,12 +87,17 @@ impl ScopeContext {
                 self.last_n_unchecked(1).print_addr_mapping();
                 */
                 self.get_addr_ref_data_unchecked(ref_addr
-                    , link_static, memory, scope+ref_addr.addr_ref().scope_clone())
+                    , link_static, memory
+                    , index
+                    // , index+ref_addr.addr_ref().index_clone() as usize
+                    , scope+ref_addr.addr_ref().scope_clone())
             },
             _ => {
                 // self.last_n_unchecked(1).print_ref_param_addr_mapping();
+                let mut a = addr.clone();
+                *a.addr_mut().index_mut() += index as u64;
                 self.last_n_unchecked(scope).get_data_unchecked(
-                    addr, link_static, memory)
+                    &a, link_static, memory)
             }
         }
     }
@@ -101,11 +106,12 @@ impl ScopeContext {
         , link_static: &RefPtr, memory: &ThreadMemory)
         -> RefPtr {
         self.get_addr_ref_data_unchecked(
-            addr, link_static, memory, addr.addr_ref().scope_clone())
+            addr, link_static, memory, addr.addr_ref().index_clone() as usize
+            , addr.addr_ref().scope_clone())
     }
 
     pub fn get_addr_ref_data_addr_unchecked(&self, addr: &AddressValue
-        , scope: usize) -> &MemoryValue {
+        , scope: usize) -> (usize, &MemoryValue) {
         match addr.typ_ref() {
             AddressType::AddrRef => {
                 let ref_addr = self.last_n_unchecked(scope).get_ref_param_addr_unchecked(
@@ -114,12 +120,16 @@ impl ScopeContext {
                     , scope+ref_addr.addr_ref().scope_clone())
             },
             _ => {
-                self.last_n_unchecked(scope).get_data_addr_unchecked(addr.addr_ref())
+                (scope, self.last_n_unchecked(scope).get_data_addr_unchecked(addr.addr_ref()))
             }
         }
     }
 
     pub fn get_data_addr_unchecked(&self, addr: &AddressValue) -> &MemoryValue {
+        self.get_addr_ref_data_addr_unchecked(addr, addr.addr_ref().scope_clone()).1
+    }
+
+    pub fn get_data_scope_addr_unchecked(&self, addr: &AddressValue) -> (usize, &MemoryValue) {
         self.get_addr_ref_data_addr_unchecked(addr, addr.addr_ref().scope_clone())
     }
 

@@ -79,7 +79,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
          * alloc_address_with_index
          * let addr = self.scope_context.alloc_address_with_index(
          *      typ.to_address_type(), value.addr_index_clone(), 0, value.addr_length_clone());
-        */
+         * */
         let addr = Address::new(AddressValue::new(
             typ.to_address_type(), AddressKey::new_with_all(
                 value.addr_index_clone() as u64, 0, 0, 0, value.addr_length_clone())));

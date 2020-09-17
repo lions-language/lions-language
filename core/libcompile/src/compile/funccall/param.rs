@@ -114,6 +114,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                  * src: src_addr
                  * dst: index 构建的地址
                  * */
+                /*
                 let addr = AddressValue::new(AddressType::AddrRef
                     , AddressKey::new_with_scope_single(index as u64, 0));
                 match typ.typ_ref() {
@@ -156,6 +157,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                          * */
                     }
                 }
+                */
             },
             TypeAttrubute::Pointer
             | TypeAttrubute::Empty => {
