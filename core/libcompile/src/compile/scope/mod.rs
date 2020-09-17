@@ -48,7 +48,8 @@ pub struct StructInit {
     , FieldGetClone, FieldGetMove
     , Clone)]
 pub struct PointAccess {
-    typ_attr: TypeAttrubute
+    typ_attr: TypeAttrubute,
+    addr_typ: AddressType
 }
 
 #[derive(FieldGet, FieldGetMove)]

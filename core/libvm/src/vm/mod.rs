@@ -74,6 +74,9 @@ impl VirtualMachine {
             Instruction::OwnershipMove(v) => {
                 self.ownership_move(v);
             },
+            Instruction::AddressBind(v) => {
+                self.address_bind(v);
+            },
             Instruction::RemoveOwnership(v) => {
                 self.remove_ownership(v);
             },

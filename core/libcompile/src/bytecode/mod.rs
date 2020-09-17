@@ -130,7 +130,7 @@ impl<'a, 'b, F: Writer> Compile for Bytecode<'a, 'b, F> {
     fn address_bind(&mut self, context: AddressBindContext) {
         let (src_addr, dst_addr) = context.fields_move();
         self.write(Instruction::AddressBind(AddressBind::new_with_all(
-            src_addr, dst_addr.addr())));
+            src_addr, dst_addr)));
     }
 
     fn return_stmt(&mut self, context: ReturnStmtContext) {

@@ -44,7 +44,7 @@ pub struct RemoveOwnership {
     , FieldGetMove, FieldGetClone)]
 pub struct AddressBind {
     src_addr: AddressKey,
-    dst_addr: AddressKey
+    dst_addr: AddressValue
 }
 
 #[derive(Debug, Clone)]

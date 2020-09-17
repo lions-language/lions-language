@@ -52,10 +52,12 @@ impl<'a, F: Compile> Compiler<'a, F> {
                             format!("not found {}, in {:?}", first, struct_define.name_ref()));
                     }
                 };
-                let var_typ_attr = self.scope_context.current_unchecked()
-                    .point_access_top_unchecked().typ_attr_clone();
-                let at = if var_typ_attr.is_ref() {
-                    var_typ_attr
+                let top_value = self.scope_context.current_unchecked()
+                    .point_access_top_unchecked();
+                let top_typ_attr = top_value.typ_attr_clone();
+                let top_addr_typ = top_value.addr_typ_clone();
+                let at = if top_typ_attr.is_ref() {
+                    top_typ_attr
                 } else {
                     field.typ_attr_clone()
                 };
