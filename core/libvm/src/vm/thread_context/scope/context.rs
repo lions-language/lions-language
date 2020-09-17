@@ -76,7 +76,7 @@ impl ScopeContext {
         -> RefPtr {
         // println!("scope: {}, addr_typ: {:?}", scope, addr.typ_ref());
         match addr.typ_ref() {
-            AddressType::AddrRef => {
+            AddressType::AddrRef(_) => {
                 // self.current_unchecked().print_ref_param_addr_mapping();
                 // self.last_n_unchecked(1).print_ref_param_addr_mapping();
                 let ref_addr = self.last_n_unchecked(scope).get_ref_param_addr_unchecked(
@@ -113,7 +113,7 @@ impl ScopeContext {
     pub fn get_addr_ref_data_addr_unchecked(&self, addr: &AddressValue
         , scope: usize) -> (usize, &MemoryValue) {
         match addr.typ_ref() {
-            AddressType::AddrRef => {
+            AddressType::AddrRef(_) => {
                 let ref_addr = self.last_n_unchecked(scope).get_ref_param_addr_unchecked(
                     addr.addr_ref());
                 self.get_addr_ref_data_addr_unchecked(ref_addr

@@ -64,7 +64,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
             */
             // println!("alloc addr, name: {}", name);
             self.scope_context.alloc_address(
-                AddressType::AddrRef, 0
+                AddressType::AddrRef(None), 0
                 , typ.addr_length())
         } else {
             unimplemented!();

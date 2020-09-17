@@ -343,11 +343,16 @@ impl AddressKey {
 }
 
 #[derive(Debug, Clone, PartialEq, Hash, Eq)]
+pub enum AddressTypeAddrRef {
+    Param(AddressKey)
+}
+
+#[derive(Debug, Clone, PartialEq, Hash, Eq)]
 pub enum AddressType {
     Static,
     Stack,
     Heap,
-    AddrRef,
+    AddrRef(Option<AddressTypeAddrRef>),
     Invalid
 }
 
