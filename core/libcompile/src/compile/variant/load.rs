@@ -55,26 +55,27 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 let top_value = self.scope_context.current_unchecked()
                     .point_access_top_unchecked();
                 let top_typ_attr = top_value.typ_attr_clone();
-                let top_addr_typ = top_value.addr_typ_clone();
-                let at = if top_typ_attr.is_ref() {
-                    top_typ_attr
+                let (ta, at) = if top_typ_attr.is_ref() {
+                    (top_typ_attr, top_value.addr_value_ref().typ_clone())
                 } else {
-                    field.typ_attr_clone()
+                    (field.typ_attr_clone(), field.addr_type_clone())
                 };
                 // println!("{:?}", at);
                 // println!("{:?}", value_addr);
                 let addr = Address::new(AddressValue::new(
-                        field.addr_type_clone()
+                        at
                         , AddressKey::new_with_all(
                             (value_addr.addr_ref().index_clone() as usize + field.index_clone() + 1)
                             as u64
-                            , 0, 0, 0, field.length())));
+                            , 0, 0
+                            , value_addr.addr_ref().scope_clone()
+                            , field.length())));
                 // println!("{:?}", addr);
                 self.scope_context.push_with_addr_context_typattr_to_value_buffer(
                     field.typ_clone()
                     , addr
                     , value_context
-                    , at);
+                    , ta);
                 // println!("{:?}", field);
                 s.struct_obj_ref().push(struct_define);
             },
