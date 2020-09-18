@@ -58,7 +58,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                 let dst = addr.addr_ref().clone_with_index_plus(i+1);
                                 let field = fields.get(&i).unwrap();
                                 if field.typ_attr_ref().is_ref() {
-                                    *src.typ_mut() = AddressType::AddrRef(None);
+                                    *src.typ_mut() = AddressType::AddrRef;
                                     self.cb.add_ref_param_addr(
                                         AddRefParamAddr::new_with_all(
                                             dst, src));

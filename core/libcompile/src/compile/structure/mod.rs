@@ -19,7 +19,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
         let addr_type = if typ_attr.is_move() {
             typ.to_address_type()
         } else if typ_attr.is_ref() {
-            AddressType::AddrRef(None)
+            AddressType::AddrRef
         } else {
             unimplemented!();
         };

@@ -4,7 +4,7 @@ use libtype::function::{AddFunctionContext};
 use libtype::structure::{StructDefine};
 use libtype::{PackageType, PackageTypeValue
     , AddressType, TypeAttrubute, TypeValue
-    , AddressKey, AddressValue, AddressTypeAddrRef};
+    , AddressKey, AddressValue};
 use libresult::DescResult;
 use libcommon::ptr::{RefPtr};
 use crate::compile::{Compile, Compiler, AddressValueExpand};
@@ -59,11 +59,6 @@ impl<'a, F: Compile> Compiler<'a, F> {
                     (top_typ_attr, top_value.addr_value_ref().typ_clone())
                 } else {
                     (field.typ_attr_clone(), field.addr_type_clone())
-                };
-                if let AddressType::AddrRef(_) = &at {
-                    // println!("{:?}", top_value.addr_value_ref());
-                    *&mut at = AddressType::AddrRef(
-                        Some(AddressTypeAddrRef::Param(top_value.addr_value_ref().addr_clone())));
                 };
                 // println!("{:?}", at);
                 // println!("{:?}", value_addr);
