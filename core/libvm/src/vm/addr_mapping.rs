@@ -5,18 +5,18 @@ use std::cmp::{PartialEq, Eq};
 use std::hash::Hash;
 
 #[derive(Debug, PartialEq, Eq, Hash)]
-struct Key(usize, usize, usize);
+struct Key(usize, usize);
 
 impl From<AddressKey> for Key {
     fn from(v: AddressKey) -> Self {
         let (index, offset, lengthen_offset, _, length) = v.fields_move();
-        Key(index as usize, offset, lengthen_offset)
+        Key(index as usize, lengthen_offset)
     }
 }
 
 impl From<&AddressKey> for Key {
     fn from(v: &AddressKey) -> Self {
-        Key(v.index_clone() as usize, v.offset_clone(), v.lengthen_offset_clone())
+        Key(v.index_clone() as usize, v.lengthen_offset_clone())
     }
 }
 
