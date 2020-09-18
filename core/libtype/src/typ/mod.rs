@@ -1,4 +1,5 @@
 use libcommon::ptr::{HeapPtr};
+use libresult::DescResult;
 use crate::{Type, TypeValue
     , Primeval, TypeAddrType
     , TypeAttrubute
@@ -41,6 +42,40 @@ impl Type {
             },
             _ => {
                 0
+            }
+        }
+    }
+
+    pub fn struct_field_offset(&self, name: &str) -> Result<usize, DescResult> {
+        match self.typ_ref() {
+            TypeValue::Structure(dp) => {
+                let v = dp.struct_obj_ref().pop();
+                match v.member_ref() {
+                    Some(m) => {
+                        match m.find_field(name) {
+                            Some(field) => {
+                                let index = field.index_clone();
+                                dp.struct_obj_ref().push(v);
+                                return Ok(index);
+                            },
+                            None => {
+                                dp.struct_obj_ref().push(v);
+                                return Err(DescResult::Error(
+                                        format!("{} is not exists in {:?}"
+                                            , name, self)));
+                            }
+                        }
+                    },
+                    None => {
+                        dp.struct_obj_ref().push(v);
+                        return Err(DescResult::Error(
+                                format!("{:?} no members", self)));
+                    }
+                }
+            },
+            _ => {
+                return Err(DescResult::Error(
+                        format!("{:?} is not struct type", self)));
             }
         }
     }

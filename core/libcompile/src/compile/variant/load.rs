@@ -24,6 +24,11 @@ impl<'a, F: Compile> Compiler<'a, F> {
         let (first, _, typ_attr, lengthen_offset) = context.fields_move();
         let first_data = first.token_data().expect("should not happend");
         let first = extract_token_data!(first_data, Id);
+        /*
+         * 将name追加进去
+         * */
+        self.scope_context.current_mut_unchecked()
+            .append_point_access_fullname(&first);
         let value_item = match self.scope_context.take_top_from_value_buffer() {
             Ok(v) => v,
             Err(e) => {
@@ -62,6 +67,14 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 };
                 // println!("{:?}", at);
                 // println!("{:?}", value_addr);
+                /*
+                 * 自己与 最上层 的偏移计算:
+                 *  top自身的偏移 + 自己与top之间的偏移
+                 * */
+                let top_offset = top_value.addr_value_ref().addr_ref().offset_clone();
+                let fullname = self.scope_context.current_unchecked()
+                    .get_point_access_fullname_unchecked();
+                let self_and_top_offset = top_value.typ_ref().struct_field_offset(fullname);
                 let addr = Address::new(AddressValue::new(
                         at
                         , AddressKey::new_with_all(

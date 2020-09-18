@@ -147,9 +147,9 @@ impl<'a, F: Compile> Compiler<'a, F> {
 
     pub fn process_struct_init_field_after_expr(&mut self
         , init_context: &mut StructInitContext) -> DescResult {
-        let value = self.scope_context.current_mut_unchecked()
+        let top_value = self.scope_context.current_mut_unchecked()
             .get_structinit_stack_top_item_unchecked();
-        let start_addr_index = value.addr_index_clone();
+        let start_addr_index = top_value.addr_index_clone();
         let struct_field = self.scope_context.current_mut_unchecked()
             .get_current_mut_structinit_field_stack_unchecked()
             .field_mut().as_mut::<StructField>();
@@ -163,7 +163,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
         let field_typ_attr = struct_field.typ_attr_clone();
         let addr = Address::new(AddressValue::new(
             field_typ.to_address_type(), AddressKey::new_with_all(
-                field_addr_index as u64, 0, 0, 0, field_typ.addr_length())));
+                field_addr_index as u64, field_index + 1, 0, 0, field_typ.addr_length())));
         let value_item = match self.scope_context.take_top_from_value_buffer() {
             Ok(v) => v,
             Err(e) => {

@@ -41,13 +41,14 @@ pub struct StructInitField {
 pub struct StructInit {
     define: HeapPtr,
     addr_index: usize,
-    addr_length: usize
+    addr_length: usize,
 }
 
 #[derive(Default, FieldGet, NewWithAll
     , FieldGetClone, FieldGetMove
     , Clone)]
 pub struct PointAccess {
+    typ: Type,
     typ_attr: TypeAttrubute,
     addr_value: AddressValue,
 }
@@ -77,7 +78,8 @@ pub struct Scope {
     /*
      * . 操作符
      * */
-    point_access: Option<VecDeque<PointAccess>>
+    point_access: Option<VecDeque<PointAccess>>,
+    point_access_fullname: Option<String>
 }
 
 impl Scope {
@@ -394,6 +396,7 @@ impl Scope {
                 pa.pop_back();
                 if pa.is_empty() {
                     *&mut self.point_access = None;
+                    self.point_access_fullname = None;
                 }
             },
             None => {
@@ -423,6 +426,22 @@ impl Scope {
         }
     }
 
+    pub fn append_point_access_fullname(&mut self, name: &str) {
+        match &mut self.point_access_fullname {
+            Some(n) => {
+                n.push('.');
+                n.push_str(name);
+            },
+            None => {
+                *&mut self.point_access_fullname = Some(String::from(name));
+            }
+        }
+    }
+
+    pub fn get_point_access_fullname_unchecked(&self) -> &String {
+        &self.point_access_fullname.as_ref().expect("should not happend")
+    }
+
     pub fn new_with_addr_start(start: usize, scope_typ: ScopeType) -> Self {
         Self {
             scope_typ: scope_typ,
@@ -436,7 +455,8 @@ impl Scope {
             return_jumps: None,
             structinit_field_stack: None,
             structinit_stack: None,
-            point_access: None
+            point_access: None,
+            point_access_fullname: None
         }
     }
 
