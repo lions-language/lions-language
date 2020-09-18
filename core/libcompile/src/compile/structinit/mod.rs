@@ -39,7 +39,6 @@ impl<'a, F: Compile> Compiler<'a, F> {
              * */
             let start_addr_index =
                 self.scope_context.alloc_continuous_address(1+member_length);
-            // println!("{:?}, {}", member_length, start_addr_index+1);
             /*
             /*
              * 为struct分配地址

@@ -73,7 +73,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                  * */
                 let addr = self.scope_context.alloc_address(typ.to_address_type(), 0
                     , typ.addr_length());
-                // println!("alloc addr: {:?}", addr);
+                // println!("var {} define, alloc addr: {:?}", name, addr);
                 self.scope_context.add_variant(name
                     , Variant::new(
                         Address::new(addr.addr_clone()), typ, typ_attr));

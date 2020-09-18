@@ -81,6 +81,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                     }
                 };
                 let offset = top_offset + self_and_top_offset;
+                // let offset = self_and_top_offset;
                 let addr = Address::new(AddressValue::new(
                         at
                         , AddressKey::new_with_all(

@@ -23,7 +23,7 @@ impl AddressDispatch {
          * */
         self.used_addr_index.insert(self.index as usize);
         self.index += 1;
-        for _ in 0..(length+1) {
+        for _ in 0..length {
             self.used_addr_index.insert(self.index as usize);
             self.index += 1;
         }
