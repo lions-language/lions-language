@@ -74,15 +74,22 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 let top_offset = top_value.addr_value_ref().addr_ref().offset_clone();
                 let fullname = self.scope_context.current_unchecked()
                     .get_point_access_fullname_unchecked();
-                let self_and_top_offset = top_value.typ_ref().struct_field_offset(fullname);
+                let self_and_top_offset = match top_value.typ_ref().struct_field_offset(fullname) {
+                    Ok(of) => of,
+                    Err(e) => {
+                        return e;
+                    }
+                };
+                let offset = top_offset + self_and_top_offset;
                 let addr = Address::new(AddressValue::new(
                         at
                         , AddressKey::new_with_all(
                             (value_addr.addr_ref().index_clone() as usize + field.index_clone() + 1)
                             as u64
-                            , 0, 0
+                            , offset, 0
                             , value_addr.addr_ref().scope_clone()
                             , field.length())));
+                // println!("{}, {}, {:?}", top_offset, self_and_top_offset, addr);
                 // println!("{:?}", addr);
                 self.scope_context.push_with_addr_context_typattr_to_value_buffer(
                     field.typ_clone()

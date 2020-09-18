@@ -54,7 +54,7 @@ impl Type {
                     Some(m) => {
                         match m.find_field(name) {
                             Some(field) => {
-                                let index = field.index_clone();
+                                let index = field.index_clone() + 1;
                                 dp.struct_obj_ref().push(v);
                                 return Ok(index);
                             },
