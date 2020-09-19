@@ -77,7 +77,7 @@ impl ScopeContext {
         , top_addr: AddressKey)
         -> RefPtr {
         // println!("scope: {}, addr_typ: {:?}", scope, addr.typ_ref());
-        match addr.typ_ref() {
+        match addr.root_typ_ref() {
             AddressType::AddrRef => {
                 // self.current_unchecked().print_ref_param_addr_mapping();
                 // self.last_n_unchecked(1).print_ref_param_addr_mapping();
@@ -94,18 +94,20 @@ impl ScopeContext {
                 let ref_addr = self.last_n_unchecked(scope).get_ref_param_addr_unchecked(
                     &ak);
                 */
-                let ref_addr = self.last_n_unchecked(scope).get_ref_param_addr_unchecked(
-                    addr.addr_ref());
+                let mut ref_addr = self.last_n_unchecked(scope).get_ref_param_addr_unchecked(
+                    addr.addr_ref()).clone();
+                *ref_addr.typ_mut() = addr.typ_clone();
+                // println!("{:?}", ref_addr);
                 /*
                 println!("{:?}", ref_addr);
                 self.current_unchecked().print_addr_mapping();
                 self.last_n_unchecked(1).print_addr_mapping();
                 */
-                self.get_addr_ref_data_unchecked(ref_addr
+                self.get_addr_ref_data_unchecked(&ref_addr
                     , link_static, memory
-                    , offset
+                    , offset + ref_addr.addr_ref().offset_clone()
                     // , index+ref_addr.addr_ref().index_clone() as usize
-                    , scope+ref_addr.addr_ref().scope_clone()
+                    , scope + ref_addr.addr_ref().scope_clone()
                     , top_addr)
             },
             _ => {
@@ -122,10 +124,21 @@ impl ScopeContext {
                 };
                 */
                 let mut a = addr.clone();
-                println!("{:?}, {}", a, offset);
                 *a.addr_mut().index_mut() += offset as u64;
-                self.last_n_unchecked(scope).get_data_unchecked(
-                    &a, link_static, memory)
+                match a.typ_ref() {
+                    AddressType::AddrRef => {
+                        *a.root_typ_mut() = a.typ_clone();
+                        self.get_addr_ref_data_unchecked(&a
+                            , link_static, memory
+                            , offset
+                            , scope
+                            , top_addr)
+                    },
+                    _ => {
+                        self.last_n_unchecked(scope).get_data_unchecked(
+                            &a, link_static, memory)
+                    }
+                }
             }
         }
     }
@@ -134,7 +147,8 @@ impl ScopeContext {
         , link_static: &RefPtr, memory: &ThreadMemory)
         -> RefPtr {
         self.get_addr_ref_data_unchecked(
-            addr, link_static, memory, 0
+            addr, link_static, memory
+            , addr.addr_ref().offset_clone()
             , addr.addr_ref().scope_clone()
             , addr.addr_clone())
     }

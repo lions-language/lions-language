@@ -80,12 +80,14 @@ impl<'a, F: Compile> Compiler<'a, F> {
                         return e;
                     }
                 };
-                let offset = top_offset + self_and_top_offset;
-                // let offset = self_and_top_offset;
-                let addr = Address::new(AddressValue::new(
+                // let offset = top_offset + self_and_top_offset;
+                let offset = self_and_top_offset;
+                let addr = Address::new(AddressValue::new_with_root_typ(
                         field.addr_type_clone()
+                        , top_value.addr_value_ref().typ_clone()
                         , AddressKey::new_with_all(
-                            (value_addr.addr_ref().index_clone() as usize + field.index_clone() + 1)
+                            // (value_addr.addr_ref().index_clone() as usize + field.index_clone() + 1)
+                            value_addr.addr_ref().index_clone()
                             as u64
                             , offset, 0
                             , value_addr.addr_ref().scope_clone()
