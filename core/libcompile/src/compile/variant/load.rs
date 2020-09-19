@@ -60,10 +60,10 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 let top_value = self.scope_context.current_unchecked()
                     .point_access_top_unchecked();
                 let top_typ_attr = top_value.typ_attr_clone();
-                let (ta, mut at) = if top_typ_attr.is_ref() {
-                    (top_typ_attr, top_value.addr_value_ref().typ_clone())
+                let ta = if top_typ_attr.is_ref() {
+                    top_typ_attr
                 } else {
-                    (field.typ_attr_clone(), field.addr_type_clone())
+                    field.typ_attr_clone()
                 };
                 // println!("{:?}", at);
                 // println!("{:?}", value_addr);
@@ -83,7 +83,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 let offset = top_offset + self_and_top_offset;
                 // let offset = self_and_top_offset;
                 let addr = Address::new(AddressValue::new(
-                        at
+                        field.addr_type_clone()
                         , AddressKey::new_with_all(
                             (value_addr.addr_ref().index_clone() as usize + field.index_clone() + 1)
                             as u64

@@ -367,7 +367,8 @@ pub enum AddressNodeType {
     , FieldGetMove)]
 pub struct AddressValue {
     typ: AddressType,
-    addr: AddressKey
+    addr: AddressKey,
+    root_typ: AddressType
 }
 
 impl AddressValue {
@@ -406,10 +407,20 @@ impl AddressValue {
         Self::default()
     }
 
+    pub fn new_with_root_typ(typ: AddressType, root_typ: AddressType
+        , addr: AddressKey) -> Self {
+        Self {
+            typ: typ.clone(),
+            addr: addr,
+            root_typ: root_typ
+        }
+    }
+
     pub fn new(typ: AddressType, addr: AddressKey) -> Self {
         Self {
-            typ: typ,
-            addr: addr
+            typ: typ.clone(),
+            addr: addr,
+            root_typ: typ
         }
     }
 }
