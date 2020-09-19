@@ -82,9 +82,13 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 };
                 // let offset = top_offset + self_and_top_offset;
                 let offset = self_and_top_offset;
-                let addr = Address::new(AddressValue::new_with_root_typ(
-                        field.addr_type_clone()
-                        , top_value.addr_value_ref().typ_clone()
+                let at = if ta.is_ref() {
+                    AddressType::AddrRef
+                } else {
+                    field.addr_type_clone()
+                };
+                let addr = Address::new(AddressValue::new(
+                        at
                         , AddressKey::new_with_all(
                             (value_addr.addr_ref().index_clone() as usize + field.index_clone() + 1)
                             // value_addr.addr_ref().index_clone()

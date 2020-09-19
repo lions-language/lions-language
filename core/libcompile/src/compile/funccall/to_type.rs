@@ -102,12 +102,17 @@ impl<'a, F: Compile> Compiler<'a, F> {
                             , input_value_context));
                 } else if input_typ_attr.is_ref_as_param() {
                     let mut ia = input_addr.addr_ref().clone_with_scope_plus(1);
+                    /*
+                    println!("{:?}", ia);
+                    */
+                    /*
                     let at = if input_typ_attr.is_ref_as_param() {
                         AddressType::AddrRef
                     } else {
                         input_addr.addr_ref().typ_clone()
                     };
                     *ia.typ_mut() = at;
+                    */
                     ref_param_addr = Some(
                         AddRefParamAddr::new_with_all(
                         AddressKey::new_with_all(0, 0, 0, 0, 0)
