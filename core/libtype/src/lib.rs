@@ -398,8 +398,8 @@ impl AddressValue {
     pub fn clone_with_index_scope_plus(&self
         , index: usize, scope: usize) -> Self {
         let mut addr = self.clone();
-        *addr.addr_mut().index_mut() = index as u64;
-        *addr.addr_mut().scope_mut() = scope as usize;
+        *addr.addr_mut().index_mut() += index as u64;
+        *addr.addr_mut().scope_mut() += scope as usize;
         addr
     }
 

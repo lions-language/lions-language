@@ -140,6 +140,13 @@ impl VirtualMachine {
         /*
          * 获取数据
          * */
+        let (typ_attr, addr_type) = value.param_context.expect("should not happend").remove(0)
+            .fields_move();
+        let at = if typ_attr.is_ref_as_param() {
+            AddressType::AddrRef
+        } else {
+            addr_type
+        };
         let param_compile_addr = AddressValue::new(
             AddressType::AddrRef, AddressKey::new_with_all(0, 0, 0, 0, 0));
         let param_value = self.thread_context.current_unchecked().get_data_unchecked(

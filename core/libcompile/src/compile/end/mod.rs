@@ -48,6 +48,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                             package_str: PackageStr::Itself,
                             func: &func,
                             param_addrs: None,
+                            param_context: None,
                             call_param_len: 0,
                             return_data: CallFunctionReturnData::default()
                         };

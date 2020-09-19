@@ -8,7 +8,7 @@ use libtype::instruction::{Instruction, CallPrimevalFunction
     , LoadStack, OwnershipMove
     , AddressBind, ReturnStmt
     , Jump, RemoveOwnership
-    , AddRefParamAddr};
+    , AddRefParamAddr, CallPrimevalFunctionParamContext};
 use crate::compile::{StaticContext, CallFunctionContext
     , FunctionNamedStmtContext, Compile
     , LoadStackContext, OwnershipMoveContext
@@ -66,6 +66,7 @@ impl<'a, 'b, F: Writer> Compile for Bytecode<'a, 'b, F> {
                     CallPrimevalFunction{
                         opt: def.optcode.clone(),
                         param_addrs: context.param_addrs,
+                        param_context: context.param_context,
                         call_param_len: context.call_param_len,
                         return_data: context.return_data
                     }

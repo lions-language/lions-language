@@ -22,7 +22,8 @@ use libtype::function::{Function, CallFunctionParamAddr
 use libtype::structure::{StructDefine};
 use libtype::instruction::{
     Jump, RemoveOwnership
-    , AddRefParamAddr};
+    , AddRefParamAddr
+    , CallPrimevalFunctionParamContext};
 use libtypecontrol::function::FunctionControl;
 use libtype::module::Module;
 use libresult::*;
@@ -63,6 +64,7 @@ pub struct CallFunctionContext<'a> {
     pub package_str: PackageStr,
     pub func: &'a Function,
     pub param_addrs: Option<Vec<CallFunctionParamAddr>>,
+    pub param_context: Option<Vec<CallPrimevalFunctionParamContext>>,
     pub call_param_len: usize,
     pub return_data: CallFunctionReturnData
 }

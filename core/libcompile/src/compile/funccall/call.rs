@@ -26,6 +26,56 @@ use crate::address::Address;
 use std::collections::{VecDeque, HashMap};
 
 impl<'a, F: Compile> Compiler<'a, F> {
+    fn push_ref_param(&self
+        , typ: &Type
+        , addr_value: &AddressValue
+        , ref_param_addrs: &mut VecDeque<AddRefParamAddr>) {
+        let ia = addr_value.clone_with_scope_plus(1);
+        // *ia.typ_mut() = AddressType::AddrRef;
+        ref_param_addrs.push_back(
+            AddRefParamAddr::new_with_all(
+            AddressKey::new_with_all(0, 0, 0, 0, 0)
+            , ia));
+        /*
+         * 展开结构体
+         * */
+        match typ.typ_ref() {
+            TypeValue::Structure(s) => {
+                /*
+                 * 添加 成员
+                 * */
+                let so = s.struct_obj_ref().pop();
+                if let Some(member) = so.member_ref() {
+                    let fields = member.index_field_mapping();
+                    for i in 0..typ.addr_length() {
+                        let field = fields.get(&i).unwrap();
+                        let mut ia =
+                            addr_value.clone_with_index_scope_plus(
+                            i+1, 1);
+                        /*
+                        if field.typ_attr_ref().is_ref_as_param() {
+                            *ia.typ_mut() = AddressType::AddrRef;
+                        } else {
+                            *ia.typ_mut() =
+                                field.typ_ref().to_address_type();
+                        }
+                        */
+                        // *ia.typ_mut() = AddressType::AddrRef;
+                        *ia.typ_mut() = field.addr_type_clone();
+                        ref_param_addrs.push_back(
+                            AddRefParamAddr::new_with_all(
+                            AddressKey::new_with_all(
+                                (i+1) as u64, 0, 0, 0, 0)
+                            , ia));
+                    }
+                }
+                s.struct_obj_ref().push(so);
+            },
+            _ => {
+            }
+        }
+    }
+
     pub fn handle_call_function(&mut self
         , param_len: usize
         , call_context: GrammarCallFunctionContext) -> DescResult {
@@ -142,7 +192,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                          * TODO
                                          *  临时方案, 这里是对 println 的特殊处理
                                          * */
-                                        let mut ia = addr_value.clone_with_scope_plus(1);
+                                        let ia = addr_value.clone_with_scope_plus(1);
                                         // *ia.typ_mut() = AddressType::AddrRef;
                                         ref_param_addrs.push_back(
                                             AddRefParamAddr::new_with_all(
@@ -177,14 +227,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                         // println!("{:?}", addr_value.clone_with_scope_plus(1));
                                         // let addr_value =
                                             // addr_value.addr_with_scope_plus(self.vm_scope_value);
-                                        let mut ia = addr_value.clone_with_scope_plus(1);
-                                        // *ia.typ_mut() = AddressType::AddrRef;
-                                        ref_param_addrs.push_back(
-                                            AddRefParamAddr::new_with_all(
-                                            AddressKey::new_with_all(0, 0, 0, 0, 0)
-                                            , ia));
-                                        // move_param_contexts.push((0, typ, typ_attr
-                                        // , addr_value.clone(), value_context));
+                                        self.push_ref_param(&typ, &addr_value, &mut ref_param_addrs);
                                         return_ref_params.insert(0, addr_value);
                                     } else {
                                         unimplemented!();
@@ -530,6 +573,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
             package_str: call_context.package_str(),
             func: &func,
             param_addrs: None,
+            param_context: None,
             call_param_len: param_len,
             return_data: CallFunctionReturnData::new_with_all(
                 return_addr.addr_clone(), return_is_alloc)

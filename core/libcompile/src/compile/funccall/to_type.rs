@@ -6,7 +6,8 @@ use libtype::function::{FindFunctionContext, FindFunctionResult
     , CallFunctionParamAddr, Function, splice::FunctionSplice
     , FunctionReturnDataAttr, FunctionParamDataItem
     , CallFunctionReturnData};
-use libtype::instruction::{AddRefParamAddr};
+use libtype::instruction::{AddRefParamAddr
+    , CallPrimevalFunctionParamContext};
 use libtype::{AddressValue};
 use libresult::*;
 use libcommon::ptr::RefPtr;
@@ -91,6 +92,9 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 let mut param_move = None;
                 let param_addrs = vec![CallFunctionParamAddr::Fixed(
                     input_addr.addr_ref().clone_with_scope_plus(1))];
+                let param_context = vec![CallPrimevalFunctionParamContext::new_with_all(
+                    input_typ_attr.clone()
+                    , input_addr.addr_ref().typ_clone())];
                 if input_typ_attr.is_move_as_param() {
                     param_move = Some((input_typ.clone(), input_typ_attr.clone()
                             , input_addr.addr_clone()
@@ -98,8 +102,12 @@ impl<'a, F: Compile> Compiler<'a, F> {
                             , input_value_context));
                 } else if input_typ_attr.is_ref_as_param() {
                     let mut ia = input_addr.addr_ref().clone_with_scope_plus(1);
-                    // println!("{:?}", ia);
-                    // *ia.typ_mut() = AddressType::AddrRef;
+                    let at = if input_typ_attr.is_ref_as_param() {
+                        AddressType::AddrRef
+                    } else {
+                        input_addr.addr_ref().typ_clone()
+                    };
+                    *ia.typ_mut() = at;
                     ref_param_addr = Some(
                         AddRefParamAddr::new_with_all(
                         AddressKey::new_with_all(0, 0, 0, 0, 0)
@@ -173,6 +181,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                     package_str: input_package_str,
                     func: &func,
                     param_addrs: Some(param_addrs),
+                    param_context: Some(param_context),
                     call_param_len: 1,
                     return_data: CallFunctionReturnData::new_with_all(
                         return_addr.addr_clone(), return_is_alloc)
