@@ -39,55 +39,50 @@ impl<'a, F: Compile> Compiler<'a, F> {
         /*
          * 展开结构体
          * */
-        /*
-        for i in 0..typ.addr_length() {
-            /*
-             * TODO: 通过 addr_value 依次找 addr_value.index + i 的地址信息
-             * 然后将找到的结果作为 ref_param_addrs 的 value
-             * */
-            let mut ia =
-                addr_value.clone_with_index_scope_plus(
-                i+1, 1);
-            ref_param_addrs.push_back(
-                AddRefParamAddr::new_with_all(
-                AddressKey::new_with_all(
-                    (i+1) as u64, 0, 0, 0, 0)
-                , ia));
-        }
-        */
-        /*
-         * TODO: 如果多级将存在问题, 不能从 field 中推断出 AddressType
-         * */
-        match typ.typ_ref() {
-            TypeValue::Structure(s) => {
-                let so = s.struct_obj_ref().pop();
-                if let Some(member) = so.member_ref() {
-                    let fields = member.index_field_mapping();
-                    for i in 0..typ.addr_length() {
-                        let field = fields.get(&i).unwrap();
-                        let mut ia =
-                            addr_value.clone_with_index_scope_plus(
-                            i+1, 1);
-                        if field.typ_attr_ref().is_ref_as_param() {
-                            *ia.typ_mut() = AddressType::AddrRef;
-                        } else {
-                            *ia.typ_mut() =
-                                field.typ_ref().to_address_type();
+        if let AddressType::AddrRef = addr_value.typ_ref() {
+            for i in 0..typ.addr_length() {
+                let mut ia =
+                    addr_value.clone_with_index_scope_plus(
+                    i+1, 1);
+                *ia.typ_mut() = AddressType::AddrRef;
+                ref_param_addrs.push_back(
+                    AddRefParamAddr::new_with_all(
+                    AddressKey::new_with_all(
+                        (i+1) as u64, 0, 0, 0, 0)
+                    , ia));
+            }
+        } else {
+            match typ.typ_ref() {
+                TypeValue::Structure(s) => {
+                    let so = s.struct_obj_ref().pop();
+                    if let Some(member) = so.member_ref() {
+                        let fields = member.index_field_mapping();
+                        for i in 0..typ.addr_length() {
+                            let field = fields.get(&i).unwrap();
+                            let mut ia =
+                                addr_value.clone_with_index_scope_plus(
+                                i+1, 1);
+                            if field.typ_attr_ref().is_ref_as_param() {
+                                *ia.typ_mut() = AddressType::AddrRef;
+                            } else {
+                                *ia.typ_mut() =
+                                    field.typ_ref().to_address_type();
+                            }
+                            /*
+                            */
+                            // *ia.typ_mut() = AddressType::AddrRef;
+                            // *ia.typ_mut() = field.addr_type_clone();
+                            ref_param_addrs.push_back(
+                                AddRefParamAddr::new_with_all(
+                                AddressKey::new_with_all(
+                                    (i+1) as u64, 0, 0, 0, 0)
+                                , ia));
                         }
-                        /*
-                        */
-                        // *ia.typ_mut() = AddressType::AddrRef;
-                        // *ia.typ_mut() = field.addr_type_clone();
-                        ref_param_addrs.push_back(
-                            AddRefParamAddr::new_with_all(
-                            AddressKey::new_with_all(
-                                (i+1) as u64, 0, 0, 0, 0)
-                            , ia));
                     }
+                    s.struct_obj_ref().push(so);
+                },
+                _ => {
                 }
-                s.struct_obj_ref().push(so);
-            },
-            _ => {
             }
         }
     }
