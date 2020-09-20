@@ -29,13 +29,15 @@ impl<'a, F: Compile> Compiler<'a, F> {
     fn push_ref_param(&self
         , typ: &Type
         , addr_value: &AddressValue
-        , ref_param_addrs: &mut VecDeque<AddRefParamAddr>) {
+        , ref_param_addrs: &mut VecDeque<AddRefParamAddr>
+        , return_ref_params: &mut HashMap<usize, AddressValue>) {
         let ia = addr_value.clone_with_scope_plus(1);
         // *ia.typ_mut() = AddressType::AddrRef;
         ref_param_addrs.push_back(
             AddRefParamAddr::new_with_all(
             AddressKey::new_with_all(0, 0, 0, 0, 0)
             , ia));
+        return_ref_params.insert(0, addr_value.clone());
         /*
          * 展开结构体
          * */
@@ -50,6 +52,10 @@ impl<'a, F: Compile> Compiler<'a, F> {
                     AddressKey::new_with_all(
                         (i+1) as u64, 0, 0, 0, 0)
                     , ia));
+                let mut ra = addr_value.clone_with_index_plus(i+1);
+                *ra.typ_mut() = AddressType::AddrRef;
+                return_ref_params.insert(i+1
+                    , ra);
             }
         } else {
             match typ.typ_ref() {
@@ -77,6 +83,15 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                 AddressKey::new_with_all(
                                     (i+1) as u64, 0, 0, 0, 0)
                                 , ia));
+                            let mut ra = addr_value.clone_with_index_plus(i+1);
+                            if field.typ_attr_ref().is_ref_as_param() {
+                                *ra.typ_mut() = AddressType::AddrRef;
+                            } else {
+                                *ra.typ_mut() =
+                                    field.typ_ref().to_address_type();
+                            }
+                            return_ref_params.insert(i+1
+                                , ra);
                         }
                     }
                     s.struct_obj_ref().push(so);
@@ -238,8 +253,10 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                         // println!("{:?}", addr_value.clone_with_scope_plus(1));
                                         // let addr_value =
                                             // addr_value.addr_with_scope_plus(self.vm_scope_value);
-                                        self.push_ref_param(&typ, &addr_value, &mut ref_param_addrs);
-                                        return_ref_params.insert(0, addr_value);
+                                        self.push_ref_param(&typ, &addr_value
+                                            , &mut ref_param_addrs
+                                            , &mut return_ref_params);
+                                        // return_ref_params.insert(0, addr_value);
                                     } else {
                                         unimplemented!();
                                     }

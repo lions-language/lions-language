@@ -82,7 +82,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 };
                 // let offset = top_offset + self_and_top_offset;
                 let offset = self_and_top_offset;
-                let at = if ta.is_ref() {
+                let at = if let &AddressType::AddrRef = top_value.addr_value_ref().typ_ref() {
                     AddressType::AddrRef
                 } else {
                     field.addr_type_clone()
