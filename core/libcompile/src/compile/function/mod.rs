@@ -1,5 +1,6 @@
 use libgrammar::token::{TokenValue, TokenData};
 use libgrammar::grammar::{FunctionDefineParamContext
+    , FunctionDefineParamContextType
     , FunctionDefineParamMutContext
     , FunctionDefineReturnContext
     , FunctionDefineContext
@@ -30,19 +31,27 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 panic!("should not happend");
             }
         };
-        let statement_ptr = self.cb.function_named_stmt(FunctionNamedStmtContext{
-            name: s
+        self.cb.function_named_stmt(FunctionNamedStmtContext{
+            name: s,
+            typ: None
         });
     }
 
     pub fn handle_function_define_param(&mut self, context: FunctionDefineParamContext
         , mut_context: &mut FunctionDefineParamMutContext) {
-        let (name_token, type_token, typ_attr, lengthen_attr, param_no)
+        let (name_token, t, typ_attr, lengthen_attr, param_no)
             = context.fields_move();
         let name = extract_token_data!(
            name_token.token_data().expect("should not happend")
            , Id);
-        let typ = self.to_type(type_token);
+        let typ = match t {
+            FunctionDefineParamContextType::Token(token) => {
+                self.to_type(token)
+            },
+            FunctionDefineParamContextType::Typ(ty) => {
+                ty
+            }
+        };
         /*
          * 为参数分配一个地址
          *  只是分配一个地址, 不做其他事情 (就是增加地址分配器的索引,

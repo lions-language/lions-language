@@ -22,8 +22,9 @@ pub struct FunctionDefineDispatch<'a> {
 
 impl<'a> FunctionDefineDispatch<'a> {
     pub fn alloc_define(&mut self, context: FunctionNamedStmtContext) -> (RefPtr, DefineObject) {
+        let (func_name, typ) = context.fields_move();
         let def = FunctionDefine::new(
-            FunctionStatement::new(context.name(), None, FunctionReturn::default(), None)
+            FunctionStatement::new(func_name, None, FunctionReturn::default(), typ)
             , self.define_stream.alloc_item());
         /*
          * 关键点: 获取插入后的元素的引用

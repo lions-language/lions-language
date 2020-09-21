@@ -121,10 +121,16 @@ pub struct ConstStringContext {
     typ_attr: TypeAttrubute
 }
 
+#[derive(Debug)]
+pub enum FunctionDefineParamContextType {
+    Token(TypeToken),
+    Typ(Type)
+}
+
 #[derive(FieldGet, NewWithAll, FieldGetMove)]
 pub struct FunctionDefineParamContext {
     name_token: TokenValue,
-    type_token: TypeToken,
+    type_token: FunctionDefineParamContextType,
     typ_attr: TypeAttrubute,
     lengthen_attr: FunctionParamLengthenAttr,
     /*
@@ -185,6 +191,13 @@ pub struct ReturnStmtContext {
     is_exist_expr: bool
 }
 
+#[derive(Debug, FieldGet, FieldGetClone
+    , NewWithAll, FieldGetMove
+    , Default)]
+pub struct ObjectFunctionDefineMutContext {
+    typ: Type
+}
+
 pub trait Grammar {
     // type IdUse;
     
@@ -229,9 +242,10 @@ pub trait Grammar {
          * */
         func_name.print_token_type(Some("named function stmt:"));
     }
-    fn function_object_method_stmt(&mut self, object_name: TokenValue
-        , object_type: Type, function_name: TokenValue) {
-        println!("object method stmt");
+    fn function_object_method_stmt(&mut self
+        , _object_type: TypeToken, _function_name: TokenValue
+        , _mut_context: &mut ObjectFunctionDefineMutContext) {
+        unimplemented!("function_object_memthod_stmt");
     }
     fn function_struct_method_stmt(&mut self) {
     }

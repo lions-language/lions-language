@@ -1,7 +1,11 @@
 use super::{GrammarParser, Grammar};
 use crate::lexical::{CallbackReturnStatus};
 use crate::token::{TokenType, TokenValue};
-use crate::grammar::{FunctionDefineContext};
+use crate::grammar::{FunctionDefineContext
+    , ObjectFunctionDefineMutContext
+    , FunctionDefineParamMutContext
+    , FunctionDefineParamContext
+    , FunctionDefineParamContextType};
   
 impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, CB> {
     pub fn function_object_method(&mut self) {
@@ -15,16 +19,9 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
          * */
         self.skip_next_one();
         /*
-         * 计算类型
+         * 解析类型
          * */
-        let typ = match self.typesof_calc() {
-            Some(t) => {
-                t
-            },
-            None => {
-                panic!("should not happend");
-            }
-        };
+        let (typ_attr, lengthen_attr, typ_token) = self.typ_parse();
         /*
          * 查找 结束的 ]
          * */
@@ -57,9 +54,22 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
          * 语法正确的情况下, next token 是函数名称
          * */
         let function_name = self.take_next_one();
-        self.cb().function_object_method_stmt(object_name.token_value()
-            , typ, function_name.token_value());
-        self.function_parse_param_list(&mut context);
+        let mut mut_context = ObjectFunctionDefineMutContext::default();
+        self.cb().function_object_method_stmt(
+            typ_token, function_name.token_value(), &mut mut_context);
+        /*
+         * 成员方法的第一个参数就是结构体实例, 所以需要添加第一个参数
+         * */
+        let mut param_mut_context = FunctionDefineParamMutContext::default();
+        self.grammar_context().cb.function_define_param(
+            FunctionDefineParamContext::new_with_all(
+                object_name.token_value(), FunctionDefineParamContextType::Typ(mut_context.typ())
+                , typ_attr, lengthen_attr, 0), &mut param_mut_context);
+        /*
+         * 添加其余参数
+         * */
+        self.function_parse_param_list(1, &mut context, &mut param_mut_context);
+        self.function_parse_return();
         self.function_parse_block(&mut context);
     }
 

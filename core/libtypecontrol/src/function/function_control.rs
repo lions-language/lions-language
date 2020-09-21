@@ -78,7 +78,7 @@ impl FunctionControl {
                         &mut self.primeval_control
                     },
                     _ => {
-                        unimplemented!();
+                        unimplemented!("{:?}", ty);
                     }
                 }
             },
@@ -93,7 +93,7 @@ impl FunctionControl {
                         &mut self.notype_function_control
                     },
                     _ => {
-                        unimplemented!();
+                        unimplemented!("{:?}", package_typ);
                     }
                 }
             }

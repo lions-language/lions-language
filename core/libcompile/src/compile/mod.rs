@@ -69,9 +69,10 @@ pub struct CallFunctionContext<'a> {
     pub return_data: CallFunctionReturnData
 }
 
-#[derive(Debug, FieldGet)]
+#[derive(Debug, FieldGet, FieldGetMove)]
 pub struct FunctionNamedStmtContext {
-    name: String
+    name: String,
+    typ: Option<Type>
 }
 
 #[derive(Debug, FieldGet)]
