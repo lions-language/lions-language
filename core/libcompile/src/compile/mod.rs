@@ -10,10 +10,10 @@ use libgrammar::grammar::{Grammar, CallFuncScopeContext
     , FunctionDefineReturnContext
     , FunctionDefineContext
     , StructDefineFieldContext
-    , ReturnStmtContext as GrammarReturnStmtContext};
+    , ReturnStmtContext as GrammarReturnStmtContext
+    , ObjectFunctionDefineMutContext, TypeToken};
 use libgrammar::token::{TokenValue};
-use libtype::{Type, Data
-    , TypeAttrubute};
+use libtype::{Type, Data};
 use libtype::function::{Function, CallFunctionParamAddr
     , CallFunctionReturnData
     , FunctionParamDataItem
@@ -35,8 +35,6 @@ use crate::address;
 use crate::address::PackageIndex;
 use crate::static_dispatch::{StaticVariantDispatch};
 use scope::context::ScopeContext;
-use crate::define::DefineObject;
-use std::collections::{VecDeque};
 
 #[derive(Debug)]
 pub struct StaticContext {
@@ -309,6 +307,13 @@ impl<'a, F: Compile> Grammar for Compiler<'a, F> {
 
     fn function_named_stmt(&mut self, value: TokenValue) {
         self.handle_function_named_stmt(value);
+    }
+    
+    fn function_object_method_stmt(&mut self
+        , object_type: TypeToken, func_name: TokenValue
+        , mut_context: &mut ObjectFunctionDefineMutContext) {
+        self.handle_function_object_method_stmt(object_type
+            , func_name, mut_context);
     }
 
     fn function_define_start(&mut self, _value: TokenValue) {

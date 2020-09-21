@@ -333,7 +333,7 @@ pub struct AddFunctionContext<'a> {
      * 通过typ 区别应该存储在哪个对象中
      * */
     pub func_name: String,
-    pub typ: Option<&'a Type>,
+    pub typ: Option<Type>,
     pub package_typ: Option<&'a PackageType>,
     pub func_str: String,
     pub module_str: String,
