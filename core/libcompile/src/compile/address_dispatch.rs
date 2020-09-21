@@ -71,8 +71,8 @@ impl AddressDispatch {
 
     pub fn alloc_continuous(&mut self, length: usize) -> usize {
         let start = self.index;
-        for i in (start as usize)..length {
-            self.used_addr_index.insert(i);
+        for i in 0..length {
+            self.used_addr_index.insert(i+start);
         }
         self.index += length;
         start as usize
@@ -85,6 +85,7 @@ impl AddressDispatch {
             },
             _ => {}
         }
+        // println!("{:?}", self.used_addr_index);
         match self.used_addr_index.get(&(addr.addr_ref().index_clone() as usize)) {
             Some(_) => {
                 // println!("{:?}", addr);
