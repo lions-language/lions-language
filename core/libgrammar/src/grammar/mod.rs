@@ -15,8 +15,7 @@ use libmacro::{FieldGet, NewWithAll
 pub struct CallFuncScopeContext {
     package_type: Option<PackageType>,
     package_str: PackageStr,
-    desc_ctx: DescContext,
-    typ: Option<Type>
+    desc_ctx: DescContext
 }
 
 #[derive(FieldGet)]

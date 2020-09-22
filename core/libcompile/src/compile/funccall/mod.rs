@@ -26,6 +26,33 @@ use std::collections::VecDeque;
 impl<'a, F: Compile> Compiler<'a, F> {
     pub fn handle_call_function_prepare(&mut self, call_scope_context: CallFuncScopeContext
         , call_context: &mut GrammarCallFunctionContext) -> DescResult {
+        if self.scope_context.current_unchecked().is_point_access() {
+            self.handle_call_function_prepare_with_point_access(
+                call_scope_context, call_context)
+        } else {
+            self.handle_call_function_prepare_no_point_access(
+                call_scope_context, call_context)
+        }
+    }
+
+    fn handle_call_function_prepare_with_point_access(&mut self
+        , call_scope_context: CallFuncScopeContext
+        , call_context: &mut GrammarCallFunctionContext) -> DescResult {
+        /*
+         * 获取 value_buffer 顶端类型
+         * */
+        let value_item = self.scope_context.top_n_with_panic_from_value_buffer(1);
+        let typ = value_item.typ_clone();
+        let typ_attr = value_item.typ_attr_clone();
+        *call_context.typ_mut() = Some(typ.clone());
+        call_context.push_param_typ(typ, typ_attr);
+        self.handle_call_function_prepare_no_point_access(
+            call_scope_context, call_context)
+    }
+
+    fn handle_call_function_prepare_no_point_access(&mut self
+        , call_scope_context: CallFuncScopeContext
+        , call_context: &mut GrammarCallFunctionContext) -> DescResult {
         self.scope_context.enter_func_call();
         /*
          * 1. 查找函数声明
@@ -53,13 +80,17 @@ impl<'a, F: Compile> Compiler<'a, F> {
         call_context.set_desc_ctx(call_scope_context.desc_ctx_clone());
         let find_func_context = FindFunctionContext {
             func_name: call_context.func_name_ref_unchecked(),
-            typ: call_scope_context.typ_ref().as_ref(),
+            typ: call_context.typ_ref().as_ref(),
             package_typ: call_scope_context.package_type_ref().as_ref(),
             func_str: &func_str,
             module_str: self.module_stack.current().name_ref()
         };
         let (exists, handle) = self.function_control.is_exists(&find_func_context);
         if exists {
+            /*
+             * 这一步的查找只是为了查找那些不能进行重载的函数的
+             * 比如 println 可以被查找到
+             * */
             let h = Some(handle);
             let func_res = self.function_control.find_function(&find_func_context, &h);
             let func_ptr = match func_res {
@@ -76,8 +107,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
             call_context.set_func_ptr(func_ptr);
             call_context.set_package_str(call_scope_context.package_str());
         } else {
-            let (package_type, package_str, _, typ) = call_scope_context.fields_move();
-            call_context.set_typ(typ);
+            let (package_type, package_str, _) = call_scope_context.fields_move();
             // call_context.set_func_name(func_str);
             call_context.set_package_str(package_str);
             call_context.set_package_typ(package_type);

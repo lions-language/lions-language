@@ -55,6 +55,7 @@ impl FunctionControlInterface for StructFunctionControl {
         let pt = context.package_typ.expect("must be specify package type");
         match pt.typ_ref() {
             PackageTypeValue::Crate => {
+                // println!("{:?}", func);
                 self.handler_mut(self.typ_from_add_unchecked(&context))
                     .as_mut::<compile_unit::Handler>().add_function(context, handle, func)
             },

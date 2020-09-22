@@ -41,7 +41,17 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
             }
         };
         let typ = tp.as_ref::<T, CB>().context_token_type();
-        let mut param_len = 0;
+        /*
+         * 如果含有类型 (成员方法) => 参数长度需要从 1 开始
+         * */
+        let mut param_len = match call_context.typ_ref() {
+            Some(_) => {
+                1
+            },
+            None => {
+                0
+            }
+        };
         match typ {
             TokenType::RightParenthese => {
                 /*

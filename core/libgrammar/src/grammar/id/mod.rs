@@ -75,8 +75,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         let scope_context = CallFuncScopeContext{
             package_type: Some(PackageType::new(PackageTypeValue::Crate)),
             package_str: PackageStr::Itself,
-            desc_ctx: desc_ctx.clone(),
-            typ: None
+            desc_ctx: desc_ctx.clone()
         };
         self.set_backtrack_point();
         self.virtual_skip_next_one();
