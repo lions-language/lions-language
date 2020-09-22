@@ -22,7 +22,8 @@ impl FunctionControl {
 
     pub fn add_function(&mut self, context: AddFunctionContext
         , handle: Option<FindFunctionHandle>, func: Function) -> AddFunctionResult {
-        self.find_instance_add(&context.typ, &context.package_typ).add_function(context, handle, func)
+        self.find_instance_add(&context.typ.as_ref(), &context.package_typ)
+            .add_function(context, handle, func)
     }
 
     /*

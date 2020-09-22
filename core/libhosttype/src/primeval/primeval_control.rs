@@ -54,13 +54,13 @@ impl FunctionControlInterface for PrimevalControl {
     fn add_function(&mut self, context: AddFunctionContext
         , handle: Option<FindFunctionHandle>, func: Function) -> AddFunctionResult {
         let typ = context.typ.expect("primeval must exist type");
-        match primeval_method(typ, &context.func_str) {
+        match primeval_method(&typ, &context.func_str) {
             Some(_) => {
                 /*
                  * 一定要重写原生方法
                  * 判断当前模块是否已经重写了
                  * */
-                return self.add_method_to_module_method(typ, context.module_str
+                return self.add_method_to_module_method(&typ, context.module_str
                     , context.func_str, func);
             },
             None => {
@@ -70,20 +70,20 @@ impl FunctionControlInterface for PrimevalControl {
                  * 如果定义过, 那么说明可能是需要重写的(具体是否是重写, 还需要在
                  * 含有模块信息的集合中查找)
                  * */
-                match self.context(typ).define_map.find_method(
+                match self.context(&typ).define_map.find_method(
                     &context.func_str) {
                     Some(_) => {
                         /*
                          * 查看当前模块是否定义
                          * */
-                        return self.add_method_to_module_method(typ
+                        return self.add_method_to_module_method(&typ
                             , context.module_str, context.func_str, func);
                     },
                     None => {
                         /*
                          * 第一次定义 => 写入 method 集合中
                          * */
-                        self.context_mut(typ).define_map.insert_method(
+                        self.context_mut(&typ).define_map.insert_method(
                             context.func_str, func);
                     }
                 }
