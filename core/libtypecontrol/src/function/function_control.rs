@@ -6,7 +6,7 @@ use libtype::function::{FindFunctionContext, FindFunctionResult
                         , FindFunctionHandle};
 use libhosttype::primeval::PrimevalControl;
 use libhostfunction::control::PrimevalFuncControl;
-use libfunction::control::NotypeFunctionControl;
+use libfunction::control::{NotypeFunctionControl, StructFunctionControl};
 
 impl FunctionControl {
     pub fn is_exists(&mut self, context: &FindFunctionContext) -> (bool, FindFunctionHandle) {
@@ -40,7 +40,7 @@ impl FunctionControl {
                         &mut self.primeval_control
                     },
                     _ => {
-                        unimplemented!();
+                        &mut self.struct_function_control
                     }
                 }
             },
@@ -79,7 +79,7 @@ impl FunctionControl {
                         &mut self.primeval_control
                     },
                     _ => {
-                        unimplemented!("{:?}", ty);
+                        &mut self.struct_function_control
                     }
                 }
             },
@@ -105,7 +105,8 @@ impl FunctionControl {
         Self {
             primeval_control: PrimevalControl::new(),
             primeval_func_control: PrimevalFuncControl::new(),
-            notype_function_control: NotypeFunctionControl::new()
+            notype_function_control: NotypeFunctionControl::new(),
+            struct_function_control: StructFunctionControl::new()
         }
     }
 }
