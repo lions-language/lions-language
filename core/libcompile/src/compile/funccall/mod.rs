@@ -45,7 +45,9 @@ impl<'a, F: Compile> Compiler<'a, F> {
         let typ = value_item.typ_clone();
         let typ_attr = value_item.typ_attr_clone();
         *call_context.typ_mut() = Some(typ.clone());
-        call_context.push_param_typ(typ, typ_attr);
+        let current_point_access =
+            self.scope_context.current_unchecked().point_access_current_unchecked();
+        call_context.push_param_typ(typ, current_point_access.object_typ_attr_clone());
         self.handle_call_function_prepare_no_point_access(
             call_scope_context, call_context)
     }

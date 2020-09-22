@@ -51,6 +51,7 @@ pub struct PointAccess {
     typ: Type,
     typ_attr: TypeAttrubute,
     addr_value: AddressValue,
+    object_typ_attr: TypeAttrubute
 }
 
 #[derive(FieldGet, FieldGetMove)]
@@ -419,6 +420,17 @@ impl Scope {
         match &self.point_access {
             Some(pa) => {
                 pa.front().expect("should not append")
+            },
+            None => {
+                panic!("should not happend");
+            }
+        }
+    }
+
+    pub fn point_access_current_unchecked(&self) -> &PointAccess {
+        match &self.point_access {
+            Some(pa) => {
+                pa.back().expect("should not happend")
             },
             None => {
                 panic!("should not happend");

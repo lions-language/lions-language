@@ -2,10 +2,10 @@ use libtype::{PackageType, PackageTypeValue
     , TypeAttrubute};
 use libtype::package::{PackageStr};
 use libresult::DescResult;
-use super::{GrammarParser, Grammar
+use crate::grammar::{GrammarParser, Grammar
     , ExpressContext
     , CallFuncScopeContext, LoadVariantContext
-    , DescContext};
+    , DescContext, EnterPointAccessContext};
 use crate::lexical::{CallbackReturnStatus};
 use crate::token::{TokenType, TokenData};
 
@@ -20,7 +20,28 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         /*
          * enter point access
          * */
-        self.cb().enter_point_access();
+        /*
+         * 判断 . 之后是不是 &
+         * */
+        let mut object_typ_attr = TypeAttrubute::Move;
+        match self.skip_white_space_token() {
+            Some(t) => {
+                let token = t.as_ref::<T, CB>();
+                match token.context_token_type() {
+                    TokenType::And => {
+                        object_typ_attr = TypeAttrubute::Ref;
+                        self.skip_next_one();
+                    },
+                    _ => {
+                    }
+                }
+            },
+            None => {
+            }
+        }
+        let context = EnterPointAccessContext::new_with_all(
+            object_typ_attr);
+        self.cb().enter_point_access(context);
         /*
          * 解析表达式
          * */

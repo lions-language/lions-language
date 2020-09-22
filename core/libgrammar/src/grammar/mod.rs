@@ -197,6 +197,13 @@ pub struct ObjectFunctionDefineMutContext {
     typ: Type
 }
 
+#[derive(Debug, FieldGet, FieldGetClone
+    , NewWithAll, FieldGetMove
+    , Default)]
+pub struct EnterPointAccessContext {
+    object_typ_attr: TypeAttrubute
+}
+
 pub trait Grammar {
     // type IdUse;
     
@@ -326,7 +333,7 @@ pub trait Grammar {
     fn end(&mut self) -> DescResult {
         DescResult::Success
     }
-    fn enter_point_access(&mut self) {
+    fn enter_point_access(&mut self, _context: EnterPointAccessContext) {
         unimplemented!();
     }
     fn leave_point_access(&mut self) {

@@ -11,7 +11,8 @@ use libgrammar::grammar::{Grammar, CallFuncScopeContext
     , FunctionDefineContext
     , StructDefineFieldContext
     , ReturnStmtContext as GrammarReturnStmtContext
-    , ObjectFunctionDefineMutContext, TypeToken};
+    , ObjectFunctionDefineMutContext, TypeToken
+    , EnterPointAccessContext};
 use libgrammar::token::{TokenValue};
 use libtype::{Type, Data};
 use libtype::function::{Function, CallFunctionParamAddr
@@ -406,8 +407,8 @@ impl<'a, F: Compile> Grammar for Compiler<'a, F> {
         self.process_struct_init_end(init_context)
     }
 
-    fn enter_point_access(&mut self) {
-        self.process_enter_point_access();
+    fn enter_point_access(&mut self, context: EnterPointAccessContext) {
+        self.process_enter_point_access(context);
     }
 
     fn leave_point_access(&mut self) {
