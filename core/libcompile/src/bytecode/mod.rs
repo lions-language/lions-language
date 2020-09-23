@@ -259,9 +259,10 @@ mod test {
         let mut package_index = PackageIndex::new();
         let package_str = String::from("test");
         let mut test_writer = TestWriter{};
+        let module = Module::new(String::from("main"));
         let mut grammar_context = GrammarContext{
             cb: Compiler::new(
-                Module::new(String::from("main")),
+                &module,
                 Bytecode::new(
                     &mut test_writer
                     , &mut fdd),
