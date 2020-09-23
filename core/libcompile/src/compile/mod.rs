@@ -275,7 +275,7 @@ impl InputContext {
 pub struct Compiler<'a, F: Compile> {
     function_control: FunctionControl,
     struct_control: StructControl,
-    module_stack: ModuleStack,
+    module: &'a Module,
     scope_context: ScopeContext,
     input_context: InputContext,
     package_index: &'a mut PackageIndex,
@@ -418,14 +418,14 @@ impl<'a, F: Compile> Grammar for Compiler<'a, F> {
 }
 
 impl<'a, F: Compile> Compiler<'a, F> {
-    pub fn new(module: Module, cb: F, input_context: InputContext
+    pub fn new(module: &'a Module, cb: F, input_context: InputContext
         , package_index: &'a mut PackageIndex
         , static_variant_dispatch: &'a mut StaticVariantDispatch<'a>
         , package_str: &'a str) -> Self {
         Self {
             function_control: FunctionControl::new(),
             struct_control: StructControl::new(),
-            module_stack: ModuleStack::new(module),
+            module: module,
             scope_context: ScopeContext::new(),
             input_context: input_context,
             package_index: package_index,
@@ -509,8 +509,9 @@ mod test {
         let mut static_stream = StaticStream::new();
         let mut static_variant_dispatch = StaticVariantDispatch::new(&mut static_stream);
         let package_str = String::from("test");
+        let module = Module::new(String::from("main"));
         let mut grammar_context = GrammarContext{
-            cb: Compiler::new(Module::new(String::from("main"))
+            cb: Compiler::new(&module
                     , TestComplie{}, InputContext::new(InputAttribute::new(
                             FileType::Main))
                     , &mut package_index

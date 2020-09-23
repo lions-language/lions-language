@@ -60,7 +60,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                     typ: Some(&input_typ),
                     package_typ: input_package_type.as_ref(),
                     func_str: &expect_func_str,
-                    module_str: self.module_stack.current().name_ref()
+                    module_str: self.module.name_ref()
                 };
                 let (exists, handle) = self.function_control.is_exists(&find_func_context);
                 if !exists {

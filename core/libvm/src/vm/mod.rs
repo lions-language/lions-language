@@ -293,9 +293,10 @@ mod test {
         let mut package_str = String::from("test");
         let mut link = Link::new(ds_ptr
             , ss_ptr);
+        let module = Module::new(String::from("main"));
         let mut grammar_context = GrammarContext{
             cb: Compiler::new(
-                Module::new(String::from("main")),
+                &module,
                 Bytecode::new(
                     &mut link
                     , &mut fdd

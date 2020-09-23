@@ -130,7 +130,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
             func_name: func.func_statement_ref().func_name_clone(),
             typ: func.func_statement_ref().typ_clone(),
             package_typ: Some(&package_typ),
-            module_str: self.module_stack.current().to_str().to_string(),
+            module_str: self.module.to_str().to_string(),
             // func_str: func.func_statement_ref().func_name.clone()
             func_str: func.func_statement_ref().statement_full_str().to_string(),
             is_overload: if define_context.has_lengthen_param_clone() {false} else {true}
