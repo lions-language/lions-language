@@ -12,3 +12,4 @@ pub mod define_dispatch;
 pub mod define_stream;
 pub mod static_dispatch;
 pub mod static_stream;
+pub mod module;

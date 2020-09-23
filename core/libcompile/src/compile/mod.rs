@@ -35,6 +35,7 @@ use libmacro::{FieldGet, FieldGetClone, FieldGetMove, NewWithAll};
 use crate::address;
 use crate::address::PackageIndex;
 use crate::static_dispatch::{StaticVariantDispatch};
+use crate::module::ModuleStack;
 use scope::context::ScopeContext;
 
 #[derive(Debug)]
@@ -274,7 +275,7 @@ impl InputContext {
 pub struct Compiler<'a, F: Compile> {
     function_control: FunctionControl,
     struct_control: StructControl,
-    module_stack: module_stack::ModuleStack,
+    module_stack: ModuleStack,
     scope_context: ScopeContext,
     input_context: InputContext,
     package_index: &'a mut PackageIndex,
@@ -424,7 +425,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
         Self {
             function_control: FunctionControl::new(),
             struct_control: StructControl::new(),
-            module_stack: module_stack::ModuleStack::new(module),
+            module_stack: ModuleStack::new(module),
             scope_context: ScopeContext::new(),
             input_context: input_context,
             package_index: package_index,
@@ -437,7 +438,6 @@ impl<'a, F: Compile> Compiler<'a, F> {
     }
 }
 
-mod module_stack;
 mod value_buffer;
 mod ref_count;
 mod address_dispatch;
