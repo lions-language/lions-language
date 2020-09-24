@@ -1,5 +1,6 @@
 use libtype::instruction::{Jump, Instruction};
 use libtype::function::FunctionStatement;
+use libcommon::address::{FunctionAddrValue};
 use libcommon::ptr::RefPtr;
 use crate::define::FunctionDefine;
 use crate::define::to_be_filled::function::{FuncToBeFilled};
@@ -38,6 +39,10 @@ impl FunctionDefine {
             statement: statement,
             define_item: define_item
         }
+    }
+
+    pub fn func_addr_value(&self) -> FunctionAddrValue {
+        FunctionAddrValue::new(self.index(), self.length())
     }
     /*
     pub fn write(&mut self, instruction: Instruction) {

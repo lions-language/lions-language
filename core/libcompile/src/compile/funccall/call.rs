@@ -168,7 +168,6 @@ impl<'a, F: Compile> Compiler<'a, F> {
                         if let Some(f) = self.cb.current_function_statement() {
                             let current_define_func_str = f.statement_full_str();
                             if current_define_func_str == func_str {
-                                println!("call self");
                                 return self.call_self();
                             }
                         };
@@ -653,6 +652,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
     }
 
     fn call_self(&self) -> DescResult {
+        let define_addr_value = self.cb.current_function_addr_value();
+        println!("{:?}", define_addr_value);
         DescResult::Success
     }
 }

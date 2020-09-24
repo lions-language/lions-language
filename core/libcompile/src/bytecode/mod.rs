@@ -1,4 +1,5 @@
 use libcommon::ptr::RefPtr;
+use libcommon::address::{FunctionAddrValue};
 use libtype::function::{FunctionDefine, Function
     , FunctionParamDataItem
     , FunctionReturn
@@ -118,6 +119,11 @@ impl<'a, 'b, F: Writer> Compile for Bytecode<'a, 'b, F> {
 
     fn current_function_statement(&self) -> Option<&FunctionStatement> {
         self.func_define_dispatch.current_function_statement()
+    }
+
+    fn current_function_addr_value(&self) -> FunctionAddrValue {
+        let ds = self.define_stack.back_unchecked();
+        self.func_define_dispatch.current_function_addr_value(ds)
     }
 
     fn function_define_end(&mut self) -> Function {

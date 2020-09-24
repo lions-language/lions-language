@@ -1,4 +1,5 @@
 use libcommon::ptr::RefPtr;
+use libcommon::address::{FunctionAddrValue};
 use libgrammar::grammar::{Grammar, CallFuncScopeContext
     , VarStmtContext, LoadVariantContext as GrammarLoadVariantContext
     , ConstNumberContext, ConstStringContext
@@ -194,6 +195,10 @@ pub trait Compile {
     }
 
     fn current_function_statement(&self) -> Option<&FunctionStatement> {
+        unimplemented!();
+    }
+
+    fn current_function_addr_value(&self) -> FunctionAddrValue {
         unimplemented!();
     }
 

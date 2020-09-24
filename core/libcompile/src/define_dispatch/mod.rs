@@ -102,6 +102,11 @@ impl<'a> FunctionDefineDispatch<'a> {
         }
     }
 
+    pub fn current_function_addr_value(&self, obj: &DefineObject) -> FunctionAddrValue {
+        let fd = obj.ptr_ref().as_ref::<FunctionDefine>();
+        fd.func_addr_value()
+    }
+
     pub fn finish_define(&mut self, obj: &DefineObject) -> Function {
         /*
          * 暂时不考虑多线程问题, 这里的 obj 就是为了以后多线程时, 可以从中间移除元素
@@ -109,8 +114,11 @@ impl<'a> FunctionDefineDispatch<'a> {
          * 现在单线程的情况下, 相当于是一个 栈, 从栈顶部移除即可
          * */
         let fd = obj.ptr_ref().as_ref::<FunctionDefine>();
+        /*
         let addr = FunctionAddrValue::new(
             fd.index(), fd.length());
+        */
+        let addr = fd.func_addr_value();
         let item = self.processing_funcs.pop_back().expect("should not happend");
         self.to_function(item.statement(), fd, addr)
     }
