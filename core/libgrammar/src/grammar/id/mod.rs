@@ -75,6 +75,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         let scope_context = CallFuncScopeContext{
             package_type: Some(PackageType::new(PackageTypeValue::Crate)),
             package_str: PackageStr::Itself,
+            module_str: None,
             desc_ctx: desc_ctx.clone()
         };
         self.set_backtrack_point();
@@ -123,6 +124,9 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                         return;
                     },
                     TokenType::ColonColon => {
+                        /*
+                         * TODO 填充 scope_context 中的 module_str
+                         * */
                         unimplemented!();
                     },
                     _ => {

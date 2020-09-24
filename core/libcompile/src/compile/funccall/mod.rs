@@ -109,10 +109,11 @@ impl<'a, F: Compile> Compiler<'a, F> {
             call_context.set_func_ptr(func_ptr);
             call_context.set_package_str(call_scope_context.package_str());
         } else {
-            let (package_type, package_str, _) = call_scope_context.fields_move();
+            let (package_type, package_str, module_str, _) = call_scope_context.fields_move();
             // call_context.set_func_name(func_str);
             call_context.set_package_str(package_str);
             call_context.set_package_typ(package_type);
+            call_context.set_module_str(module_str);
             /*
             return DescResult::Error(
                 format!("the {} function is not found", func_str));
