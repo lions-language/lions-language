@@ -2,12 +2,13 @@ use libtype::{
     TypeAttrubute, TypeValue
     , Type};
 use libtype::function::{FindFunctionContext, FindFunctionResult
-    , FunctionParamData
+    , FunctionParamData, FunctionDefine
     , FunctionParamLengthenAttr
     , CallFunctionParamAddr, Function, splice::FunctionSplice
     , FunctionReturnDataAttr, FunctionParamDataItem
-    , FunctionReturnRefParam
-    , CallFunctionReturnData};
+    , FunctionReturnRefParam, AddressFunctionDefine
+    , CallFunctionReturnData
+    , FunctionStatement};
 use libtype::instruction::{
     AddRefParamAddr};
 use libtype::{AddressValue, AddressKey
@@ -17,6 +18,7 @@ use libgrammar::grammar::{CallFuncScopeContext
     , CallFunctionContext as GrammarCallFunctionContext};
 use libresult::*;
 use libcommon::ptr::RefPtr;
+use libcommon::address::{FunctionAddress};
 use crate::compile::{Compile, Compiler
     , CallFunctionContext, value_buffer::ValueBufferItem
     , value_buffer::ValueBufferItemContext
@@ -165,10 +167,10 @@ impl<'a, F: Compile> Compiler<'a, F> {
                         /*
                          * module str 不存在, 调用的可能是自身
                          * */
-                        if let Some(f) = self.cb.current_function_statement() {
-                            let current_define_func_str = f.statement_full_str();
+                        if let Some(statement) = self.cb.current_function_statement() {
+                            let current_define_func_str = statement.statement_full_str();
                             if current_define_func_str == func_str {
-                                return self.call_self();
+                                return self.call_self(&call_context, statement.clone(), param_len);
                             }
                         };
                     }
@@ -651,9 +653,24 @@ impl<'a, F: Compile> Compiler<'a, F> {
         DescResult::Success
     }
 
-    fn call_self(&self) -> DescResult {
+    fn call_self(&mut self, call_context: &GrammarCallFunctionContext
+        , statement: FunctionStatement, param_len: usize) -> DescResult {
         let define_addr_value = self.cb.current_function_addr_value();
-        println!("{:?}", define_addr_value);
+        let func = Function::new(statement.clone()
+            , FunctionDefine::Address(AddressFunctionDefine::new(
+                FunctionAddress::Define(define_addr_value))));
+        self.cb_enter_scope();
+        let cc = CallFunctionContext {
+            package_str: call_context.package_str_clone(),
+            func: &func,
+            param_addrs: None,
+            param_context: None,
+            call_param_len: param_len,
+            return_data: CallFunctionReturnData::new_with_all(
+                AddressValue::new_invalid(), false)
+        };
+        self.cb.call_function(cc);
+        self.cb_leave_scope();
         DescResult::Success
     }
 }
