@@ -19,7 +19,8 @@ use libtype::function::{Function, CallFunctionParamAddr
     , CallFunctionReturnData
     , FunctionParamDataItem
     , FunctionReturn
-    , FunctionReturnDataAttr};
+    , FunctionReturnDataAttr
+    , FunctionStatement};
 use libtype::structure::{StructDefine};
 use libtype::instruction::{
     Jump, RemoveOwnership
@@ -190,6 +191,10 @@ pub trait Compile {
 
     fn function_define_start(&mut self) {
         println!("function define start");
+    }
+
+    fn current_function_statement(&self) -> Option<&FunctionStatement> {
+        unimplemented!();
     }
 
     fn function_define_end(&mut self) -> Function {

@@ -91,6 +91,17 @@ impl<'a> FunctionDefineDispatch<'a> {
         *statement.func_return_mut().data_mut().attr_mut() = attr;
     }
 
+    pub fn current_function_statement(&self) -> Option<&FunctionStatement> {
+        match self.processing_funcs.back() {
+            Some(item) => {
+                Some(item.statement_ref())
+            },
+            None => {
+                None
+            }
+        }
+    }
+
     pub fn finish_define(&mut self, obj: &DefineObject) -> Function {
         /*
          * 暂时不考虑多线程问题, 这里的 obj 就是为了以后多线程时, 可以从中间移除元素

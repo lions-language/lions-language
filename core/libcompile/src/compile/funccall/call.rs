@@ -155,6 +155,25 @@ impl<'a, F: Compile> Compiler<'a, F> {
                     }
                 };
             } else {
+                match call_context.module_str_ref() {
+                    Some(_) => {
+                        /*
+                         * module str 存在 => 调用的一定不是自身
+                         * */
+                    },
+                    None => {
+                        /*
+                         * module str 不存在, 调用的可能是自身
+                         * */
+                        if let Some(f) = self.cb.current_function_statement() {
+                            let current_define_func_str = f.statement_full_str();
+                            if current_define_func_str == func_str {
+                                println!("call self");
+                                return self.call_self();
+                            }
+                        };
+                    }
+                }
                 return DescResult::Error(
                     format!("the {} function is not found", func_str));
             }
@@ -630,6 +649,10 @@ impl<'a, F: Compile> Compiler<'a, F> {
         }
         // self.compile_context.reset();
         self.scope_context.leave_func_call();
+        DescResult::Success
+    }
+
+    fn call_self(&self) -> DescResult {
         DescResult::Success
     }
 }
