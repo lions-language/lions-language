@@ -10,7 +10,7 @@ use libtype::function::{FindFunctionContext, FindFunctionResult
     , CallFunctionReturnData
     , FunctionStatement};
 use libtype::instruction::{
-    AddRefParamAddr};
+    AddRefParamAddr, CallSelfFunction};
 use libtype::{AddressValue, AddressKey
     , AddressType};
 use libgrammar::token::{TokenValue, TokenData};
@@ -656,20 +656,19 @@ impl<'a, F: Compile> Compiler<'a, F> {
     fn call_self(&mut self, call_context: &GrammarCallFunctionContext
         , statement: FunctionStatement, param_len: usize) -> DescResult {
         let define_addr_value = self.cb.current_function_addr_value();
+        /*
         let func = Function::new(statement.clone()
             , FunctionDefine::Address(AddressFunctionDefine::new(
                 FunctionAddress::Define(define_addr_value))));
+        */
         self.cb_enter_scope();
-        let cc = CallFunctionContext {
+        let cf = CallSelfFunction {
             package_str: call_context.package_str_clone(),
-            func: &func,
-            param_addrs: None,
-            param_context: None,
-            call_param_len: param_len,
+            define_addr: FunctionAddress::Define(define_addr_value),
             return_data: CallFunctionReturnData::new_with_all(
                 AddressValue::new_invalid(), false)
         };
-        self.cb.call_function(cc);
+        self.cb.call_self_function(cf);
         self.cb_leave_scope();
         DescResult::Success
     }

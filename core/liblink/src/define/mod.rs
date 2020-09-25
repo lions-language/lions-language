@@ -128,6 +128,8 @@ impl LinkDefine {
                     }
                 }
             },
+            Instruction::CallSelfFunction(value) => {
+            },
             Instruction::ReadStaticVariant(_) => {
                 /*
                  * 从 static_stream 中查找
