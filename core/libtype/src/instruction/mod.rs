@@ -34,6 +34,13 @@ pub struct CallFunction {
     pub return_data: CallFunctionReturnData
 }
 
+#[derive(Debug, FieldGet, Clone)]
+pub struct CallSelfFunction {
+    pub package_str: PackageStr,
+    pub define_addr: FunctionAddress,
+    pub return_data: CallFunctionReturnData
+}
+
 #[derive(Debug, FieldGet, Clone, NewWithAll
     , FieldGetMove)]
 pub struct OwnershipMove {
@@ -153,6 +160,7 @@ pub enum Instruction {
     ReadStaticVariant(StaticVariant),
     CallPrimevalFunction(CallPrimevalFunction),
     CallFunction(CallFunction),
+    CallSelfFunction(CallSelfFunction),
     OwnershipMove(OwnershipMove),
     AddressBind(AddressBind),
     ReturnStmt(ReturnStmt),

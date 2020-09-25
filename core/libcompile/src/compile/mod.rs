@@ -26,6 +26,7 @@ use libtype::structure::{StructDefine};
 use libtype::instruction::{
     Jump, RemoveOwnership
     , AddRefParamAddr
+    , CallSelfFunction
     , CallPrimevalFunctionParamContext};
 use libtypecontrol::function::FunctionControl;
 use libtype::module::Module;
@@ -176,6 +177,10 @@ pub trait Compile {
 
     fn call_function(&mut self, context: CallFunctionContext) {
         println!("{:?}", context);
+    }
+
+    fn call_self_function(&mut self, context: CallSelfFunction) {
+        unimplemented!();
     }
 
     fn function_named_stmt(&mut self, _context: FunctionNamedStmtContext) -> RefPtr {

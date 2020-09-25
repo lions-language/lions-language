@@ -10,6 +10,7 @@ use libtype::instruction::{Instruction, CallPrimevalFunction
     , LoadStack, OwnershipMove
     , AddressBind, ReturnStmt
     , Jump, RemoveOwnership
+    , CallSelfFunction
     , AddRefParamAddr, CallPrimevalFunctionParamContext};
 use crate::compile::{StaticContext, CallFunctionContext
     , FunctionNamedStmtContext, Compile
@@ -89,6 +90,10 @@ impl<'a, 'b, F: Writer> Compile for Bytecode<'a, 'b, F> {
                 unimplemented!();
             }
         }
+    }
+
+    fn call_self_function(&mut self, context: CallSelfFunction) {
+        self.write(Instruction::CallSelfFunction(context));
     }
 
     fn function_define_start(&mut self) {

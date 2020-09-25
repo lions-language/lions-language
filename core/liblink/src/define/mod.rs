@@ -83,7 +83,7 @@ impl LinkDefine {
         &mut self.link_static
     }
 
-    pub fn call_itself_func(&mut self, call_context: &mut CallFunction) {
+    pub fn call_local_func(&mut self, call_context: &mut CallFunction) {
         let src_addr = match call_context.define_addr_mut() {
             FunctionAddress::Define(v) => {
                 v
@@ -114,7 +114,7 @@ impl LinkDefine {
                         /*
                          * 从 define_stream 中查找
                          * */
-                        self.call_itself_func(value);
+                        self.call_local_func(value);
                     },
                     PackageStr::Third(_) => {
                         /*
