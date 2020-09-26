@@ -1,5 +1,5 @@
 use libtype::instruction::{Instruction, Jump};
-use libcommon::ptr::RefPtr;
+use libcommon::ptr::{RefPtr, HeapPtr};
 use libcommon::address::FunctionAddrValue;
 use std::collections::VecDeque;
 
@@ -46,25 +46,64 @@ impl DefineItem {
     }
 }
 
+#[derive(Clone)]
+pub struct DefineItemObject(HeapPtr);
+
+impl DefineItemObject {
+    pub fn new(item: DefineItem) -> Self {
+        Self(HeapPtr::alloc::<DefineItem>(item))
+    }
+    pub fn get(&self) -> Box<DefineItem> {
+        self.0.pop::<DefineItem>()
+    }
+    pub fn free(&self, item: Box<DefineItem>) {
+        self.0.push::<DefineItem>(item);
+    }
+    pub fn length(&self) -> usize {
+        let item = self.get();
+        let len = item.length();
+        self.free(item);
+        len
+    }
+}
+
+pub struct InstructionVec(RefPtr);
+
+impl InstructionVec {
+    pub fn get_mut(&mut self) -> &mut VecDeque<Instruction> {
+        self.0.as_mut::<VecDeque<Instruction>>()
+    }
+
+    pub fn new(v: &mut VecDeque<Instruction>) -> Self {
+        Self(RefPtr::from_ref(v))
+    }
+}
+
 pub struct DefineStream {
-    items: VecDeque<DefineItem>
+    items: VecDeque<DefineItemObject>
     /*
      * TODO: 添加 header 信息, 便于在链接阶段, 替换没有定义的函数地址
      * */
 }
 
 impl DefineStream {
-    pub fn alloc_item(&mut self) -> RefPtr {
+    pub fn alloc_item(&mut self) -> DefineItemObject {
         let index = self.items.len();
-        self.items.push_back(DefineItem::new(index));
+        self.items.push_back(DefineItemObject::new(DefineItem::new(index)));
         let v = self.items.back().expect("should not happend");
-        RefPtr::from_ref(v)
+        v.clone()
     }
 
+    /*
+     * return: &mut VecDeque<Instruction>
+     * */
     pub fn get_all_ins_mut_unchecked(&mut self, index: usize)
-        -> &mut VecDeque<Instruction> {
-        self.items.get_mut(index).expect("should not happend")
-            .get_all_mut()
+        -> InstructionVec {
+        let p = self.items.get_mut(index).expect("should not happend");
+        let mut item = p.get();
+        let all = InstructionVec::new(item.get_all_mut());
+        p.free(item);
+        all
     }
 
     pub fn read(&mut self, addr: &FunctionAddrValue
@@ -91,13 +130,13 @@ impl DefineStream {
 }
 
 pub struct DefineBlock<'a> {
-    item: &'a DefineItem,
+    item: &'a DefineItemObject,
     index: usize,
     length: usize
 }
 
 impl<'a> DefineBlock<'a> {
-    pub fn new(item: &'a DefineItem) -> Self {
+    pub fn new(item: &'a DefineItemObject) -> Self {
         Self {
             item: item,
             index: 0,
@@ -113,7 +152,8 @@ impl<'a> Iterator for DefineBlock<'a> {
         if self.index == self.length {
             return None;
         }
-        match self.item.get(self.index) {
+        let item = self.item.get();
+        let ins = match item.get(self.index) {
             Some(v) => {
                 self.index += 1;
                 // println!("{:?}", v);
@@ -122,7 +162,9 @@ impl<'a> Iterator for DefineBlock<'a> {
             None => {
                 None
             }
-        }
+        };
+        self.item.free(item);
+        ins
     }
 }
 

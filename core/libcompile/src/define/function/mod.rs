@@ -4,37 +4,50 @@ use libcommon::address::{FunctionAddrValue};
 use libcommon::ptr::RefPtr;
 use crate::define::FunctionDefine;
 use crate::define::to_be_filled::function::{FuncToBeFilled};
-use crate::define_stream::{DefineItem};
+use crate::define_stream::{DefineItem, DefineItemObject};
 
 impl FunctionDefine {
     pub fn write(&mut self, instruction: Instruction) {
         /*
          * 将指令先缓存下来, 全部完成后写入到文件
          * */
-        self.define_item.as_mut::<DefineItem>().write(instruction);
+        let mut item = self.define_item.get();
+        item.write(instruction);
+        self.define_item.free(item);
     }
 
     pub fn set_jump(&mut self, index: usize, jump: Jump) {
-        self.define_item.as_mut::<DefineItem>().set_jump(index, jump);
+        let mut item = self.define_item.get();
+        item.set_jump(index, jump);
+        self.define_item.free(item);
     }
 
     pub fn current_index(&self) -> usize {
-        self.define_item.as_ref::<DefineItem>().length() - 1
+        let item = self.define_item.get();
+        let len = item.length() - 1;
+        self.define_item.free(item);
+        len
     }
 
     /*
      * item 在 define_stream 中的索引
      * */
     pub fn index(&self) -> usize {
-        self.define_item.as_ref::<DefineItem>().index()
+        let item = self.define_item.get();
+        let index = item.index();
+        self.define_item.free(item);
+        index
     }
 
     pub fn length(&self) -> usize {
-        self.define_item.as_ref::<DefineItem>().length()
+        let item = self.define_item.get();
+        let length = item.length();
+        self.define_item.free(item);
+        length
     }
 
     pub fn new(statement: FunctionStatement
-        , define_item: RefPtr) -> Self {
+        , define_item: DefineItemObject) -> Self {
         Self {
             statement: statement,
             define_item: define_item

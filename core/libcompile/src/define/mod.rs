@@ -1,6 +1,7 @@
 use libcommon::ptr::RefPtr;
 use libmacro::{FieldGet, FieldGetClone};
 use libtype::function::FunctionStatement;
+use crate::define_stream::{DefineItemObject};
 
 pub enum DefineType {
     Function
@@ -48,7 +49,7 @@ impl Into<u8> for DefineType {
 #[derive(FieldGet)]
 pub struct FunctionDefine {
     statement: FunctionStatement,
-    define_item: RefPtr
+    define_item: DefineItemObject
 }
 /*
 #[derive(FieldGet)]

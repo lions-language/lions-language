@@ -69,7 +69,7 @@ impl LinkDefine {
         let mut ds = self.define_stream.clone();
         let ds = ds.as_mut::<DefineStream>();
         for index in self.define_seque.iter() {
-            self.code_segment.append(ds.get_all_ins_mut_unchecked(index.clone()));
+            self.code_segment.append(ds.get_all_ins_mut_unchecked(index.clone()).get_mut());
         }
         /*
          * print
