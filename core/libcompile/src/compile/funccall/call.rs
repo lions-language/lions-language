@@ -168,9 +168,9 @@ impl<'a, F: Compile> Compiler<'a, F> {
                          * module str 不存在, 调用的可能是自身
                          * */
                         if let Some(statement) = self.cb.current_function_statement() {
-                            let current_define_func_str = statement.statement_full_str();
+                            let current_define_func_str = statement.get().statement_full_str();
                             if current_define_func_str == func_str {
-                                return self.call_self(&call_context, statement.clone(), param_len);
+                                return self.call_self(&call_context, statement.get().clone(), param_len);
                             }
                         };
                     }

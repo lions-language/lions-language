@@ -17,7 +17,8 @@ use crate::compile::{StaticContext, CallFunctionContext
     , LoadStackContext, OwnershipMoveContext
     , AddressBindContext, ReturnStmtContext};
 use define_stack::DefineStack;
-use crate::define_dispatch::{FunctionDefineDispatch};
+use crate::define_dispatch::{FunctionDefineDispatch
+    , function::FunctionStatementObject};
 
 pub trait Writer {
     fn write(&mut self, _: Instruction) {
@@ -122,7 +123,7 @@ impl<'a, 'b, F: Writer> Compile for Bytecode<'a, 'b, F> {
         self.func_define_dispatch.update_func_return_data_attr(ds, attr);
     }
 
-    fn current_function_statement(&self) -> Option<&FunctionStatement> {
+    fn current_function_statement(&self) -> Option<FunctionStatementObject> {
         self.func_define_dispatch.current_function_statement()
     }
 

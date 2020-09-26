@@ -1,4 +1,4 @@
-use libcommon::ptr::RefPtr;
+use libcommon::ptr::{RefPtr, HeapPtr};
 use libmacro::{FieldGet, FieldGetClone};
 use libtype::function::FunctionStatement;
 use crate::define_stream::{DefineItemObject};
@@ -46,6 +46,30 @@ impl Into<u8> for DefineType {
     }
 }
 
+pub struct FunctionDefineObject(HeapPtr);
+
+impl FunctionDefineObject {
+    pub fn new(define: FunctionDefine) -> Self {
+        Self(HeapPtr::alloc(define))
+    }
+
+    pub fn get(&self) -> Box<FunctionDefine> {
+        self.0.pop::<FunctionDefine>()
+    }
+
+    pub fn restore(&self, v: Box<FunctionDefine>) {
+        self.0.push::<FunctionDefine>(v)
+    }
+
+    pub fn free(&self) {
+        self.0.free::<FunctionDefine>();
+    }
+
+    pub fn ptr_clone(&self) -> HeapPtr {
+        self.0.clone()
+    }
+}
+
 #[derive(FieldGet)]
 pub struct FunctionDefine {
     statement: FunctionStatement,
@@ -67,19 +91,27 @@ pub struct FunctionDefine {
  * */
 #[derive(FieldGet, FieldGetClone, Clone)]
 pub struct DefineObject {
-    ptr: RefPtr
+    ptr: HeapPtr
 }
 
 impl Default for DefineObject {
     fn default() -> Self {
         Self {
-            ptr: RefPtr::new_null()
+            ptr: HeapPtr::new_null()
         }
     }
 }
 
 impl DefineObject {
-    pub fn new(ptr: RefPtr) -> Self {
+    pub fn get<T>(&self) -> Box<T> {
+        self.ptr.pop::<T>()
+    }
+
+    pub fn restore<T>(&self, v: Box<T>) {
+        self.ptr.push::<T>(v);
+    }
+
+    pub fn new(ptr: HeapPtr) -> Self {
         Self {
             ptr: ptr
         }

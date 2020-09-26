@@ -57,6 +57,10 @@ impl HeapPtr {
         let b = unsafe{Heap::from_raw(self.ptr as *mut T)};
         std::mem::drop(b);
     }
+    
+    pub fn typ_ref(&self) -> &u8 {
+        &self.typ
+    }
 
     pub fn new_null() -> Self {
         Self {

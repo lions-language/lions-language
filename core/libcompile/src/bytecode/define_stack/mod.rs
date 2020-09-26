@@ -32,8 +32,9 @@ impl DefineStack {
         let obj = self.ws.back_mut().expect("should not happend");
         match DefineType::from(obj.ptr_ref().typ_ref()) {
             DefineType::Function => {
-                let fd = obj.ptr_mut().as_mut::<FunctionDefine>();
+                let mut fd = obj.get::<FunctionDefine>();
                 fd.set_jump(index, jump);
+                obj.restore(fd);
             }
         }
     }
@@ -42,8 +43,10 @@ impl DefineStack {
         let obj = self.ws.back().expect("should not happend");
         match DefineType::from(obj.ptr_ref().typ_ref()) {
             DefineType::Function => {
-                let fd = obj.ptr_ref().as_ref::<FunctionDefine>();
-                fd.current_index()
+                let fd = obj.get::<FunctionDefine>();
+                let index = fd.current_index();
+                obj.restore(fd);
+                index
             }
         }
     }
@@ -58,8 +61,9 @@ impl DefineStack {
         let obj = self.ws.back_mut().expect("should not happend");
         match DefineType::from(obj.ptr_ref().typ_ref()) {
             DefineType::Function => {
-                let fd = obj.ptr_mut().as_mut::<FunctionDefine>();
+                let mut fd = obj.get::<FunctionDefine>();
                 fd.write(instruction);
+                obj.restore(fd);
             }
         }
         true

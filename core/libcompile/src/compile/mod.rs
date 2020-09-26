@@ -40,6 +40,7 @@ use crate::address::PackageIndex;
 use crate::static_dispatch::{StaticVariantDispatch};
 use crate::module::ModuleStack;
 use scope::context::ScopeContext;
+use crate::define_dispatch::{function::FunctionStatementObject};
 
 #[derive(Debug)]
 pub struct StaticContext {
@@ -199,7 +200,7 @@ pub trait Compile {
         println!("function define start");
     }
 
-    fn current_function_statement(&self) -> Option<&FunctionStatement> {
+    fn current_function_statement(&self) -> Option<FunctionStatementObject> {
         unimplemented!();
     }
 
