@@ -46,29 +46,8 @@ impl Into<u8> for DefineType {
     }
 }
 
+#[derive(Debug)]
 pub struct FunctionDefineObject(HeapPtr);
-
-impl FunctionDefineObject {
-    pub fn new(define: FunctionDefine) -> Self {
-        Self(HeapPtr::alloc(define))
-    }
-
-    pub fn get(&self) -> Box<FunctionDefine> {
-        self.0.pop::<FunctionDefine>()
-    }
-
-    pub fn restore(&self, v: Box<FunctionDefine>) {
-        self.0.push::<FunctionDefine>(v)
-    }
-
-    pub fn free(&self) {
-        self.0.free::<FunctionDefine>();
-    }
-
-    pub fn ptr_clone(&self) -> HeapPtr {
-        self.0.clone()
-    }
-}
 
 #[derive(FieldGet)]
 pub struct FunctionDefine {
@@ -86,10 +65,18 @@ pub struct FunctionDefine {
 }
 */
 
+#[derive(Debug)]
+pub struct BlockDefineObject(HeapPtr);
+
+#[derive(FieldGet)]
+pub struct BlockDefine {
+    define_item: DefineItemObject
+}
+
 /*
  * 用来保存 FunctionDefine 对象
  * */
-#[derive(FieldGet, FieldGetClone, Clone)]
+#[derive(Debug, FieldGet, FieldGetClone, Clone)]
 pub struct DefineObject {
     ptr: HeapPtr
 }
@@ -119,4 +106,5 @@ impl DefineObject {
 }
 
 mod function;
+mod block;
 mod to_be_filled;

@@ -133,8 +133,8 @@ impl<'a, 'b, F: Writer> Compile for Bytecode<'a, 'b, F> {
     }
 
     fn function_define_end(&mut self) -> Function {
-        let ds = self.define_stack.leave();
-        self.func_define_dispatch.finish_define(&ds)
+        self.define_stack.leave();
+        self.func_define_dispatch.finish_define()
     }
 
     fn ownership_move(&mut self, context: OwnershipMoveContext) {

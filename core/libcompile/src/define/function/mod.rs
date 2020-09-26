@@ -1,10 +1,32 @@
 use libtype::instruction::{Jump, Instruction};
 use libtype::function::FunctionStatement;
 use libcommon::address::{FunctionAddrValue};
-use libcommon::ptr::RefPtr;
-use crate::define::FunctionDefine;
+use libcommon::ptr::{RefPtr, HeapPtr};
+use crate::define::{FunctionDefine, FunctionDefineObject};
 use crate::define::to_be_filled::function::{FuncToBeFilled};
 use crate::define_stream::{DefineItem, DefineItemObject};
+
+impl FunctionDefineObject {
+    pub fn new(define: FunctionDefine) -> Self {
+        Self(HeapPtr::alloc(define))
+    }
+
+    pub fn get(&self) -> Box<FunctionDefine> {
+        self.0.pop::<FunctionDefine>()
+    }
+
+    pub fn restore(&self, v: Box<FunctionDefine>) {
+        self.0.push::<FunctionDefine>(v)
+    }
+
+    pub fn free(&self) {
+        self.0.free::<FunctionDefine>();
+    }
+
+    pub fn ptr_clone(&self) -> HeapPtr {
+        self.0.clone()
+    }
+}
 
 impl FunctionDefine {
     pub fn write(&mut self, instruction: Instruction) {

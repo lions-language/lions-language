@@ -1,4 +1,4 @@
-use crate::define::FunctionDefineObject;
+use crate::define::{FunctionDefineObject, BlockDefineObject};
 use crate::define_stream::DefineStream;
 use std::collections::VecDeque;
 
@@ -11,6 +11,7 @@ pub struct FunctionDefineDispatch<'a> {
 }
 
 pub struct BlockDefineDispatch<'a> {
+    processing_blocks: VecDeque<BlockDefineObject>,
     define_stream: &'a mut DefineStream
 }
 
