@@ -11,7 +11,8 @@ pub type Heap<T> = Box<T>;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct HeapPtr {
-    ptr: usize
+    ptr: usize,
+    typ: u8
 }
 
 mod ref_ptr;

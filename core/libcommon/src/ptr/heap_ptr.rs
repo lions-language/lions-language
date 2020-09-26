@@ -8,11 +8,16 @@ pub struct HeapGet<T> {
 
 impl HeapPtr {
     pub fn alloc<T>(value: T) -> Self {
+        HeapPtr::alloc_with_typ(value, 0)
+    }
+
+    pub fn alloc_with_typ<T>(value: T, typ: u8) -> Self {
         let b = Heap::new(value);
         let bp = Heap::into_raw(b);
         let bpval = bp as usize;
         let o = Self {
-            ptr: bpval
+            ptr: bpval,
+            typ: typ
         };
         std::mem::forget(unsafe{Heap::from_raw(bp)});
         o
@@ -55,7 +60,8 @@ impl HeapPtr {
 
     pub fn new_null() -> Self {
         Self {
-            ptr: 0
+            ptr: 0,
+            typ: 0
         }
     }
 }
