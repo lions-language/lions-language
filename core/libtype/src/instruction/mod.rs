@@ -37,7 +37,8 @@ pub struct CallFunction {
 #[derive(Debug, FieldGet, Clone)]
 pub struct CallSelfFunction {
     pub package_str: PackageStr,
-    pub define_addr: FunctionAddress,
+    pub func_define_addr: FunctionAddress,
+    pub param_define_addr: FunctionAddress,
     pub return_data: CallFunctionReturnData
 }
 

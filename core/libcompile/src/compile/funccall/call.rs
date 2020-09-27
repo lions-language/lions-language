@@ -686,7 +686,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
          *  但是, 此时的 函数定义还没有结束(在指令中记录函数定义的起始地址, 在 link
          *  阶段修改地址段范围)
          * */
-        let define_addr_value = self.cb.current_function_addr_value();
+        let func_define_addr_value = self.cb.current_function_addr_value();
         /*
          * 获取当前环境的函数调用参数
          * */
@@ -706,7 +706,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
             }
         }
         self.cb.enter_block_define();
-        let block_define_addr_value = self.cb.current_block_addr_value();
+        let param_define_addr_value = self.cb.current_block_addr_value();
         /*
          * 将调用参数写入到block define指令中
          * */
@@ -728,11 +728,21 @@ impl<'a, F: Compile> Compiler<'a, F> {
             self.process_param(
                 &typ, &typ_attr, src_addr, move_index, value_context);
         }
+        /*
+         * 添加跳转指令 (跳转到函数定义 参数指令 之后)
+         * */
         self.cb.leave_block_define();
         self.cb_enter_scope();
+        /*
+         * 计算函数定义地址
+         *  1. 去掉函数定义的参数指令部分
+         *  2. 去掉最后的 leave scope 指令
+         * */
+        let func_define_addr = func_define_addr_value;
         let cf = CallSelfFunction {
             package_str: call_context.package_str_clone(),
-            define_addr: FunctionAddress::Define(define_addr_value),
+            func_define_addr: FunctionAddress::Define(func_define_addr),
+            param_define_addr: FunctionAddress::Define(param_define_addr_value),
             return_data: CallFunctionReturnData::new_with_all(
                 AddressValue::new_invalid(), false)
         };
