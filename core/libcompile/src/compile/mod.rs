@@ -212,6 +212,16 @@ pub trait Compile {
         unimplemented!();
     }
 
+    fn enter_block_define(&mut self) {
+    }
+
+    fn current_block_addr_value(&self) -> FunctionAddrValue {
+        unimplemented!();
+    }
+
+    fn leave_block_define(&mut self) {
+    }
+
     fn ownership_move(&mut self, _context: OwnershipMoveContext) {
         unimplemented!();
     }

@@ -232,7 +232,7 @@ mod test {
     use libgrammar::grammar::GrammarContext;
     use libtype::module::Module;
     use libcompile::compile::{FileType, InputAttribute, InputContext};
-    use libcompile::define_dispatch::FunctionDefineDispatch;
+    use libcompile::define_dispatch::{FunctionDefineDispatch, BlockDefineDispatch};
     use libcompile::static_dispatch::{StaticVariantDispatch};
     use libcompile::static_stream::{StaticStream};
     use libcompile::address::PackageIndex;
@@ -286,7 +286,9 @@ mod test {
         let mut ss = StaticStream::new();
         let mut ds_ptr = RefPtr::from_ref::<DefineStream>(&ds);
         let mut ss_ptr = RefPtr::from_ref::<StaticStream>(&ss);
-        let mut fdd = FunctionDefineDispatch::new(&mut ds);
+        let mut func_ds = ds_ptr.clone();
+        let mut fdd = FunctionDefineDispatch::new(func_ds.as_mut::<DefineStream>());
+        let mut bdd = BlockDefineDispatch::new(&mut ds);
         let mut package_index = PackageIndex::new();
         let mut static_variant_dispatch = StaticVariantDispatch::new(
             &mut ss);
@@ -300,6 +302,7 @@ mod test {
                 Bytecode::new(
                     &mut link
                     , &mut fdd
+                    , &mut bdd
                 ),
                 InputContext::new(InputAttribute::new(FileType::Main)),
                 &mut package_index,

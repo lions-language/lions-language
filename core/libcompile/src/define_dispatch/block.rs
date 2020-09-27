@@ -2,6 +2,8 @@ use libcommon::address::FunctionAddrValue;
 use super::{BlockDefineDispatch};
 use crate::define::{BlockDefine, DefineObject
     , BlockDefineObject};
+use crate::define_stream::{DefineStream};
+use std::collections::VecDeque;
 
 impl<'a> BlockDefineDispatch<'a> {
     pub fn alloc_define(&mut self) -> DefineObject {
@@ -33,5 +35,12 @@ impl<'a> BlockDefineDispatch<'a> {
          * */
         let item_ptr = self.processing_blocks.pop_back().expect("should not happend");
         item_ptr.free();
+    }
+
+    pub fn new(ds: &'a mut DefineStream) -> Self {
+        Self {
+            processing_blocks: VecDeque::new(),
+            define_stream: ds
+        }
     }
 }

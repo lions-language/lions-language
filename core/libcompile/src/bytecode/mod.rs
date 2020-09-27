@@ -18,6 +18,7 @@ use crate::compile::{StaticContext, CallFunctionContext
     , AddressBindContext, ReturnStmtContext};
 use define_stack::DefineStack;
 use crate::define_dispatch::{FunctionDefineDispatch
+    , BlockDefineDispatch
     , function::FunctionStatementObject};
 
 pub trait Writer {
@@ -34,7 +35,8 @@ pub trait Writer {
 pub struct Bytecode<'a, 'b, F: Writer> {
     writer: &'a mut F,
     define_stack: DefineStack,
-    func_define_dispatch: &'a mut FunctionDefineDispatch<'b>
+    func_define_dispatch: &'a mut FunctionDefineDispatch<'b>,
+    block_define_dispatch: &'a mut BlockDefineDispatch<'b>
 }
 
 impl<'a, 'b, F: Writer> Compile for Bytecode<'a, 'b, F> {
@@ -137,6 +139,21 @@ impl<'a, 'b, F: Writer> Compile for Bytecode<'a, 'b, F> {
         self.func_define_dispatch.finish_define()
     }
 
+    fn enter_block_define(&mut self) {
+        let define_obj = self.block_define_dispatch.alloc_define();
+        self.define_stack.enter(define_obj);
+    }
+
+    fn current_block_addr_value(&self) -> FunctionAddrValue {
+        let ds = self.define_stack.back_unchecked();
+        self.block_define_dispatch.current_block_addr_value(ds)
+    }
+
+    fn leave_block_define(&mut self) {
+        self.define_stack.leave();
+        self.block_define_dispatch.finish_define();
+    }
+
     fn ownership_move(&mut self, context: OwnershipMoveContext) {
         // println!("{:?}", &context);
         // println!("ownership move");
@@ -209,11 +226,13 @@ impl<'a, 'b, F: Writer> Bytecode<'a, 'b, F> {
         }
     }
 
-    pub fn new(writer: &'a mut F, func_define_dispatch: &'a mut FunctionDefineDispatch<'b>) -> Self {
+    pub fn new(writer: &'a mut F, func_define_dispatch: &'a mut FunctionDefineDispatch<'b>
+        , block_define_dispatch: &'a mut BlockDefineDispatch<'b>) -> Self {
         Self {
             writer: writer,
             define_stack: DefineStack::new(),
-            func_define_dispatch: func_define_dispatch
+            func_define_dispatch: func_define_dispatch,
+            block_define_dispatch: block_define_dispatch
         }
     }
 }
@@ -271,6 +290,7 @@ mod test {
         });
         let mut ds = DefineStream::new();
         let mut fdd = FunctionDefineDispatch::new(&mut ds);
+        let mut bdd = BlockDefineDispatch::new(&mut ds);
         let mut static_stream = StaticStream::new();
         let mut static_variant_dispatch = StaticVariantDispatch::new(&mut static_stream);
         let mut package_index = PackageIndex::new();
@@ -282,7 +302,8 @@ mod test {
                 &module,
                 Bytecode::new(
                     &mut test_writer
-                    , &mut fdd),
+                    , &mut fdd
+                    , &mut bdd),
                 InputContext::new(InputAttribute::new(FileType::Main)),
                 &mut package_index,
                 &mut static_variant_dispatch,

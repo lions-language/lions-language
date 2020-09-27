@@ -679,13 +679,56 @@ impl<'a, F: Compile> Compiler<'a, F> {
     }
 
     fn call_self(&mut self, call_context: &GrammarCallFunctionContext
-        , statement: FunctionStatement, param_len: usize) -> DescResult {
+        , func_statement: FunctionStatement, param_len: usize) -> DescResult {
+        /*
+         * 1. 构建一个指令块, 将函数调用前 的指令写入
+         * 2. call self 的时候, 首先执行 第1步 的指令, 然后跳转到 函数定义指令中的函数体部分
+         *  但是, 此时的 函数定义还没有结束(在指令中记录函数定义的起始地址, 在 link
+         *  阶段修改地址段范围)
+         * */
         let define_addr_value = self.cb.current_function_addr_value();
         /*
-        let func = Function::new(statement.clone()
-            , FunctionDefine::Address(AddressFunctionDefine::new(
-                FunctionAddress::Define(define_addr_value))));
-        */
+         * 获取当前环境的函数调用参数
+         * */
+        let mut move_param_contexts = Vec::new();
+        let mut ref_param_addrs = VecDeque::new();
+        let mut return_ref_params = HashMap::new();
+        let mut return_addr = Address::new(AddressValue::new_invalid());
+        let mut scope = None;
+        let desc_result = self.funccall_external_environment(&func_statement, param_len
+            , &mut move_param_contexts, &mut ref_param_addrs
+            , &mut return_ref_params, &mut return_addr, &mut scope);
+        match desc_result {
+            DescResult::Success => {
+            },
+            _ => {
+                return desc_result;
+            }
+        }
+        self.cb.enter_block_define();
+        let block_define_addr_value = self.cb.current_block_addr_value();
+        /*
+         * 将调用参数写入到block define指令中
+         * */
+        while !ref_param_addrs.is_empty() {
+            let ref_param = ref_param_addrs.remove(0)
+                .expect("ref_param.remove: should not happend");
+            self.cb.add_ref_param_addr(ref_param);
+        }
+        while !move_param_contexts.is_empty() {
+            let (move_index, typ, typ_attr, src_addr, value_context) =
+                move_param_contexts.remove(0);
+            /*
+             * NOTE
+             * 因为 process_param 中会让虚拟机执行移动操作
+             * 所以必须要在虚拟机进入作用域之后执行
+             * 如果 process_param 中存在移动, 则返回新的地址
+             *  如果不存在移动, 则返回输入的地址
+             * */
+            self.process_param(
+                &typ, &typ_attr, src_addr, move_index, value_context);
+        }
+        self.cb.leave_block_define();
         self.cb_enter_scope();
         let cf = CallSelfFunction {
             package_str: call_context.package_str_clone(),
