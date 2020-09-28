@@ -2,11 +2,12 @@ use libtype::instruction::{Jump, Instruction};
 use libcommon::ptr::HeapPtr;
 use libcommon::address::{FunctionAddrValue};
 use crate::define_stream::{DefineItemObject};
+use crate::define::{DefineType};
 use super::{BlockDefine, BlockDefineObject};
 
 impl BlockDefineObject {
     pub fn new(define: BlockDefine) -> Self {
-        Self(HeapPtr::alloc(define))
+        Self(HeapPtr::alloc_with_typ(define, DefineType::Block.into()))
     }
 
     pub fn get(&self) -> Box<BlockDefine> {

@@ -1,5 +1,6 @@
 use libtype::instruction::{Instruction, Jump};
 use crate::define::{DefineObject, FunctionDefine
+    , BlockDefine
     , DefineType};
 use std::collections::VecDeque;
 
@@ -35,6 +36,11 @@ impl DefineStack {
                 let mut fd = obj.get::<FunctionDefine>();
                 fd.set_jump(index, jump);
                 obj.restore(fd);
+            },
+            DefineType::Block => {
+                let mut bd = obj.get::<BlockDefine>();
+                bd.set_jump(index, jump);
+                obj.restore(bd);
             }
         }
     }
@@ -46,6 +52,12 @@ impl DefineStack {
                 let fd = obj.get::<FunctionDefine>();
                 let index = fd.current_index();
                 obj.restore(fd);
+                index
+            },
+            DefineType::Block => {
+                let bd = obj.get::<BlockDefine>();
+                let index = bd.current_index();
+                obj.restore(bd);
                 index
             }
         }
@@ -64,6 +76,11 @@ impl DefineStack {
                 let mut fd = obj.get::<FunctionDefine>();
                 fd.write(instruction);
                 obj.restore(fd);
+            },
+            DefineType::Block => {
+                let mut bd = obj.get::<BlockDefine>();
+                bd.write(instruction);
+                obj.restore(bd);
             }
         }
         true

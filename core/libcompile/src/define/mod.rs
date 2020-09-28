@@ -4,7 +4,8 @@ use libtype::function::FunctionStatement;
 use crate::define_stream::{DefineItemObject};
 
 pub enum DefineType {
-    Function
+    Function,
+    Block
 }
 
 impl From<u8> for DefineType {
@@ -12,6 +13,9 @@ impl From<u8> for DefineType {
         match v {
             0 => {
                 DefineType::Function
+            },
+            1 => {
+                DefineType::Block
             },
             _ => {
                 unimplemented!();
@@ -26,6 +30,9 @@ impl From<&u8> for DefineType {
             &0 => {
                 DefineType::Function
             },
+            &1 => {
+                DefineType::Block
+            },
             _ => {
                 unimplemented!();
             }
@@ -38,6 +45,9 @@ impl Into<u8> for DefineType {
         match self {
             DefineType::Function => {
                 0
+            },
+            DefineType::Block => {
+                1
             },
             _ => {
                 unimplemented!();

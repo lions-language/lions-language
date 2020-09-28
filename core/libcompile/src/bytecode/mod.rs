@@ -196,12 +196,10 @@ impl<'a, 'b, F: Writer> Compile for Bytecode<'a, 'b, F> {
     }
 
     fn enter_scope(&mut self) {
-        // println!("xxxxxxx");
         self.write(Instruction::EnterScope);
     }
 
     fn leave_scope(&mut self) {
-        // println!("yyyyyyyyy");
         self.write(Instruction::LeaveScope);
     }
 

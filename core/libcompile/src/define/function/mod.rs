@@ -2,13 +2,14 @@ use libtype::instruction::{Jump, Instruction};
 use libtype::function::FunctionStatement;
 use libcommon::address::{FunctionAddrValue};
 use libcommon::ptr::{RefPtr, HeapPtr};
-use crate::define::{FunctionDefine, FunctionDefineObject};
+use crate::define::{FunctionDefine, FunctionDefineObject
+    , DefineType};
 use crate::define::to_be_filled::function::{FuncToBeFilled};
 use crate::define_stream::{DefineItem, DefineItemObject};
 
 impl FunctionDefineObject {
     pub fn new(define: FunctionDefine) -> Self {
-        Self(HeapPtr::alloc(define))
+        Self(HeapPtr::alloc_with_typ(define, DefineType::Function.into()))
     }
 
     pub fn get(&self) -> Box<FunctionDefine> {
