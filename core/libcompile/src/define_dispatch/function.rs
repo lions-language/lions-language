@@ -121,6 +121,12 @@ impl<'a> FunctionDefineDispatch<'a> {
         addr_value
     }
 
+    pub fn update_after_param_index_use_current(&mut self, obj: &DefineObject) {
+        let mut fd = obj.get::<FunctionDefine>();
+        let addr_value = fd.update_after_param_index_use_current();
+        obj.restore(fd);
+    }
+
     pub fn finish_define(&mut self) -> Function {
         /*
          * 暂时不考虑多线程问题, 这里的 obj 就是为了以后多线程时, 可以从中间移除元素

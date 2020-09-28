@@ -18,7 +18,7 @@ use libgrammar::grammar::{CallFuncScopeContext
     , CallFunctionContext as GrammarCallFunctionContext};
 use libresult::*;
 use libcommon::ptr::RefPtr;
-use libcommon::address::{FunctionAddress, UnknownDefine};
+use libcommon::address::{FunctionAddress};
 use crate::compile::{Compile, Compiler
     , CallFunctionContext, value_buffer::ValueBufferItem
     , value_buffer::ValueBufferItemContext
@@ -640,6 +640,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
             self.process_param(
                 &typ, &typ_attr, src_addr, move_index, value_context);
         }
+        self.cb.update_after_param_index_use_current();
         let desc_ctx = call_context.desc_ctx_clone();
         let cc = CallFunctionContext {
             package_str: call_context.package_str(),
@@ -741,8 +742,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
         let func_define_addr = func_define_addr_value;
         let cf = CallSelfFunction {
             package_str: call_context.package_str_clone(),
-            func_define_addr: FunctionAddress::UnknownDefine(
-                UnknownDefine::ExcludeParamAndLeaveFuncScope(func_define_addr)),
+            func_define_addr: FunctionAddress::Define(func_define_addr),
             param_define_addr: FunctionAddress::Define(param_define_addr_value),
             return_data: CallFunctionReturnData::new_with_all(
                 AddressValue::new_invalid(), false)

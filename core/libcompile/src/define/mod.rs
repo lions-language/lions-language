@@ -1,4 +1,5 @@
 use libcommon::ptr::{RefPtr, HeapPtr};
+use libcommon::address::{FunctionAddrValue};
 use libmacro::{FieldGet, FieldGetClone};
 use libtype::function::FunctionStatement;
 use crate::define_stream::{DefineItemObject};
@@ -62,7 +63,8 @@ pub struct FunctionDefineObject(HeapPtr);
 #[derive(FieldGet)]
 pub struct FunctionDefine {
     statement: FunctionStatement,
-    define_item: DefineItemObject
+    define_item: DefineItemObject,
+    after_param_index: usize
 }
 /*
 #[derive(FieldGet)]

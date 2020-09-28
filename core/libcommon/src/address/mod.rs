@@ -18,15 +18,9 @@ impl FunctionAddrValue {
     }
 }
 
- #[derive(Debug, Clone)]
-pub enum UnknownDefine {
-    ExcludeParamAndLeaveFuncScope(FunctionAddrValue)
-}
-
- #[derive(Debug, Clone)]
+#[derive(Debug, Clone)]
 pub enum FunctionAddress {
     ReferencesDefine(FunctionAddrValue),
-    Define(FunctionAddrValue),
-    UnknownDefine(UnknownDefine)
+    Define(FunctionAddrValue)
 }
 

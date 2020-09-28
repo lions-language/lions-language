@@ -1,6 +1,6 @@
 use libtype::instruction::{
     Instruction, CallFunction
-    , JumpType};
+    , CallSelfFunction, JumpType};
 use libcommon::ptr::RefPtr;
 use libcommon::address::{FunctionAddress, FunctionAddrValue};
 use libtype::package::{PackageStr};
@@ -104,6 +104,21 @@ impl LinkDefine {
         *src_addr = self.alloc_func_define_addr(src_addr);
     }
 
+    fn call_self_func(&mut self, call_context: &mut CallSelfFunction) {
+        let func_define_addr = match call_context.func_define_addr_mut() {
+            FunctionAddress::Define(v) => {
+                v
+            },
+            _ => {
+                unimplemented!();
+            }
+        };
+        let mut ds = self.define_stream.clone();
+        let ds = ds.as_mut::<DefineStream>();
+        let define_block = ds.read(func_define_addr, true);
+        // *src_addr = self.alloc_func_define_addr(src_addr);
+    }
+
     fn execute(&mut self, instruction: &mut Instruction, is_first: bool) {
         // println!("{:?}", instruction);
         match instruction {
@@ -129,6 +144,7 @@ impl LinkDefine {
                 }
             },
             Instruction::CallSelfFunction(value) => {
+                println!("{:?}", value);
             },
             Instruction::ReadStaticVariant(_) => {
                 /*

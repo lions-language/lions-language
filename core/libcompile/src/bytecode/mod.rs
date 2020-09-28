@@ -134,6 +134,11 @@ impl<'a, 'b, F: Writer> Compile for Bytecode<'a, 'b, F> {
         self.func_define_dispatch.current_function_addr_value(ds)
     }
 
+    fn update_after_param_index_use_current(&mut self) {
+        let ds = self.define_stack.back_unchecked();
+        self.func_define_dispatch.update_after_param_index_use_current(ds);
+    }
+
     fn function_define_end(&mut self) -> Function {
         self.define_stack.leave();
         self.func_define_dispatch.finish_define()

@@ -195,14 +195,6 @@ impl PrimevalControl {
                         return AddFunctionResult::Panic(
                             format!("module: {}, func_str: {} already define"
                                 , module_str, func_str));
-                    },
-                    FunctionAddress::UnknownDefine(_) => {
-                        /*
-                         * 当前模块已经定义过了 => 报错
-                         * */
-                        return AddFunctionResult::Panic(
-                            format!("module: {}, func_str: {} already define"
-                                , module_str, func_str));
                     }
                 }
             },
