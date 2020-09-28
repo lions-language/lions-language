@@ -36,19 +36,19 @@ impl FunctionDefine {
          * */
         let mut item = self.define_item.get();
         item.write(instruction);
-        self.define_item.free(item);
+        self.define_item.restore(item);
     }
 
     pub fn set_jump(&mut self, index: usize, jump: Jump) {
         let mut item = self.define_item.get();
         item.set_jump(index, jump);
-        self.define_item.free(item);
+        self.define_item.restore(item);
     }
 
     pub fn current_index(&self) -> usize {
         let item = self.define_item.get();
         let len = item.length() - 1;
-        self.define_item.free(item);
+        self.define_item.restore(item);
         len
     }
 
@@ -56,7 +56,8 @@ impl FunctionDefine {
      * 用当前的索引更新参数索引
      * */
     pub fn update_after_param_index_use_current(&mut self) {
-        self.after_param_index = self.index();
+        self.after_param_index = self.current_index();
+        // println!("{}", self.after_param_index);
     }
 
     /*
@@ -65,14 +66,14 @@ impl FunctionDefine {
     pub fn index(&self) -> usize {
         let item = self.define_item.get();
         let index = item.index();
-        self.define_item.free(item);
+        self.define_item.restore(item);
         index
     }
 
     pub fn length(&self) -> usize {
         let item = self.define_item.get();
         let length = item.length();
-        self.define_item.free(item);
+        self.define_item.restore(item);
         length
     }
 

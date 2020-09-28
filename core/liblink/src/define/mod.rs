@@ -116,6 +116,15 @@ impl LinkDefine {
         let mut ds = self.define_stream.clone();
         let ds = ds.as_mut::<DefineStream>();
         let define_block = ds.read(func_define_addr, true);
+        let define_item_ptr = define_block.item_clone();
+        let define_item = define_item_ptr.get();
+        let define_item_data = define_item.data_clone();
+        let item_data = define_item_data.pop::<libcompile::define::FunctionDefineItemData>();
+        *func_define_addr = self.alloc_func_define_addr(func_define_addr);
+        // println!("{}", item_data.after_param_index_ref());
+        *func_define_addr.index_mut() += item_data.after_param_index_clone();
+        define_item_data.push(item_data);
+        define_item_ptr.restore(define_item);
         // *src_addr = self.alloc_func_define_addr(src_addr);
     }
 
@@ -144,6 +153,7 @@ impl LinkDefine {
                 }
             },
             Instruction::CallSelfFunction(value) => {
+                self.call_self_func(value);
                 println!("{:?}", value);
             },
             Instruction::ReadStaticVariant(_) => {

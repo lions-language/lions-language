@@ -30,11 +30,11 @@ impl<'a> BlockDefineDispatch<'a> {
          * (在 FunctionDefine 中存储 索引, 移除的时候根据这个索引移除元素)
          * 现在单线程的情况下, 相当于是一个 栈, 从栈顶部移除即可
          * */
+        let block_define_ptr = self.processing_blocks.pop_back().expect("should not happend");
         /*
-         * item 在作用域结束之后会自动释放 (释放存储进去的堆内存)
+         * 释放 BlockDefine 对象
          * */
-        let item_ptr = self.processing_blocks.pop_back().expect("should not happend");
-        item_ptr.free();
+        block_define_ptr.free();
     }
 
     pub fn new(ds: &'a mut DefineStream) -> Self {

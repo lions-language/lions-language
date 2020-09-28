@@ -10,6 +10,7 @@ use std::collections::VecDeque;
 pub struct DefineItem{
     mem: memory::Memory,
     index: usize,
+    data: HeapPtr
 }
 
 impl DefineItem {
@@ -38,10 +39,19 @@ impl DefineItem {
         self.mem.length()
     }
 
+    pub fn set_data(&mut self, data: HeapPtr) {
+        self.data = data;
+    }
+
+    pub fn data_clone(&self) -> HeapPtr {
+        self.data.clone()
+    }
+
     pub fn new(index: usize) -> Self {
         Self{
             mem: memory::Memory::new(),
-            index: index
+            index: index,
+            data: HeapPtr::new_null()
         }
     }
 }
@@ -56,13 +66,13 @@ impl DefineItemObject {
     pub fn get(&self) -> Box<DefineItem> {
         self.0.pop::<DefineItem>()
     }
-    pub fn free(&self, item: Box<DefineItem>) {
+    pub fn restore(&self, item: Box<DefineItem>) {
         self.0.push::<DefineItem>(item);
     }
     pub fn length(&self) -> usize {
         let item = self.get();
         let len = item.length();
-        self.free(item);
+        self.restore(item);
         len
     }
 }
@@ -102,7 +112,7 @@ impl DefineStream {
         let p = self.items.get_mut(index).expect("should not happend");
         let mut item = p.get();
         let all = InstructionVec::new(item.get_all_mut());
-        p.free(item);
+        p.restore(item);
         all
     }
 
@@ -136,6 +146,10 @@ pub struct DefineBlock<'a> {
 }
 
 impl<'a> DefineBlock<'a> {
+    pub fn item_clone(&self) -> DefineItemObject {
+        self.item.clone()
+    }
+
     pub fn new(item: &'a DefineItemObject) -> Self {
         Self {
             item: item,
@@ -163,7 +177,7 @@ impl<'a> Iterator for DefineBlock<'a> {
                 None
             }
         };
-        self.item.free(item);
+        self.item.restore(item);
         ins
     }
 }

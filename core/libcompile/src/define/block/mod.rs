@@ -40,19 +40,19 @@ impl BlockDefine {
          * */
         let mut item = self.define_item.get();
         item.write(instruction);
-        self.define_item.free(item);
+        self.define_item.restore(item);
     }
 
     pub fn set_jump(&mut self, index: usize, jump: Jump) {
         let mut item = self.define_item.get();
         item.set_jump(index, jump);
-        self.define_item.free(item);
+        self.define_item.restore(item);
     }
 
     pub fn current_index(&self) -> usize {
         let item = self.define_item.get();
         let len = item.length() - 1;
-        self.define_item.free(item);
+        self.define_item.restore(item);
         len
     }
 
@@ -62,14 +62,14 @@ impl BlockDefine {
     pub fn index(&self) -> usize {
         let item = self.define_item.get();
         let index = item.index();
-        self.define_item.free(item);
+        self.define_item.restore(item);
         index
     }
 
     pub fn length(&self) -> usize {
         let item = self.define_item.get();
         let length = item.length();
-        self.define_item.free(item);
+        self.define_item.restore(item);
         length
     }
 

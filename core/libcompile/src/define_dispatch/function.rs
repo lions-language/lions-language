@@ -1,4 +1,4 @@
-use libcommon::ptr::RefPtr;
+use libcommon::ptr::{RefPtr, HeapPtr};
 use libcommon::address::{FunctionAddress, FunctionAddrValue};
 use libtype::function::{self, FunctionStatement
     , FunctionReturn, Function
@@ -7,7 +7,8 @@ use libtype::function::{self, FunctionStatement
     , FunctionParam, FunctionParamData
     , FunctionParamDataItem};
 use crate::define::{DefineObject, FunctionDefine
-    , FunctionDefineObject, DefineType};
+    , FunctionDefineObject, DefineType
+    , FunctionDefineItemData};
 use crate::compile::FunctionNamedStmtContext;
 use crate::define_stream::{DefineStream};
 use std::collections::VecDeque;
@@ -123,7 +124,7 @@ impl<'a> FunctionDefineDispatch<'a> {
 
     pub fn update_after_param_index_use_current(&mut self, obj: &DefineObject) {
         let mut fd = obj.get::<FunctionDefine>();
-        let addr_value = fd.update_after_param_index_use_current();
+        fd.update_after_param_index_use_current();
         obj.restore(fd);
     }
 
@@ -134,12 +135,25 @@ impl<'a> FunctionDefineDispatch<'a> {
          * 现在单线程的情况下, 相当于是一个 栈, 从栈顶部移除即可
          * */
         /*
-         * item 在作用域结束之后会自动释放 (释放存储进去的堆内存)
+         * func_define 在作用域结束之后会自动释放 (释放存储进去的堆内存)
          * */
-        let item_ptr = self.processing_funcs.pop_back().expect("should not happend");
-        let item = item_ptr.get();
-        let addr = item.func_addr_value();
-        let func = self.to_function(item.statement(), addr);
+        let func_define_ptr = self.processing_funcs.pop_back().expect("should not happend");
+        let func_define = func_define_ptr.get();
+        let addr = func_define.func_addr_value();
+        let (statement, define_item_ptr, after_param_index) = func_define.fields_move();
+        // println!("{}, {:?}", after_param_index, statement);
+        /*
+         * 组装 Function
+         * */
+        let func = self.to_function(statement, addr);
+        /*
+         * 设置数据
+         * */
+        let mut define_item = define_item_ptr.get();
+        define_item.set_data(HeapPtr::alloc_with_typ(
+                FunctionDefineItemData::new_with_all(after_param_index)
+                , DefineType::Block.into()));
+        define_item_ptr.restore(define_item);
         func
     }
 

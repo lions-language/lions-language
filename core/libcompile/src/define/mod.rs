@@ -1,6 +1,7 @@
 use libcommon::ptr::{RefPtr, HeapPtr};
 use libcommon::address::{FunctionAddrValue};
-use libmacro::{FieldGet, FieldGetClone};
+use libmacro::{FieldGet, FieldGetClone
+    , FieldGetMove, NewWithAll};
 use libtype::function::FunctionStatement;
 use crate::define_stream::{DefineItemObject};
 
@@ -57,10 +58,19 @@ impl Into<u8> for DefineType {
     }
 }
 
+/*
+ * 存储在 define item 中的数据结构
+ * */
+#[derive(Debug, FieldGet, FieldGetClone
+    , NewWithAll)]
+pub struct FunctionDefineItemData {
+    after_param_index: usize
+}
+
 #[derive(Debug)]
 pub struct FunctionDefineObject(HeapPtr);
 
-#[derive(FieldGet)]
+#[derive(FieldGet, FieldGetClone, FieldGetMove)]
 pub struct FunctionDefine {
     statement: FunctionStatement,
     define_item: DefineItemObject,
