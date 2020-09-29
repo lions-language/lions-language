@@ -98,5 +98,30 @@ mod test {
         p.push(value);
         println!("{}", p.pop::<String>());
     }
+
+    struct Test {
+    }
+
+    impl Test {
+        fn print(&self) {
+        }
+    }
+
+    impl Drop for Test {
+        fn drop(&mut self) {
+            println!("drop");
+        }
+    }
+
+    #[test]
+    fn heap_ptr_ownership_test() {
+        let p = HeapPtr::alloc(Test{});
+        {
+            /*
+             * 即使不赋值给变量, pop 之后的作用域也会被转移, 作用域结束后, 同样会被销毁
+             * */
+            p.pop::<Test>().print();
+        }
+    }
 }
 
