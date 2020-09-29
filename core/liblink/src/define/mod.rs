@@ -92,16 +92,21 @@ impl LinkDefine {
                 unimplemented!();
             }
         };
-        let mut ds = self.define_stream.clone();
-        let ds = ds.as_mut::<DefineStream>();
-        let define_block = ds.read(src_addr, true);
-        for mut instruction in define_block {
-            self.execute(instruction.as_mut::<Instruction>(), false);
-        }
+        if let Some(addr) = self.is_defined(src_addr) {
+            *src_addr = addr.clone();
+            return;
+        };
         /*
          * 修改地址
          * */
+        let src_addr_clone = src_addr.clone();
         *src_addr = self.alloc_func_define_addr(src_addr);
+        let mut ds = self.define_stream.clone();
+        let ds = ds.as_mut::<DefineStream>();
+        let define_block = ds.read(&src_addr_clone, true);
+        for mut instruction in define_block {
+            self.execute(instruction.as_mut::<Instruction>(), false);
+        }
     }
 
     fn call_self_func(&mut self, call_context: &mut CallSelfFunction) {
@@ -156,6 +161,11 @@ impl LinkDefine {
             _ => {
             }
         }
+    }
+
+    fn is_defined(&mut self, src_addr: &FunctionAddrValue)
+        -> Option<&FunctionAddrValue> {
+        self.define_mapping.get(src_addr.index_ref())
     }
 
     fn alloc_func_define_addr(&mut self, src_addr: &FunctionAddrValue)
