@@ -58,23 +58,13 @@ impl Into<u8> for DefineType {
     }
 }
 
-/*
- * 存储在 define item 中的数据结构
- * */
-#[derive(Debug, FieldGet, FieldGetClone
-    , NewWithAll)]
-pub struct FunctionDefineItemData {
-    after_param_index: usize
-}
-
 #[derive(Debug)]
 pub struct FunctionDefineObject(HeapPtr);
 
 #[derive(FieldGet, FieldGetClone, FieldGetMove)]
 pub struct FunctionDefine {
     statement: FunctionStatement,
-    define_item: DefineItemObject,
-    after_param_index: usize
+    define_item: DefineItemObject
 }
 /*
 #[derive(FieldGet)]

@@ -53,14 +53,6 @@ impl FunctionDefine {
     }
 
     /*
-     * 用当前的索引更新参数索引
-     * */
-    pub fn update_after_param_index_use_current(&mut self) {
-        self.after_param_index = self.current_index();
-        // println!("{}", self.after_param_index);
-    }
-
-    /*
      * item 在 define_stream 中的索引
      * */
     pub fn index(&self) -> usize {
@@ -81,8 +73,7 @@ impl FunctionDefine {
         , define_item: DefineItemObject) -> Self {
         Self {
             statement: statement,
-            define_item: define_item,
-            after_param_index: 0
+            define_item: define_item
         }
     }
 

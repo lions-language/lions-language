@@ -640,7 +640,6 @@ impl<'a, F: Compile> Compiler<'a, F> {
             self.process_param(
                 &typ, &typ_attr, src_addr, move_index, value_context);
         }
-        self.cb.update_after_param_index_use_current();
         let desc_ctx = call_context.desc_ctx_clone();
         let cc = CallFunctionContext {
             package_str: call_context.package_str(),

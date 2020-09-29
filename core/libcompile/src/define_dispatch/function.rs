@@ -7,8 +7,7 @@ use libtype::function::{self, FunctionStatement
     , FunctionParam, FunctionParamData
     , FunctionParamDataItem};
 use crate::define::{DefineObject, FunctionDefine
-    , FunctionDefineObject, DefineType
-    , FunctionDefineItemData};
+    , FunctionDefineObject, DefineType};
 use crate::compile::FunctionNamedStmtContext;
 use crate::define_stream::{DefineStream};
 use std::collections::VecDeque;
@@ -122,12 +121,6 @@ impl<'a> FunctionDefineDispatch<'a> {
         addr_value
     }
 
-    pub fn update_after_param_index_use_current(&mut self, obj: &DefineObject) {
-        let mut fd = obj.get::<FunctionDefine>();
-        fd.update_after_param_index_use_current();
-        obj.restore(fd);
-    }
-
     pub fn finish_define(&mut self) -> Function {
         /*
          * 暂时不考虑多线程问题, 这里的 obj 就是为了以后多线程时, 可以从中间移除元素
@@ -140,20 +133,12 @@ impl<'a> FunctionDefineDispatch<'a> {
         let func_define_ptr = self.processing_funcs.pop_back().expect("should not happend");
         let func_define = func_define_ptr.get();
         let addr = func_define.func_addr_value();
-        let (statement, define_item_ptr, after_param_index) = func_define.fields_move();
+        let (statement, define_item_ptr) = func_define.fields_move();
         // println!("{}, {:?}", after_param_index, statement);
         /*
          * 组装 Function
          * */
         let func = self.to_function(statement, addr);
-        /*
-         * 设置数据
-         * */
-        let mut define_item = define_item_ptr.get();
-        define_item.set_data(HeapPtr::alloc_with_typ(
-                FunctionDefineItemData::new_with_all(after_param_index)
-                , DefineType::Block.into()));
-        define_item_ptr.restore(define_item);
         func
     }
 

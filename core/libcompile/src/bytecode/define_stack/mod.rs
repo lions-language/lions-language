@@ -63,20 +63,6 @@ impl DefineStack {
         }
     }
 
-    pub fn update_after_param_index_use_current(&mut self) {
-        let obj = self.ws.back().expect("should not happend");
-        match DefineType::from(obj.ptr_ref().typ_ref()) {
-            DefineType::Function => {
-                let mut fd = obj.get::<FunctionDefine>();
-                fd.update_after_param_index_use_current();
-                obj.restore(fd);
-            },
-            _ => {
-                panic!("should not happend");
-            }
-        }
-    }
-
     pub fn write(&mut self, instruction: Instruction) -> bool {
         if self.ws.is_empty() {
             return false;

@@ -208,9 +208,6 @@ pub trait Compile {
         unimplemented!();
     }
 
-    fn update_after_param_index_use_current(&mut self) {
-    }
-
     fn function_define_end(&mut self) -> Function {
         unimplemented!();
     }

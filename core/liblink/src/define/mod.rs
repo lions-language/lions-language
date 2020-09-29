@@ -116,15 +116,6 @@ impl LinkDefine {
         let mut ds = self.define_stream.clone();
         let ds = ds.as_mut::<DefineStream>();
         let define_block = ds.read(func_define_addr, true);
-        let define_item_ptr = define_block.item_clone();
-        let define_item = define_item_ptr.get();
-        let define_item_data = define_item.data_clone();
-        let item_data = define_item_data.pop::<libcompile::define::FunctionDefineItemData>();
-        *func_define_addr = self.alloc_func_define_addr(func_define_addr);
-        // println!("{}", item_data.after_param_index_ref());
-        *func_define_addr.index_mut() += item_data.after_param_index_clone();
-        define_item_data.push(item_data);
-        define_item_ptr.restore(define_item);
         // *src_addr = self.alloc_func_define_addr(src_addr);
     }
 
@@ -192,83 +183,6 @@ impl LinkDefine {
             }
         }
     }
-
-    /*
-    pub fn call_itself_func(&mut self, call_context: &CallFunction) {
-        /*
-         * 语法点:
-         * let mut ds = self.define_stream.clone();
-         * let ds = ds.as_mut::<DefineStream>();
-         * 不能变为一句:
-         * let ds = self.define_stream.as_mut::<DefineStream>();
-         * 如果这样, 将导致 这里的 self 和 后面的 self.execute 在同一个作用域下的两个可变引用
-         * 也就是借用检查器会不通过
-         * */
-        let mut ds = self.define_stream.clone();
-        let ds = ds.as_mut::<DefineStream>();
-        let address_value = match call_context.define_addr_ref() {
-            FunctionAddress::Define(v) => {
-                v
-            },
-            _ => {
-                unimplemented!();
-            }
-        };
-        let define_block = ds.read(address_value, true);
-        for instruction in define_block {
-            self.execute(instruction.as_ref::<Instruction>(), false);
-        }
-    }
-
-    fn execute(&mut self, instruction: &Instruction, is_first: bool) {
-        // println!("{:?}", instruction);
-        match instruction {
-            Instruction::CallFunction(value) => {
-                let ps = value.package_str_ref();
-                match ps {
-                    PackageStr::Itself => {
-                        /*
-                         * 从 define_stream 中查找
-                         * */
-                        self.call_itself_func(&value);
-                    },
-                    PackageStr::Third(_) => {
-                        /*
-                         * 1. 遇到新的包, 需要获取包编译后的函数位置, 然后链接到这里来
-                         * 2. 使用链接后的地址, 重写这里的 call 地址
-                         * */
-                        unimplemented!();
-                    },
-                    _ => {
-                        panic!("should not happend");
-                    }
-                }
-            },
-            Instruction::ReadStaticVariant(_) => {
-                /*
-                 * 从 static_stream 中查找
-                 * */
-                self.link_static.process(instruction);
-            },
-            _ => {
-            }
-        }
-        if !is_first {
-            self.code_segment.push_back(instruction.clone());
-            /*
-            match self.code_segment.get_mut(*index) {
-                Some(v) => {
-                    *v = instruction.clone();
-                },
-                None => {
-                    panic!("should not happend");
-                }
-            }
-            *index += 1;
-            */
-        }
-    }
-    */
 
     pub fn read(&self, addr: &FunctionAddrValue) -> LinkDefineBlock {
         println!("read: {:?}", addr);
