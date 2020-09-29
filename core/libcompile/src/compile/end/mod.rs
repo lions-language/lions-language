@@ -46,7 +46,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                          * */
                         let call_context = CallFunctionContext {
                             package_str: PackageStr::Itself,
-                            func: &func,
+                            func_define: func.func_define.clone(),
                             param_addrs: None,
                             param_context: None,
                             call_param_len: 0,

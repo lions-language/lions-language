@@ -184,7 +184,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 }
                 let call_context = CallFunctionContext {
                     package_str: input_package_str,
-                    func: &func,
+                    func_define: func.func_define.clone(),
                     param_addrs: Some(param_addrs),
                     param_context: Some(param_context),
                     call_param_len: 1,

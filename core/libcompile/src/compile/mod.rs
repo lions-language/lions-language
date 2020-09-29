@@ -64,9 +64,9 @@ pub struct OwnershipMoveContext {
 }
 
 #[derive(Debug)]
-pub struct CallFunctionContext<'a> {
+pub struct CallFunctionContext {
     pub package_str: PackageStr,
-    pub func: &'a Function,
+    pub func_define: libtype::function::FunctionDefine,
     pub param_addrs: Option<Vec<CallFunctionParamAddr>>,
     pub param_context: Option<Vec<CallPrimevalFunctionParamContext>>,
     pub call_param_len: usize,

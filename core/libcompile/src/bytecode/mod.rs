@@ -66,7 +66,7 @@ impl<'a, 'b, F: Writer> Compile for Bytecode<'a, 'b, F> {
     }
 
     fn call_function(&mut self, context: CallFunctionContext) {
-        match &context.func.func_define {
+        match &context.func_define {
             FunctionDefine::Optcode(def) => {
                 let instruction = Instruction::CallPrimevalFunction(
                     CallPrimevalFunction{

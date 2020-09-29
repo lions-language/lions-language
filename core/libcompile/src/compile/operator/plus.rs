@@ -345,7 +345,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
             &right_type, &right_typ_attr, right_addr_value, 1, right_context);
         self.cb.call_function(CallFunctionContext{
             package_str: PackageStr::Empty,
-            func: &func,
+            func_define: func.func_define.clone(),
             param_addrs: Some(vec![CallFunctionParamAddr::Fixed(left_addr_value)
                 , CallFunctionParamAddr::Fixed(right_addr_value)]),
             param_context: None,

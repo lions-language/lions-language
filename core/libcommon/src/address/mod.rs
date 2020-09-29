@@ -1,7 +1,8 @@
 use libmacro::{FieldGet, FieldGetClone
     , FieldGetMove};
 
-#[derive(Debug, Clone, FieldGet
+#[derive(Debug, Clone, Default
+    , FieldGet
     , FieldGetClone
     , FieldGetMove)]
 pub struct FunctionAddrValue {

@@ -75,6 +75,12 @@ impl DefineItemObject {
         self.restore(item);
         len
     }
+    pub fn index(&self) -> usize {
+        let item = self.get();
+        let index = item.index();
+        self.restore(item);
+        index
+    }
 }
 
 pub struct InstructionVec(RefPtr);
@@ -114,6 +120,19 @@ impl DefineStream {
         let all = InstructionVec::new(item.get_all_mut());
         p.restore(item);
         all
+    }
+
+    pub fn item_clone(&self, addr: &FunctionAddrValue) -> Option<DefineItemObject> {
+        match self.items.get(addr.index_clone()) {
+            Some(item) => {
+                Some(item.clone())
+            },
+            None => None
+        }
+    }
+
+    pub fn item_clone_unchecked(&self, addr: &FunctionAddrValue) -> DefineItemObject {
+        self.item_clone(addr).expect("should not happend")
     }
 
     pub fn read(&mut self, addr: &FunctionAddrValue

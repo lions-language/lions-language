@@ -1,5 +1,5 @@
 use super::{Type, PackageType, TypeAttrubute};
-use libcommon::address::FunctionAddress;
+use libcommon::address::{FunctionAddress, FunctionAddrValue};
 use libcommon::optcode::OptCode;
 use libcommon::ptr::RefPtr;
 use libmacro::{FieldGet, FieldGetMove, NewWithAll
@@ -229,15 +229,31 @@ impl FunctionStatement {
 /*
  * 函数定义
  * */
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum FunctionDefine {
     Optcode(OptcodeFunctionDefine),
     Address(AddressFunctionDefine)
 }
 
+impl FunctionDefine {
+    pub fn new_invalid_addr() -> Self {
+        FunctionDefine::Address(
+            AddressFunctionDefine::new(
+                FunctionAddress::Define(
+                    libcommon::address::FunctionAddrValue::new(0, 0))))
+    }
+
+    pub fn new_addr(addr_value: FunctionAddrValue) -> Self {
+        FunctionDefine::Address(
+            AddressFunctionDefine::new(
+                FunctionAddress::Define(
+                    addr_value)))
+    }
+}
+
 type OptcodeFunctionDefinePrepareFn = fn(ptr: RefPtr) -> DescResult;
 
-#[derive(Debug, FieldGet)]
+#[derive(Debug, Clone, FieldGet)]
 pub struct OptcodeFunctionDefine {
     pub optcode: OptCode,
     /*
@@ -246,7 +262,7 @@ pub struct OptcodeFunctionDefine {
     // pub prepare_fn: Option<OptcodeFunctionDefinePrepareFn>
 }
 
-#[derive(Debug, FieldGet)]
+#[derive(Debug, Clone, FieldGet)]
 pub struct AddressFunctionDefine {
     pub addr: FunctionAddress
 }

@@ -529,6 +529,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
          * 1. 查找函数声明
          * */
         let mut return_is_alloc = false;
+        let mut func_define = FunctionDefine::new_invalid_addr();
         let mut func_ptr = call_context.func_ptr_clone();
         if func_ptr.is_null() {
             /*
@@ -563,9 +564,9 @@ impl<'a, F: Compile> Compiler<'a, F> {
             if exists {
                 let h = Some(handle);
                 let func_res = self.function_control.find_function(&find_func_context, &h);
-                func_ptr = match func_res {
+                match func_res {
                     FindFunctionResult::Success(r) => {
-                        RefPtr::from_ref(r.func)
+                        r.func.func_define.clone();
                     },
                     FindFunctionResult::Panic(s) => {
                         return DescResult::Error(s);
@@ -573,7 +574,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                     _ => {
                         panic!("find_function: should not happend");
                     }
-                };
+                }
             } else {
                 match call_context.module_str_ref() {
                     Some(_) => {
@@ -588,23 +589,38 @@ impl<'a, F: Compile> Compiler<'a, F> {
                         if let Some(statement) = self.cb.current_function_statement() {
                             let current_define_func_str = statement.get().statement_full_str();
                             if current_define_func_str == func_str {
-                                return self.call_self(&call_context, statement.get().clone(), param_len);
+                                let func_define_addr_value = self.cb.current_function_addr_value();
+                                func_define = FunctionDefine::new_addr(func_define_addr_value);
+                                // return self.call_self(&call_context, statement.get().clone(), param_len);
+                            } else {
+                                return DescResult::Error(
+                                    format!("the {} function is not found 1", func_str));
                             }
-                        };
+                        } else {
+                            return DescResult::Error(
+                                format!("the {} function is not found 2", func_str));
+                        }
                     }
                 }
+                /*
                 return DescResult::Error(
-                    format!("the {} function is not found", func_str));
+                    format!("the {} function is not found 3", func_str));
+                */
             }
         }
-        let func = func_ptr.as_ref::<Function>();
-        let func_statement = func.func_statement_ref();
+        // let func = func_ptr.as_ref::<Function>();
+        // let func_statement = func.func_statement_ref();
+        let func_statement = if let Some(statement) = self.cb.current_function_statement() {
+            statement
+        } else {
+            panic!("should not happend");
+        };
         let mut move_param_contexts = Vec::new();
         let mut ref_param_addrs = VecDeque::new();
         let mut return_ref_params = HashMap::new();
         let mut return_addr = Address::new(AddressValue::new_invalid());
         let mut scope = None;
-        let desc_result = self.funccall_external_environment(&func_statement, param_len
+        let desc_result = self.funccall_external_environment(func_statement.get(), param_len
             , &mut move_param_contexts, &mut ref_param_addrs
             , &mut return_ref_params, &mut return_addr, &mut scope);
         match desc_result {
@@ -643,7 +659,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
         let desc_ctx = call_context.desc_ctx_clone();
         let cc = CallFunctionContext {
             package_str: call_context.package_str(),
-            func: &func,
+            func_define: func_define,
             param_addrs: None,
             param_context: None,
             call_param_len: param_len,
@@ -662,7 +678,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
         /*
          * 获取返回类型, 将其写入到队列中
          * */
-        let return_data = &func_statement.func_return.data;
+        let return_data = &func_statement.get().func_return.data;
         if !return_addr.is_invalid() {
             let ta = if desc_ctx.typ_attr_ref().is_ref() {
                 desc_ctx.typ_attr()
@@ -678,6 +694,75 @@ impl<'a, F: Compile> Compiler<'a, F> {
         DescResult::Success
     }
 
+    fn call_self(&mut self, call_context: &GrammarCallFunctionContext
+        , func_statement: FunctionStatement, param_len: usize) -> DescResult {
+        /*
+         * 1. 构建一个指令块, 将函数调用前 的指令写入
+         * 2. call self 的时候, 首先执行 第1步 的指令, 然后跳转到 函数定义指令中的函数体部分
+         *  但是, 此时的 函数定义还没有结束(在指令中记录函数定义的起始地址, 在 link
+         *  阶段修改地址段范围)
+         * */
+        let func_define_addr_value = self.cb.current_function_addr_value();
+        /*
+         * 获取当前环境的函数调用参数
+         * */
+        let mut move_param_contexts = Vec::new();
+        let mut ref_param_addrs = VecDeque::new();
+        let mut return_ref_params = HashMap::new();
+        let mut return_addr = Address::new(AddressValue::new_invalid());
+        let mut scope = None;
+        let desc_result = self.funccall_external_environment(&func_statement, param_len
+            , &mut move_param_contexts, &mut ref_param_addrs
+            , &mut return_ref_params, &mut return_addr, &mut scope);
+        match desc_result {
+            DescResult::Success => {
+            },
+            _ => {
+                return desc_result;
+            }
+        }
+        let param_define_addr_value = self.cb.current_block_addr_value();
+        /*
+         * 将调用参数写入到block define指令中
+         * */
+        while !ref_param_addrs.is_empty() {
+            let ref_param = ref_param_addrs.remove(0)
+                .expect("ref_param.remove: should not happend");
+            self.cb.add_ref_param_addr(ref_param);
+        }
+        while !move_param_contexts.is_empty() {
+            let (move_index, typ, typ_attr, src_addr, value_context) =
+                move_param_contexts.remove(0);
+            /*
+             * NOTE
+             * 因为 process_param 中会让虚拟机执行移动操作
+             * 所以必须要在虚拟机进入作用域之后执行
+             * 如果 process_param 中存在移动, 则返回新的地址
+             *  如果不存在移动, 则返回输入的地址
+             * */
+            self.process_param(
+                &typ, &typ_attr, src_addr, move_index, value_context);
+        }
+        self.cb_enter_scope();
+        /*
+         * 计算函数定义地址
+         *  1. 去掉函数定义的参数指令部分
+         *  2. 去掉最后的 leave scope 指令
+         * */
+        let func_define_addr = func_define_addr_value;
+        let cf = CallSelfFunction {
+            package_str: call_context.package_str_clone(),
+            func_define_addr: FunctionAddress::Define(func_define_addr),
+            param_define_addr: FunctionAddress::Define(param_define_addr_value),
+            return_data: CallFunctionReturnData::new_with_all(
+                AddressValue::new_invalid(), false)
+        };
+        self.cb.call_self_function(cf);
+        self.cb_leave_scope();
+        DescResult::Success
+    }
+
+    /*
     fn call_self(&mut self, call_context: &GrammarCallFunctionContext
         , func_statement: FunctionStatement, param_len: usize) -> DescResult {
         /*
@@ -750,5 +835,6 @@ impl<'a, F: Compile> Compiler<'a, F> {
         self.cb_leave_scope();
         DescResult::Success
     }
+    */
 }
 
