@@ -45,7 +45,7 @@ pub struct VirtualMachine {
 
 impl VirtualMachine {
     fn execute(&mut self, instruction: Instruction
-        , current_pos: &usize, block_end_pos: &usize) {
+        , current_pos: &usize, block_length: &usize) {
         // println!("{:?}", &instruction);
         match instruction {
             Instruction::LoadUint8Const(v) => {
@@ -70,7 +70,7 @@ impl VirtualMachine {
                 self.load_variant(v);
             },
             Instruction::CallFunction(v) => {
-                self.call_function(v);
+                self.call_function(v, current_pos, block_length);
             },
             Instruction::OwnershipMove(v) => {
                 self.ownership_move(v);

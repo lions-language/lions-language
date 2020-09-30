@@ -52,11 +52,11 @@ impl ScopeContext {
         /*
          * 获取前一个作用域
          * */
-        self.last_n_unchecked(1)
+        self.last_n_unchecked(0)
     }
 
     pub fn last_one_mut_unchecked(&mut self) -> &mut Scope {
-        self.last_n_mut_unchecked(1)
+        self.last_n_mut_unchecked(0)
     }
 
     pub fn last_n_unchecked(&self, n: usize) -> &Scope {
@@ -69,6 +69,38 @@ impl ScopeContext {
         let len = self.scopes.len();
         let index = len - 1 - n;
         self.scopes.get_mut(index).expect(&format!("len: {}, index: {}", len, index))
+    }
+
+    pub fn last_one(&self) -> Option<&Scope> {
+        self.last_n(0)
+    }
+
+    pub fn last_n(&self, n: usize) -> Option<&Scope> {
+        let len = self.scopes.len();
+        if len == 0 || len - 1 < n {
+            return None;
+        }
+        if len - 1 == 0 {
+            return self.scopes.back();
+        }
+        let index = len - 1 - n;
+        self.scopes.get(index)
+    }
+
+    pub fn last_one_mut(&mut self) -> Option<&mut Scope> {
+        self.last_n_mut(0)
+    }
+
+    pub fn last_n_mut(&mut self, n: usize) -> Option<&mut Scope> {
+        let len = self.scopes.len();
+        if len == 0 || len - 1 < n {
+            return None;
+        }
+        if len -1 == 0 {
+            return self.scopes.back_mut();
+        }
+        let index = len - 1 - n;
+        self.scopes.get_mut(index)
     }
 
     fn get_addr_ref_data_unchecked(&self, addr: &AddressValue

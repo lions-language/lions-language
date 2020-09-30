@@ -8,7 +8,22 @@ use liblink::define::{LinkDefine};
 use crate::vm::VirtualMachine;
 
 impl VirtualMachine {
-    pub fn call_function(&mut self, value: CallFunction) {
+    pub fn call_function(&mut self, value: CallFunction
+        , current_pos: &usize, block_length: &usize) {
+        /*
+         * 函数调用之前, 先将函数调用完成之后的指令位置记录下来
+         *  函数调用指令 + leave scope 指令 => 在 current pos 的基础上加2
+         * */
+        match self.thread_context.current_mut_unchecked().scope_context_mut()
+            .last_one_mut() {
+            Some(scope) => {
+                scope.set_after_func_call_addr(
+                    FunctionAddrValue::new(current_pos.clone() + 2
+                        , block_length.clone()));
+            },
+            None => {
+            }
+        }
         /*
          * 1. 在 当前作用域中 查找 param_addrs 中指定的参数地址对应的数据
          * 2. 创建作用域

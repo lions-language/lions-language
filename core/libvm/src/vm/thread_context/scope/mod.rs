@@ -1,6 +1,7 @@
 use libtype::{AddressValue, AddressType
     , AddressKey, Data};
 use libcommon::ptr::RefPtr;
+use libcommon::address::{FunctionAddrValue};
 use liblink::statics::LinkStatic;
 use crate::memory::stack::rand::RandStack;
 use crate::vm::addr_mapping::{AddressMapping};
@@ -18,6 +19,10 @@ pub struct Scope {
      * 记录当前作用域的结果 数据地址
      * */
     result_data_addr: AddressValue,
+    /*
+     * 记录函数调用前的位置
+     * */
+    after_func_call_addr: Option<FunctionAddrValue>
 }
 
 impl Scope {
@@ -163,6 +168,14 @@ impl Scope {
         &self.result_data_addr
     }
 
+    pub fn set_after_func_call_addr(&mut self, addr: FunctionAddrValue) {
+        *&mut self.after_func_call_addr = Some(addr);
+    }
+
+    pub fn get_after_func_call_addr(&self) -> &Option<FunctionAddrValue> {
+        &&self.after_func_call_addr
+    }
+
     pub fn print_ref_param_addr_mapping(&self) {
         self.ref_param_addr_mapping.print();
     }
@@ -175,7 +188,8 @@ impl Scope {
         Self {
             addr_mapping: AddressMapping::new(),
             ref_param_addr_mapping: AddressMapping::new(),
-            result_data_addr: AddressValue::new_invalid()
+            result_data_addr: AddressValue::new_invalid(),
+            after_func_call_addr: None
         }
     }
 }
