@@ -103,7 +103,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                     return DescResult::Error(s);
                 },
                 _ => {
-                    panic!("should not happend");
+                    panic!("should not happend, {:?}", func_res);
                 }
             };
             call_context.set_func_ptr(func_ptr);

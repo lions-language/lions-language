@@ -531,6 +531,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
         let mut return_is_alloc = false;
         let mut func_define = FunctionDefine::new_invalid_addr();
         let mut func_ptr = call_context.func_ptr_clone();
+        let mut func_statement: Option<FunctionStatement> = None;
         if func_ptr.is_null() {
             /*
              * prepare 阶没有找到函数声明 => 查找
@@ -566,7 +567,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 let func_res = self.function_control.find_function(&find_func_context, &h);
                 match func_res {
                     FindFunctionResult::Success(r) => {
-                        r.func.func_define.clone();
+                        func_define = r.func.func_define.clone();
+                        func_statement = Some(r.func.func_statement_ref().clone());
                     },
                     FindFunctionResult::Panic(s) => {
                         return DescResult::Error(s);
@@ -587,6 +589,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                          * module str 不存在, 调用的可能是自身
                          * */
                         if let Some(statement) = self.cb.current_function_statement() {
+                            // func_statement = Some(statement);
                             let current_define_func_str = statement.get().statement_full_str();
                             if current_define_func_str == func_str {
                                 let func_define_addr_value = self.cb.current_function_addr_value();
@@ -607,20 +610,23 @@ impl<'a, F: Compile> Compiler<'a, F> {
                     format!("the {} function is not found 3", func_str));
                 */
             }
+        } else {
+            func_statement = Some(func_ptr.as_ref::<Function>().func_statement_ref().clone());
+            func_define = func_ptr.as_ref::<Function>().func_define_ref().clone();
         }
         // let func = func_ptr.as_ref::<Function>();
         // let func_statement = func.func_statement_ref();
-        let func_statement = if let Some(statement) = self.cb.current_function_statement() {
+        let func_statement = if let Some(statement) = func_statement {
             statement
         } else {
-            panic!("should not happend");
+            panic!("func_statement is none: should not happend");
         };
         let mut move_param_contexts = Vec::new();
         let mut ref_param_addrs = VecDeque::new();
         let mut return_ref_params = HashMap::new();
         let mut return_addr = Address::new(AddressValue::new_invalid());
         let mut scope = None;
-        let desc_result = self.funccall_external_environment(func_statement.get(), param_len
+        let desc_result = self.funccall_external_environment(&func_statement, param_len
             , &mut move_param_contexts, &mut ref_param_addrs
             , &mut return_ref_params, &mut return_addr, &mut scope);
         match desc_result {
@@ -678,7 +684,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
         /*
          * 获取返回类型, 将其写入到队列中
          * */
-        let return_data = &func_statement.get().func_return.data;
+        let return_data = &func_statement.func_return.data;
         if !return_addr.is_invalid() {
             let ta = if desc_ctx.typ_attr_ref().is_ref() {
                 desc_ctx.typ_attr()

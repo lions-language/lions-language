@@ -186,15 +186,17 @@ impl LinkDefine {
                 /*
                  * 不存在 => 新建并插入
                  * */
+                /*
                 let ds = self.define_stream.as_ref::<DefineStream>();
                 let item_object = ds.item_clone_unchecked(src_addr);
                 let item = item_object.get();
                 let addr = FunctionAddrValue::new(
                     item.index(), item.length());
                 item_object.restore(item);
-                /*
+                */
                 let addr = FunctionAddrValue::new(
                     self.index.clone(), src_addr.length_clone());
+                /*
                 */
                 self.define_mapping.insert(
                     src_addr.index_clone(), addr.clone());
@@ -238,6 +240,88 @@ pub struct LinkDefineBlock<'a> {
 }
 
 impl<'a> LinkDefineBlock<'a> {
+    pub fn current_pos_clone(&self) -> usize {
+        self.pos.clone()
+    }
+
+    pub fn block_length_clone(&self) -> usize {
+        self.length.clone()
+    }
+
+    pub fn current_pos_ref(&self) -> &usize {
+        &self.pos
+    }
+
+    pub fn block_length_ref(&self) -> &usize {
+        &self.length
+    }
+
+    pub fn get_next(&mut self) -> Option<&Instruction> {
+        if self.pos == self.length {
+            return None;
+        }
+        match self.link_define.code_segment.get(self.pos) {
+            Some(v) => {
+                // self.pos += 1;
+                // println!("{:?}", v);
+                match self.update_pos_ref(v) {
+                    Some(ins) => {
+                        // println!("{:?}", ins);
+                        // println!("{}, {:?}", self.pos, ins);
+                        Some(ins)
+                    },
+                    None => {
+                        None
+                    }
+                }
+                // Some(v.clone())
+            },
+            None => {
+                None
+            }
+        }
+    }
+
+    fn update_pos_ref<'b>(&'b mut self, ins: &'b Instruction) -> Option<&'b Instruction> {
+        match ins {
+            Instruction::Jump(jp) => {
+                // println!("{}", self.pos);
+                match jp.typ_ref() {
+                    JumpType::Backward => {
+                        // println!("{}, {:?}", self.pos, jp);
+                        self.pos += jp.index_clone();
+                        // println!("index: {}", jp.index_ref());
+                        // self.pos += 1;
+                        // println!("{:?}", self.pos);
+                    },
+                    JumpType::Forward => {
+                        self.pos -= jp.index_clone();
+                    }
+                }
+                if self.pos == self.length {
+                    return None;
+                }
+                match self.link_define.code_segment.get(self.pos) {
+                    Some(v) => {
+                        /*
+                        println!("{}", self.pos);
+                        println!("before: {:?}, after: {:?}"
+                            , ins, v);
+                        */
+                        return Some(v);
+                    },
+                    None => {
+                        return None;
+                    }
+                }
+            },
+            _ => {
+                self.pos += 1;
+                return Some(ins);
+            }
+        }
+    }
+
     fn update_pos(&mut self, ins: &Instruction) -> Option<Instruction> {
         match ins {
             Instruction::Jump(jp) => {

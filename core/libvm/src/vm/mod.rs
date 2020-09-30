@@ -44,7 +44,8 @@ pub struct VirtualMachine {
 }
 
 impl VirtualMachine {
-    fn execute(&mut self, instruction: Instruction) {
+    fn execute(&mut self, instruction: Instruction
+        , current_pos: &usize, block_end_pos: &usize) {
         // println!("{:?}", &instruction);
         match instruction {
             Instruction::LoadUint8Const(v) => {
@@ -108,7 +109,7 @@ impl VirtualMachine {
          * 所以这里需要手动进入
          * */
         self.thread_context.enter_thread_scope();
-        self.execute(entrance);
+        self.execute(entrance, &0, &0);
         self.thread_context.leave_thread_scope();
     }
 
