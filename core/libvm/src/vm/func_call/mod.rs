@@ -24,16 +24,16 @@ impl VirtualMachine {
             FunctionAddress::Define(v) => {
                 let mut block = ld.read(v);
                 /*
+                */
                 while let Some(ins) = block.get_next() {
                     self.execute(ins.clone(), block.current_pos_ref(), block.block_length_ref());
                 }
-                */
                 /*
-                */
                 for ins in block {
                     // self.execute(ins, block.current_pos_ref(), block.block_length_ref());
                     self.execute(ins, &0, &0);
                 }
+                */
             },
             _ => {
                 unimplemented!();

@@ -589,12 +589,11 @@ impl<'a, F: Compile> Compiler<'a, F> {
                          * module str 不存在, 调用的可能是自身
                          * */
                         if let Some(statement) = self.cb.current_function_statement() {
-                            // func_statement = Some(statement);
+                            func_statement = Some(statement.get().clone());
                             let current_define_func_str = statement.get().statement_full_str();
                             if current_define_func_str == func_str {
                                 let func_define_addr_value = self.cb.current_function_addr_value();
                                 func_define = FunctionDefine::new_addr(func_define_addr_value);
-                                // return self.call_self(&call_context, statement.get().clone(), param_len);
                             } else {
                                 return DescResult::Error(
                                     format!("the {} function is not found 1", func_str));

@@ -187,16 +187,16 @@ impl LinkDefine {
                  * 不存在 => 新建并插入
                  * */
                 /*
+                */
                 let ds = self.define_stream.as_ref::<DefineStream>();
                 let item_object = ds.item_clone_unchecked(src_addr);
                 let item = item_object.get();
                 let addr = FunctionAddrValue::new(
-                    item.index(), item.length());
+                    self.index.clone(), item.length());
                 item_object.restore(item);
-                */
+                /*
                 let addr = FunctionAddrValue::new(
                     self.index.clone(), src_addr.length_clone());
-                /*
                 */
                 self.define_mapping.insert(
                     src_addr.index_clone(), addr.clone());
