@@ -666,6 +666,7 @@ mod string;
 mod typ;
 mod structure;
 mod structinit;
+mod process_if;
 
 #[cfg(test)]
 mod test {
