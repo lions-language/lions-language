@@ -623,7 +623,11 @@ impl<'a, F: Compile> Compiler<'a, F> {
         let mut move_param_contexts = Vec::new();
         let mut ref_param_addrs = VecDeque::new();
         let mut return_ref_params = HashMap::new();
-        let mut return_addr = Address::new(AddressValue::new_invalid());
+        // let mut return_addr = Address::new(AddressValue::new_invalid());
+        let return_data = &func_statement.func_return.data;
+        let mut return_addr = self.scope_context.alloc_address(
+                            AddressType::Dynamic, 0
+                            , return_data.typ_ref().addr_length());
         let mut scope = None;
         let desc_result = self.funccall_external_environment(&func_statement, param_len
             , &mut move_param_contexts, &mut ref_param_addrs
