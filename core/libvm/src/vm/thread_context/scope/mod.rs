@@ -15,6 +15,7 @@ struct ParamRef {
 pub struct Scope {
     addr_mapping: AddressMapping,
     ref_param_addr_mapping: AddressMapping,
+    dynamic_addr_mapping: AddressMapping,
     /*
      * 记录当前作用域的结果 数据地址
      * */
@@ -157,6 +158,12 @@ impl Scope {
             , MemoryValue::new(src_addr));
     }
 
+    pub fn add_dynamic_addr_bind(&mut self, addr: AddressKey
+        , data_addr: AddressValue) {
+        self.dynamic_addr_mapping.bind(addr
+            , MemoryValue::new(data_addr));
+    }
+
     pub fn remove_bind(&mut self, addr: AddressKey) {
         self.addr_mapping.remove(addr);
     }
@@ -197,6 +204,7 @@ impl Scope {
         Self {
             addr_mapping: AddressMapping::new(),
             ref_param_addr_mapping: AddressMapping::new(),
+            dynamic_addr_mapping: AddressMapping::new(),
             result_data_addr: AddressValue::new_invalid(),
             after_func_call_addr: None,
             func_call_return_addr: AddressValue::new_invalid()
