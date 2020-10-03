@@ -25,6 +25,12 @@ impl VirtualMachine {
             }
         }
         /*
+         * 将函数返回值的地址写入到作用域中, 之后的 return 语句将会绑定这个地址
+         * */
+        self.thread_context.current_mut_unchecked().scope_context_mut()
+            .last_one_mut_unchecked().set_func_call_return_addr(
+                value.return_data_ref().addr_value_ref().clone());
+        /*
          * 1. 在 当前作用域中 查找 param_addrs 中指定的参数地址对应的数据
          * 2. 创建作用域
          * 3. 根据第一步的值, 在调用函数内部的指令之前先将函数调用创建的作用域的参数位置进行填充

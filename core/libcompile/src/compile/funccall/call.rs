@@ -404,7 +404,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
         }
         let mut return_is_alloc = false;
         let return_data = &func_statement.func_return.data;
-        *return_addr = match return_data.typ_ref().typ_ref() {
+        // *return_addr = match return_data.typ_ref().typ_ref() {
+        match return_data.typ_ref().typ_ref() {
             TypeValue::Empty => {
                 /*
                  * 如果返回值是空的, 那么就没有必要分配内存

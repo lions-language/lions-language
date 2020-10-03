@@ -22,7 +22,8 @@ pub struct Scope {
     /*
      * 记录函数调用前的位置
      * */
-    after_func_call_addr: Option<FunctionAddrValue>
+    after_func_call_addr: Option<FunctionAddrValue>,
+    func_call_return_addr: AddressValue
 }
 
 impl Scope {
@@ -172,6 +173,14 @@ impl Scope {
         *&mut self.after_func_call_addr = Some(addr);
     }
 
+    pub fn set_func_call_return_addr(&mut self, addr: AddressValue) {
+        *&mut self.func_call_return_addr = addr;
+    }
+
+    pub fn get_func_call_return_addr(&self) -> &AddressValue {
+        return &self.func_call_return_addr;
+    } 
+
     pub fn get_after_func_call_addr(&self) -> &Option<FunctionAddrValue> {
         &&self.after_func_call_addr
     }
@@ -189,7 +198,8 @@ impl Scope {
             addr_mapping: AddressMapping::new(),
             ref_param_addr_mapping: AddressMapping::new(),
             result_data_addr: AddressValue::new_invalid(),
-            after_func_call_addr: None
+            after_func_call_addr: None,
+            func_call_return_addr: AddressValue::new_invalid()
         }
     }
 }
