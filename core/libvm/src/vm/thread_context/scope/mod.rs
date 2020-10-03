@@ -56,6 +56,12 @@ impl Scope {
                 let data = memory.stack_data_ref().get_unwrap(stack_addr);
                 RefPtr::from_ref::<Data>(data)
             },
+            AddressType::Dynamic => {
+                let data_addr = self.dynamic_addr_mapping.get_unwrap(addr.addr_ref());
+                let data = self.get_data_by_data_addr_unchecked(
+                    data_addr, link_static, memory);
+                data
+            },
             _ => {
                 unimplemented!("{:?}", addr.typ_ref());
             }

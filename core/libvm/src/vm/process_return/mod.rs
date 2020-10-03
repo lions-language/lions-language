@@ -21,10 +21,13 @@ impl VirtualMachine {
         // println!("{:?}", addr_key);
         let data_addr = self.thread_context.current_mut_unchecked()
             .get_data_addr_unchecked(&addr_value).addr_value_clone();
+        let cur_func_call_return_addr = self.thread_context.current_unchecked()
+            .scope_context_ref().last_n_unchecked(scope+1)
+            .get_func_call_return_addr().addr_clone();
         self.thread_context.current_mut_unchecked()
             .scope_context_mut().last_n_mut_unchecked(scope)
             .add_dynamic_addr_bind(
-                addr_value.addr_clone(), data_addr);
+                cur_func_call_return_addr, data_addr);
         // println!("{:?}", data_addr);
         /*
          * 2
