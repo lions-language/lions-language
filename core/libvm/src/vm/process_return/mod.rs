@@ -24,6 +24,7 @@ impl VirtualMachine {
         let cur_func_call_return_addr = self.thread_context.current_unchecked()
             .scope_context_ref().last_n_unchecked(scope+1)
             .get_func_call_return_addr().addr_clone();
+        // println!("{:?} {:?}", cur_func_call_return_addr, data_addr);
         self.thread_context.current_mut_unchecked()
             .scope_context_mut().last_n_mut_unchecked(scope)
             .add_dynamic_addr_bind(

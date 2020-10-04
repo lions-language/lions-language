@@ -678,6 +678,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
         };
         self.cb.call_function(cc);
         self.cb_leave_scope();
+        /*
         match scope {
             Some(n) => {
                 return_addr.addr_mut().addr_mut_with_scope_minus(n);
@@ -685,6 +686,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
             None => {
             }
         }
+        */
         /*
          * 获取返回类型, 将其写入到队列中
          * */
