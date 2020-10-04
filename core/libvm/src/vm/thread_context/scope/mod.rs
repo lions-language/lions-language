@@ -114,8 +114,15 @@ impl Scope {
         }
     }
 
-    pub fn get_data_addr_unchecked(&self, addr: &AddressKey) -> &MemoryValue {
-        self.addr_mapping.get_unwrap(addr)
+    pub fn get_data_addr_unchecked(&self, addr: &AddressValue) -> &MemoryValue {
+        match addr.typ_ref() {
+            AddressType::Dynamic => {
+                self.dynamic_addr_mapping.get_unwrap(addr.addr_ref())
+            },
+            _ => {
+                self.addr_mapping.get_unwrap(addr.addr_ref())
+            }
+        }
     }
 
     pub fn get_ref_param_addr_unchecked(&self, addr: &AddressKey) -> &AddressValue {

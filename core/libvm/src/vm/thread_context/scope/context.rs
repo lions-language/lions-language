@@ -200,7 +200,7 @@ impl ScopeContext {
                     , scope+ref_addr.addr_ref().scope_clone())
             },
             _ => {
-                (scope, self.last_n_unchecked(scope).get_data_addr_unchecked(addr.addr_ref()))
+                (scope, self.last_n_unchecked(scope).get_data_addr_unchecked(&addr))
             }
         }
     }
