@@ -29,6 +29,7 @@ impl VirtualMachine {
             .scope_context_mut().last_n_mut_unchecked(scope)
             .add_dynamic_addr_bind(
                 cur_func_call_return_addr, data_addr);
+        self.thread_context.current_mut_unchecked().print_last_n_dynamic_addr_mapping(1);
         // println!("{:?}", data_addr);
         /*
          * 2

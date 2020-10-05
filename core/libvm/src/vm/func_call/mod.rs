@@ -61,6 +61,7 @@ impl VirtualMachine {
             }
         }
         /*
+        /*
          * TODO: 绑定地址
          * 1. 编译期在遇到 return 的时候, 会让虚拟机将return指向的数据地址存储在当前作用域中
          *  这里需要将当前作用域中的 数据地址 和 CallFunction 中的 return_addr 进行绑定
@@ -72,6 +73,7 @@ impl VirtualMachine {
                 value.return_data_ref().addr_value_ref().addr_clone()
                 , data_addr.clone());
         }
+        */
         /*
          * 离开作用域
          * */

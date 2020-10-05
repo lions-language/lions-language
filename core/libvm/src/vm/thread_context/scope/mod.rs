@@ -213,6 +213,10 @@ impl Scope {
         self.addr_mapping.print();
     }
 
+    pub fn print_dynamic_addr_mapping(&self) {
+        self.dynamic_addr_mapping.print();
+    }
+
     pub fn new() -> Self {
         Self {
             addr_mapping: AddressMapping::new(),
