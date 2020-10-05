@@ -27,6 +27,7 @@ impl VirtualMachine {
         /*
          * 将函数返回值的地址写入到作用域中, 之后的 return 语句将会绑定这个地址
          * */
+        // println!("{:?}", value.return_data_ref().addr_value_ref());
         self.thread_context.current_mut_unchecked().scope_context_mut()
             .last_one_mut_unchecked().set_func_call_return_addr(
                 value.return_data_ref().addr_value_ref().clone());
