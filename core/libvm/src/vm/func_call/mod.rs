@@ -29,7 +29,7 @@ impl VirtualMachine {
          * */
         // println!("{:?}", value.return_data_ref().addr_value_ref());
         self.thread_context.current_mut_unchecked().scope_context_mut()
-            .last_one_mut_unchecked().set_func_call_return_addr(
+            .last_n_mut_unchecked(1).set_func_call_return_addr(
                 value.return_data_ref().addr_value_ref().clone());
         /*
          * 1. 在 当前作用域中 查找 param_addrs 中指定的参数地址对应的数据

@@ -67,6 +67,7 @@ impl ScopeContext {
 
     pub fn last_n_mut_unchecked(&mut self, n: usize) -> &mut Scope {
         let len = self.scopes.len();
+        // println!("{:?}", len);
         let index = len - 1 - n;
         self.scopes.get_mut(index).expect(&format!("len: {}, index: {}", len, index))
     }
@@ -214,8 +215,13 @@ impl ScopeContext {
     }
 
     pub fn new() -> Self {
+        let mut scopes = VecDeque::new();
+        /*
+         * 线程入口作用域
+         * */
+        scopes.push_back(Scope::new());
         Self {
-            scopes: VecDeque::new()
+            scopes: scopes
         }
     }
 }

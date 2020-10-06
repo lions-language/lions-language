@@ -15,10 +15,11 @@ impl VirtualMachine {
         self.thread_context.current_mut_unchecked().print_last_n_addr_mapping(1);
         self.thread_context.current_mut_unchecked().print_stack_datas();
         */
-        // self.thread_context.current_mut_unchecked().print_last_n_dynamic_addr_mapping(0);
         let (dst_addr, src_addr) = value.fields_move();
+        // println!("{:?}", src_addr);
         let src_data_addr = self.thread_context.current_mut_unchecked()
             .get_data_addr_unchecked(&src_addr).addr_value_clone();
+        // self.thread_context.current_mut_unchecked().print_last_n_dynamic_addr_mapping(1);
         // println!("--- {:?}", src_data_addr);
         // println!("{:?}", dst_addr);
         /*

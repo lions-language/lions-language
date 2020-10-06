@@ -52,7 +52,9 @@ impl<'a, F: Compile> Compiler<'a, F> {
                             call_param_len: 0,
                             return_data: CallFunctionReturnData::default()
                         };
+                        // self.cb_enter_scope();
                         self.cb.call_function(call_context);
+                        // self.cb_leave_scope();
                     },
                     _ => {
                         panic!("should not happend");
