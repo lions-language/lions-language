@@ -147,6 +147,7 @@ impl ThreadScope {
         println!("**********************************************************");
     }
 
+    /*
     pub fn print_last_n_dynamic_addr_mapping(&self, scope: usize) {
         if !self.scope_context.last_n_is_valid(scope) {
             return;
@@ -162,6 +163,7 @@ impl ThreadScope {
         self.scope_context.last_n_mut_unchecked(scope).print_dynamic_addr_mapping();
         println!("******************************************************************");
     }
+    */
 
     pub fn print_stack_datas(&self) {
         println!("**************** stack data ******************");
