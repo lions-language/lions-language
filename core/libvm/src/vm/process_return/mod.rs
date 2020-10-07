@@ -1,9 +1,10 @@
+use libcommon::address::{FunctionAddrValue};
 use libtype::{AddressValue, AddressKey, AddressType};
 use libtype::instruction::{ReturnStmt};
 use crate::vm::VirtualMachine;
 
 impl VirtualMachine {
-    pub fn process_return_stmt(&mut self, value: ReturnStmt) {
+    pub fn process_return_stmt(&mut self, value: ReturnStmt) -> Option<FunctionAddrValue> {
         let (scope, addr_value) = value.fields_move();
         /*
          * 1. 找到数据地址
@@ -39,5 +40,34 @@ impl VirtualMachine {
                 .leave_scope_last_n(scope);
         }
         */
+        /*
+         * 回退到函数调用的位置
+         * */
+        self.backtrace_func_call_scope()
+    }
+
+    fn backtrace_func_call_scope(&mut self) -> Option<FunctionAddrValue> {
+        loop {
+            match self.thread_context.current_mut_unchecked()
+                .scope_context_mut().last_n_mut(0) {
+                Some(scope) => {
+                    match scope.get_after_func_call_addr() {
+                        Some(addr) => {
+                            return Some(addr.clone());
+                        },
+                        None => {
+                            self.thread_context.current_mut_unchecked()
+                                .scope_context_mut().leave();
+                        }
+                    }
+                },
+                None => {
+                    /*
+                     * 没有作用域了
+                     * */
+                    return None;
+                }
+            }
+        }
     }
 }

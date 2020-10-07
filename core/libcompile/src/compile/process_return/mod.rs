@@ -181,6 +181,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
             }
         }
         /*
+        /*
          * 释放到 函数作用域
          * */
         for _ in 0..scope {
@@ -195,6 +196,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
          * 所以, 这里将 Jump 指令的位置记录下来
          * */
         self.scope_context.last_n_mut_unchecked(scope).add_return_jump(jump_index);
+        */
         DescResult::Success
     }
 }

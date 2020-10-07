@@ -248,6 +248,7 @@ impl<'a> LinkDefineBlock<'a> {
         self.length.clone()
     }
 
+    /*
     pub fn current_pos_ref(&self) -> &usize {
         &self.pos
     }
@@ -255,6 +256,7 @@ impl<'a> LinkDefineBlock<'a> {
     pub fn block_length_ref(&self) -> &usize {
         &self.length
     }
+    */
 
     pub fn get_next(&mut self) -> Option<&Instruction> {
         if self.pos == self.length {
@@ -262,8 +264,7 @@ impl<'a> LinkDefineBlock<'a> {
         }
         match self.link_define.code_segment.get(self.pos) {
             Some(v) => {
-                // self.pos += 1;
-                // println!("{:?}", v);
+                /*
                 match self.update_pos_ref(v) {
                     Some(ins) => {
                         // println!("{:?}", ins);
@@ -274,7 +275,9 @@ impl<'a> LinkDefineBlock<'a> {
                         None
                     }
                 }
-                // Some(v.clone())
+                */
+                self.pos += 1;
+                Some(v)
             },
             None => {
                 None
@@ -372,19 +375,18 @@ impl<'a> Iterator for LinkDefineBlock<'a> {
         }
         match self.link_define.code_segment.get(self.pos) {
             Some(v) => {
-                // self.pos += 1;
-                // println!("{:?}", v);
+                /*
                 match self.update_pos(v) {
                     Some(ins) => {
-                        // println!("{:?}", ins);
-                        // println!("{}, {:?}", self.pos, ins);
                         Some(ins)
                     },
                     None => {
                         None
                     }
                 }
-                // Some(v.clone())
+                */
+                self.pos += 1;
+                Some(v.clone())
             },
             None => {
                 None

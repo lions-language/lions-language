@@ -121,7 +121,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
 
     pub fn handle_function_define_end(&mut self
         , define_context: &FunctionDefineContext) {
-        self.fill_return_jumps();
+        // self.fill_return_jumps();
         // println!("{:?}", self.scope_context.get_current_func_return_ref());
         let func = self.cb.function_define_end();
         // println!("{:?}", func.func_statement_ref().statement_full_str());

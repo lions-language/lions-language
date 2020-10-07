@@ -22,7 +22,8 @@ pub struct Scope {
     /*
      * 记录函数调用前的位置
      * */
-    after_func_call_addr: Option<FunctionAddrValue>
+    after_func_call_addr: Option<FunctionAddrValue>,
+    block_addr: Option<FunctionAddrValue>
 }
 
 impl Scope {
@@ -176,6 +177,18 @@ impl Scope {
         &&self.after_func_call_addr
     }
 
+    pub fn set_block_addr(&mut self, addr: FunctionAddrValue) {
+        *&mut self.block_addr = Some(addr);
+    }
+
+    pub fn get_block_addr(&self) -> &Option<FunctionAddrValue> {
+        &self.block_addr
+    }
+
+    pub fn get_block_addr_unchecked(&self) -> FunctionAddrValue {
+        self.block_addr.as_ref().expect("should not happend").clone()
+    }
+
     pub fn print_ref_param_addr_mapping(&self) {
         self.ref_param_addr_mapping.print();
     }
@@ -189,7 +202,8 @@ impl Scope {
             addr_mapping: AddressMapping::new(),
             ref_param_addr_mapping: AddressMapping::new(),
             result_data_addr: AddressValue::new_invalid(),
-            after_func_call_addr: None
+            after_func_call_addr: None,
+            block_addr: None
         }
     }
 }

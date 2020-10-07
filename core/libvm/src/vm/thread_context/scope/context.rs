@@ -214,8 +214,10 @@ impl ScopeContext {
     }
 
     pub fn new() -> Self {
+        let mut scopes = VecDeque::new();
+        // scopes.push_back(Scope::new());
         Self {
-            scopes: VecDeque::new()
+            scopes: scopes
         }
     }
 }

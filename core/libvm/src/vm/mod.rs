@@ -10,6 +10,7 @@ use libcompile::bytecode::{Bytecode, Writer};
 use libcompile::define_stream::{DefineStream};
 use libcommon::optcode;
 use libcommon::ptr::RefPtr;
+use libcommon::address::{FunctionAddrValue};
 use liblink::define::LinkDefine;
 use liblink::statics::LinkStatic;
 use liblink::link::Link;
@@ -45,7 +46,7 @@ pub struct VirtualMachine {
 
 impl VirtualMachine {
     fn execute(&mut self, instruction: Instruction
-        , current_pos: &usize, block_length: &usize) {
+        , current_pos: &usize, block_length: &usize) -> Option<FunctionAddrValue> {
         // println!("{:?}", &instruction);
         match instruction {
             Instruction::LoadUint8Const(v) => {
@@ -82,7 +83,7 @@ impl VirtualMachine {
                 self.remove_ownership(v);
             },
             Instruction::ReturnStmt(v) => {
-                self.process_return_stmt(v);
+                return self.process_return_stmt(v);
             },
             Instruction::ReadStaticVariant(v) => {
                 self.read_static_variant(v);
@@ -100,6 +101,7 @@ impl VirtualMachine {
                 unimplemented!("{:?}", &instruction);
             }
         }
+        None
     }
 
     fn run(&mut self, entrance: Instruction) {
