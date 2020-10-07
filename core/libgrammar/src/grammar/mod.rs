@@ -416,7 +416,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
     fn select_with_exprcontext(&mut self, token: &TokenPointer, express_context: &ExpressContext<T, CB>) {
         match token.as_ref::<T, CB>().context_ref().token_type() {
             TokenType::If => {
-                unimplemented!();
+                self.if_process();
             },
             TokenType::Annotate => {
                 self.annotate_process();

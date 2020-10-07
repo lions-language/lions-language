@@ -95,6 +95,19 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         TokenMethodResult::Continue
     }
 
+    pub fn expression_end_left_big_parenthese(
+        grammar: &mut GrammarParser<T, CB>
+        , token: &TokenVecItem<T, CB>) -> TokenMethodResult {
+        match token.context_ref().token_type() {
+            TokenType::LeftBigParenthese => {
+                return TokenMethodResult::StmtEnd;
+            },
+            _ => {
+            }
+        }
+        TokenMethodResult::Continue
+    }
+
     pub fn expression_end_right_big_parenthese(
         grammar: &mut GrammarParser<T, CB>
         , token: &TokenVecItem<T, CB>) -> TokenMethodResult {

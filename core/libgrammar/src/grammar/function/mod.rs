@@ -27,7 +27,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                 /*
                  * func 后面是 io EOF => 语法错误
                  * */
-                self.panic("expect id or `(` after func, but arrive IO EOF");
+                self.panic("expect id or `(` / `[` after func, but arrive IO EOF");
                 return;
             }
         };
