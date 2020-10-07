@@ -106,6 +106,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
 
     fn funccall_external_environment(&mut self, func_statement: &FunctionStatement
         , param_len: usize
+        , return_is_alloc: &mut bool
         , move_param_contexts: &mut Vec<(usize, Type
             , TypeAttrubute, AddressValue, ValueBufferItemContext)>
         , ref_param_addrs: &mut VecDeque<AddRefParamAddr>
@@ -402,7 +403,6 @@ impl<'a, F: Compile> Compiler<'a, F> {
             None => {
             }
         }
-        let mut return_is_alloc = false;
         let return_data = &func_statement.func_return.data;
         *return_addr = match return_data.typ_ref().typ_ref() {
             TypeValue::Empty => {
@@ -424,7 +424,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                          *   所以, 需要将作用域加1
                          * */
                         *scope = Some(1);
-                        return_is_alloc = true;
+                        *return_is_alloc = true;
                         let a = self.scope_context.alloc_address(
                             return_data.typ_ref().to_address_type(), 1
                             , return_data.typ_ref().addr_length());
@@ -626,7 +626,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
         let mut return_addr = Address::new(AddressValue::new_invalid());
         let mut scope = None;
         let desc_result = self.funccall_external_environment(&func_statement, param_len
-            , &mut move_param_contexts, &mut ref_param_addrs
+            , &mut return_is_alloc, &mut move_param_contexts, &mut ref_param_addrs
             , &mut return_ref_params, &mut return_addr, &mut scope);
         match desc_result {
             DescResult::Success => {
