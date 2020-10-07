@@ -137,7 +137,6 @@ impl<'a, F: Compile> Compiler<'a, F> {
             let src_addr = value.addr_ref().addr_clone();
             let func_return = self.scope_context.last_n_mut_unchecked(scope).func_return_mut()
                 .as_mut().expect("should not happend");
-            /*
             if func_return.data_ref().typ_attr_ref().is_move_as_return() {
                 /*
                  * 虚拟机处理 return_stmt: 将其写入到作用域中, 然后在函数调用的时候将其绑定
@@ -146,9 +145,6 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 self.cb.return_stmt(ReturnStmtContext::new_with_all(
                         scope, src_addr.clone()));
             }
-            */
-            self.cb.return_stmt(ReturnStmtContext::new_with_all(
-                    scope, src_addr.clone()));
             /*
              * 检测表达式结果和函数声明是否一致
              * */

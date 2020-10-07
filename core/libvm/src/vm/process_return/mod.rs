@@ -18,31 +18,16 @@ impl VirtualMachine {
         self.thread_context.current_unchecked().print_last_n_addr_mapping(2);
         self.thread_context.current_unchecked().print_stack_datas();
         */
-        /*
-        println!("{:?}", self.thread_context.current_unchecked()
-            .scope_context_ref().last_n_unchecked(scope+1)
-            .get_func_call_return_addr());
-        */
+        // println!("{:?}", addr_key);
         let data_addr = self.thread_context.current_mut_unchecked()
             .get_data_addr_unchecked(&addr_value).addr_value_clone();
-        let cur_func_call_return_addr = self.thread_context.current_unchecked()
-            .scope_context_ref().last_n_unchecked(scope+1)
-            .get_func_call_return_addr().addr_clone();
-        // println!("{:?} {:?}", cur_func_call_return_addr, data_addr);
-        self.thread_context.current_mut_unchecked()
-            .scope_context_mut().last_n_mut_unchecked(scope+1)
-            .add_dynamic_addr_bind(
-                cur_func_call_return_addr, data_addr);
-        // self.thread_context.current_mut_unchecked().print_last_n_dynamic_addr_mapping(0);
         // println!("{:?}", data_addr);
         /*
          * 2
         * */
         // println!("{}, {:?}", scope, data_addr);
-        /*
         self.thread_context.current_mut_unchecked()
             .set_result_data_addr(scope, data_addr);
-        */
         // println!("{}", scope);
         /*
         if scope > 0 {

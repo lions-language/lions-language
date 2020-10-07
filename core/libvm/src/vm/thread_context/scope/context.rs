@@ -67,7 +67,6 @@ impl ScopeContext {
 
     pub fn last_n_mut_unchecked(&mut self, n: usize) -> &mut Scope {
         let len = self.scopes.len();
-        // println!("{:?}", len);
         let index = len - 1 - n;
         self.scopes.get_mut(index).expect(&format!("len: {}, index: {}", len, index))
     }
@@ -201,7 +200,7 @@ impl ScopeContext {
                     , scope+ref_addr.addr_ref().scope_clone())
             },
             _ => {
-                (scope, self.last_n_unchecked(scope).get_data_addr_unchecked(&addr))
+                (scope, self.last_n_unchecked(scope).get_data_addr_unchecked(addr.addr_ref()))
             }
         }
     }
@@ -215,13 +214,8 @@ impl ScopeContext {
     }
 
     pub fn new() -> Self {
-        let mut scopes = VecDeque::new();
-        /*
-         * 线程入口作用域
-         * */
-        scopes.push_back(Scope::new());
         Self {
-            scopes: scopes
+            scopes: VecDeque::new()
         }
     }
 }

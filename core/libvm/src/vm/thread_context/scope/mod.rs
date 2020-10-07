@@ -15,7 +15,6 @@ struct ParamRef {
 pub struct Scope {
     addr_mapping: AddressMapping,
     ref_param_addr_mapping: AddressMapping,
-    // dynamic_addr_mapping: AddressMapping,
     /*
      * 记录当前作用域的结果 数据地址
      * */
@@ -23,8 +22,7 @@ pub struct Scope {
     /*
      * 记录函数调用前的位置
      * */
-    after_func_call_addr: Option<FunctionAddrValue>,
-    func_call_return_addr: AddressValue
+    after_func_call_addr: Option<FunctionAddrValue>
 }
 
 impl Scope {
@@ -55,13 +53,6 @@ impl Scope {
                 let stack_addr = self.addr_mapping.get_unwrap(addr.addr_ref());
                 let data = memory.stack_data_ref().get_unwrap(stack_addr);
                 RefPtr::from_ref::<Data>(data)
-            },
-            AddressType::Dynamic => {
-                // let data_addr = self.dynamic_addr_mapping.get_unwrap(addr.addr_ref());
-                let data_addr = self.addr_mapping.get_unwrap(addr.addr_ref());
-                let data = self.get_data_by_data_addr_unchecked(
-                    data_addr, link_static, memory);
-                data
             },
             _ => {
                 unimplemented!("{:?}", addr.typ_ref());
@@ -115,16 +106,8 @@ impl Scope {
         }
     }
 
-    pub fn get_data_addr_unchecked(&self, addr: &AddressValue) -> &MemoryValue {
-        match addr.typ_ref() {
-            AddressType::Dynamic => {
-                // self.dynamic_addr_mapping.get_unwrap(addr.addr_ref())
-                self.addr_mapping.get_unwrap(addr.addr_ref())
-            },
-            _ => {
-                self.addr_mapping.get_unwrap(addr.addr_ref())
-            }
-        }
+    pub fn get_data_addr_unchecked(&self, addr: &AddressKey) -> &MemoryValue {
+        self.addr_mapping.get_unwrap(addr)
     }
 
     pub fn get_ref_param_addr_unchecked(&self, addr: &AddressKey) -> &AddressValue {
@@ -173,13 +156,6 @@ impl Scope {
             , MemoryValue::new(src_addr));
     }
 
-    pub fn add_dynamic_addr_bind(&mut self, addr: AddressKey
-        , data_addr: AddressValue) {
-        // self.dynamic_addr_mapping.bind(addr
-        self.addr_mapping.bind(addr
-            , MemoryValue::new(data_addr));
-    }
-
     pub fn remove_bind(&mut self, addr: AddressKey) {
         self.addr_mapping.remove(addr);
     }
@@ -196,14 +172,6 @@ impl Scope {
         *&mut self.after_func_call_addr = Some(addr);
     }
 
-    pub fn set_func_call_return_addr(&mut self, addr: AddressValue) {
-        *&mut self.func_call_return_addr = addr;
-    }
-
-    pub fn get_func_call_return_addr(&self) -> &AddressValue {
-        return &self.func_call_return_addr;
-    } 
-
     pub fn get_after_func_call_addr(&self) -> &Option<FunctionAddrValue> {
         &&self.after_func_call_addr
     }
@@ -216,20 +184,12 @@ impl Scope {
         self.addr_mapping.print();
     }
 
-    /*
-    pub fn print_dynamic_addr_mapping(&self) {
-        self.dynamic_addr_mapping.print();
-    }
-    */
-
     pub fn new() -> Self {
         Self {
             addr_mapping: AddressMapping::new(),
             ref_param_addr_mapping: AddressMapping::new(),
-            // dynamic_addr_mapping: AddressMapping::new(),
             result_data_addr: AddressValue::new_invalid(),
-            after_func_call_addr: None,
-            func_call_return_addr: AddressValue::new_invalid()
+            after_func_call_addr: None
         }
     }
 }

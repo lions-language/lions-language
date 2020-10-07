@@ -404,8 +404,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
         }
         let mut return_is_alloc = false;
         let return_data = &func_statement.func_return.data;
-        // *return_addr = match return_data.typ_ref().typ_ref() {
-        match return_data.typ_ref().typ_ref() {
+        *return_addr = match return_data.typ_ref().typ_ref() {
             TypeValue::Empty => {
                 /*
                  * 如果返回值是空的, 那么就没有必要分配内存
@@ -624,11 +623,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
         let mut move_param_contexts = Vec::new();
         let mut ref_param_addrs = VecDeque::new();
         let mut return_ref_params = HashMap::new();
-        // let mut return_addr = Address::new(AddressValue::new_invalid());
-        let return_data = &func_statement.func_return.data;
-        let mut return_addr = self.scope_context.alloc_address(
-                            AddressType::Dynamic, 0
-                            , return_data.typ_ref().addr_length());
+        let mut return_addr = Address::new(AddressValue::new_invalid());
         let mut scope = None;
         let desc_result = self.funccall_external_environment(&func_statement, param_len
             , &mut move_param_contexts, &mut ref_param_addrs
@@ -678,7 +673,6 @@ impl<'a, F: Compile> Compiler<'a, F> {
         };
         self.cb.call_function(cc);
         self.cb_leave_scope();
-        /*
         match scope {
             Some(n) => {
                 return_addr.addr_mut().addr_mut_with_scope_minus(n);
@@ -686,7 +680,6 @@ impl<'a, F: Compile> Compiler<'a, F> {
             None => {
             }
         }
-        */
         /*
          * 获取返回类型, 将其写入到队列中
          * */
