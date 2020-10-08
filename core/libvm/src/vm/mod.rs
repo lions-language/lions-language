@@ -45,7 +45,7 @@ pub struct VirtualMachine {
 }
 
 pub enum ExecuteResult {
-    ReturnFunc(FunctionAddrValue),
+    ReturnFunc,
     Normal
 }
 

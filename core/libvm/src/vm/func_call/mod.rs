@@ -15,18 +15,7 @@ impl VirtualMachine {
          *  函数调用指令 + leave scope 指令 => 在 current pos 的基础上加2
          *  但是, pos 是 index + 1, 所以, 这里只需要加  2-1, 也就是 1
          * */
-        // println!("{:?}, {:?}", current_pos, block_length);
         /*
-                match self.thread_context.current_unchecked().scope_context_ref()
-                    .last_n(1) {
-                    Some(sc) => {
-                        println!("{:?}", sc.get_after_func_call_addr());
-                    },
-                    None => {
-                        println!("None");
-                    }
-                }
-        */
         let block_addr = match self.thread_context.current_unchecked().scope_context_ref().last_n(1) {
             Some(sc) => {
                 match sc.get_block_addr() {
@@ -61,7 +50,8 @@ impl VirtualMachine {
             },
             None => {
             }
-        } 
+        }
+        */
         /*
          * 1. 在 当前作用域中 查找 param_addrs 中指定的参数地址对应的数据
          * 2. 创建作用域
@@ -83,12 +73,25 @@ impl VirtualMachine {
                 while let Some(ins) = block.get_next() {
                     // println!("{:?}, {:?}", i, ins);
                     match self.execute(ins.clone(), &block.current_pos_clone(), &block.block_length_clone()) {
+                        /*
                         ExecuteResult::ReturnFunc(addr) => {
                             /*
                              * TODO: 绑定地址
                              * 1. 编译期在遇到 return 的时候, 会让虚拟机将return指向的数据地址存储在当前作用域中
                              *  这里需要将当前作用域中的 数据地址 和 CallFunction 中的 return_addr 进行绑定
                              * */
+                            if value.return_data_ref().is_alloc_ref().clone() {
+                                let data_addr = self.thread_context.current_unchecked().get_result_data_addr().clone();
+                                // println!("{:?}, {:?}", value.return_data_ref().addr_value_ref().addr_ref(), &data_addr);
+                                // println!("{:?}", self.thread_context.current_unchecked().scope_context_ref().length());
+                                self.thread_context.current_mut_unchecked().add_bind(
+                                    value.return_data_ref().addr_value_ref().addr_clone()
+                                    , data_addr.clone());
+                            }
+                            break;
+                        },
+                        */
+                        ExecuteResult::ReturnFunc => {
                             if value.return_data_ref().is_alloc_ref().clone() {
                                 let data_addr = self.thread_context.current_unchecked().get_result_data_addr().clone();
                                 // println!("{:?}, {:?}", value.return_data_ref().addr_value_ref().addr_ref(), &data_addr);

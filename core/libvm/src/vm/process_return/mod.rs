@@ -40,13 +40,19 @@ impl VirtualMachine {
                 .leave_scope_last_n(scope);
         }
         */
+        for _ in 0..scope {
+            self.thread_context.current_mut_unchecked()
+                .scope_context_mut().leave();
+        }
+        ExecuteResult::ReturnFunc
+        // self.backtrace_func_call_scope()
+    }
+
+    /*
+    fn backtrace_func_call_scope(&mut self) -> ExecuteResult {
         /*
          * 回退到函数调用的位置
          * */
-        self.backtrace_func_call_scope()
-    }
-
-    fn backtrace_func_call_scope(&mut self) -> ExecuteResult {
         loop {
             match self.thread_context.current_mut_unchecked()
                 .scope_context_mut().last_n_mut(0) {
@@ -70,4 +76,5 @@ impl VirtualMachine {
             }
         }
     }
+    */
 }

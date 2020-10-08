@@ -21,6 +21,14 @@ impl DefineStack {
         self.ws.back().expect("should not happend")
     }
 
+    pub fn front_mut_unchecked(&mut self) -> &mut DefineObject {
+        self.ws.front_mut().expect("should not happend")
+    }
+
+    pub fn front_unchecked(&self) -> &DefineObject {
+        self.ws.front().expect("should not happend")
+    }
+
     pub fn leave(&mut self) -> DefineObject {
         self.ws.pop_back().expect("should not happend")
     }
