@@ -96,6 +96,7 @@ impl ThreadScope {
     pub fn add_bind(&mut self, addr: AddressKey
         , src_addr: AddressValue) {
         let scope = addr.scope_clone();
+        // println!("{:?}", scope);
         self.scope_context.last_n_mut_unchecked(scope).add_bind(
             addr, src_addr);
     }

@@ -17,7 +17,12 @@ impl ScopeContext {
     }
 
     pub fn leave(&mut self) {
+        // println!("xxx");
         self.scopes.pop_back();
+    }
+
+    pub fn length(&self) -> usize {
+        self.scopes.len()
     }
 
     pub fn leave_last_n(&mut self, n: usize) {

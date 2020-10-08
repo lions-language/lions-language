@@ -44,9 +44,14 @@ pub struct VirtualMachine {
     link_static: RefPtr,
 }
 
+pub enum ExecuteResult {
+    ReturnFunc(FunctionAddrValue),
+    Normal
+}
+
 impl VirtualMachine {
     fn execute(&mut self, instruction: Instruction
-        , current_pos: &usize, block_length: &usize) -> Option<FunctionAddrValue> {
+        , current_pos: &usize, block_length: &usize) -> ExecuteResult {
         // println!("{:?}", &instruction);
         match instruction {
             Instruction::LoadUint8Const(v) => {
@@ -101,7 +106,7 @@ impl VirtualMachine {
                 unimplemented!("{:?}", &instruction);
             }
         }
-        None
+        ExecuteResult::Normal
     }
 
     fn run(&mut self, entrance: Instruction) {
