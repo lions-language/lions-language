@@ -21,6 +21,7 @@ use define_stack::DefineStack;
 use crate::define_dispatch::{FunctionDefineDispatch
     , BlockDefineDispatch
     , function::FunctionStatementObject};
+use crate::define::{DefineObject};
 
 pub trait Writer {
     fn write(&mut self, _: Instruction) {
@@ -106,39 +107,52 @@ impl<'a, 'b, F: Writer> Compile for Bytecode<'a, 'b, F> {
     fn function_named_stmt(&mut self, context: FunctionNamedStmtContext
         , define_context: &mut FunctionDefineContext) -> RefPtr {
         let (statement_ptr, define_obj) = self.func_define_dispatch.alloc_define(context);
+        *define_context.define_obj_mut() = define_obj.original().clone();
         self.define_stack.enter(define_obj);
         statement_ptr
     }
 
     fn function_push_param_to_statement(&mut self
-        , item: FunctionParamDataItem) {
-        let ds = self.define_stack.back_mut_unchecked();
-        self.func_define_dispatch.push_function_param_to_statement(ds, item);
+        , item: FunctionParamDataItem
+        , define_context: &FunctionDefineContext) {
+        // let ds = self.define_stack.back_mut_unchecked();
+        let mut ds = DefineObject::new(define_context.define_obj_clone());
+        self.func_define_dispatch.push_function_param_to_statement(&mut ds, item);
     }
 
     fn function_set_return_to_statement(&mut self
-        , item: FunctionReturn) {
-        let ds = self.define_stack.back_mut_unchecked();
-        self.func_define_dispatch.set_function_return_to_statement(ds, item);
+        , item: FunctionReturn
+        , define_context: &FunctionDefineContext) {
+        // let ds = self.define_stack.back_mut_unchecked();
+        let mut ds = DefineObject::new(define_context.define_obj_clone());
+        self.func_define_dispatch.set_function_return_to_statement(&mut ds, item);
     }
 
-    fn update_func_return_data_addr(&mut self, attr: FunctionReturnDataAttr) {
-        let ds = self.define_stack.back_mut_unchecked();
-        self.func_define_dispatch.update_func_return_data_attr(ds, attr);
+    fn update_func_return_data_addr(&mut self, attr: FunctionReturnDataAttr
+        , define_obj: DefineObject) {
+        // let ds = self.define_stack.back_mut_unchecked();
+        let mut ds = define_obj;
+        self.func_define_dispatch.update_func_return_data_attr(&mut ds, attr);
     }
 
-    fn current_function_statement(&self) -> Option<FunctionStatementObject> {
-        self.func_define_dispatch.current_function_statement()
+    fn current_function_statement(&self
+        , define_obj: DefineObject) -> Option<FunctionStatementObject> {
+        let ds = define_obj;
+        self.func_define_dispatch.current_function_statement(&ds)
     }
 
-    fn current_function_addr_value(&self) -> FunctionAddrValue {
-        let ds = self.define_stack.back_unchecked();
-        self.func_define_dispatch.current_function_addr_value(ds)
+    fn current_function_addr_value(&self
+        , define_obj: DefineObject) -> FunctionAddrValue {
+        // let ds = self.define_stack.back_unchecked();
+        let ds = define_obj;
+        self.func_define_dispatch.current_function_addr_value(&ds)
     }
 
-    fn function_define_end(&mut self) -> Function {
+    fn function_define_end(&mut self
+        , define_context: &FunctionDefineContext) -> Function {
         self.define_stack.leave();
-        self.func_define_dispatch.finish_define()
+        let ds = DefineObject::new(define_context.define_obj_clone());
+        self.func_define_dispatch.finish_define(&ds)
     }
 
     fn enter_block_define(&mut self) {

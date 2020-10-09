@@ -41,6 +41,7 @@ use crate::static_dispatch::{StaticVariantDispatch};
 use crate::module::ModuleStack;
 use scope::context::ScopeContext;
 use crate::define_dispatch::{function::FunctionStatementObject};
+use crate::define::{DefineObject};
 
 #[derive(Debug)]
 pub struct StaticContext {
@@ -190,26 +191,31 @@ pub trait Compile {
     }
 
     fn function_push_param_to_statement(&mut self
-        , _item: FunctionParamDataItem) {
+        , _item: FunctionParamDataItem
+        , _define_context: &FunctionDefineContext) {
     }
 
     fn function_set_return_to_statement(&mut self
-        , _item: FunctionReturn) {
+        , _item: FunctionReturn
+        , _define_context: &FunctionDefineContext) {
     }
 
     fn function_define_start(&mut self) {
         println!("function define start");
     }
 
-    fn current_function_statement(&self) -> Option<FunctionStatementObject> {
+    fn current_function_statement(&self
+        , _define_obj: DefineObject) -> Option<FunctionStatementObject> {
         unimplemented!();
     }
 
-    fn current_function_addr_value(&self) -> FunctionAddrValue {
+    fn current_function_addr_value(&self
+        , _define_obj: DefineObject) -> FunctionAddrValue {
         unimplemented!();
     }
 
-    fn function_define_end(&mut self) -> Function {
+    fn function_define_end(&mut self
+        , _define_context: &FunctionDefineContext) -> Function {
         unimplemented!();
     }
 
@@ -259,7 +265,8 @@ pub trait Compile {
         unimplemented!();
     }
 
-    fn update_func_return_data_addr(&mut self, _: FunctionReturnDataAttr) {
+    fn update_func_return_data_addr(&mut self, _: FunctionReturnDataAttr
+        , _define_obj: DefineObject) {
         unimplemented!();
     }
 
@@ -352,12 +359,14 @@ impl<'a, F: Compile> Grammar for Compiler<'a, F> {
     }
 
     fn function_define_param(&mut self, context: FunctionDefineParamContext
-        , mut_context: &mut FunctionDefineParamMutContext) {
-        self.handle_function_define_param(context, mut_context);
+        , mut_context: &mut FunctionDefineParamMutContext
+        , define_context: &mut FunctionDefineContext) {
+        self.handle_function_define_param(context, mut_context, define_context);
     }
 
-    fn function_define_return(&mut self, context: FunctionDefineReturnContext) {
-        self.handle_function_define_return(context);
+    fn function_define_return(&mut self, context: FunctionDefineReturnContext
+        , define_context: &mut FunctionDefineContext) {
+        self.handle_function_define_return(context, define_context);
     }
 
     fn function_define_end(&mut self, _value: TokenValue

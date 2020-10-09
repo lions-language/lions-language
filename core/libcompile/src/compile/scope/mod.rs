@@ -10,6 +10,7 @@ use crate::compile::ref_count::RefCounter;
 use crate::compile::value_buffer::{ValueBuffer
     , ValueBufferItem, ValueBufferItemContext};
 use crate::address::{Address};
+use crate::define::{DefineObject};
 use std::cmp::{PartialEq};
 use std::collections::VecDeque;
 
@@ -57,6 +58,7 @@ pub struct PointAccess {
 #[derive(FieldGet, FieldGetMove)]
 pub struct Scope {
     scope_typ: ScopeType,
+    define_obj: DefineObject,
     address_dispatch: AddressDispatch,
     ref_counter: RefCounter,
     vars: vars::Variants,
@@ -95,6 +97,18 @@ impl Scope {
         self.address_dispatch.alloc_with_index(typ, index, scope, length)
     }
     */
+
+    pub fn set_define_obj(&mut self, define_obj: DefineObject) {
+        *&mut self.define_obj = define_obj;
+    }
+
+    pub fn get_define_obj_ref(&self) -> &DefineObject {
+        &self.define_obj
+    }
+
+    pub fn get_define_obj_clone(&self) -> DefineObject {
+        self.define_obj.clone()
+    }
 
     pub fn update_addr_index(&mut self, index: usize) {
         self.address_dispatch.update_addr_index(index);
@@ -454,9 +468,10 @@ impl Scope {
         &self.point_access_fullname.as_ref().expect("should not happend")
     }
 
-    pub fn new_with_addr_start(start: usize, scope_typ: ScopeType) -> Self {
+    fn _new(start: usize, define_obj: DefineObject, scope_typ: ScopeType) -> Self {
         Self {
             scope_typ: scope_typ,
+            define_obj: define_obj,
             address_dispatch: AddressDispatch::new_with_start(start),
             ref_counter: RefCounter::new(),
             vars: vars::Variants::new(),
@@ -472,8 +487,16 @@ impl Scope {
         }
     }
 
+    pub fn new_with_addr_start(start: usize, scope_typ: ScopeType) -> Self {
+        Scope::_new(start, DefineObject::new(HeapPtr::new_null()), scope_typ)
+    }
+
+    pub fn new_with_define_obj(define_obj: DefineObject, scope_typ: ScopeType) -> Self {
+        Scope::_new(0, define_obj, scope_typ)
+    }
+
     pub fn new(scope_typ: ScopeType) -> Self {
-        Scope::new_with_addr_start(0, scope_typ)
+        Scope::_new(0, DefineObject::new(HeapPtr::new_null()), scope_typ)
     }
 }
 

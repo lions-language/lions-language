@@ -31,11 +31,7 @@ impl<'a> FunctionDefineDispatch<'a> {
         let def = FunctionDefine::new(
             FunctionStatement::new(func_name, None, FunctionReturn::default(), typ)
             , self.define_stream.alloc_item());
-        /*
-         * 关键点: 获取插入后的元素的引用
-         * */
-        self.processing_funcs.push_back(FunctionDefineObject::new(def));
-        let v_ptr = self.processing_funcs.back().expect("should not happend");
+        let v_ptr = FunctionDefineObject::new(def);
         let v = v_ptr.get();
         let statement_ptr = RefPtr::from_ref(v.statement_ref());
         v_ptr.restore(v);
@@ -100,18 +96,12 @@ impl<'a> FunctionDefineDispatch<'a> {
         define_obj.restore(fd);
     }
 
-    pub fn current_function_statement(&self) -> Option<FunctionStatementObject> {
-        match self.processing_funcs.back() {
-            Some(item_ptr) => {
-                let item = item_ptr.get();
-                let s = Some(FunctionStatementObject::new(item.statement_ref()));
-                item_ptr.restore(item);
-                s
-            },
-            None => {
-                None
-            }
-        }
+    pub fn current_function_statement(&self
+        , define_obj: &DefineObject) -> Option<FunctionStatementObject> {
+        let item = define_obj.get::<FunctionDefine>();
+        let s = Some(FunctionStatementObject::new(item.statement_ref()));
+        define_obj.restore(item);
+        s
     }
 
     pub fn current_function_addr_value(&self, obj: &DefineObject) -> FunctionAddrValue {
@@ -121,7 +111,7 @@ impl<'a> FunctionDefineDispatch<'a> {
         addr_value
     }
 
-    pub fn finish_define(&mut self) -> Function {
+    pub fn finish_define(&mut self, define_obj: &DefineObject) -> Function {
         /*
          * 暂时不考虑多线程问题, 这里的 obj 就是为了以后多线程时, 可以从中间移除元素
          * (在 FunctionDefine 中存储 索引, 移除的时候根据这个索引移除元素)
@@ -130,11 +120,9 @@ impl<'a> FunctionDefineDispatch<'a> {
         /*
          * func_define 在作用域结束之后会自动释放 (释放存储进去的堆内存)
          * */
-        let func_define_ptr = self.processing_funcs.pop_back().expect("should not happend");
-        let func_define = func_define_ptr.get();
+        let func_define = define_obj.get::<FunctionDefine>();
         let addr = func_define.func_addr_value();
         let (statement, define_item_ptr) = func_define.fields_move();
-        // println!("{}, {:?}", after_param_index, statement);
         /*
          * 组装 Function
          * */
@@ -149,7 +137,6 @@ impl<'a> FunctionDefineDispatch<'a> {
 
     pub fn new(ds: &'a mut DefineStream) -> Self {
         Self {
-            processing_funcs: VecDeque::new(),
             define_stream: ds
         }
     }

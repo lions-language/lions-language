@@ -100,9 +100,18 @@ impl<'a, F: Compile> Compiler<'a, F> {
          * TODO
          *  如果是复合类型, 写入 value_buffer 的时候已经记录进去了
          * */
+        let define_obj = match self.scope_context.get_last_function_scope_object() {
+            Ok(scope) => {
+                scope.get_define_obj_clone()
+            },
+            Err(err) => {
+                return err;
+            }
+        };
         self.cb.update_func_return_data_addr(
             FunctionReturnDataAttr::RefParam(
-                FunctionReturnRefParam::Addr(addr.clone())));
+                FunctionReturnRefParam::Addr(addr.clone()))
+            , define_obj);
         /*
         self.cb.update_func_return_data_addr(
             FunctionReturnDataAttr::RefParam(

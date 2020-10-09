@@ -18,12 +18,15 @@ use crate::compile::{Compile, Compiler, FunctionNamedStmtContext
     , TypeTokenExpand};
 use crate::compile::scope::vars::Variant;
 use crate::compile::scope::ScopeType;
+use crate::define::{DefineObject};
 use crate::address::Address;
 
 impl<'a, F: Compile> Compiler<'a, F> {
     pub fn handle_function_named_stmt(&mut self, value: TokenValue
         , define_context: &mut FunctionDefineContext) {
-        self.scope_context.enter(ScopeType::Function);
+        self.scope_context.enter_with_define_obj(
+            DefineObject::new(define_context.define_obj_clone())
+            , ScopeType::Function);
         let s = match value.token_data.expect("should not happend") {
             TokenData::Id(v) => {
                 v
@@ -39,7 +42,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
     }
 
     pub fn handle_function_define_param(&mut self, context: FunctionDefineParamContext
-        , mut_context: &mut FunctionDefineParamMutContext) {
+        , mut_context: &mut FunctionDefineParamMutContext
+        , define_context: &mut FunctionDefineContext) {
         let (name_token, t, typ_attr, lengthen_attr, param_no)
             = context.fields_move();
         let name = extract_token_data!(
@@ -104,16 +108,17 @@ impl<'a, F: Compile> Compiler<'a, F> {
          * */
         let func_param_item = FunctionParamDataItem::new_with_lengthen(
             typ, typ_attr, lengthen_attr);
-        self.cb.function_push_param_to_statement(func_param_item);
+        self.cb.function_push_param_to_statement(func_param_item, define_context);
     }
 
-    pub fn handle_function_define_return(&mut self, context: FunctionDefineReturnContext) {
+    pub fn handle_function_define_return(&mut self, context: FunctionDefineReturnContext
+        , define_context: &FunctionDefineContext) {
         let (typ_attr, _, type_token) = context.fields_move();
         let func_return_data = FunctionReturnData::new(
             self.to_type(type_token), typ_attr);
         let func_return = FunctionReturn::new(func_return_data);
         self.scope_context.set_current_func_return(func_return.clone());
-        self.cb.function_set_return_to_statement(func_return);
+        self.cb.function_set_return_to_statement(func_return, define_context);
     }
 
     pub fn handle_function_define_start(&mut self) {
@@ -124,7 +129,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
         , define_context: &FunctionDefineContext) {
         // self.fill_return_jumps();
         // println!("{:?}", self.scope_context.get_current_func_return_ref());
-        let func = self.cb.function_define_end();
+        let func = self.cb.function_define_end(define_context);
         // println!("{:?}", func.func_statement_ref().statement_full_str());
         let package_typ = PackageType::new(PackageTypeValue::Crate);
         let context = AddFunctionContext{

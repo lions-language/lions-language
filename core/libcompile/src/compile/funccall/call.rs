@@ -588,11 +588,21 @@ impl<'a, F: Compile> Compiler<'a, F> {
                         /*
                          * module str 不存在, 调用的可能是自身
                          * */
-                        if let Some(statement) = self.cb.current_function_statement() {
+                        let define_obj = match self.scope_context.get_last_function_scope_object() {
+                            Ok(scope) => {
+                                scope.get_define_obj_clone()
+                            },
+                            Err(err) => {
+                                return err;
+                            }
+                        };
+                        if let Some(statement) = self.cb.current_function_statement(
+                            define_obj.clone()) {
                             func_statement = Some(statement.get().clone());
                             let current_define_func_str = statement.get().statement_full_str();
                             if current_define_func_str == func_str {
-                                let func_define_addr_value = self.cb.current_function_addr_value();
+                                let func_define_addr_value = self.cb.current_function_addr_value(
+                                    define_obj);
                                 func_define = FunctionDefine::new_addr(func_define_addr_value);
                             } else {
                                 return DescResult::Error(

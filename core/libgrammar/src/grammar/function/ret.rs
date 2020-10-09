@@ -1,10 +1,11 @@
 use super::{GrammarParser, Grammar};
-use crate::grammar::{FunctionDefineReturnContext};
+use crate::grammar::{FunctionDefineReturnContext
+    , FunctionDefineContext};
 use crate::lexical::{CallbackReturnStatus};
 use crate::token::{TokenType};
 
 impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, CB> {
-    pub fn function_parse_return(&mut self) {
+    pub fn function_parse_return(&mut self, define_context: &mut FunctionDefineContext) {
         /*
          * 参数解析完成之后, 被调用
          *  参数后:
@@ -40,7 +41,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         let (typ_attr, lengthen_attr, type_token) = self.typ_parse();
         self.cb().function_define_return(FunctionDefineReturnContext::new_with_all(
             typ_attr, lengthen_attr, type_token
-        ));
+        ), define_context);
     }
 }
 

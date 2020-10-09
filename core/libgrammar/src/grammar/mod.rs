@@ -162,7 +162,8 @@ pub struct FunctionDefineReturnContext {
 #[derive(Debug, Default, FieldGet, NewWithAll, FieldGetMove
     , FieldGetClone)]
 pub struct FunctionDefineContext {
-    has_lengthen_param: bool
+    has_lengthen_param: bool,
+    define_obj: HeapPtr
 }
 
 #[derive(Debug, Default, FieldGet, NewWithAll, FieldGetMove
@@ -269,10 +270,12 @@ pub trait Grammar {
         println!("named function define start");
     }
     fn function_define_param(&mut self, context: FunctionDefineParamContext
-        , _mut_context: &mut FunctionDefineParamMutContext) {
+        , _mut_context: &mut FunctionDefineParamMutContext
+        , _define_context: &mut FunctionDefineContext) {
         unimplemented!();
     }
-    fn function_define_return(&mut self, _context: FunctionDefineReturnContext) {
+    fn function_define_return(&mut self, _context: FunctionDefineReturnContext
+        , _define_context: &mut FunctionDefineContext) {
     }
     fn function_define_end(&mut self, _value: TokenValue
         , _define_context: &FunctionDefineContext) {

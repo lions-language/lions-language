@@ -1,3 +1,4 @@
+use libcommon::ptr::{HeapPtr};
 use super::{GrammarParser, Grammar};
 use crate::lexical::{CallbackReturnStatus};
 use crate::token::{TokenType, TokenValue};
@@ -9,7 +10,7 @@ use crate::grammar::{FunctionDefineContext
   
 impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, CB> {
     pub fn function_object_method(&mut self) {
-        let mut define_context = FunctionDefineContext::new_with_all(false);
+        let mut define_context = FunctionDefineContext::new_with_all(false, HeapPtr::new_null());
         /*
          * 读取 object name
          * */
@@ -65,12 +66,13 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         self.grammar_context().cb.function_define_param(
             FunctionDefineParamContext::new_with_all(
                 object_name.token_value(), FunctionDefineParamContextType::Typ(mut_context.typ())
-                , typ_attr, lengthen_attr, 0), &mut param_mut_context);
+                , typ_attr, lengthen_attr, 0), &mut param_mut_context
+                , &mut define_context);
         /*
          * 添加其余参数
          * */
         self.function_parse_param_list(1, &mut define_context, &mut param_mut_context);
-        self.function_parse_return();
+        self.function_parse_return(&mut define_context);
         self.function_parse_block(&mut define_context);
     }
 

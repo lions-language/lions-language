@@ -8,6 +8,7 @@ use super::{vars::Variant};
 use crate::address::Address;
 use crate::compile::value_buffer::{
     ValueBufferItem, ValueBufferItemContext};
+use crate::define::{DefineObject};
 use std::collections::VecDeque;
 
 pub struct ScopeContext {
@@ -27,6 +28,11 @@ impl ScopeContext {
     pub fn enter_with_addr_start(&mut self, start: usize
         , scope_typ: ScopeType) {
         self.scopes.push_back(Scope::new_with_addr_start(start, scope_typ));
+    }
+
+    pub fn enter_with_define_obj(&mut self, define_obj: DefineObject
+        , scope_typ: ScopeType) {
+        self.scopes.push_back(Scope::new_with_define_obj(define_obj, scope_typ));
     }
 
     pub fn leave(&mut self) {
@@ -230,28 +236,54 @@ impl ScopeContext {
         }
     }
 
-    pub fn get_last_function_scope_unchecked(&mut self) -> usize {
-        self.get_last_scope_type_index(&ScopeType::Function).expect("should not happend")
+    pub fn get_last_function_scope(&mut self) -> Result<usize, DescResult> {
+        match self.get_last_scope_type_index(&ScopeType::Function) {
+            Some(v) => Ok(v),
+            None => Err(DescResult::Error(
+                    String::from("must be use in function define")))
+        }
+    }
+
+    pub fn get_last_function_scope_object(&mut self) -> Result<&Scope, DescResult> {
+        match self.get_last_scope_object_by_scopetyp(&ScopeType::Function) {
+            Some(v) => Ok(v),
+            None => Err(DescResult::Error(
+                    String::from("must be use in function define")))
+        }
+    }
+
+    pub fn get_last_scope_object_by_scopetyp(&mut self, scope_typ: &ScopeType) -> Option<&Scope> {
+        let mut index = self.scopes.len() - 1;
+        let mut scope = 0;
+        match self.get_last_scope_type_index_inner(scope_typ, &mut index
+            , &mut scope) {
+            Some(sc) => {
+                Some(sc)
+            },
+            None => {
+                None
+            }
+        }
     }
 
     pub fn get_last_scope_type_index(&mut self, scope_typ: &ScopeType) -> Option<usize> {
         let mut index = self.scopes.len() - 1;
         let mut scope = 0;
-        if !self.get_last_scope_type_index_inner(scope_typ, &mut index
+        if let None = self.get_last_scope_type_index_inner(scope_typ, &mut index
             , &mut scope) {
             return None;
         }
         Some(scope)
     }
 
-    fn get_last_scope_type_index_inner(&mut self, scope_typ: &ScopeType
-        , index: &mut usize, scope: &mut usize) -> bool {
+    fn get_last_scope_type_index_inner(&self, scope_typ: &ScopeType
+        , index: &mut usize, scope: &mut usize) -> Option<&Scope> {
         let sp = match self.scopes.get(*index) {
             Some(sp) => {
                 sp
             },
             None => {
-                return false;
+                return None;
             }
         };
         let current_scope_typ = sp.scope_typ_ref();
@@ -259,10 +291,10 @@ impl ScopeContext {
             /*
              * 检测到类型相等 => 返回
              * */
-            return true;
+            return Some(sp);
         } else {
             if *index == 0 {
-                return false;
+                return None;
             }
             *index -= 1;
             *scope += 1;

@@ -181,7 +181,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         self.grammar_context().cb.function_define_param(
             FunctionDefineParamContext::new_with_all(
                 name_token.token_value(), FunctionDefineParamContextType::Token(type_token)
-                , typ_attr, lengthen_attr, param_no), mut_context);
+                , typ_attr, lengthen_attr, param_no), mut_context, define_context);
     }
 }
 

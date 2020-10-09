@@ -110,6 +110,10 @@ impl DefineObject {
         self.ptr.push::<T>(v);
     }
 
+    pub fn original(&self) -> HeapPtr {
+        self.ptr.clone()
+    }
+
     pub fn new(ptr: HeapPtr) -> Self {
         Self {
             ptr: ptr
