@@ -12,8 +12,7 @@ impl<'a> BlockDefineDispatch<'a> {
          * */
         let item = self.define_stream.alloc_item();
         let def = BlockDefine::new(item);
-        self.processing_blocks.push_back(BlockDefineObject::new(def));
-        let v_ptr = self.processing_blocks.back().expect("should not happend");
+        let v_ptr = BlockDefineObject::new(def);
         DefineObject::new(v_ptr.ptr_clone())
     }
 
@@ -24,22 +23,15 @@ impl<'a> BlockDefineDispatch<'a> {
         addr_value
     }
 
-    pub fn finish_define(&mut self) {
+    pub fn finish_define(&mut self, define_obj: &DefineObject) {
         /*
-         * 暂时不考虑多线程问题, 这里的 obj 就是为了以后多线程时, 可以从中间移除元素
-         * (在 FunctionDefine 中存储 索引, 移除的时候根据这个索引移除元素)
-         * 现在单线程的情况下, 相当于是一个 栈, 从栈顶部移除即可
+         * 释放 BlockDefine 对象 (get 后 rust自动释放)
          * */
-        let block_define_ptr = self.processing_blocks.pop_back().expect("should not happend");
-        /*
-         * 释放 BlockDefine 对象
-         * */
-        block_define_ptr.free();
+        define_obj.get::<BlockDefine>();
     }
 
     pub fn new(ds: &'a mut DefineStream) -> Self {
         Self {
-            processing_blocks: VecDeque::new(),
             define_stream: ds
         }
     }

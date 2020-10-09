@@ -140,6 +140,12 @@ pub struct ReturnStmtContext {
     addr_value: AddressValue
 }
 
+#[derive(Clone, Debug, FieldGet
+    , FieldGetClone)]
+pub struct BlockDefineContext {
+    define_obj: DefineObject
+}
+
 trait TokenValueExpand {
     fn to_type(&self) -> Type;
     fn to_data(self) -> Data;
@@ -219,14 +225,14 @@ pub trait Compile {
         unimplemented!();
     }
 
-    fn enter_block_define(&mut self) {
+    fn enter_block_define(&mut self, _define_context: &mut BlockDefineContext) {
     }
 
-    fn current_block_addr_value(&self) -> FunctionAddrValue {
+    fn current_block_addr_value(&self, _define_obj: DefineObject) -> FunctionAddrValue {
         unimplemented!();
     }
 
-    fn leave_block_define(&mut self) {
+    fn leave_block_define(&mut self, _define_obj: DefineObject) {
     }
 
     fn ownership_move(&mut self, _context: OwnershipMoveContext) {

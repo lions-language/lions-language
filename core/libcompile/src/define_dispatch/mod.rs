@@ -11,7 +11,7 @@ pub struct FunctionDefineDispatch<'a> {
 }
 
 pub struct BlockDefineDispatch<'a> {
-    processing_blocks: VecDeque<BlockDefineObject>,
+    // processing_blocks: VecDeque<BlockDefineObject>,
     define_stream: &'a mut DefineStream
 }
 

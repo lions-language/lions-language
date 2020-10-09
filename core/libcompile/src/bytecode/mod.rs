@@ -16,7 +16,8 @@ use libgrammar::grammar::{FunctionDefineContext};
 use crate::compile::{StaticContext, CallFunctionContext
     , FunctionNamedStmtContext, Compile
     , LoadStackContext, OwnershipMoveContext
-    , AddressBindContext, ReturnStmtContext};
+    , AddressBindContext, ReturnStmtContext
+    , BlockDefineContext};
 use define_stack::DefineStack;
 use crate::define_dispatch::{FunctionDefineDispatch
     , BlockDefineDispatch
@@ -137,15 +138,12 @@ impl<'a, 'b, F: Writer> Compile for Bytecode<'a, 'b, F> {
 
     fn current_function_statement(&self
         , define_obj: DefineObject) -> Option<FunctionStatementObject> {
-        let ds = define_obj;
-        self.func_define_dispatch.current_function_statement(&ds)
+        self.func_define_dispatch.current_function_statement(&define_obj)
     }
 
     fn current_function_addr_value(&self
         , define_obj: DefineObject) -> FunctionAddrValue {
-        // let ds = self.define_stack.back_unchecked();
-        let ds = define_obj;
-        self.func_define_dispatch.current_function_addr_value(&ds)
+        self.func_define_dispatch.current_function_addr_value(&define_obj)
     }
 
     fn function_define_end(&mut self
@@ -155,19 +153,19 @@ impl<'a, 'b, F: Writer> Compile for Bytecode<'a, 'b, F> {
         self.func_define_dispatch.finish_define(&ds)
     }
 
-    fn enter_block_define(&mut self) {
+    fn enter_block_define(&mut self, define_context: &mut BlockDefineContext) {
         let define_obj = self.block_define_dispatch.alloc_define();
+        *define_context.define_obj_mut() = define_obj.clone();
         self.define_stack.enter(define_obj);
     }
 
-    fn current_block_addr_value(&self) -> FunctionAddrValue {
-        let ds = self.define_stack.back_unchecked();
-        self.block_define_dispatch.current_block_addr_value(ds)
+    fn current_block_addr_value(&self, define_obj: DefineObject) -> FunctionAddrValue {
+        self.block_define_dispatch.current_block_addr_value(&define_obj)
     }
 
-    fn leave_block_define(&mut self) {
+    fn leave_block_define(&mut self, define_obj: DefineObject) {
         self.define_stack.leave();
-        self.block_define_dispatch.finish_define();
+        self.block_define_dispatch.finish_define(&define_obj);
     }
 
     fn ownership_move(&mut self, context: OwnershipMoveContext) {
