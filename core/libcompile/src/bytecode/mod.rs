@@ -12,6 +12,7 @@ use libtype::instruction::{Instruction, CallPrimevalFunction
     , Jump, RemoveOwnership
     , CallSelfFunction
     , AddRefParamAddr, CallPrimevalFunctionParamContext};
+use libgrammar::grammar::{FunctionDefineContext};
 use crate::compile::{StaticContext, CallFunctionContext
     , FunctionNamedStmtContext, Compile
     , LoadStackContext, OwnershipMoveContext
@@ -102,7 +103,8 @@ impl<'a, 'b, F: Writer> Compile for Bytecode<'a, 'b, F> {
     fn function_define_start(&mut self) {
     }
 
-    fn function_named_stmt(&mut self, context: FunctionNamedStmtContext) -> RefPtr {
+    fn function_named_stmt(&mut self, context: FunctionNamedStmtContext
+        , define_context: &mut FunctionDefineContext) -> RefPtr {
         let (statement_ptr, define_obj) = self.func_define_dispatch.alloc_define(context);
         self.define_stack.enter(define_obj);
         statement_ptr

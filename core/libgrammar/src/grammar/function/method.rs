@@ -9,7 +9,7 @@ use crate::grammar::{FunctionDefineContext
   
 impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, CB> {
     pub fn function_object_method(&mut self) {
-        let mut context = FunctionDefineContext::new_with_all(false);
+        let mut define_context = FunctionDefineContext::new_with_all(false);
         /*
          * 读取 object name
          * */
@@ -56,7 +56,8 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         let function_name = self.take_next_one();
         let mut mut_context = ObjectFunctionDefineMutContext::default();
         self.cb().function_object_method_stmt(
-            typ_token, function_name.token_value(), &mut mut_context);
+            typ_token, function_name.token_value(), &mut mut_context
+            , &mut define_context);
         /*
          * 成员方法的第一个参数就是结构体实例, 所以需要添加第一个参数
          * */
@@ -68,9 +69,9 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         /*
          * 添加其余参数
          * */
-        self.function_parse_param_list(1, &mut context, &mut param_mut_context);
+        self.function_parse_param_list(1, &mut define_context, &mut param_mut_context);
         self.function_parse_return();
-        self.function_parse_block(&mut context);
+        self.function_parse_block(&mut define_context);
     }
 
     pub fn function_struct_method(&mut self) {

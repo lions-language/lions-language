@@ -184,7 +184,8 @@ pub trait Compile {
         unimplemented!();
     }
 
-    fn function_named_stmt(&mut self, _context: FunctionNamedStmtContext) -> RefPtr {
+    fn function_named_stmt(&mut self, _context: FunctionNamedStmtContext
+        , _define_context: &mut FunctionDefineContext) -> RefPtr {
         unimplemented!();
     }
 
@@ -333,15 +334,17 @@ impl<'a, F: Compile> Grammar for Compiler<'a, F> {
         self.handle_end()
     }
 
-    fn function_named_stmt(&mut self, value: TokenValue) {
-        self.handle_function_named_stmt(value);
+    fn function_named_stmt(&mut self, value: TokenValue
+        , define_context: &mut FunctionDefineContext) {
+        self.handle_function_named_stmt(value, define_context);
     }
     
     fn function_object_method_stmt(&mut self
         , object_type: TypeToken, func_name: TokenValue
-        , mut_context: &mut ObjectFunctionDefineMutContext) {
+        , mut_context: &mut ObjectFunctionDefineMutContext
+        , define_context: &mut FunctionDefineContext) {
         self.handle_function_object_method_stmt(object_type
-            , func_name, mut_context);
+            , func_name, mut_context, define_context);
     }
 
     fn function_define_start(&mut self, _value: TokenValue) {

@@ -247,7 +247,8 @@ pub trait Grammar {
     fn operator_positive(&mut self, value: TokenValue) {
         value.print_token_type(Some("prefix operator:"));
     }
-    fn function_named_stmt(&mut self, func_name: TokenValue) {
+    fn function_named_stmt(&mut self, func_name: TokenValue
+        , define_context: &mut FunctionDefineContext) {
         /*
          * 命名函数语句
          * */
@@ -255,7 +256,8 @@ pub trait Grammar {
     }
     fn function_object_method_stmt(&mut self
         , _object_type: TypeToken, _function_name: TokenValue
-        , _mut_context: &mut ObjectFunctionDefineMutContext) {
+        , _mut_context: &mut ObjectFunctionDefineMutContext
+        , _define_context: &mut FunctionDefineContext) {
         unimplemented!("function_object_memthod_stmt");
     }
     fn function_struct_method_stmt(&mut self) {

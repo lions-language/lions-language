@@ -21,7 +21,8 @@ use crate::compile::scope::ScopeType;
 use crate::address::Address;
 
 impl<'a, F: Compile> Compiler<'a, F> {
-    pub fn handle_function_named_stmt(&mut self, value: TokenValue) {
+    pub fn handle_function_named_stmt(&mut self, value: TokenValue
+        , define_context: &mut FunctionDefineContext) {
         self.scope_context.enter(ScopeType::Function);
         let s = match value.token_data.expect("should not happend") {
             TokenData::Id(v) => {
@@ -34,7 +35,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
         self.cb.function_named_stmt(FunctionNamedStmtContext{
             name: s,
             typ: None
-        });
+        }, define_context);
     }
 
     pub fn handle_function_define_param(&mut self, context: FunctionDefineParamContext
