@@ -11,6 +11,7 @@ use libgrammar::grammar::{Grammar, CallFuncScopeContext
     , FunctionDefineReturnContext
     , FunctionDefineContext
     , BlockDefineContext
+    , IfStmtContext
     , StructDefineFieldContext
     , ReturnStmtContext as GrammarReturnStmtContext
     , ObjectFunctionDefineMutContext, TypeToken
@@ -415,8 +416,37 @@ impl<'a, F: Compile> Grammar for Compiler<'a, F> {
     }
 
     fn return_stmt(&mut self, context: GrammarReturnStmtContext) -> DescResult {
-        self.handle_return_stmt(context);
-        DescResult::Success
+        self.handle_return_stmt(context)
+    }
+    
+    fn if_stmt_start(&mut self, stmt_context: &mut IfStmtContext
+        , define_context: &mut BlockDefineContext) -> DescResult {
+        self.process_if_stmt_start(stmt_context, define_context)
+    }
+
+    fn if_stmt_branch_start(&mut self, stmt_context: &mut IfStmtContext
+        , define_context: &mut BlockDefineContext) -> DescResult {
+        self.process_if_stmt_branch_start(stmt_context, define_context)
+    }
+
+    fn if_stmt_expr_start(&mut self, stmt_context: &mut IfStmtContext
+        , define_context: &mut BlockDefineContext) -> DescResult {
+        self.process_if_stmt_expr_start(stmt_context, define_context)
+    }
+
+    fn if_stmt_expr_end(&mut self, stmt_context: &mut IfStmtContext
+        , define_context: &mut BlockDefineContext) -> DescResult {
+        self.process_if_stmt_expr_end(stmt_context, define_context)
+    }
+
+    fn if_stmt_branch_end(&mut self, stmt_context: &mut IfStmtContext
+        , define_context: &mut BlockDefineContext) -> DescResult {
+        self.process_if_stmt_branch_end(stmt_context, define_context)
+    }
+
+    fn if_stmt_end(&mut self, stmt_context: &mut IfStmtContext
+        , define_context: &mut BlockDefineContext) -> DescResult {
+        self.process_if_stmt_end(stmt_context, define_context)
     }
 
     fn anonymous_block_start(&mut self) {

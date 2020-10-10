@@ -353,10 +353,41 @@ pub trait Grammar {
     }
     fn if_stmt_start(&mut self, _stmt_context: &mut IfStmtContext
         , _define_context: &mut BlockDefineContext) -> DescResult {
+        /*
+         * 整个 if 语句开始
+         * */
+        unimplemented!();
+    }
+    fn if_stmt_expr_start(&mut self, _stmt_context: &mut IfStmtContext
+        , _define_context: &mut BlockDefineContext) -> DescResult {
+        /*
+         * if 语句 过程中的 表达式开始
+         * */
+        unimplemented!();
+    }
+    fn if_stmt_expr_end(&mut self, _stmt_context: &mut IfStmtContext
+        , _define_context: &mut BlockDefineContext) -> DescResult {
+        unimplemented!();
+    }
+    fn if_stmt_branch_start(&mut self, _stmt_context: &mut IfStmtContext
+        , _define_context: &mut BlockDefineContext) -> DescResult {
+        /*
+         * if语句中的 分支 开始
+         * */
+        unimplemented!();
+    }
+    fn if_stmt_branch_end(&mut self, _stmt_context: &mut IfStmtContext
+        , _define_context: &mut BlockDefineContext) -> DescResult {
+        /*
+         * if语句中的 分支 结束
+         * */
         unimplemented!();
     }
     fn if_stmt_end(&mut self, _stmt_context: &mut IfStmtContext
-        , _define_context: &mut BlockDefineContext) -> DescContext {
+        , _define_context: &mut BlockDefineContext) -> DescResult {
+        /*
+         * 整个 if 语句的结束
+         * */
         unimplemented!();
     }
     fn anonymous_block_start(&mut self) {
