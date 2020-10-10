@@ -72,7 +72,7 @@ impl HeapPtr {
 
 impl Default for HeapPtr {
     fn default() -> Self {
-        Self::default()
+        Self::new_null()
     }
 }
 

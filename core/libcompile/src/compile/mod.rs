@@ -227,7 +227,8 @@ pub trait Compile {
         unimplemented!();
     }
 
-    fn leave_block_define(&mut self, _define_obj: DefineObject) {
+    fn leave_block_define(&mut self, _define_obj: DefineObject) -> FunctionAddrValue {
+        unimplemented!();
     }
 
     fn ownership_move(&mut self, _context: OwnershipMoveContext) {

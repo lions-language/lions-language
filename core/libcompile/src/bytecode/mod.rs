@@ -163,9 +163,9 @@ impl<'a, 'b, F: Writer> Compile for Bytecode<'a, 'b, F> {
         self.block_define_dispatch.current_block_addr_value(&define_obj)
     }
 
-    fn leave_block_define(&mut self, define_obj: DefineObject) {
+    fn leave_block_define(&mut self, define_obj: DefineObject) -> FunctionAddrValue {
         self.define_stack.leave();
-        self.block_define_dispatch.finish_define(&define_obj);
+        self.block_define_dispatch.finish_define(&define_obj)
     }
 
     fn ownership_move(&mut self, context: OwnershipMoveContext) {

@@ -1,6 +1,7 @@
 use crate::lexical::{LexicalParser, CallbackReturnStatus, TokenVecItem, TokenPointer};
 use crate::token::{TokenType, TokenValue, TokenMethodResult};
 use libcommon::ptr::{RefPtr, HeapPtr};
+use libcommon::address::{FunctionAddrValue};
 use libtype::{Type, PackageType, TypeAttrubute
     , function::FunctionParamLengthenAttr
     , structure::StructDefine};
@@ -169,7 +170,8 @@ pub struct FunctionDefineContext {
 #[derive(Debug, Default, FieldGet, NewWithAll, FieldGetMove
     , FieldGetClone)]
 pub struct BlockDefineContext {
-    define_obj: HeapPtr
+    define_obj: HeapPtr,
+    define_addr: FunctionAddrValue
 }
 
 #[derive(Debug, Default, FieldGet, NewWithAll, FieldGetMove
@@ -200,6 +202,11 @@ pub enum TypeToken {
     , FieldGetClone)]
 pub struct ReturnStmtContext {
     is_exist_expr: bool
+}
+
+#[derive(Debug, Clone, Default
+    , FieldGet, FieldGetClone)]
+pub struct IfStmtContext {
 }
 
 #[derive(Debug, FieldGet, FieldGetClone
@@ -343,6 +350,14 @@ pub trait Grammar {
     fn return_stmt(&mut self, _context: ReturnStmtContext) -> DescResult {
         println!("return stmt");
         DescResult::Success
+    }
+    fn if_stmt_start(&mut self, _stmt_context: &mut IfStmtContext
+        , _define_context: &mut BlockDefineContext) -> DescResult {
+        unimplemented!();
+    }
+    fn if_stmt_end(&mut self, _stmt_context: &mut IfStmtContext
+        , _define_context: &mut BlockDefineContext) -> DescContext {
+        unimplemented!();
     }
     fn anonymous_block_start(&mut self) {
         println!("anonymous block start");

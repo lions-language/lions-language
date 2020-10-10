@@ -4,6 +4,7 @@ use libtype::function::{AddFunctionContext};
 use libtype::{PackageType, PackageTypeValue};
 use crate::compile::{Compile, Compiler, FunctionNamedStmtContext};
 use crate::compile::scope::{ScopeType};
+use crate::define::{DefineObject};
 
 impl<'a, F: Compile> Compiler<'a, F> {
     pub fn process_anonymous_block_start(&mut self) {
@@ -17,9 +18,11 @@ impl<'a, F: Compile> Compiler<'a, F> {
     }
 
     pub fn process_block_define_start(&mut self, define_context: &mut BlockDefineContext) {
+        self.cb.enter_block_define(define_context);
     }
 
     pub fn process_block_define_end(&mut self, define_context: &mut BlockDefineContext) {
+        let addr = self.cb.leave_block_define(DefineObject::new(define_context.define_obj_clone()));
     }
 }
 

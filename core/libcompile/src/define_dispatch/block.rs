@@ -23,11 +23,12 @@ impl<'a> BlockDefineDispatch<'a> {
         addr_value
     }
 
-    pub fn finish_define(&mut self, define_obj: &DefineObject) {
+    pub fn finish_define(&mut self, define_obj: &DefineObject) -> FunctionAddrValue {
         /*
          * 释放 BlockDefine 对象 (get 后 rust自动释放)
          * */
-        define_obj.get::<BlockDefine>();
+        let block_define = define_obj.get::<BlockDefine>();
+        block_define.block_addr_value().clone()
     }
 
     pub fn new(ds: &'a mut DefineStream) -> Self {

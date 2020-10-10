@@ -1,8 +1,9 @@
 use libcommon::ptr::{HeapPtr};
+use libcommon::address::{FunctionAddrValue};
 use libresult::{DescResult};
 use super::{GrammarParser, Grammar, NextToken, ExpressContext
     , VarStmtContext};
-use crate::grammar::{BlockDefineContext};
+use crate::grammar::{BlockDefineContext, IfStmtContext};
 use crate::lexical::{CallbackReturnStatus, TokenVecItem, TokenPointer};
 use crate::token::{TokenType, TokenValue};
 
@@ -36,9 +37,9 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
          * 跳过 `{`
          * */
         // self.skip_next_one();
-        let mut define_context = BlockDefineContext{
-            define_obj: HeapPtr::new_null()
-        };
+        let mut stmt_context = IfStmtContext::default();
+        let mut define_context = BlockDefineContext::default();
+        self.cb().if_stmt_start(&mut stmt_context, &mut define_context);
         self.cb().block_define_start(&mut define_context);
         self.parse_block_content();
         /*
@@ -46,5 +47,6 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
          * */
         self.skip_next_one();
         self.cb().block_define_end(&mut define_context);
+        self.cb().if_stmt_end(&mut stmt_context, &mut define_context);
     }
 }
