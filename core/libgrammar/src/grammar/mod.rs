@@ -168,6 +168,12 @@ pub struct FunctionDefineContext {
 
 #[derive(Debug, Default, FieldGet, NewWithAll, FieldGetMove
     , FieldGetClone)]
+pub struct BlockDefineContext {
+    define_obj: HeapPtr
+}
+
+#[derive(Debug, Default, FieldGet, NewWithAll, FieldGetMove
+    , FieldGetClone)]
 pub struct StructDefineContext {
 }
 
@@ -283,6 +289,10 @@ pub trait Grammar {
          * 命名函数函数体结束
          * */
         println!("named function define end");
+    }
+    fn block_define_start(&mut self, _define_context: &mut BlockDefineContext) {
+    }
+    fn block_define_end(&mut self, _define_context: &mut BlockDefineContext) {
     }
     fn call_function_prepare(&mut self, _context: CallFuncScopeContext
         , _: &mut CallFunctionContext) -> DescResult {

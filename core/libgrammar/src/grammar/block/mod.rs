@@ -9,6 +9,15 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
          * */
         self.skip_next_one();
         self.cb().anonymous_block_start();
+        self.parse_block_content();
+        /*
+         * 到达这里说明 next token 是 } => 跳过 `}`
+         * */
+        let t = self.skip_next_one();
+        self.cb().anonymous_block_end();
+    }
+
+    pub fn parse_block_content(&mut self) {
         let tp = match self.skip_white_space_token() {
             Some(tp) => {
                 tp
@@ -58,10 +67,5 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                 });
             }
         }
-        /*
-         * 到达这里说明 next token 是 } => 跳过 `}`
-         * */
-        let t = self.skip_next_one();
-        self.cb().anonymous_block_end();
     }
 }

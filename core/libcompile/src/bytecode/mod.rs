@@ -12,12 +12,12 @@ use libtype::instruction::{Instruction, CallPrimevalFunction
     , Jump, RemoveOwnership
     , CallSelfFunction
     , AddRefParamAddr, CallPrimevalFunctionParamContext};
-use libgrammar::grammar::{FunctionDefineContext};
+use libgrammar::grammar::{FunctionDefineContext
+    , BlockDefineContext};
 use crate::compile::{StaticContext, CallFunctionContext
     , FunctionNamedStmtContext, Compile
     , LoadStackContext, OwnershipMoveContext
-    , AddressBindContext, ReturnStmtContext
-    , BlockDefineContext};
+    , AddressBindContext, ReturnStmtContext};
 use define_stack::DefineStack;
 use crate::define_dispatch::{FunctionDefineDispatch
     , BlockDefineDispatch
@@ -155,7 +155,7 @@ impl<'a, 'b, F: Writer> Compile for Bytecode<'a, 'b, F> {
 
     fn enter_block_define(&mut self, define_context: &mut BlockDefineContext) {
         let define_obj = self.block_define_dispatch.alloc_define();
-        *define_context.define_obj_mut() = define_obj.clone();
+        *define_context.define_obj_mut() = define_obj.original().clone();
         self.define_stack.enter(define_obj);
     }
 

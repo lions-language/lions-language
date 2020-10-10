@@ -10,6 +10,7 @@ use libgrammar::grammar::{Grammar, CallFuncScopeContext
     , FunctionDefineParamMutContext
     , FunctionDefineReturnContext
     , FunctionDefineContext
+    , BlockDefineContext
     , StructDefineFieldContext
     , ReturnStmtContext as GrammarReturnStmtContext
     , ObjectFunctionDefineMutContext, TypeToken
@@ -138,12 +139,6 @@ pub struct AddressBindContext {
 pub struct ReturnStmtContext {
     scope: usize,
     addr_value: AddressValue
-}
-
-#[derive(Clone, Debug, FieldGet
-    , FieldGetClone)]
-pub struct BlockDefineContext {
-    define_obj: DefineObject
 }
 
 trait TokenValueExpand {
@@ -380,6 +375,16 @@ impl<'a, F: Compile> Grammar for Compiler<'a, F> {
         self.handle_function_define_end(define_context);
     }
 
+    fn block_define_start(&mut self
+        , define_context: &mut BlockDefineContext) {
+        self.process_block_define_start(define_context);
+    }
+
+    fn block_define_end(&mut self
+        , define_context: &mut BlockDefineContext) {
+        self.process_block_define_end(define_context);
+    }
+
     fn call_function_prepare(&mut self, scope_context: CallFuncScopeContext
         , call_context: &mut GrammarCallFunctionContext) -> DescResult {
         self.handle_call_function_prepare(scope_context, call_context)
@@ -502,6 +507,7 @@ mod block;
 mod structure;
 mod structinit;
 mod point_access;
+mod process_if;
 
 #[cfg(test)]
 mod test {

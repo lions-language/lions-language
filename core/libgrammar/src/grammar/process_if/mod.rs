@@ -1,6 +1,8 @@
+use libcommon::ptr::{HeapPtr};
 use libresult::{DescResult};
 use super::{GrammarParser, Grammar, NextToken, ExpressContext
     , VarStmtContext};
+use crate::grammar::{BlockDefineContext};
 use crate::lexical::{CallbackReturnStatus, TokenVecItem, TokenPointer};
 use crate::token::{TokenType, TokenValue};
 
@@ -30,6 +32,19 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
          * 解析 block
          * */
         self.expect_and_take_next_token_unchecked(TokenType::LeftBigParenthese);
-        self.process_block();
+        /*
+         * 跳过 `{`
+         * */
+        // self.skip_next_one();
+        let mut define_context = BlockDefineContext{
+            define_obj: HeapPtr::new_null()
+        };
+        self.cb().block_define_start(&mut define_context);
+        self.parse_block_content();
+        /*
+         * 到达这里说明 next token 是 } => 跳过 `}`
+         * */
+        self.skip_next_one();
+        self.cb().block_define_end(&mut define_context);
     }
 }
