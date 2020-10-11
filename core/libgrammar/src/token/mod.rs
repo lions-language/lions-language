@@ -51,6 +51,10 @@ pub enum TokenType {
     Return,
     // struct
     Structure,
+    // true
+    True,
+    // false
+    False,
     // ->
     RightArrow,
     // (

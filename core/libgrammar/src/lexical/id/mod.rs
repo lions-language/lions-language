@@ -1,6 +1,7 @@
 use super::{LexicalParser, CallbackReturnStatus};
 use crate::token::{TokenType, TokenData};
 use id::IdToken;
+use boolean::TrueToken;
 use crate::grammar::Grammar;
 use libtype::primeval::{PrimevalType};
 
@@ -83,6 +84,22 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
         self.id_push_keyword_token(TokenType::Structure);
     }
 
+    fn id_kw_true(&mut self) {
+        /*
+         * true
+         * */
+        let context = self.build_token_context(TokenType::True, TokenData::Id(s.to_string()));
+        self.push_to_token_buffer(TrueToken::new(context));
+        self.id_push_keyword_token(TokenType::True);
+    }
+
+    fn id_kw_false(&mut self) {
+        /*
+         * false
+         * */
+        self.id_push_keyword_token(TokenType::False);
+    }
+
     fn id_primeval_type(&mut self, typ: PrimevalType) {
         self.push_nooperate_nodata_token_to_token_buffer(TokenType::PrimevalType(typ));
     }
@@ -141,6 +158,12 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
             },
             "struct" => {
                 self.id_kw_struct();
+            },
+            "true" => {
+                self.id_kw_true();
+            },
+            "false" => {
+                self.id_kw_false();
             },
             _ => {
                 self.id(&s);

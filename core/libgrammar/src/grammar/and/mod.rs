@@ -46,6 +46,20 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
             TokenType::LeftParenthese => {
                 self.expression_process_start_with_parenthese();
             },
+            TokenType::True => {
+                /*
+                 * true
+                 * */
+                self.true_process(DescContext::new(
+                                TypeAttrubute::Ref));
+            },
+            TokenType::False => {
+                /*
+                 * false
+                 * */
+                self.false_process(DescContext::new(
+                                TypeAttrubute::Ref));
+            },
             _ => {
                 self.panic(&format!("{:?} should not after `&`", next_token_type));
             }

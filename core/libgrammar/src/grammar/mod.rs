@@ -127,6 +127,12 @@ pub struct ConstStringContext {
     typ_attr: TypeAttrubute
 }
 
+#[derive(FieldGet, NewWithAll, FieldGetMove)]
+pub struct ConstBooleanContext {
+    value: TokenValue,
+    typ_attr: TypeAttrubute
+}
+
 #[derive(Debug)]
 pub enum FunctionDefineParamContextType {
     Token(TypeToken),
@@ -233,6 +239,12 @@ pub trait Grammar {
     }
     fn const_string(&mut self, context: ConstStringContext) {
         context.value.print_token_type(None);
+    }
+    fn const_boolean_true(&mut self, _context: ConstBooleanContext) {
+        unimplemented!();
+    }
+    fn const_boolean_false(&mut self, _context: ConstBooleanContext) {
+        unimplemented!();
     }
     fn load_variant(&mut self, _context: LoadVariantContext) -> DescResult {
         println!("load variant");
@@ -734,6 +746,7 @@ mod typ;
 mod structure;
 mod structinit;
 mod process_if;
+mod boolean;
 
 #[cfg(test)]
 mod test {

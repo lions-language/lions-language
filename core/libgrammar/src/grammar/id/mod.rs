@@ -1,9 +1,7 @@
-use libtype::{PackageType, PackageTypeValue
-    , TypeAttrubute};
+use libtype::{PackageType, PackageTypeValue};
 use libtype::package::{PackageStr};
 use libresult::DescResult;
 use super::{GrammarParser, Grammar
-    , ExpressContext
     , CallFuncScopeContext, LoadVariantContext
     , DescContext};
 use crate::lexical::{CallbackReturnStatus};
@@ -19,9 +17,12 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                  * 查看下一个 token
                  * */
                 let token = tp.as_ref::<T, CB>();
-                if let TokenType::ThreePoint = token.context_token_type() {
-                    lengthen_offset = self.id_process_three_point();
-                };
+                match token.context_token_type() {
+                    TokenType::ThreePoint => {
+                        lengthen_offset = self.id_process_three_point();
+                    },
+                    _ => {}
+                }
             },
             None => {
             }

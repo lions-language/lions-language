@@ -505,6 +505,7 @@ mod point;
 mod comma;
 mod and;
 mod annotate;
+mod boolean;
 
 #[cfg(test)]
 mod test {
