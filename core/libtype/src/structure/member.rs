@@ -117,6 +117,7 @@ impl StructMember {
 
 #[cfg(test)]
 mod test {
+    use libcommon::ptr::HeapPtr;
     use super::*;
     use crate::primeval::PrimevalType;
     use crate::{TypeAttrubute, Primeval
@@ -131,30 +132,36 @@ mod test {
             /*
              * add cert
              * */
-            cert_m.add(String::from("cert_name"), &Type::new(
+            cert_m.add(String::from("cert_name"), Type::new(
                     TypeValue::Primeval(Primeval::new(PrimevalType::Str))
-                , TypeAttrubute::Empty));
-            cert_m.add(String::from("cert_no"), &Type::new(
+                , TypeAttrubute::Empty), TypeAttrubute::Ref
+                , AddressType::Static);
+            cert_m.add(String::from("cert_no"), Type::new(
                     TypeValue::Primeval(Primeval::new(PrimevalType::Uint64))
-                    , TypeAttrubute::Empty));
+                    , TypeAttrubute::Empty), TypeAttrubute::Move
+                    , AddressType::Stack);
         }
         let cert_define = StructDefine::new_with_all(String::from("user_info")
             , Some(cert_m));
         /*
          * add root
          * */
-        root_m.add(String::from("user_name"), &Type::new(
+        root_m.add(String::from("user_name"), Type::new(
                 TypeValue::Primeval(Primeval::new(PrimevalType::Str))
-            , TypeAttrubute::Empty));
-        root_m.add(String::from("user_age"), &Type::new(
+                , TypeAttrubute::Empty), TypeAttrubute::Ref
+                , AddressType::Static);
+        root_m.add(String::from("user_age"), Type::new(
                 TypeValue::Primeval(Primeval::new(PrimevalType::Uint8))
-                , TypeAttrubute::Empty));
-        root_m.add(String::from("cert"), &Type::new(
-                TypeValue::Structure(Structure::new(StructObject::from_ref(&cert_define)))
-                    , TypeAttrubute::Empty));
-        root_m.add(String::from("user_no"), &Type::new(
+                , TypeAttrubute::Empty), TypeAttrubute::Move
+                , AddressType::Stack);
+        root_m.add(String::from("cert"), Type::new(
+                TypeValue::Structure(Structure::new(StructObject::new(HeapPtr::alloc(cert_define))))
+                    , TypeAttrubute::Empty), TypeAttrubute::Move
+                    , AddressType::Stack);
+        root_m.add(String::from("user_no"), Type::new(
                 TypeValue::Primeval(Primeval::new(PrimevalType::Str))
-            , TypeAttrubute::Empty));
+                , TypeAttrubute::Empty), TypeAttrubute::Ref
+                , AddressType::Static);
         root_m.print_members();
     }
 }

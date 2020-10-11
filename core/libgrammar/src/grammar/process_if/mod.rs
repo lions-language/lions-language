@@ -29,12 +29,12 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         };
         let mut stmt_context = IfStmtContext::default();
         let mut define_context = BlockDefineContext::default();
-        self.cb().if_stmt_start(&mut stmt_context, &mut define_context);
-        self.cb().if_stmt_branch_start(&mut stmt_context, &mut define_context);
-        self.cb().if_stmt_expr_start(&mut stmt_context, &mut define_context);
+        check_desc_result!(self, self.cb().if_stmt_start(&mut stmt_context, &mut define_context));
+        check_desc_result!(self, self.cb().if_stmt_branch_start(&mut stmt_context, &mut define_context));
+        check_desc_result!(self, self.cb().if_stmt_expr_start(&mut stmt_context, &mut define_context));
         self.expression_process(&tp
             , &ExpressContext::new(GrammarParser::<T, CB>::expression_end_left_big_parenthese));
-        self.cb().if_stmt_expr_end(&mut stmt_context, &mut define_context);
+        check_desc_result!(self, self.cb().if_stmt_expr_end(&mut stmt_context, &mut define_context));
         /*
          * 解析 block
          * */
@@ -43,14 +43,14 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
          * 跳过 `{`
          * */
         // self.skip_next_one();
-        self.cb().block_define_start(&mut define_context);
+        check_desc_result!(self, self.cb().block_define_start(&mut define_context));
         self.parse_block_content();
         /*
          * 到达这里说明 next token 是 } => 跳过 `}`
          * */
         self.skip_next_one();
-        self.cb().block_define_end(&mut define_context);
-        self.cb().if_stmt_branch_end(&mut stmt_context, &mut define_context);
-        self.cb().if_stmt_end(&mut stmt_context, &mut define_context);
+        check_desc_result!(self, self.cb().block_define_end(&mut define_context));
+        check_desc_result!(self, self.cb().if_stmt_branch_end(&mut stmt_context, &mut define_context));
+        check_desc_result!(self, self.cb().if_stmt_end(&mut stmt_context, &mut define_context));
     }
 }

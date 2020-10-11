@@ -171,7 +171,8 @@ impl Default for TypeAttrubute {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq
+    , FieldGet)]
 pub struct Primeval {
     pub typ: PrimevalType
 }

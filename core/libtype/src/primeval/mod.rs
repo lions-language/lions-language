@@ -27,6 +27,7 @@ pub enum PrimevalType {
     Float32,
     Float64,
     Str,
+    Boolean,
     OrderSeque
 }
 

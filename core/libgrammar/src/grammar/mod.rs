@@ -1,3 +1,4 @@
+use libtype::AddressValue;
 use crate::lexical::{LexicalParser, CallbackReturnStatus, TokenVecItem, TokenPointer};
 use crate::token::{TokenType, TokenValue, TokenMethodResult};
 use libcommon::ptr::{RefPtr, HeapPtr};
@@ -207,6 +208,7 @@ pub struct ReturnStmtContext {
 #[derive(Debug, Clone, Default
     , FieldGet, FieldGetClone)]
 pub struct IfStmtContext {
+    cur_expr_result_addr: AddressValue
 }
 
 #[derive(Debug, FieldGet, FieldGetClone
@@ -297,9 +299,13 @@ pub trait Grammar {
          * */
         println!("named function define end");
     }
-    fn block_define_start(&mut self, _define_context: &mut BlockDefineContext) {
+    fn block_define_start(&mut self, _define_context: &mut BlockDefineContext)
+        -> DescResult {
+        unimplemented!();
     }
-    fn block_define_end(&mut self, _define_context: &mut BlockDefineContext) {
+    fn block_define_end(&mut self, _define_context: &mut BlockDefineContext)
+        -> DescResult {
+        unimplemented!();
     }
     fn call_function_prepare(&mut self, _context: CallFuncScopeContext
         , _: &mut CallFunctionContext) -> DescResult {

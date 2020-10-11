@@ -32,6 +32,24 @@ impl Type {
         }
     }
 
+    pub fn is_boolean(&self) -> bool {
+        match self.typ_ref() {
+            TypeValue::Primeval(v) => {
+                match v.typ_ref() {
+                    PrimevalType::Boolean => {
+                        true
+                    },
+                    _ => {
+                        false
+                    }
+                }
+            },
+            _ => {
+                false
+            }
+        }
+    }
+
     pub fn addr_length(&self) -> usize {
         match self.typ_ref() {
             TypeValue::Structure(dp) => {

@@ -1,4 +1,5 @@
 use crate::token::TokenData;
+use libresult::DescResult;
 
 #[macro_use]
 extern crate lazy_static;
@@ -15,6 +16,18 @@ macro_rules! extract_token_data {
             }
         }
     }
+}
+
+#[macro_export]
+macro_rules! check_desc_result {
+    ($this:expr, $e:expr) => {
+        match $e {
+            DescResult::Error(e) => {
+                $this.panic(&e);
+            },
+            _ => {}
+        }
+    };
 }
 
 pub mod lexical;

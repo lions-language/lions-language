@@ -378,13 +378,13 @@ impl<'a, F: Compile> Grammar for Compiler<'a, F> {
     }
 
     fn block_define_start(&mut self
-        , define_context: &mut BlockDefineContext) {
-        self.process_block_define_start(define_context);
+        , define_context: &mut BlockDefineContext) -> DescResult {
+        self.process_block_define_start(define_context)
     }
 
     fn block_define_end(&mut self
-        , define_context: &mut BlockDefineContext) {
-        self.process_block_define_end(define_context);
+        , define_context: &mut BlockDefineContext) -> DescResult {
+        self.process_block_define_end(define_context)
     }
 
     fn call_function_prepare(&mut self, scope_context: CallFuncScopeContext
