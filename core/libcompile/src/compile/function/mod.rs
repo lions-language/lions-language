@@ -24,9 +24,6 @@ use crate::address::Address;
 impl<'a, F: Compile> Compiler<'a, F> {
     pub fn handle_function_named_stmt(&mut self, value: TokenValue
         , define_context: &mut FunctionDefineContext) {
-        self.scope_context.enter_with_define_obj(
-            DefineObject::new(define_context.define_obj_clone())
-            , ScopeType::Function);
         let s = match value.token_data.expect("should not happend") {
             TokenData::Id(v) => {
                 v
@@ -39,6 +36,9 @@ impl<'a, F: Compile> Compiler<'a, F> {
             name: s,
             typ: None
         }, define_context);
+        self.scope_context.enter_with_define_obj(
+            DefineObject::new(define_context.define_obj_clone())
+            , ScopeType::Function);
     }
 
     pub fn handle_function_define_param(&mut self, context: FunctionDefineParamContext
