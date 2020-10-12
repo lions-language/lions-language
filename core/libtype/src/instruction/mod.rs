@@ -156,6 +156,7 @@ pub struct BlockDefine {
 #[derive(Debug, Clone, FieldGet, NewWithAll
     , FieldGetMove, FieldGetClone, Default)]
 pub struct ConditionStmt {
+    expr_addr: AddressValue,
     true_block: BlockDefine,
     false_block: BlockDefine
 }

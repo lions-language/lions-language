@@ -90,6 +90,9 @@ impl VirtualMachine {
             Instruction::ReturnStmt(v) => {
                 return self.process_return_stmt(v);
             },
+            Instruction::ConditionStmt(v) => {
+                self.process_condition_stmt(v);
+            },
             Instruction::ReadStaticVariant(v) => {
                 self.read_static_variant(v);
             },
@@ -230,6 +233,7 @@ mod thread_context;
 mod ownership;
 mod address;
 mod process_return;
+mod process_condition;
 
 #[cfg(test)]
 mod test {

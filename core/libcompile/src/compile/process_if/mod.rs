@@ -49,7 +49,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
          * */
         // println!("{:?}, {:?}", stmt_context, define_context);
         self.cb.condition_stmt(ConditionStmt::new_with_all(
-                BlockDefine::new_with_all(define_context.define_addr_clone())
+                stmt_context.cur_expr_result_addr_clone()
+                , BlockDefine::new_with_all(define_context.define_addr_clone())
                 , BlockDefine::default()));
         DescResult::Success
     }
