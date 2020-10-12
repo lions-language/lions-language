@@ -1,7 +1,9 @@
 use libgrammar::grammar::{ConstNumberContext};
+use libgrammar::token::{TokenType, TokenValue, TokenData};
 use libtype::package::PackageStr;
 use libtype::{AddressValue
-    , AddressType};
+    , AddressType, Type
+    , TypeValue, Primeval};
 use crate::address::{Address};
 use crate::compile::{Compile, Compiler
     , LoadStackContext, TokenValueExpand};
@@ -17,7 +19,16 @@ impl<'a, F: Compile> Compiler<'a, F> {
          *  1. 将 Type 中的 TypeAttrubute 去掉
          *  2. 将 这些属性放在 Param (函数参数) 中
          * */
-        let typ = value.to_type().clone();
+        // let typ = value.to_type().clone();
+        let typ = match value.token_type_clone() {
+            TokenType::Const(t) => {
+                Type::new(TypeValue::Primeval(Primeval::new(
+                            t)), typ_attr.clone())
+            },
+            _ => {
+                panic!("should not happend");
+            }
+        };
         /*
          * 在栈上分配一个地址
          * */

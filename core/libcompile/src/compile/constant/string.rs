@@ -1,6 +1,7 @@
-use libgrammar::token::{TokenValue};
+use libgrammar::token::{TokenValue, TokenType};
 use libgrammar::grammar::{ConstStringContext};
-use libtype::{AddressValue, AddressType};
+use libtype::{AddressValue, AddressType
+    , Type, TypeValue, Primeval};
 use libtype::package::PackageStr;
 use crate::compile::{Compile, Compiler, StaticContext
     , TokenValueExpand};
@@ -14,7 +15,16 @@ impl<'a, F: Compile> Compiler<'a, F> {
         /*
          * TokenType 转换为 Type
          * */
-        let typ = value.to_type().clone();
+        // let typ = value.to_type().clone();
+        let typ = match value.token_type_clone() {
+            TokenType::Const(t) => {
+                Type::new(TypeValue::Primeval(Primeval::new(
+                            t)), typ_attr.clone())
+            },
+            _ => {
+                panic!("should not happend");
+            }
+        };
         /*
          * 在静态区分配一个地址, 并将数据写入到静态区
          * 该操作不会生成到指令中

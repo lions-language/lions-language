@@ -2,7 +2,7 @@ use libcommon::ptr::RefPtr;
 use libcommon::address::{FunctionAddrValue};
 use libgrammar::grammar::{Grammar, CallFuncScopeContext
     , VarStmtContext, LoadVariantContext as GrammarLoadVariantContext
-    , ConstNumberContext, ConstStringContext
+    , ConstNumberContext, ConstStringContext, ConstBooleanContext
     , CallFunctionContext as GrammarCallFunctionContext
     , StructInitContext as GrammarStructInitContext
     , StructInitFieldContext
@@ -143,7 +143,7 @@ pub struct ReturnStmtContext {
 }
 
 trait TokenValueExpand {
-    fn to_type(&self) -> Type;
+    // fn to_type(&self) -> Type;
     fn to_data(self) -> Data;
 }
 
@@ -330,6 +330,10 @@ impl<'a, F: Compile> Grammar for Compiler<'a, F> {
 
     fn const_string(&mut self, context: ConstStringContext) {
         self.handle_const_string(context);
+    }
+
+    fn const_boolean(&mut self, context: ConstBooleanContext) {
+        self.process_const_boolean(context);
     }
 
     fn load_variant(&mut self, context: GrammarLoadVariantContext) -> DescResult {
@@ -539,6 +543,7 @@ mod structure;
 mod structinit;
 mod point_access;
 mod process_if;
+mod boolean;
 
 #[cfg(test)]
 mod test {

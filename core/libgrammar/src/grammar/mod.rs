@@ -240,10 +240,7 @@ pub trait Grammar {
     fn const_string(&mut self, context: ConstStringContext) {
         context.value.print_token_type(None);
     }
-    fn const_boolean_true(&mut self, _context: ConstBooleanContext) {
-        unimplemented!();
-    }
-    fn const_boolean_false(&mut self, _context: ConstBooleanContext) {
+    fn const_boolean(&mut self, _context: ConstBooleanContext) {
         unimplemented!();
     }
     fn load_variant(&mut self, _context: LoadVariantContext) -> DescResult {

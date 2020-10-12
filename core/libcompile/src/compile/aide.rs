@@ -35,17 +35,23 @@ impl<'a, F: Compile> Compiler<'a, F> {
 }
 
 impl TokenValueExpand for TokenValue {
+    /*
     fn to_type(&self) -> Type {
         match self.token_type_clone() {
             TokenType::Const(t) => {
                 Type::new(TypeValue::Primeval(Primeval::new(
                             t)), TypeAttrubute::Ref/*TODO*/)
             },
+            TokenType::True => {
+            },
+            TokenType::False => {
+            },
             _ => {
                 unimplemented!();
             }
         }
     }
+    */
 
     fn to_data(self) -> Data {
         match self.token_data {
