@@ -1,5 +1,5 @@
 use libcommon::optcode;
-use libcommon::address::{FunctionAddress};
+use libcommon::address::{FunctionAddress, FunctionAddrValue};
 use libmacro::{FieldGet, FieldGetClone
     , NewWithAll, FieldGetMove};
 use crate::function::{CallFunctionParamAddr
@@ -147,6 +147,19 @@ pub struct AddRefParamAddr {
     dst_addr: AddressValue
 }
 
+#[derive(Debug, Clone, FieldGet, NewWithAll
+    , FieldGetMove, FieldGetClone, Default)]
+pub struct BlockDefine {
+    addr: FunctionAddrValue
+}
+
+#[derive(Debug, Clone, FieldGet, NewWithAll
+    , FieldGetMove, FieldGetClone, Default)]
+pub struct ConditionStmt {
+    true_block: BlockDefine,
+    false_block: BlockDefine
+}
+
 /*
  * 指令
  * */
@@ -168,6 +181,7 @@ pub enum Instruction {
     Jump(Jump),
     RemoveOwnership(RemoveOwnership),
     AddRefParamAddr(AddRefParamAddr),
+    ConditionStmt(ConditionStmt),
     EnterScope,
     LeaveScope,
     Invalid

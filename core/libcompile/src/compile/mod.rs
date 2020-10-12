@@ -29,7 +29,8 @@ use libtype::instruction::{
     Jump, RemoveOwnership
     , AddRefParamAddr
     , CallSelfFunction
-    , CallPrimevalFunctionParamContext};
+    , CallPrimevalFunctionParamContext
+    , ConditionStmt};
 use libtypecontrol::function::FunctionControl;
 use libtype::module::Module;
 use libresult::*;
@@ -241,6 +242,10 @@ pub trait Compile {
     }
 
     fn return_stmt(&mut self, _context: ReturnStmtContext) {
+        unimplemented!();
+    }
+
+    fn condition_stmt(&mut self, _context: ConditionStmt) {
         unimplemented!();
     }
 

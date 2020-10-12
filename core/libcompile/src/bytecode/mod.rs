@@ -11,7 +11,8 @@ use libtype::instruction::{Instruction, CallPrimevalFunction
     , AddressBind, ReturnStmt
     , Jump, RemoveOwnership
     , CallSelfFunction
-    , AddRefParamAddr, CallPrimevalFunctionParamContext};
+    , AddRefParamAddr, CallPrimevalFunctionParamContext
+    , ConditionStmt};
 use libgrammar::grammar::{FunctionDefineContext
     , BlockDefineContext};
 use crate::compile::{StaticContext, CallFunctionContext
@@ -186,6 +187,10 @@ impl<'a, 'b, F: Writer> Compile for Bytecode<'a, 'b, F> {
         let (scope, addr_value) = context.fields_move();
         self.write(Instruction::ReturnStmt(ReturnStmt::new_with_all(
                     scope, addr_value)));
+    }
+
+    fn condition_stmt(&mut self, context: ConditionStmt) {
+        self.write(Instruction::ConditionStmt(context));
     }
 
     fn jump(&mut self, context: Jump) -> usize {

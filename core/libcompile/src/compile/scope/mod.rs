@@ -17,7 +17,8 @@ use std::collections::VecDeque;
 #[derive(Debug, PartialEq)]
 pub enum ScopeType {
     Function,
-    Block
+    Block,
+    BlockDefine
 }
 
 #[derive(Default, FieldGet, NewWithAll

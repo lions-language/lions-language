@@ -20,7 +20,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
 
     pub fn process_block_define_start(&mut self, define_context: &mut BlockDefineContext)
         -> DescResult {
-        self.scope_context.enter(ScopeType::Block);
+        self.scope_context.enter(ScopeType::BlockDefine);
         self.cb.enter_block_define(define_context);
         DescResult::Success
     }

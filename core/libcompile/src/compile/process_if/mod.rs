@@ -1,4 +1,5 @@
 use libresult::{DescResult};
+use libtype::instruction::{ConditionStmt, BlockDefine};
 use libgrammar::grammar::{IfStmtContext, BlockDefineContext};
 use crate::compile::{Compile, Compiler};
 
@@ -46,6 +47,10 @@ impl<'a, F: Compile> Compiler<'a, F> {
          * 生成一条分支指令 (记录: 表达式地址 / 表达式为true情况下执行的块地址
          *  / 表达式为false情况下执行的块地址(这个时候无法知道false情况下的块地址, 所以暂时保留))
          * */
+        // println!("{:?}, {:?}", stmt_context, define_context);
+        self.cb.condition_stmt(ConditionStmt::new_with_all(
+                BlockDefine::new_with_all(define_context.define_addr_clone())
+                , BlockDefine::default()));
         DescResult::Success
     }
 
