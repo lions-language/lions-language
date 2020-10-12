@@ -39,10 +39,6 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
          * 解析 block
          * */
         self.expect_and_take_next_token_unchecked(TokenType::LeftBigParenthese);
-        /*
-         * 跳过 `{`
-         * */
-        // self.skip_next_one();
         check_desc_result!(self, self.cb().block_define_start(&mut define_context));
         self.parse_block_content();
         /*

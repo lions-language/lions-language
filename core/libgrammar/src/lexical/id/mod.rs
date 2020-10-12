@@ -92,7 +92,6 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
         let context = self.build_token_context(TokenType::True
             , TokenData::Const(PrimevalData::Boolean(Boolean::new(BooleanValue::True))));
         self.push_to_token_buffer(TrueToken::new(context));
-        self.id_push_keyword_token(TokenType::True);
     }
 
     fn id_kw_false(&mut self) {
@@ -102,7 +101,6 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
         let context = self.build_token_context(TokenType::False
             , TokenData::Const(PrimevalData::Boolean(Boolean::new(BooleanValue::False))));
         self.push_to_token_buffer(TrueToken::new(context));
-        self.id_push_keyword_token(TokenType::False);
     }
 
     fn id_primeval_type(&mut self, typ: PrimevalType) {
