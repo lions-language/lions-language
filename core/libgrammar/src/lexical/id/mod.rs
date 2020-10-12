@@ -1,9 +1,10 @@
 use super::{LexicalParser, CallbackReturnStatus};
 use crate::token::{TokenType, TokenData};
 use id::IdToken;
-use boolean::TrueToken;
+use crate::lexical::boolean::true_token::TrueToken;
 use crate::grammar::Grammar;
-use libtype::primeval::{PrimevalType};
+use libtype::primeval::{PrimevalType, PrimevalData
+    , boolean::Boolean, boolean::BooleanValue};
 
 impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
     fn id_push_keyword_token(&mut self, token_type: TokenType) {
@@ -88,7 +89,8 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
         /*
          * true
          * */
-        let context = self.build_token_context(TokenType::True, TokenData::Id(s.to_string()));
+        let context = self.build_token_context(TokenType::True
+            , TokenData::Const(PrimevalData::Boolean(Boolean::new(BooleanValue::True))));
         self.push_to_token_buffer(TrueToken::new(context));
         self.id_push_keyword_token(TokenType::True);
     }
@@ -97,6 +99,9 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
         /*
          * false
          * */
+        let context = self.build_token_context(TokenType::False
+            , TokenData::Const(PrimevalData::Boolean(Boolean::new(BooleanValue::False))));
+        self.push_to_token_buffer(TrueToken::new(context));
         self.id_push_keyword_token(TokenType::False);
     }
 

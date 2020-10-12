@@ -148,6 +148,12 @@ impl Type {
                             PrimevalType::Str))
                     , addr_typ))
             },
+            "bool"|"boolean" => {
+                Some(Type::new_with_addrtyp(TypeValue::Primeval(
+                        Primeval::new(
+                            PrimevalType::Boolean))
+                    , addr_typ))
+            },
             _ => {
                 None
             }

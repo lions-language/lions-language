@@ -51,6 +51,7 @@ pub enum PrimevalData {
     Float32(Option<Float32>),
     Float64(Option<Float64>),
     Str(Option<Str>),
+    Boolean(boolean::Boolean),
     /*
      * 自身没有存储数据, 只是存储了字符串中的位置信息
      * */
@@ -103,6 +104,7 @@ impl PrimevalData {
             PrimevalData::Float32(_)
             | PrimevalData::Float64(_)
             | PrimevalData::Str(_)
+            | PrimevalData::Boolean(_)
             | PrimevalData::StrSlice(_) => {
                 panic!("should not happend");
             }
@@ -112,5 +114,6 @@ impl PrimevalData {
 
 pub mod number;
 pub mod string;
+pub mod boolean;
 pub mod primeval_type;
 
