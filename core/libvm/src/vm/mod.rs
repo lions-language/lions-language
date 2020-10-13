@@ -139,6 +139,11 @@ impl VirtualMachine {
     }
     */
 
+    pub fn panic(&self, msg: &str) {
+        println!("{}", msg);
+        std::process::exit(0);
+    }
+
     pub fn new(link_define: RefPtr
         , link_static: RefPtr) -> Self {
         Self {

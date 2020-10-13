@@ -1,4 +1,4 @@
-use libmacro::NumberToStd;
+use libmacro::{FieldGet, NumberToStd};
 
 #[derive(Debug, Clone)]
 pub enum BooleanValue {
@@ -6,7 +6,7 @@ pub enum BooleanValue {
     False
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, FieldGet)]
 pub struct Boolean {
     pub value: BooleanValue
 }
