@@ -74,6 +74,6 @@ impl BlockDefine {
     }
 
     pub fn block_addr_value(&self) -> FunctionAddrValue {
-        FunctionAddrValue::new(self.index(), self.length())
+        FunctionAddrValue::new_valid(self.index(), self.length())
     }
 }

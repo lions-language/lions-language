@@ -35,12 +35,17 @@ impl VirtualMachine {
                 /*
                  * 执行 true block 的语句
                  * */
-                self.execute_block(true_block.addr_ref());
+                if true_block.addr_ref().is_valid() {
+                    self.execute_block(true_block.addr_ref());
+                }
             },
             BooleanValue::False => {
                 /*
                  * 执行 false block 的语句
                  * */
+                if false_block.addr_ref().is_valid() {
+                    self.execute_block(false_block.addr_ref());
+                }
             }
         }
     }

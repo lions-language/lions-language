@@ -78,7 +78,7 @@ impl FunctionDefine {
     }
 
     pub fn func_addr_value(&self) -> FunctionAddrValue {
-        FunctionAddrValue::new(self.index(), self.length())
+        FunctionAddrValue::new_valid(self.index(), self.length())
     }
     /*
     pub fn write(&mut self, instruction: Instruction) {

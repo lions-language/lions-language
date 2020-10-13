@@ -240,7 +240,7 @@ impl FunctionDefine {
         FunctionDefine::Address(
             AddressFunctionDefine::new(
                 FunctionAddress::Define(
-                    libcommon::address::FunctionAddrValue::new(0, 0))))
+                    libcommon::address::FunctionAddrValue::new_invalid())))
     }
 
     pub fn new_addr(addr_value: FunctionAddrValue) -> Self {

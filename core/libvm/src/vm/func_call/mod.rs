@@ -69,7 +69,8 @@ impl VirtualMachine {
                 let mut block = ld.read(&av);
                 self.thread_context.current_mut_unchecked().scope_context_mut()
                     .last_one_mut_unchecked().set_block_addr(
-                        FunctionAddrValue::new(block.current_pos_clone(), block.block_length_clone()));
+                        FunctionAddrValue::new_valid(
+                            block.current_pos_clone(), block.block_length_clone()));
                 while let Some(ins) = block.get_next() {
                     // println!("{:?}, {:?}", i, ins);
                     match self.execute(ins.clone(), &block.current_pos_clone(), &block.block_length_clone()) {

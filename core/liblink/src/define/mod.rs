@@ -175,12 +175,15 @@ impl LinkDefine {
                 }
             },
             Instruction::ConditionStmt(value) => {
-                self.process_block_define(value.true_block_mut());
-                // self.process_block_define(value.false_block_mut());
+                if value.true_block_ref().addr_ref().is_valid() {
+                    self.process_block_define(value.true_block_mut());
+                }
+                if value.false_block_ref().addr_ref().is_valid() {
+                    self.process_block_define(value.false_block_mut());
+                }
             },
             Instruction::CallSelfFunction(value) => {
                 self.call_self_func(value);
-                println!("{:?}", value);
             },
             Instruction::ReadStaticVariant(_) => {
                 /*
@@ -218,7 +221,7 @@ impl LinkDefine {
                 let ds = self.define_stream.as_ref::<DefineStream>();
                 let item_object = ds.item_clone_unchecked(src_addr);
                 let item = item_object.get();
-                let addr = FunctionAddrValue::new(
+                let addr = FunctionAddrValue::new_valid(
                     self.index.clone(), item.length());
                 item_object.restore(item);
                 /*
