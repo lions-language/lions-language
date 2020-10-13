@@ -1,5 +1,6 @@
 use libtype::instruction::{
     Instruction, CallFunction
+    , BlockDefine
     , CallSelfFunction, JumpType};
 use libcommon::ptr::RefPtr;
 use libcommon::address::{FunctionAddress, FunctionAddrValue};
@@ -112,6 +113,28 @@ impl LinkDefine {
         }
     }
 
+    pub fn process_block_define(&mut self, block_define: &mut BlockDefine) {
+        let src_addr = block_define.addr_mut();
+        /*
+         * 如果定义过 => 直接将定义过的地址拿来
+         * */
+        if let Some(addr) = self.is_defined(src_addr) {
+            *src_addr = addr.clone();
+            return;
+        };
+        /*
+         * 修改地址
+         * */
+        let src_addr_clone = src_addr.clone();
+        *src_addr = self.alloc_func_define_addr(src_addr);
+        let mut ds = self.define_stream.clone();
+        let ds = ds.as_mut::<DefineStream>();
+        let define_block = ds.read(&src_addr_clone, true);
+        for mut instruction in define_block {
+            self.execute(instruction.as_mut::<Instruction>(), false);
+        }
+    }
+
     fn call_self_func(&mut self, call_context: &mut CallSelfFunction) {
         let func_define_addr = match call_context.func_define_addr_mut() {
             FunctionAddress::Define(v) => {
@@ -150,6 +173,10 @@ impl LinkDefine {
                         panic!("should not happend");
                     }
                 }
+            },
+            Instruction::ConditionStmt(value) => {
+                self.process_block_define(value.true_block_mut());
+                // self.process_block_define(value.false_block_mut());
             },
             Instruction::CallSelfFunction(value) => {
                 self.call_self_func(value);

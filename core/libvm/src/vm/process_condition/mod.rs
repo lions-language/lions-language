@@ -1,3 +1,5 @@
+use libcommon::address::{FunctionAddrValue};
+use liblink::{define::LinkDefine};
 use libtype::instruction::{ConditionStmt};
 use libtype::{Data, DataValue
     , primeval::PrimevalData
@@ -33,12 +35,23 @@ impl VirtualMachine {
                 /*
                  * 执行 true block 的语句
                  * */
+                self.execute_block(true_block.addr_ref());
             },
             BooleanValue::False => {
                 /*
                  * 执行 false block 的语句
                  * */
             }
+        }
+    }
+
+    fn execute_block(&mut self, define_addr: &FunctionAddrValue) {
+        let ld = self.link_define.clone();
+        let ld = ld.as_ref::<LinkDefine>();
+        let mut block = ld.read(define_addr);
+        while let Some(ins) = block.get_next() {
+            // println!("{:?}", ins);
+            self.execute(ins.clone(), &block.current_pos_clone(), &block.block_length_clone());
         }
     }
 }
