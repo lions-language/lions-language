@@ -565,7 +565,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
             }
         };
         let next = tp.as_ref::<T, CB>();
-        if let &token_type = &next.context_token_type() {
+        if &token_type == next.context_token_type() {
             NextToken::<T, CB>::True(self.take_next_one())
         } else {
             NextToken::<T, CB>::False(tp)

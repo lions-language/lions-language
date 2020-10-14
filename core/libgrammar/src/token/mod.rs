@@ -3,6 +3,7 @@ use crate::grammar::{GrammarParser, ExpressContext, Grammar};
 use libtype::primeval::{PrimevalType, PrimevalData};
 use libtype::{TypeAttrubute};
 use libmacro::{FieldGet, NewWithAll};
+use std::cmp::{PartialEq, Eq};
 
 #[derive(Debug)]
 pub enum NumberValue {
@@ -18,7 +19,7 @@ pub enum NumberValue {
     Float64(f64)
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum TokenType {
     Unknown,
     // +
