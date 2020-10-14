@@ -10,7 +10,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
          * 跳过 return 关键字
          * */
         self.skip_next_one();
-        let tp = match self.skip_white_space_token() {
+        let tp = match self.lookup_next_one_ptr() {
             Some(tp) => tp,
             None => {
                 /*
@@ -25,10 +25,35 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         let mut is_exist_expr = false;
         let next = tp.as_ref::<T, CB>();
         match next.context_token_type() {
-            TokenType::Semicolon
-                | TokenType::NewLine
-                | TokenType::RightBigParenthese => {
+            TokenType::Semicolon => {
+                // return;
                 self.skip_next_one();
+            },
+            TokenType::RightBigParenthese => {
+                // return }
+            },
+            TokenType::NewLine => {
+                let wst = match self.skip_white_space_token() {
+                    Some(t) => t,
+                    None => {
+                        self.panic("expect `}` / expr, but arrive IOEof");
+                        return;
+                    }
+                };
+                let wstoken = wst.as_ref::<T, CB>();
+                match wstoken.context_token_type() {
+                    TokenType::RightBigParenthese => {
+                        /*
+                         *  return
+                         * }
+                         * */
+                    },
+                    _ => {
+                        is_exist_expr = true;
+                        self.expression_process(&tp
+                            , &ExpressContext::new(GrammarParser::<T, CB>::expression_end_block));
+                    }
+                }
             },
             _ => {
                 is_exist_expr = true;
