@@ -188,6 +188,9 @@ impl<'a, F: Compile> Compiler<'a, F> {
                     _ => {}
                 }
             }
+        } else {
+            self.cb.return_stmt(ReturnStmtContext::new_with_all(
+                    scope, AddressValue::new_invalid()));
         }
         /*
         /*

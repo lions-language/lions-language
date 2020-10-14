@@ -4,10 +4,10 @@ use libtype::instruction::{ConditionStmt};
 use libtype::{Data, DataValue
     , primeval::PrimevalData
     , primeval::boolean::BooleanValue};
-use crate::vm::{VirtualMachine};
+use crate::vm::{VirtualMachine, ExecuteResult};
 
 impl VirtualMachine {
-    pub fn process_condition_stmt(&mut self, value: ConditionStmt) {
+    pub fn process_condition_stmt(&mut self, value: ConditionStmt) -> ExecuteResult {
         let (expr_addr, true_block, false_block) = value.fields_move();
         /*
          * 计算表达式的结果
@@ -36,7 +36,13 @@ impl VirtualMachine {
                  * 执行 true block 的语句
                  * */
                 if true_block.addr_ref().is_valid() {
-                    self.execute_block(true_block.addr_ref());
+                    match self.execute_block(true_block.addr_ref()) {
+                        ExecuteResult::ReturnFunc => {
+                            return ExecuteResult::ReturnFunc;
+                        },
+                        ExecuteResult::Normal => {
+                        }
+                    }
                 }
             },
             BooleanValue::False => {
@@ -44,20 +50,34 @@ impl VirtualMachine {
                  * 执行 false block 的语句
                  * */
                 if false_block.addr_ref().is_valid() {
-                    self.execute_block(false_block.addr_ref());
+                    match self.execute_block(false_block.addr_ref()) {
+                        ExecuteResult::ReturnFunc => {
+                            return ExecuteResult::ReturnFunc;
+                        },
+                        ExecuteResult::Normal => {
+                        }
+                    }
                 }
             }
         }
+        ExecuteResult::Normal
     }
 
-    fn execute_block(&mut self, define_addr: &FunctionAddrValue) {
+    fn execute_block(&mut self, define_addr: &FunctionAddrValue) -> ExecuteResult {
         let ld = self.link_define.clone();
         let ld = ld.as_ref::<LinkDefine>();
         let mut block = ld.read(define_addr);
         while let Some(ins) = block.get_next() {
             // println!("{:?}", ins);
-            self.execute(ins.clone(), &block.current_pos_clone(), &block.block_length_clone());
+            match self.execute(ins.clone(), &block.current_pos_clone(), &block.block_length_clone()) {
+                ExecuteResult::ReturnFunc => {
+                    return ExecuteResult::ReturnFunc;
+                },
+                ExecuteResult::Normal => {
+                }
+            }
         }
+        ExecuteResult::Normal
     }
 }
 

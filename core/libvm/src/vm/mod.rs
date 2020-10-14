@@ -91,7 +91,7 @@ impl VirtualMachine {
                 return self.process_return_stmt(v);
             },
             Instruction::ConditionStmt(v) => {
-                self.process_condition_stmt(v);
+                return self.process_condition_stmt(v);
             },
             Instruction::ReadStaticVariant(v) => {
                 self.read_static_variant(v);
