@@ -56,11 +56,13 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
 
     fn process_else(&mut self, stmt_context: &mut IfStmtContext) -> DescResult {
         let mut define_context = BlockDefineContext::default();
+        check_desc_result!(self, self.cb().if_stmt_branch_start(stmt_context, &mut define_context));
         self.expect_and_take_next_token_unchecked(TokenType::LeftBigParenthese);
         check_desc_result!(self, self.cb().block_define_start(&mut define_context));
         self.parse_block_content();
         self.skip_next_one();
         check_desc_result!(self, self.cb().block_define_end(&mut define_context));
+        check_desc_result!(self, self.cb().if_stmt_branch_end(stmt_context, &mut define_context));
         DescResult::Success
     }
 

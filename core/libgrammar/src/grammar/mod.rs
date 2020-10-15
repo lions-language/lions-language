@@ -215,7 +215,10 @@ pub struct ReturnStmtContext {
     , FieldGet, FieldGetClone)]
 pub struct IfStmtContext {
     cur_expr_result_addr: AddressValue,
-    last_condition_instruction_index: usize
+    /*
+     * 如果是 if, 那么 last 就是 None
+     * */
+    last_condition_instruction_index: Option<usize>
 }
 
 #[derive(Debug, FieldGet, FieldGetClone

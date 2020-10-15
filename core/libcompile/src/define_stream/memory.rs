@@ -44,6 +44,10 @@ impl Memory {
         self.instructions.get(index)
     }
 
+    pub fn get_mut(&mut self, index: usize) -> Option<&mut Instruction> {
+        self.instructions.get_mut(index)
+    }
+
     pub fn get_all_mut(&mut self) -> &mut VecDeque<Instruction> {
         &mut self.instructions
     }

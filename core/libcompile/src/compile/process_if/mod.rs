@@ -43,6 +43,12 @@ impl<'a, F: Compile> Compiler<'a, F> {
 
     pub fn process_if_stmt_branch_end(&mut self, stmt_context: &mut IfStmtContext
         , define_context: &mut BlockDefineContext) -> DescResult {
+        match stmt_context.last_condition_instruction_index_mut() {
+            Some(index) => {
+            },
+            None => {
+            }
+        }
         /*
          * 生成一条分支指令 (记录: 表达式地址 / 表达式为true情况下执行的块地址
          *  / 表达式为false情况下执行的块地址(这个时候无法知道false情况下的块地址, 所以暂时保留))
@@ -56,7 +62,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
          * 将这条指令的索引记录保存在 stmt context 中的 last instruction index 中
          * */
         *stmt_context.last_condition_instruction_index_mut() =
-            self.cb.current_index();
+            Some(self.cb.current_index());
         DescResult::Success
     }
 

@@ -45,6 +45,16 @@ impl FunctionDefine {
         self.define_item.restore(item);
     }
 
+    /*
+     * 只能一次使用, 不能进行拷贝, 否则在数组元素重新分配的时候会导致地址访问出错
+     * */
+    pub fn get_instructure_ptr_unchecked(&self, index: usize) -> RefPtr {
+        let item = self.define_item.get();
+        let ptr = RefPtr::from_ref(item.get(index).as_ref().expect("should not happend"));
+        self.define_item.restore(item);
+        ptr
+    }
+
     pub fn current_index(&self) -> usize {
         let item = self.define_item.get();
         let len = item.length() - 1;

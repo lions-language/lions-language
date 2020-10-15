@@ -1,5 +1,5 @@
 use libtype::instruction::{Jump, Instruction};
-use libcommon::ptr::HeapPtr;
+use libcommon::ptr::{RefPtr, HeapPtr};
 use libcommon::address::{FunctionAddrValue};
 use crate::define_stream::{DefineItemObject};
 use crate::define::{DefineType};
@@ -54,6 +54,13 @@ impl BlockDefine {
         let len = item.length() - 1;
         self.define_item.restore(item);
         len
+    }
+
+    pub fn get_instructure_ptr_unchecked(&self, index: usize) -> RefPtr {
+        let item = self.define_item.get();
+        let ptr = RefPtr::from_ref(item.get(index).as_ref().expect("should not happend"));
+        self.define_item.restore(item);
+        ptr
     }
 
     pub fn update_instructure_by_index(&mut self, index: usize, ins: Instruction) {
