@@ -52,6 +52,12 @@ impl FunctionDefine {
         len
     }
 
+    pub fn update_instructure_by_index(&mut self, index: usize, ins: Instruction) {
+        let mut item = self.define_item.get();
+        item.update_instructure_by_index(index, ins);
+        self.define_item.restore(item);
+    }
+
     /*
      * item 在 define_stream 中的索引
      * */

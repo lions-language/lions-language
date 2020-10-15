@@ -26,7 +26,8 @@ use libtype::function::{Function, CallFunctionParamAddr
     , FunctionStatement};
 use libtype::structure::{StructDefine};
 use libtype::instruction::{
-    Jump, RemoveOwnership
+    Instruction
+    , Jump, RemoveOwnership
     , AddRefParamAddr
     , CallSelfFunction
     , CallPrimevalFunctionParamContext
@@ -250,6 +251,10 @@ pub trait Compile {
     }
 
     fn current_index(&self) -> usize {
+        unimplemented!();
+    }
+
+    fn update_instructure_by_index(&mut self, index: usize, ins: Instruction) {
         unimplemented!();
     }
 

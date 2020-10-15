@@ -71,6 +71,22 @@ impl DefineStack {
         }
     }
 
+    pub fn update_instructure_by_index(&mut self, index: usize, ins: Instruction) {
+        let obj = self.ws.back().expect("should not happend");
+        match DefineType::from(obj.ptr_ref().typ_ref()) {
+            DefineType::Function => {
+                let mut fd = obj.get::<FunctionDefine>();
+                fd.update_instructure_by_index(index, ins);
+                obj.restore(fd);
+            },
+            DefineType::Block => {
+                let mut bd = obj.get::<BlockDefine>();
+                bd.update_instructure_by_index(index, ins);
+                obj.restore(bd);
+            }
+        }
+    }
+
     pub fn write(&mut self, instruction: Instruction) -> bool {
         if self.ws.is_empty() {
             return false;

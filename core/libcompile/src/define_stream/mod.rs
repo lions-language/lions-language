@@ -23,6 +23,10 @@ impl DefineItem {
         self.mem.set_jump(index, jump);
     }
 
+    pub fn update_instructure_by_index(&mut self, index: usize, ins: Instruction) {
+        self.mem.update_instructure_by_index(index, ins);
+    }
+
     pub fn get(&self, index: usize) -> Option<&Instruction> {
         self.mem.get(index)
     }

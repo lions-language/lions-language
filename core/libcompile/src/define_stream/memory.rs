@@ -29,6 +29,17 @@ impl Memory {
         }
     }
 
+    pub fn update_instructure_by_index(&mut self, index: usize, ins: Instruction) {
+        match self.instructions.get_mut(index) {
+            Some(instruction) => {
+                *instruction = ins;
+            },
+            None => {
+                panic!("should not happend");
+            }
+        }
+    }
+
     pub fn get(&self, index: usize) -> Option<&Instruction> {
         self.instructions.get(index)
     }

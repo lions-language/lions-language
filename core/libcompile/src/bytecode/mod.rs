@@ -206,6 +206,14 @@ impl<'a, 'b, F: Writer> Compile for Bytecode<'a, 'b, F> {
         }
     }
 
+    fn update_instructure_by_index(&mut self, index: usize, ins: Instruction) {
+        if self.define_stack.is_empty() {
+            panic!("should not happend");
+        } else {
+            self.define_stack.update_instructure_by_index(index, ins);
+        }
+    }
+
     fn set_jump(&mut self, index: usize, jump: Jump) {
         if self.define_stack.is_empty() {
             self.writer.set_jump(index, jump);
