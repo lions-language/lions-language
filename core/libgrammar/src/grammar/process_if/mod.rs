@@ -50,11 +50,11 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         /*
          * 查看下一个 token 是 else_if 还是 else 或者 都不是
          * */
-        check_desc_result!(self, self.process_after_if_brach());
+        check_desc_result!(self, self.process_after_if_brach(&mut stmt_context));
         check_desc_result!(self, self.cb().if_stmt_end(&mut stmt_context, &mut define_context));
     }
 
-    fn process_else(&mut self) -> DescResult {
+    fn process_else(&mut self, stmt_context: &mut IfStmtContext) -> DescResult {
         let mut define_context = BlockDefineContext::default();
         self.expect_and_take_next_token_unchecked(TokenType::LeftBigParenthese);
         check_desc_result!(self, self.cb().block_define_start(&mut define_context));
@@ -64,7 +64,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         DescResult::Success
     }
 
-    fn process_else_if(&mut self) -> DescResult {
+    fn process_else_if(&mut self, stmt_context: &mut IfStmtContext) -> DescResult {
         /*
          * 跳过 if 关键字
          * */
@@ -94,7 +94,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         DescResult::Success
     }
 
-    fn process_after_if_brach(&mut self) -> DescResult {
+    fn process_after_if_brach(&mut self, stmt_context: &mut IfStmtContext) -> DescResult {
         let tp = match self.skip_white_space_token() {
             Some(tp) => tp,
             None => {
@@ -113,7 +113,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                 /*
                  * elif 语句
                  * */
-                return self.process_else_if();
+                return self.process_else_if(stmt_context);
             },
             _ => {
                 /*
@@ -140,13 +140,13 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                 /*
                  * else if 语句
                  * */
-                return self.process_else_if();
+                return self.process_else_if(stmt_context);
             },
             TokenType::LeftBigParenthese => {
                 /*
                  * else 语句
                  * */
-                return self.process_else();
+                return self.process_else(stmt_context);
             },
             _ => {
                 /*

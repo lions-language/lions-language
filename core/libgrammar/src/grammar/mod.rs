@@ -214,7 +214,8 @@ pub struct ReturnStmtContext {
 #[derive(Debug, Clone, Default
     , FieldGet, FieldGetClone)]
 pub struct IfStmtContext {
-    cur_expr_result_addr: AddressValue
+    cur_expr_result_addr: AddressValue,
+    last_instruction_index: usize
 }
 
 #[derive(Debug, FieldGet, FieldGetClone

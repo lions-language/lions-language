@@ -52,6 +52,11 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 stmt_context.cur_expr_result_addr_clone()
                 , BlockDefine::new_with_all(define_context.define_addr_clone())
                 , BlockDefine::default()));
+        /*
+         * 将这条指令的索引记录保存在 stmt context 中的 last instruction index 中
+         * */
+        *stmt_context.last_instruction_index_mut() =
+            self.cb.current_index();
         DescResult::Success
     }
 
