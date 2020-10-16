@@ -30,7 +30,8 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         let mut stmt_context = IfStmtContext::default();
         let mut define_context = BlockDefineContext::default();
         check_desc_result!(self, self.cb().if_stmt_start(&mut stmt_context, &mut define_context));
-        check_desc_result!(self, self.cb().if_stmt_branch_start(&mut stmt_context, &mut define_context));
+        check_desc_result!(self, self.cb().if_stmt_condition_branch_start(
+                &mut stmt_context, &mut define_context));
         check_desc_result!(self, self.cb().if_stmt_expr_start(&mut stmt_context, &mut define_context));
         self.expression_process(&tp
             , &ExpressContext::new(GrammarParser::<T, CB>::expression_end_left_big_parenthese));
@@ -46,7 +47,8 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
          * */
         self.skip_next_one();
         check_desc_result!(self, self.cb().block_define_end(&mut define_context));
-        check_desc_result!(self, self.cb().if_stmt_branch_end(&mut stmt_context, &mut define_context));
+        check_desc_result!(self, self.cb().if_stmt_condition_branch_end(
+                &mut stmt_context, &mut define_context));
         /*
          * 查看下一个 token 是 else_if 还是 else 或者 都不是
          * */
@@ -56,13 +58,13 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
 
     fn process_else(&mut self, stmt_context: &mut IfStmtContext) -> DescResult {
         let mut define_context = BlockDefineContext::default();
-        check_desc_result!(self, self.cb().if_stmt_branch_start(stmt_context, &mut define_context));
+        check_desc_result!(self, self.cb().if_stmt_else_branch_start(stmt_context, &mut define_context));
         self.expect_and_take_next_token_unchecked(TokenType::LeftBigParenthese);
         check_desc_result!(self, self.cb().block_define_start(&mut define_context));
         self.parse_block_content();
         self.skip_next_one();
         check_desc_result!(self, self.cb().block_define_end(&mut define_context));
-        check_desc_result!(self, self.cb().if_stmt_branch_end(stmt_context, &mut define_context));
+        check_desc_result!(self, self.cb().if_stmt_else_branch_end(stmt_context, &mut define_context));
         DescResult::Success
     }
 

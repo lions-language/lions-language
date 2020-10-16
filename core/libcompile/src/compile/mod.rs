@@ -442,9 +442,14 @@ impl<'a, F: Compile> Grammar for Compiler<'a, F> {
         self.process_if_stmt_start(stmt_context, define_context)
     }
 
-    fn if_stmt_branch_start(&mut self, stmt_context: &mut IfStmtContext
+    fn if_stmt_else_branch_start(&mut self, stmt_context: &mut IfStmtContext
         , define_context: &mut BlockDefineContext) -> DescResult {
-        self.process_if_stmt_branch_start(stmt_context, define_context)
+        self.process_if_stmt_else_branch_start(stmt_context, define_context)
+    }
+
+    fn if_stmt_condition_branch_start(&mut self, stmt_context: &mut IfStmtContext
+        , define_context: &mut BlockDefineContext) -> DescResult {
+        self.process_if_stmt_condition_branch_start(stmt_context, define_context)
     }
 
     fn if_stmt_expr_start(&mut self, stmt_context: &mut IfStmtContext
@@ -457,9 +462,14 @@ impl<'a, F: Compile> Grammar for Compiler<'a, F> {
         self.process_if_stmt_expr_end(stmt_context, define_context)
     }
 
-    fn if_stmt_branch_end(&mut self, stmt_context: &mut IfStmtContext
+    fn if_stmt_condition_branch_end(&mut self, stmt_context: &mut IfStmtContext
         , define_context: &mut BlockDefineContext) -> DescResult {
-        self.process_if_stmt_branch_end(stmt_context, define_context)
+        self.process_if_stmt_condition_branch_end(stmt_context, define_context)
+    }
+
+    fn if_stmt_else_branch_end(&mut self, stmt_context: &mut IfStmtContext
+        , define_context: &mut BlockDefineContext) -> DescResult {
+        self.process_if_stmt_else_branch_end(stmt_context, define_context)
     }
 
     fn if_stmt_end(&mut self, stmt_context: &mut IfStmtContext

@@ -388,14 +388,28 @@ pub trait Grammar {
         , _define_context: &mut BlockDefineContext) -> DescResult {
         unimplemented!();
     }
-    fn if_stmt_branch_start(&mut self, _stmt_context: &mut IfStmtContext
+    fn if_stmt_condition_branch_start(&mut self, _stmt_context: &mut IfStmtContext
         , _define_context: &mut BlockDefineContext) -> DescResult {
         /*
          * if语句中的 分支 开始
          * */
         unimplemented!();
     }
-    fn if_stmt_branch_end(&mut self, _stmt_context: &mut IfStmtContext
+    fn if_stmt_condition_branch_end(&mut self, _stmt_context: &mut IfStmtContext
+        , _define_context: &mut BlockDefineContext) -> DescResult {
+        /*
+         * if语句中的 分支 结束
+         * */
+        unimplemented!();
+    }
+    fn if_stmt_else_branch_start(&mut self, _stmt_context: &mut IfStmtContext
+        , _define_context: &mut BlockDefineContext) -> DescResult {
+        /*
+         * if语句中的 分支 开始
+         * */
+        unimplemented!();
+    }
+    fn if_stmt_else_branch_end(&mut self, _stmt_context: &mut IfStmtContext
         , _define_context: &mut BlockDefineContext) -> DescResult {
         /*
          * if语句中的 分支 结束

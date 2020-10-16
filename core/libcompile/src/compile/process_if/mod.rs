@@ -10,7 +10,12 @@ impl<'a, F: Compile> Compiler<'a, F> {
         DescResult::Success
     }
 
-    pub fn process_if_stmt_branch_start(&mut self, stmt_context: &mut IfStmtContext
+    pub fn process_if_stmt_condition_branch_start(&mut self, stmt_context: &mut IfStmtContext
+        , define_context: &mut BlockDefineContext) -> DescResult {
+        DescResult::Success
+    }
+
+    pub fn process_if_stmt_else_branch_start(&mut self, stmt_context: &mut IfStmtContext
         , define_context: &mut BlockDefineContext) -> DescResult {
         DescResult::Success
     }
@@ -42,12 +47,10 @@ impl<'a, F: Compile> Compiler<'a, F> {
         DescResult::Success
     }
 
-    pub fn process_if_stmt_branch_end(&mut self, stmt_context: &mut IfStmtContext
-        , define_context: &mut BlockDefineContext) -> DescResult {
+    fn process_if_stmt_update_last_condition(&mut self, stmt_context: &mut IfStmtContext
+        , define_context: &mut BlockDefineContext) {
         match stmt_context.last_condition_instruction_index_mut() {
             Some(index) => {
-                let mut ptr = self.cb.get_current_instructure_ptr(*index);
-                let ins = ptr.as_mut::<Instruction>();
                 let mut ptr = self.cb.get_current_instructure_ptr(*index);
                 let ins = ptr.as_mut::<Instruction>();
                 match ins {
@@ -63,6 +66,11 @@ impl<'a, F: Compile> Compiler<'a, F> {
             None => {
             }
         }
+    }
+
+    pub fn process_if_stmt_condition_branch_end(&mut self, stmt_context: &mut IfStmtContext
+        , define_context: &mut BlockDefineContext) -> DescResult {
+        self.process_if_stmt_update_last_condition(stmt_context, define_context);
         /*
          * 生成一条分支指令 (记录: 表达式地址 / 表达式为true情况下执行的块地址
          *  / 表达式为false情况下执行的块地址(这个时候无法知道false情况下的块地址, 所以暂时保留))
@@ -77,6 +85,12 @@ impl<'a, F: Compile> Compiler<'a, F> {
          * */
         *stmt_context.last_condition_instruction_index_mut() =
             Some(self.cb.current_index());
+        DescResult::Success
+    }
+
+    pub fn process_if_stmt_else_branch_end(&mut self, stmt_context: &mut IfStmtContext
+        , define_context: &mut BlockDefineContext) -> DescResult {
+        self.process_if_stmt_update_last_condition(stmt_context, define_context);
         DescResult::Success
     }
 
