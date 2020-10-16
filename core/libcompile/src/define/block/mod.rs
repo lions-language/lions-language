@@ -58,7 +58,7 @@ impl BlockDefine {
 
     pub fn get_current_instructure_ptr_unchecked(&self, index: usize) -> RefPtr {
         let item = self.define_item.get();
-        let ptr = RefPtr::from_ref(item.get(index).as_ref().expect("should not happend"));
+        let ptr = RefPtr::from_ref(item.get(index).expect("should not happend"));
         self.define_item.restore(item);
         ptr
     }

@@ -46,7 +46,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
         , define_context: &mut BlockDefineContext) -> DescResult {
         match stmt_context.last_condition_instruction_index_mut() {
             Some(index) => {
-                /*
+                let mut ptr = self.cb.get_current_instructure_ptr(*index);
+                let ins = ptr.as_mut::<Instruction>();
                 let mut ptr = self.cb.get_current_instructure_ptr(*index);
                 let ins = ptr.as_mut::<Instruction>();
                 match ins {
@@ -58,7 +59,6 @@ impl<'a, F: Compile> Compiler<'a, F> {
                         panic!("expect ConditionStmt, but meet {:?}", ins);
                     }
                 }
-                */
             },
             None => {
             }
