@@ -47,7 +47,7 @@ impl VirtualMachine {
             },
             BooleanValue::False => {
                 /*
-                 * 执行 false block 的语句
+                 * 跳转到下一个指定的语句中
                  * */
                 if false_block.addr_ref().is_valid() {
                     match self.execute_block(false_block.addr_ref()) {
