@@ -214,6 +214,14 @@ impl<'a, 'b, F: Writer> Compile for Bytecode<'a, 'b, F> {
         }
     }
 
+    fn get_current_instructure_ptr(&self, index: usize) -> RefPtr {
+        if self.define_stack.is_empty() {
+            panic!("should not happend");
+        } else {
+            self.define_stack.get_current_instructure_ptr(index)
+        }
+    }
+
     fn set_jump(&mut self, index: usize, jump: Jump) {
         if self.define_stack.is_empty() {
             self.writer.set_jump(index, jump);

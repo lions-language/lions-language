@@ -1,5 +1,6 @@
 use libresult::{DescResult};
-use libtype::instruction::{ConditionStmt, BlockDefine};
+use libtype::instruction::{ConditionStmt, BlockDefine
+    , Instruction};
 use libgrammar::grammar::{IfStmtContext, BlockDefineContext};
 use crate::compile::{Compile, Compiler};
 
@@ -45,6 +46,19 @@ impl<'a, F: Compile> Compiler<'a, F> {
         , define_context: &mut BlockDefineContext) -> DescResult {
         match stmt_context.last_condition_instruction_index_mut() {
             Some(index) => {
+                /*
+                let mut ptr = self.cb.get_current_instructure_ptr(*index);
+                let ins = ptr.as_mut::<Instruction>();
+                match ins {
+                    Instruction::ConditionStmt(v) => {
+                        *v.false_block_mut() = BlockDefine::new_with_all(
+                            define_context.define_addr_clone());
+                    },
+                    _ => {
+                        panic!("expect ConditionStmt, but meet {:?}", ins);
+                    }
+                }
+                */
             },
             None => {
             }

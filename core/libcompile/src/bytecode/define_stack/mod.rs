@@ -1,3 +1,4 @@
+use libcommon::ptr::{RefPtr};
 use libtype::instruction::{Instruction, Jump};
 use crate::define::{DefineObject, FunctionDefine
     , BlockDefine
@@ -83,6 +84,24 @@ impl DefineStack {
                 let mut bd = obj.get::<BlockDefine>();
                 bd.update_instructure_by_index(index, ins);
                 obj.restore(bd);
+            }
+        }
+    }
+
+    pub fn get_current_instructure_ptr(&self, index: usize) -> RefPtr {
+        let obj = self.ws.back().expect("should not happend");
+        match DefineType::from(obj.ptr_ref().typ_ref()) {
+            DefineType::Function => {
+                let fd = obj.get::<FunctionDefine>();
+                let ptr = fd.get_current_instructure_ptr_unchecked(index);
+                obj.restore(fd);
+                ptr
+            },
+            DefineType::Block => {
+                let mut bd = obj.get::<BlockDefine>();
+                let ptr = bd.get_current_instructure_ptr_unchecked(index);
+                obj.restore(bd);
+                ptr
             }
         }
     }

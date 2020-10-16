@@ -258,6 +258,10 @@ pub trait Compile {
         unimplemented!();
     }
 
+    fn get_current_instructure_ptr(&self, index: usize) -> RefPtr {
+        unimplemented!();
+    }
+
     fn set_jump(&mut self, _: usize, _: Jump) {
         unimplemented!();
     }
