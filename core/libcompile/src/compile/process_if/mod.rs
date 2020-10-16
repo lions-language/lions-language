@@ -55,6 +55,9 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 let ins = ptr.as_mut::<Instruction>();
                 match ins {
                     Instruction::ConditionStmt(v) => {
+                        /*
+                         * 将 当前 分支的 指令(else 开始)的地址写入
+                         * */
                         *v.false_block_mut() = BlockDefine::new_with_all(
                             define_context.define_addr_clone());
                     },
@@ -82,6 +85,9 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 , BlockDefine::default()));
         /*
          * 将这条指令的索引记录保存在 stmt context 中的 last instruction index 中
+         * */
+        /*
+         * TODO: 这里应该记录指令的地址, 而不是索引
          * */
         *stmt_context.last_condition_instruction_index_mut() =
             Some(self.cb.current_index());
