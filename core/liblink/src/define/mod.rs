@@ -1,7 +1,8 @@
 use libtype::instruction::{
     Instruction, CallFunction
     , BlockDefine
-    , CallSelfFunction, JumpType};
+    , CallSelfFunction, JumpType
+    , ConditionStmtFalseHandle};
 use libcommon::ptr::RefPtr;
 use libcommon::address::{FunctionAddress, FunctionAddrValue};
 use libtype::package::{PackageStr};
@@ -178,8 +179,11 @@ impl LinkDefine {
                 if value.true_block_ref().addr_ref().is_valid() {
                     self.process_block_define(value.true_block_mut());
                 }
-                if value.false_block_ref().addr_ref().is_valid() {
-                    self.process_block_define(value.false_block_mut());
+                match value.false_handle_mut() {
+                    ConditionStmtFalseHandle::Block(bd) => {
+                        self.process_block_define(bd);
+                    },
+                    _ => {}
                 }
             },
             Instruction::CallSelfFunction(value) => {
