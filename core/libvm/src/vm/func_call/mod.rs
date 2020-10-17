@@ -103,6 +103,9 @@ impl VirtualMachine {
                             }
                             break;
                         },
+                        ExecuteResult::Jump(jump) => {
+                            block.update_by_jump(&jump);
+                        },
                         ExecuteResult::Normal => {
                         }
                     }

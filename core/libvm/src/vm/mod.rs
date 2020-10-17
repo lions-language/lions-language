@@ -3,7 +3,7 @@ use libgrammar::token::{TokenValue};
 use libtype::function::{FunctionDefine};
 use libtype::primeval::{PrimevalType, PrimevalData};
 use libtype::{AddressValue, AddressType, AddressKey};
-use libtype::instruction::{Instruction};
+use libtype::instruction::{Instruction, Jump};
 use libcompile::compile::{StaticContext, CallFunctionContext
     , Compile, Compiler};
 use libcompile::bytecode::{Bytecode, Writer};
@@ -46,6 +46,7 @@ pub struct VirtualMachine {
 
 pub enum ExecuteResult {
     ReturnFunc,
+    Jump(Jump),
     Normal
 }
 

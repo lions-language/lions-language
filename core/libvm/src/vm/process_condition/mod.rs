@@ -42,6 +42,9 @@ impl VirtualMachine {
                             return ExecuteResult::ReturnFunc;
                         },
                         ExecuteResult::Normal => {
+                        },
+                        ExecuteResult::Jump(_) => {
+                            panic!("should not happend");
                         }
                     }
                 }
@@ -56,9 +59,15 @@ impl VirtualMachine {
                             ExecuteResult::ReturnFunc => {
                                 return ExecuteResult::ReturnFunc;
                             },
+                            ExecuteResult::Jump(_) => {
+                                panic!("should not happend");
+                            },
                             ExecuteResult::Normal => {
                             }
                         }
+                    },
+                    ConditionStmtFalseHandle::Jump(jump) => {
+                        return ExecuteResult::Jump(jump);
                     },
                     _ => {
                         unimplemented!("{:?}", false_handle);
@@ -78,6 +87,9 @@ impl VirtualMachine {
             match self.execute(ins.clone(), &block.current_pos_clone(), &block.block_length_clone()) {
                 ExecuteResult::ReturnFunc => {
                     return ExecuteResult::ReturnFunc;
+                },
+                ExecuteResult::Jump(jump) => {
+                    block.update_by_jump(&jump);
                 },
                 ExecuteResult::Normal => {
                 }

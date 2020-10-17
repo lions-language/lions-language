@@ -1,6 +1,6 @@
 use libtype::instruction::{
     Instruction, CallFunction
-    , BlockDefine
+    , BlockDefine, Jump
     , CallSelfFunction, JumpType
     , ConditionStmtFalseHandle};
 use libcommon::ptr::RefPtr;
@@ -315,6 +315,17 @@ impl<'a> LinkDefineBlock<'a> {
             },
             None => {
                 None
+            }
+        }
+    }
+
+    pub fn update_by_jump(&mut self, jump: &Jump) {
+        match jump.typ_ref() {
+            JumpType::Backward => {
+                self.pos += jump.index_clone();
+            },
+            JumpType::Forward => {
+                self.pos -= jump.index_clone();
             }
         }
     }
