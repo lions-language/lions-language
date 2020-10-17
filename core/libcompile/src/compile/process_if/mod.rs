@@ -1,6 +1,7 @@
 use libresult::{DescResult};
 use libtype::instruction::{ConditionStmt, BlockDefine
-    , Instruction};
+    , Instruction, ConditionStmtFalseHandle, Jump
+    , JumpType};
 use libgrammar::grammar::{IfStmtContext, BlockDefineContext};
 use crate::compile::{Compile, Compiler};
 
@@ -47,8 +48,18 @@ impl<'a, F: Compile> Compiler<'a, F> {
         DescResult::Success
     }
 
-    fn process_if_stmt_update_last_condition(&mut self, stmt_context: &mut IfStmtContext
-        , define_context: &mut BlockDefineContext) {
+    pub fn process_if_stmt_condition_branch_end(&mut self, stmt_context: &mut IfStmtContext
+        , define_context: &mut BlockDefineContext) -> DescResult {
+        /*
+         * 生成一条分支指令 (记录: 表达式地址 / 表达式为true情况下执行的块地址
+         *  / 表达式为false情况下执行的块地址(这个时候无法知道false情况下的块地址, 所以暂时保留))
+         * */
+        // println!("{:?}, {:?}", stmt_context, define_context);
+        self.cb.condition_stmt(ConditionStmt::new_with_all(
+                stmt_context.cur_expr_result_addr_clone()
+                , BlockDefine::new_with_all(define_context.define_addr_clone())
+                , ConditionStmtFalseHandle::default()));
+        let else_index = self.cb.current_index();
         match stmt_context.last_condition_instruction_index_mut() {
             Some(index) => {
                 let mut ptr = self.cb.get_current_instructure_ptr(*index);
@@ -58,8 +69,9 @@ impl<'a, F: Compile> Compiler<'a, F> {
                         /*
                          * 将 当前 分支的 指令(else 开始)的地址写入
                          * */
-                        *v.false_block_mut() = BlockDefine::new_with_all(
-                            define_context.define_addr_clone());
+                        *v.false_handle_mut() = ConditionStmtFalseHandle::Jump(
+                            Jump::new_with_all(JumpType::Backward
+                                , else_index - *index));
                     },
                     _ => {
                         panic!("expect ConditionStmt, but meet {:?}", ins);
@@ -69,20 +81,6 @@ impl<'a, F: Compile> Compiler<'a, F> {
             None => {
             }
         }
-    }
-
-    pub fn process_if_stmt_condition_branch_end(&mut self, stmt_context: &mut IfStmtContext
-        , define_context: &mut BlockDefineContext) -> DescResult {
-        self.process_if_stmt_update_last_condition(stmt_context, define_context);
-        /*
-         * 生成一条分支指令 (记录: 表达式地址 / 表达式为true情况下执行的块地址
-         *  / 表达式为false情况下执行的块地址(这个时候无法知道false情况下的块地址, 所以暂时保留))
-         * */
-        // println!("{:?}, {:?}", stmt_context, define_context);
-        self.cb.condition_stmt(ConditionStmt::new_with_all(
-                stmt_context.cur_expr_result_addr_clone()
-                , BlockDefine::new_with_all(define_context.define_addr_clone())
-                , BlockDefine::default()));
         /*
          * 将这条指令的索引记录保存在 stmt context 中的 last instruction index 中
          * */
@@ -96,7 +94,27 @@ impl<'a, F: Compile> Compiler<'a, F> {
 
     pub fn process_if_stmt_else_branch_end(&mut self, stmt_context: &mut IfStmtContext
         , define_context: &mut BlockDefineContext) -> DescResult {
-        self.process_if_stmt_update_last_condition(stmt_context, define_context);
+        match stmt_context.last_condition_instruction_index_mut() {
+            Some(index) => {
+                let mut ptr = self.cb.get_current_instructure_ptr(*index);
+                let ins = ptr.as_mut::<Instruction>();
+                match ins {
+                    Instruction::ConditionStmt(v) => {
+                        /*
+                         * 将 当前 分支的 指令(else 开始)的地址写入
+                         * */
+                        *v.false_handle_mut() = ConditionStmtFalseHandle::Block(
+                            BlockDefine::new_with_all(
+                                define_context.define_addr_clone()));
+                    },
+                    _ => {
+                        panic!("expect ConditionStmt, but meet {:?}", ins);
+                    }
+                }
+            },
+            None => {
+            }
+        }
         DescResult::Success
     }
 
