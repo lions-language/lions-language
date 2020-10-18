@@ -1,6 +1,7 @@
 use libresult::{DescResult};
 use libtype::instruction::{ConditionStmt, BlockDefine
     , Instruction, ConditionStmtFalseHandle, Jump
+    , ConditionStmtTrue
     , JumpType};
 use libgrammar::grammar::{IfStmtContext, BlockDefineContext};
 use crate::compile::{Compile, Compiler};
@@ -57,8 +58,10 @@ impl<'a, F: Compile> Compiler<'a, F> {
         // println!("{:?}, {:?}", stmt_context, define_context);
         self.cb.condition_stmt(ConditionStmt::new_with_all(
                 stmt_context.cur_expr_result_addr_clone()
-                , BlockDefine::new_with_all(define_context.define_addr_clone())
-                , ConditionStmtFalseHandle::default()));
+                , ConditionStmtTrue::new_with_all(
+                    BlockDefine::new_with_all(define_context.define_addr_clone())
+                        , Jump::default())
+                    , ConditionStmtFalseHandle::default()));
         let else_index = self.cb.current_index();
         match stmt_context.last_condition_instruction_index_mut() {
             Some(index) => {

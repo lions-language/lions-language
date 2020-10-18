@@ -167,9 +167,16 @@ impl Default for ConditionStmtFalseHandle {
 
 #[derive(Debug, Clone, FieldGet, NewWithAll
     , FieldGetMove, FieldGetClone, Default)]
+pub struct ConditionStmtTrue {
+    define: BlockDefine,
+    jump: Jump
+}
+
+#[derive(Debug, Clone, FieldGet, NewWithAll
+    , FieldGetMove, FieldGetClone, Default)]
 pub struct ConditionStmt {
     expr_addr: AddressValue,
-    true_block: BlockDefine,
+    true_block: ConditionStmtTrue,
     false_handle: ConditionStmtFalseHandle
 }
 

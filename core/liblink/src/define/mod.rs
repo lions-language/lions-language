@@ -176,8 +176,8 @@ impl LinkDefine {
                 }
             },
             Instruction::ConditionStmt(value) => {
-                if value.true_block_ref().addr_ref().is_valid() {
-                    self.process_block_define(value.true_block_mut());
+                if value.true_block_ref().define_ref().addr_ref().is_valid() {
+                    self.process_block_define(value.true_block_mut().define_mut());
                 }
                 match value.false_handle_mut() {
                     ConditionStmtFalseHandle::Block(bd) => {
