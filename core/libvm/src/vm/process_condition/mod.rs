@@ -51,6 +51,7 @@ impl VirtualMachine {
             },
             BooleanValue::False => {
                 /*
+                /*
                  * 跳转到下一个指定的语句中
                  * */
                 match false_handle {
@@ -67,12 +68,13 @@ impl VirtualMachine {
                         }
                     },
                     ConditionStmtFalseHandle::Jump(jump) => {
-                        return ExecuteResult::Jump(jump);
+                        // return ExecuteResult::Jump(jump);
                     },
                     _ => {
                         unimplemented!("{:?}", false_handle);
                     }
                 }
+                */
             }
         }
         ExecuteResult::Normal

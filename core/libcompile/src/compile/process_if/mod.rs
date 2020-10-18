@@ -71,7 +71,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                          * */
                         *v.false_handle_mut() = ConditionStmtFalseHandle::Jump(
                             Jump::new_with_all(JumpType::Backward
-                                , else_index - *index));
+                                , else_index - *index - 1));
                     },
                     _ => {
                         panic!("expect ConditionStmt, but meet {:?}", ins);
