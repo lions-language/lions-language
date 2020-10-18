@@ -36,18 +36,17 @@ impl VirtualMachine {
                 /*
                  * 执行 true block 的语句
                  * */
-                if true_block.define_ref().addr_ref().is_valid() {
-                    match self.execute_block(true_block.define_ref().addr_ref()) {
-                        ExecuteResult::ReturnFunc => {
-                            return ExecuteResult::ReturnFunc;
-                        },
-                        ExecuteResult::Normal => {
-                        },
-                        ExecuteResult::Jump(_) => {
-                            panic!("should not happend");
-                        }
+                match self.execute_block(true_block.define_ref().addr_ref()) {
+                    ExecuteResult::ReturnFunc => {
+                        return ExecuteResult::ReturnFunc;
+                    },
+                    ExecuteResult::Normal => {
+                    },
+                    ExecuteResult::Jump(_) => {
+                        panic!("should not happend");
                     }
                 }
+                return ExecuteResult::Jump(true_block.jump_clone());
             },
             BooleanValue::False => {
                 /*

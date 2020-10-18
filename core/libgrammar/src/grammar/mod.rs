@@ -218,7 +218,8 @@ pub struct IfStmtContext {
     /*
      * 如果是 if, 那么 last 就是 None
      * */
-    last_condition_instruction_index: Option<usize>
+    last_condition_instruction_index: Option<usize>,
+    condition_instructure_indexs: Vec<usize>
 }
 
 #[derive(Debug, FieldGet, FieldGetClone

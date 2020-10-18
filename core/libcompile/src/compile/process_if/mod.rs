@@ -92,6 +92,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
          * */
         *stmt_context.last_condition_instruction_index_mut() =
             Some(self.cb.current_index());
+        stmt_context.condition_instructure_indexs_mut().push(self.cb.current_index());
         DescResult::Success
     }
 
@@ -123,6 +124,25 @@ impl<'a, F: Compile> Compiler<'a, F> {
 
     pub fn process_if_stmt_end(&mut self, stmt_context: &mut IfStmtContext
         , define_context: &mut BlockDefineContext) -> DescResult {
+        let cur_index = self.cb.current_index();
+        let indexs = stmt_context.condition_instructure_indexs_ref();
+        for index in indexs {
+            let mut ptr = self.cb.get_current_instructure_ptr(*index);
+            let ins = ptr.as_mut::<Instruction>();
+            match ins {
+                Instruction::ConditionStmt(v) => {
+                    /*
+                     * 将 当前 分支的 指令(else 开始)的地址写入
+                     * */
+                    *v.true_block_mut().jump_mut() =
+                        Jump::new_with_all(JumpType::Backward
+                            , cur_index - index);
+                },
+                _ => {
+                    panic!("expect ConditionStmt, but meet {:?}", ins);
+                }
+            }
+        }
         DescResult::Success
     }
 }
