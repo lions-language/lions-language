@@ -152,19 +152,6 @@ pub struct BlockDefine {
     addr: FunctionAddrValue
 }
 
-#[derive(Debug, Clone)]
-pub enum ConditionStmtFalseHandle {
-    Jump(Jump),
-    Block(BlockDefine),
-    Empty
-}
-
-impl Default for ConditionStmtFalseHandle {
-    fn default() -> Self {
-        ConditionStmtFalseHandle::Empty
-    }
-}
-
 #[derive(Debug, Clone, FieldGet, NewWithAll
     , FieldGetMove, FieldGetClone, Default)]
 pub struct ConditionStmtTrue {
@@ -176,8 +163,7 @@ pub struct ConditionStmtTrue {
     , FieldGetMove, FieldGetClone, Default)]
 pub struct ConditionStmt {
     expr_addr: AddressValue,
-    true_block: ConditionStmtTrue,
-    false_handle: ConditionStmtFalseHandle
+    true_handle: ConditionStmtTrue
 }
 
 /*

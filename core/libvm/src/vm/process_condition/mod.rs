@@ -1,7 +1,6 @@
 use libcommon::address::{FunctionAddrValue};
 use liblink::{define::LinkDefine};
 use libtype::instruction::{ConditionStmt
-    , ConditionStmtFalseHandle
     , BlockDefine};
 use libtype::{Data, DataValue
     , primeval::PrimevalData
@@ -10,7 +9,7 @@ use crate::vm::{VirtualMachine, ExecuteResult};
 
 impl VirtualMachine {
     pub fn process_condition_stmt(&mut self, value: ConditionStmt) -> ExecuteResult {
-        let (expr_addr, true_block, false_handle) = value.fields_move();
+        let (expr_addr, true_handle) = value.fields_move();
         /*
          * 计算表达式的结果
          * */
@@ -37,7 +36,7 @@ impl VirtualMachine {
                 /*
                  * 执行 true block 的语句
                  * */
-                match self.execute_block(true_block.define_ref().addr_ref()) {
+                match self.execute_block(true_handle.define_ref().addr_ref()) {
                     ExecuteResult::ReturnFunc => {
                         return ExecuteResult::ReturnFunc;
                     },
@@ -47,7 +46,7 @@ impl VirtualMachine {
                         panic!("should not happend");
                     }
                 }
-                return ExecuteResult::Jump(true_block.jump_clone());
+                return ExecuteResult::Jump(true_handle.jump_clone());
             },
             BooleanValue::False => {
                 /*

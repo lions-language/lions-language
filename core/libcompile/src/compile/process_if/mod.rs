@@ -1,6 +1,6 @@
 use libresult::{DescResult};
 use libtype::instruction::{ConditionStmt, BlockDefine
-    , Instruction, ConditionStmtFalseHandle, Jump
+    , Instruction, Jump
     , ConditionStmtTrue
     , JumpType};
 use libgrammar::grammar::{IfStmtContext, BlockDefineContext};
@@ -60,30 +60,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 stmt_context.cur_expr_result_addr_clone()
                 , ConditionStmtTrue::new_with_all(
                     BlockDefine::new_with_all(define_context.define_addr_clone())
-                        , Jump::default())
-                    , ConditionStmtFalseHandle::default()));
-        let else_index = self.cb.current_index();
-        match stmt_context.last_condition_instruction_index_mut() {
-            Some(index) => {
-                let mut ptr = self.cb.get_current_instructure_ptr(*index);
-                let ins = ptr.as_mut::<Instruction>();
-                match ins {
-                    Instruction::ConditionStmt(v) => {
-                        /*
-                         * 将 当前 分支的 指令(else 开始)的地址写入
-                         * */
-                        *v.false_handle_mut() = ConditionStmtFalseHandle::Jump(
-                            Jump::new_with_all(JumpType::Backward
-                                , else_index - *index - 1));
-                    },
-                    _ => {
-                        panic!("expect ConditionStmt, but meet {:?}", ins);
-                    }
-                }
-            },
-            None => {
-            }
-        }
+                        , Jump::default())));
         /*
          * 将这条指令的索引记录保存在 stmt context 中的 last instruction index 中
          * */
@@ -100,27 +77,6 @@ impl<'a, F: Compile> Compiler<'a, F> {
         , define_context: &mut BlockDefineContext) -> DescResult {
         self.cb.execute_block(BlockDefine::new_with_all(
                 define_context.define_addr_clone()));
-        match stmt_context.last_condition_instruction_index_mut() {
-            Some(index) => {
-                let mut ptr = self.cb.get_current_instructure_ptr(*index);
-                let ins = ptr.as_mut::<Instruction>();
-                match ins {
-                    Instruction::ConditionStmt(v) => {
-                        /*
-                         * 将 当前 分支的 指令(else 开始)的地址写入
-                         * */
-                        *v.false_handle_mut() = ConditionStmtFalseHandle::Block(
-                            BlockDefine::new_with_all(
-                                define_context.define_addr_clone()));
-                    },
-                    _ => {
-                        panic!("expect ConditionStmt, but meet {:?}", ins);
-                    }
-                }
-            },
-            None => {
-            }
-        }
         DescResult::Success
     }
 
@@ -136,7 +92,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                     /*
                      * 将 当前 分支的 指令(else 开始)的地址写入
                      * */
-                    *v.true_block_mut().jump_mut() =
+                    *v.true_handle_mut().jump_mut() =
                         Jump::new_with_all(JumpType::Backward
                             , cur_index - index);
                 },
