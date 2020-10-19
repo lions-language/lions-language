@@ -186,6 +186,9 @@ impl LinkDefine {
                     _ => {}
                 }
             },
+            Instruction::ExecuteBlock(value) => {
+                self.process_block_define(value);
+            },
             Instruction::CallSelfFunction(value) => {
                 self.call_self_func(value);
             },

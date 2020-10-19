@@ -12,7 +12,7 @@ use libtype::instruction::{Instruction, CallPrimevalFunction
     , Jump, RemoveOwnership
     , CallSelfFunction
     , AddRefParamAddr, CallPrimevalFunctionParamContext
-    , ConditionStmt};
+    , ConditionStmt, BlockDefine};
 use libgrammar::grammar::{FunctionDefineContext
     , BlockDefineContext};
 use crate::compile::{StaticContext, CallFunctionContext
@@ -244,6 +244,10 @@ impl<'a, 'b, F: Writer> Compile for Bytecode<'a, 'b, F> {
 
     fn add_ref_param_addr(&mut self, context: AddRefParamAddr) {
         self.write(Instruction::AddRefParamAddr(context));
+    }
+
+    fn execute_block(&mut self, context: BlockDefine) {
+        self.write(Instruction::ExecuteBlock(context));
     }
 }
 

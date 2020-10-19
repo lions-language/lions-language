@@ -98,6 +98,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
 
     pub fn process_if_stmt_else_branch_end(&mut self, stmt_context: &mut IfStmtContext
         , define_context: &mut BlockDefineContext) -> DescResult {
+        self.cb.execute_block(BlockDefine::new_with_all(
+                define_context.define_addr_clone()));
         match stmt_context.last_condition_instruction_index_mut() {
             Some(index) => {
                 let mut ptr = self.cb.get_current_instructure_ptr(*index);

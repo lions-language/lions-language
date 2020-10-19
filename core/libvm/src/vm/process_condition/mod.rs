@@ -1,7 +1,8 @@
 use libcommon::address::{FunctionAddrValue};
 use liblink::{define::LinkDefine};
 use libtype::instruction::{ConditionStmt
-    , ConditionStmtFalseHandle};
+    , ConditionStmtFalseHandle
+    , BlockDefine};
 use libtype::{Data, DataValue
     , primeval::PrimevalData
     , primeval::boolean::BooleanValue};
@@ -97,6 +98,10 @@ impl VirtualMachine {
             }
         }
         ExecuteResult::Normal
+    }
+
+    pub fn process_execute_block(&mut self, context: BlockDefine) -> ExecuteResult {
+        self.execute_block(context.addr_ref())
     }
 }
 

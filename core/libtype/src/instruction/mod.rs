@@ -202,6 +202,7 @@ pub enum Instruction {
     RemoveOwnership(RemoveOwnership),
     AddRefParamAddr(AddRefParamAddr),
     ConditionStmt(ConditionStmt),
+    ExecuteBlock(BlockDefine),
     EnterScope,
     LeaveScope,
     Invalid

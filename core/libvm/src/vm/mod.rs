@@ -106,6 +106,9 @@ impl VirtualMachine {
             Instruction::LeaveScope => {
                 self.thread_context.leave_thread_scope();
             },
+            Instruction::ExecuteBlock(v) => {
+                return self.process_execute_block(v);
+            },
             _ => {
                 unimplemented!("{:?}", &instruction);
             }

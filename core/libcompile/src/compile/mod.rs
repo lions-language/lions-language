@@ -26,7 +26,7 @@ use libtype::function::{Function, CallFunctionParamAddr
     , FunctionStatement};
 use libtype::structure::{StructDefine};
 use libtype::instruction::{
-    Instruction
+    Instruction, BlockDefine
     , Jump, RemoveOwnership
     , AddRefParamAddr
     , CallSelfFunction
@@ -288,6 +288,10 @@ pub trait Compile {
     }
 
     fn add_ref_param_addr(&mut self, _: AddRefParamAddr) {
+        unimplemented!();
+    }
+
+    fn execute_block(&mut self, _: BlockDefine) {
         unimplemented!();
     }
 }
