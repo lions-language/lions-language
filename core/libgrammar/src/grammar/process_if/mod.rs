@@ -101,6 +101,10 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         check_desc_result!(self, self.cb().block_define_end(&mut define_context));
         check_desc_result!(self, self.cb().if_stmt_condition_branch_end(
                 stmt_context, &mut define_context));
+        /*
+         * 查看下一个 token 是 else if / else / 都不是
+         * */
+        self.process_after_if_brach(stmt_context);
         DescResult::Success
     }
 
