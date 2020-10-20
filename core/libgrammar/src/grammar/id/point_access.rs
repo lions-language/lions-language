@@ -61,6 +61,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
             }
         }
         self.cb().leave_point_access();
+        self.id_after_process_id_without_next();
     }
 }
 

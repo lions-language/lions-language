@@ -4,14 +4,14 @@ use libresult::DescResult;
 use super::{GrammarParser, Grammar
     , CallFuncScopeContext, LoadVariantContext
     , DescContext};
-use crate::lexical::{CallbackReturnStatus};
+use crate::lexical::{CallbackReturnStatus, TokenPointer};
 use crate::token::{TokenType, TokenData};
 
 impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, CB> {
     pub fn id_process_id(&mut self, desc_ctx: DescContext) {
         let mut token_value = self.take_next_one().token_value();
         let mut lengthen_offset = 0;
-        match self.skip_white_space_token() {
+        match self.lookup_next_one_ptr() {
             Some(tp) => {
                 /*
                  * 查看下一个 token
@@ -21,7 +21,11 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                     TokenType::ThreePoint => {
                         lengthen_offset = self.id_process_three_point();
                     },
-                    _ => {}
+                    _ => {
+                        if self.id_after_process_id_with_next(&tp) {
+                            return;
+                        }
+                    }
                 }
             },
             None => {
@@ -36,6 +40,32 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
             _ => {
             }
         }
+    }
+
+    /*
+     * 如果匹配 => 返回 true, 否则返回 false
+     * */
+    fn id_after_process_id_with_next(&mut self, tp: &TokenPointer) -> bool {
+        let next = tp.as_ref::<T, CB>();
+        match next.context_token_type() {
+            TokenType::Equal => {
+                self.id_process_equal();
+                return true;
+            },
+            _ => {
+            }
+        }
+        false
+    }
+
+    fn id_after_process_id_without_next(&mut self) -> bool {
+        let tp = match self.lookup_next_one_ptr() {
+            Some(tp) => tp,
+            None => {
+                return false;
+            }
+        };
+        self.id_after_process_id_with_next(&tp)
     }
 
     pub fn id_process_three_point(&mut self) -> usize {
@@ -151,4 +181,5 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
 }
 
 mod point_access;
+mod equal;
 
