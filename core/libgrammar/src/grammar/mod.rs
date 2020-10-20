@@ -259,6 +259,9 @@ pub trait Grammar {
         value.print_token_type(None);
         DescResult::Success
     }
+    fn operator_equal(&mut self, value: TokenValue) -> DescResult {
+        unimplemented!();
+    }
     fn operator_prefix_increase(&mut self, value: TokenValue) {
         value.print_token_type(Some("prefix increase:"));
     }
@@ -763,6 +766,7 @@ mod structure;
 mod structinit;
 mod process_if;
 mod boolean;
+mod equal;
 
 #[cfg(test)]
 mod test {

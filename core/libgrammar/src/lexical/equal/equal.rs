@@ -18,7 +18,7 @@ impl EqualToken {
     }
 
     fn led<T: FnMut() -> CallbackReturnStatus, CB: Grammar>(token: &Token<T, CB>, grammar: &mut GrammarParser<T, CB>, express_context: &ExpressContext<T, CB>) -> TokenMethodResult {
-        TokenMethodResult::None
+        grammar.equal_process(express_context)
     }
 }
 
