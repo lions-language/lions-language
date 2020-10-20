@@ -27,6 +27,10 @@ pub struct VarStmtContext {
     is_exist_equal: bool
 }
 
+#[derive(Default, FieldGet)]
+pub struct VarUpdateStmtContext {
+}
+
 impl Default for VarStmtContext {
     fn default() -> Self {
         Self {
@@ -369,6 +373,9 @@ pub trait Grammar {
     }
     fn var_stmt_end(&mut self, _context: VarStmtContext) -> DescResult {
         unimplemented!("var stmt end");
+    }
+    fn var_update_stmt(&mut self, _context: VarUpdateStmtContext) -> DescResult {
+        unimplemented!();
     }
     fn return_stmt(&mut self, _context: ReturnStmtContext) -> DescResult {
         println!("return stmt");

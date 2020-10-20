@@ -15,7 +15,7 @@ use libgrammar::grammar::{Grammar, CallFuncScopeContext
     , StructDefineFieldContext
     , ReturnStmtContext as GrammarReturnStmtContext
     , ObjectFunctionDefineMutContext, TypeToken
-    , EnterPointAccessContext};
+    , EnterPointAccessContext, VarUpdateStmtContext};
 use libgrammar::token::{TokenValue};
 use libtype::{Type, Data};
 use libtype::function::{Function, CallFunctionParamAddr
@@ -435,6 +435,10 @@ impl<'a, F: Compile> Grammar for Compiler<'a, F> {
 
     fn var_stmt_end(&mut self, context: VarStmtContext) -> DescResult {
         self.handle_var_stmt_end(context)
+    }
+
+    fn var_update_stmt(&mut self, context: VarUpdateStmtContext) -> DescResult {
+        self.handle_var_update_stmt(context)
     }
 
     fn return_stmt(&mut self, context: GrammarReturnStmtContext) -> DescResult {

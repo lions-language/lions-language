@@ -4,7 +4,7 @@ use libtype::function::{AddFunctionContext};
 use libtype::{PackageType, PackageTypeValue
     , AddressType, AddressValue
     , Type, TypeAttrubute};
-use libgrammar::grammar::{VarStmtContext};
+use libgrammar::grammar::{VarStmtContext, VarUpdateStmtContext};
 use crate::address::Address;
 use crate::compile::{Compile, Compiler, OwnershipMoveContext};
 use crate::compile::scope::vars::Variant;
@@ -112,6 +112,28 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 unimplemented!();
             }
         }
+        DescResult::Success
+    }
+
+    pub fn handle_var_update_stmt(&mut self, context: VarUpdateStmtContext) -> DescResult {
+        /*
+         * 等号右边的
+         * */
+        let right_value = match self.scope_context.take_top_from_value_buffer() {
+            Ok(v) => v,
+            Err(e) => {
+                return e;
+            }
+        };
+        /*
+         * 等号左边的
+         * */
+        let left_value = match self.scope_context.take_top_from_value_buffer() {
+            Ok(v) => v,
+            Err(e) => {
+                return e;
+            }
+        };
         DescResult::Success
     }
 }
