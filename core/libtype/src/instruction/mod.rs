@@ -148,6 +148,13 @@ pub struct AddRefParamAddr {
 
 #[derive(Debug, Clone, FieldGet, NewWithAll
     , FieldGetMove, FieldGetClone, Default)]
+pub struct UpdateRefParamAddr {
+    addr: AddressKey,
+    dst_addr: AddressValue
+}
+
+#[derive(Debug, Clone, FieldGet, NewWithAll
+    , FieldGetMove, FieldGetClone, Default)]
 pub struct BlockDefine {
     addr: FunctionAddrValue
 }

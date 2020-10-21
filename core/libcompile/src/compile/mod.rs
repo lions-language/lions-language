@@ -29,6 +29,7 @@ use libtype::instruction::{
     Instruction, BlockDefine
     , Jump, RemoveOwnership
     , AddRefParamAddr
+    , UpdateRefParamAddr
     , CallSelfFunction
     , CallPrimevalFunctionParamContext
     , ConditionStmt};
@@ -288,6 +289,10 @@ pub trait Compile {
     }
 
     fn add_ref_param_addr(&mut self, _: AddRefParamAddr) {
+        unimplemented!();
+    }
+
+    fn update_ref_param_addr(&mut self, _: UpdateRefParamAddr) {
         unimplemented!();
     }
 

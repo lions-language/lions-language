@@ -4,6 +4,7 @@ use libtype::function::{AddFunctionContext};
 use libtype::{PackageType, PackageTypeValue
     , AddressType, AddressValue
     , Type, TypeAttrubute};
+use libtype::instruction::{UpdateRefParamAddr};
 use libgrammar::grammar::{VarStmtContext, VarUpdateStmtContext};
 use crate::address::Address;
 use crate::compile::{Compile, Compiler, OwnershipMoveContext};
@@ -173,7 +174,11 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 None => {
                     /*
                      * 左边是对象成员的 point access
+                     *  => 告诉虚拟机换一下地址
                      * */
+                    self.cb.update_ref_param_addr(
+                        UpdateRefParamAddr::new_with_all(
+                            var_addr.addr().addr(), expr_addr.addr_clone()));
                 }
             }
         } else if var_typ_attr.is_move_as_assign() {
