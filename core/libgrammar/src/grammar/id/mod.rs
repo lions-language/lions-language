@@ -28,6 +28,9 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
             None => {
             }
         }
+        let name =
+            extract_token_data!(token_value.token_data_ref().as_ref().expect("should not happend")
+                , Id).to_string();
         let context = LoadVariantContext::new_with_all(
             token_value, None, desc_ctx.typ_attr, lengthen_offset);
         match self.grammar_context().cb.load_variant(context) {
@@ -37,17 +40,17 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
             _ => {
             }
         }
-        self.id_after_process_id_without_next();
+        self.id_after_process_id_without_next(Some(name));
     }
 
     /*
      * 如果匹配 => 返回 true, 否则返回 false
      * */
-    fn id_after_process_id_with_next(&mut self, tp: &TokenPointer) -> bool {
+    fn id_after_process_id_with_next(&mut self, tp: &TokenPointer, name: Option<String>) -> bool {
         let next = tp.as_ref::<T, CB>();
         match next.context_token_type() {
             TokenType::Equal => {
-                self.id_process_equal();
+                self.id_process_equal(name);
                 return true;
             },
             _ => {
@@ -56,14 +59,14 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         false
     }
 
-    fn id_after_process_id_without_next(&mut self) -> bool {
+    fn id_after_process_id_without_next(&mut self, name: Option<String>) -> bool {
         let tp = match self.lookup_next_one_ptr() {
             Some(tp) => tp,
             None => {
                 return false;
             }
         };
-        self.id_after_process_id_with_next(&tp)
+        self.id_after_process_id_with_next(&tp, name)
     }
 
     pub fn id_process_three_point(&mut self) -> usize {

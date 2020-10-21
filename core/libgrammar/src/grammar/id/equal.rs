@@ -10,7 +10,7 @@ use crate::lexical::{CallbackReturnStatus};
 use crate::token::{TokenType, TokenData};
 
 impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, CB> {
-    pub fn id_process_equal(&mut self) {
+    pub fn id_process_equal(&mut self, name: Option<String>) {
         /*
          * 跳过 = token
          * */
@@ -22,7 +22,8 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
             parser.expression_process(&tp
                 , &ExpressContext::new(GrammarParser::<T, CB>::expression_end_normal));
         }, "expression");
-        check_desc_result!(self, self.cb().var_update_stmt(VarUpdateStmtContext::default()));
+        check_desc_result!(self, self.cb().var_update_stmt(VarUpdateStmtContext::new_with_all(
+                    name)));
     }
 }
  

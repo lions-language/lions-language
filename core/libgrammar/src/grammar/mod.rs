@@ -27,8 +27,13 @@ pub struct VarStmtContext {
     is_exist_equal: bool
 }
 
-#[derive(Default, FieldGet)]
+#[derive(Default, FieldGet, NewWithAll
+    , FieldGetMove)]
 pub struct VarUpdateStmtContext {
+    /*
+     * 如果没有, 说明是对 xxx.xxx 的形式
+     * */
+    name: Option<String>
 }
 
 impl Default for VarStmtContext {

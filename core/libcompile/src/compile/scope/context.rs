@@ -203,6 +203,22 @@ impl ScopeContext {
                     , var.typ_attr_ref().clone())))
     }
 
+    pub fn find_variant_mut(&mut self, name: &str) -> Option<RefPtr> {
+        let mut index = self.scopes.len() - 1;
+        let mut scope = 0;
+        let value = match self.find_variant_inner(name, &mut scope, &mut index) {
+            Some(v) => v,
+            None => {
+                return None;
+            }
+        };
+        let (_, var) = value;
+        let mut var_ptr = RefPtr::from_ref(var);
+        let var_mut = var_ptr.as_mut::<Variant>();
+        *var_mut.addr_mut().addr_mut().addr_mut().scope_mut() += scope;
+        Some(var_ptr)
+    }
+
     fn find_variant_inner(&self, name: &str, scope: &mut usize
         , index: &mut usize) -> Option<(&String, &Variant)> {
         match self.scopes.get(*index) {

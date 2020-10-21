@@ -116,6 +116,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
     }
 
     pub fn handle_var_update_stmt(&mut self, context: VarUpdateStmtContext) -> DescResult {
+        let name = context.fields_move();
         /*
          * 等号右边的
          * */
@@ -154,11 +155,27 @@ impl<'a, F: Compile> Compiler<'a, F> {
                     format!("typ attr not match! left typ attr: {:?}, but right typ attr: {:?}"
                         , var_typ_attr, expr_typ_attr));
             }
-            /*
-            self.scope_context.add_variant(name
-                , Variant::new(
-                    Address::new(src_addr), typ, typ_attr));
-            */
+            match name {
+                Some(var_name) => {
+                    /*
+                     * 左边是变量名
+                     * */
+                    let mut var_ptr = match self.scope_context.find_variant_mut(&var_name) {
+                        Some(v) => v,
+                        None => {
+                            return DescResult::Error(
+                                format!("var: {:?} is not found", var_name));
+                        }
+                    };
+                    let var = var_ptr.as_mut::<Variant>();
+                    *var.addr_mut() = expr_addr;
+                },
+                None => {
+                    /*
+                     * 左边是对象成员的 point access
+                     * */
+                }
+            }
         } else if var_typ_attr.is_move_as_assign() {
             if !expr_typ_attr.is_move_as_assign() {
                 return DescResult::Error(
