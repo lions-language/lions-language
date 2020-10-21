@@ -22,9 +22,6 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                         lengthen_offset = self.id_process_three_point();
                     },
                     _ => {
-                        if self.id_after_process_id_with_next(&tp) {
-                            return;
-                        }
                     }
                 }
             },
@@ -40,6 +37,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
             _ => {
             }
         }
+        self.id_after_process_id_without_next();
     }
 
     /*

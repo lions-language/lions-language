@@ -141,6 +141,30 @@ impl TypeAttrubute {
         }
     }
 
+    pub fn is_ref_as_assign(&self) -> bool {
+        match self {
+            TypeAttrubute::Ref
+            | TypeAttrubute::MutRef => {
+                true
+            },
+            _ => {
+                false
+            }
+        }
+    }
+
+    pub fn is_move_as_assign(&self) -> bool {
+        match self {
+            TypeAttrubute::Move
+            | TypeAttrubute::CreateRef => {
+                true
+            },
+            _ => {
+                false
+            }
+        }
+    }
+
     pub fn to_str(&self) -> &'static str {
         match self {
             TypeAttrubute::Move => {

@@ -22,7 +22,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
             parser.expression_process(&tp
                 , &ExpressContext::new(GrammarParser::<T, CB>::expression_end_normal));
         }, "expression");
-        self.cb().var_update_stmt(VarUpdateStmtContext::default());
+        check_desc_result!(self, self.cb().var_update_stmt(VarUpdateStmtContext::default()));
     }
 }
  
