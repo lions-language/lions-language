@@ -32,7 +32,7 @@ use libtype::instruction::{
     , UpdateRefParamAddr
     , CallSelfFunction
     , CallPrimevalFunctionParamContext
-    , ConditionStmt};
+    , ConditionStmt, DeleteData};
 use libtypecontrol::function::FunctionControl;
 use libtype::module::Module;
 use libresult::*;
@@ -280,6 +280,10 @@ pub trait Compile {
     }
 
     fn remove_ownership(&mut self, _context: RemoveOwnership) {
+        unimplemented!();
+    }
+
+    fn delete_data(&mut self, _context: DeleteData) {
         unimplemented!();
     }
 

@@ -12,7 +12,7 @@ use libtype::instruction::{Instruction, CallPrimevalFunction
     , Jump, RemoveOwnership
     , CallSelfFunction
     , AddRefParamAddr, CallPrimevalFunctionParamContext
-    , ConditionStmt, BlockDefine};
+    , ConditionStmt, BlockDefine, DeleteData};
 use libgrammar::grammar::{FunctionDefineContext
     , BlockDefineContext};
 use crate::compile::{StaticContext, CallFunctionContext
@@ -248,6 +248,10 @@ impl<'a, 'b, F: Writer> Compile for Bytecode<'a, 'b, F> {
 
     fn execute_block(&mut self, context: BlockDefine) {
         self.write(Instruction::ExecuteBlock(context));
+    }
+
+    fn delete_data(&mut self, context: DeleteData) {
+        self.write(Instruction::DeleteData(context));
     }
 }
 

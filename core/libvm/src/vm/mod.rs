@@ -100,6 +100,9 @@ impl VirtualMachine {
             Instruction::AddRefParamAddr(v) => {
                 self.add_ref_param_addr(v);
             },
+            Instruction::DeleteData(v) => {
+                self.delete_data(v);
+            },
             Instruction::EnterScope => {
                 self.thread_context.enter_thread_scope();
             },
@@ -243,6 +246,7 @@ mod ownership;
 mod address;
 mod process_return;
 mod process_condition;
+mod memory;
 
 #[cfg(test)]
 mod test {

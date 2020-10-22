@@ -4,7 +4,8 @@ use libtype::function::{AddFunctionContext};
 use libtype::{PackageType, PackageTypeValue
     , AddressType, AddressValue
     , Type, TypeAttrubute};
-use libtype::instruction::{UpdateRefParamAddr};
+use libtype::instruction::{UpdateRefParamAddr
+    , DeleteData};
 use libgrammar::grammar::{VarStmtContext, VarUpdateStmtContext};
 use crate::address::Address;
 use crate::compile::{Compile, Compiler, OwnershipMoveContext};
@@ -186,6 +187,28 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 return DescResult::Error(
                     format!("not match! left typ attr: {:?}, but right typ attr: {:?}"
                         , var_typ_attr, expr_typ_attr));
+            }
+            match name {
+                Some(var_name) => {
+                    /*
+                     * 左边是变量名
+                     *  1. 告诉虚拟机释放原来指向的数据地址
+                     *  2. 将编译期的 vars 中的地址更新为新的地址
+                     * */
+                    let mut var_ptr = match self.scope_context.find_variant_mut(&var_name) {
+                        Some(v) => v,
+                        None => {
+                            return DescResult::Error(
+                                format!("var: {:?} is not found", var_name));
+                        }
+                    };
+                    let var = var_ptr.as_mut::<Variant>();
+                    let last_addr = var.addr_ref().addr_clone();
+                    self.cb.delete_data(DeleteData::new_with_all(last_addr));
+                    *var.addr_mut() = expr_addr;
+                },
+                None => {
+                }
             }
         } else {
             unimplemented!();

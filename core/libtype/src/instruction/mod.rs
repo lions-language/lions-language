@@ -173,6 +173,12 @@ pub struct ConditionStmt {
     true_handle: ConditionStmtTrue
 }
 
+#[derive(Debug, Clone, FieldGet, NewWithAll
+    , FieldGetMove, FieldGetClone, Default)]
+pub struct DeleteData {
+    addr: AddressValue
+}
+
 /*
  * 指令
  * */
@@ -196,6 +202,7 @@ pub enum Instruction {
     AddRefParamAddr(AddRefParamAddr),
     ConditionStmt(ConditionStmt),
     ExecuteBlock(BlockDefine),
+    DeleteData(DeleteData),
     EnterScope,
     LeaveScope,
     Invalid
