@@ -10,6 +10,10 @@ pub struct AddressDispatch {
      *  那么将导致检测地址有效性出现错误
      * */
     pub recycles: Vec<AddressValue>,
+    /*
+     * 如果移动的是结构体中的某一个字段, 之后是不允许访问的
+     *  这里的 used_addr_index 就是用来判断地址 结构体中的某个字段是否被移动的
+     * */
     used_addr_index: HashSet<usize>,
     index: usize
 }

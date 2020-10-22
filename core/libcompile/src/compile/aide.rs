@@ -32,6 +32,13 @@ impl<'a, F: Compile> Compiler<'a, F> {
     pub fn cb_leave_scope(&mut self) {
         self.cb.leave_scope();
     }
+
+    pub fn cb_ownership_move(&mut self, addr: AddressKey
+        , src_addr: AddressValue) {
+        self.cb.ownership_move(OwnershipMoveContext::new_with_all(
+            addr, src_addr.clone()));
+        self.scope_context.recycle_address(src_addr);
+    }
 }
 
 impl TokenValueExpand for TokenValue {

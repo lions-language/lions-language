@@ -79,8 +79,12 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 self.scope_context.add_variant(name
                     , Variant::new(
                         Address::new(addr.addr_clone()), typ, typ_attr));
+                /*
                 self.cb.ownership_move(OwnershipMoveContext::new_with_all(
                     addr.addr().addr(), src_addr.clone()));
+                */
+                self.cb_ownership_move(
+                    addr.addr().addr(), src_addr.clone());
                 /*
                  * 如果是移动的变量, 需要将被移动的变量从变量列表中移除
                  * */
@@ -98,7 +102,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                  * 回收索引
                  * */
                 // println!("{:?}", src_addr);
-                self.scope_context.recycle_address(src_addr);
+                // self.scope_context.recycle_address(src_addr);
             },
             TypeAttrubute::Ref
             | TypeAttrubute::MutRef => {
@@ -206,8 +210,12 @@ impl<'a, F: Compile> Compiler<'a, F> {
                     let var = var_ptr.as_ref::<Variant>();
                     let last_addr = var.addr_ref().addr_clone();
                     self.cb.delete_data(DeleteData::new_with_all(last_addr));
+                    /*
                     self.cb.ownership_move(OwnershipMoveContext::new_with_all(
                         var_addr.addr().addr(), expr_addr.addr_clone()));
+                    */
+                    self.cb_ownership_move(
+                        var_addr.addr().addr(), expr_addr.addr_clone());
                     /*
                      * 如果是移动的变量, 需要将被移动的变量从变量列表中移除
                      * */
