@@ -231,6 +231,21 @@ impl<'a, F: Compile> Compiler<'a, F> {
                     }
                 },
                 None => {
+                    self.cb_ownership_move(
+                        var_addr.addr().addr(), expr_addr.addr_clone());
+                    /*
+                     * 如果是移动的变量, 需要将被移动的变量从变量列表中移除
+                     * */
+                    match expr_context {
+                        ValueBufferItemContext::Variant(v) => {
+                            let var_name = v.as_ref::<String>();
+                            // println!("remove {}", var_name);
+                            self.scope_context.remove_variant_unchecked(
+                                expr_addr.addr_ref().addr_ref().scope_clone()
+                                , var_name, expr_addr.addr_ref().addr_ref());
+                        },
+                        _ => {}
+                    }
                 }
             }
         } else {
