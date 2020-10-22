@@ -1,3 +1,4 @@
+use libresult::DescResult;
 use libtype::{TypeValue, AddressType};
 use libtype::structure::{StructDefine
     , StructMember};
@@ -11,11 +12,16 @@ impl<'a, F: Compile> Compiler<'a, F> {
     }
 
     pub fn process_struct_define_field(&mut self, context: StructDefineFieldContext
-        , define: &mut StructDefine) {
+        , define: &mut StructDefine) -> DescResult {
         let (name_token, type_token, typ_attr) = context.fields_move();
         let name_data = name_token.token_data_unchecked();
         let name = extract_token_data!(name_data, Id);
-        let typ = self.to_type(type_token);
+        let typ = match self.to_type(type_token) {
+            Ok(ty) => ty,
+            Err(err) => {
+                return err;
+            }
+        };
         let addr_type = if typ_attr.is_move() {
             typ.to_address_type()
         } else if typ_attr.is_ref() {
@@ -33,6 +39,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 *define.member_mut() = Some(m);
             }
         }
+        DescResult::Success
     }
 
     pub fn process_struct_define_end(&mut self, define: StructDefine) {

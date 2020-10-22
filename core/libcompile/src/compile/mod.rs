@@ -162,7 +162,7 @@ trait AddressValueExpand {
 }
 
 trait TypeTokenExpand {
-    fn to_type<F: Compile>(self, compiler: RefPtr) -> Type;
+    fn to_type<F: Compile>(self, compiler: RefPtr) -> Result<Type, DescResult>;
 }
 
 pub trait Compile {
@@ -376,16 +376,16 @@ impl<'a, F: Compile> Grammar for Compiler<'a, F> {
     }
 
     fn function_named_stmt(&mut self, value: TokenValue
-        , define_context: &mut FunctionDefineContext) {
-        self.handle_function_named_stmt(value, define_context);
+        , define_context: &mut FunctionDefineContext) -> DescResult {
+        self.handle_function_named_stmt(value, define_context)
     }
     
     fn function_object_method_stmt(&mut self
         , object_type: TypeToken, func_name: TokenValue
         , mut_context: &mut ObjectFunctionDefineMutContext
-        , define_context: &mut FunctionDefineContext) {
+        , define_context: &mut FunctionDefineContext) -> DescResult {
         self.handle_function_object_method_stmt(object_type
-            , func_name, mut_context, define_context);
+            , func_name, mut_context, define_context)
     }
 
     fn function_define_start(&mut self, _value: TokenValue) {
@@ -394,13 +394,13 @@ impl<'a, F: Compile> Grammar for Compiler<'a, F> {
 
     fn function_define_param(&mut self, context: FunctionDefineParamContext
         , mut_context: &mut FunctionDefineParamMutContext
-        , define_context: &mut FunctionDefineContext) {
-        self.handle_function_define_param(context, mut_context, define_context);
+        , define_context: &mut FunctionDefineContext) -> DescResult {
+        self.handle_function_define_param(context, mut_context, define_context)
     }
 
     fn function_define_return(&mut self, context: FunctionDefineReturnContext
-        , define_context: &mut FunctionDefineContext) {
-        self.handle_function_define_return(context, define_context);
+        , define_context: &mut FunctionDefineContext) -> DescResult {
+        self.handle_function_define_return(context, define_context)
     }
 
     fn function_define_end(&mut self, _value: TokenValue
@@ -507,8 +507,8 @@ impl<'a, F: Compile> Grammar for Compiler<'a, F> {
     }
 
     fn struct_define_field(&mut self, context: StructDefineFieldContext
-        , define: &mut StructDefine) {
-        self.process_struct_define_field(context, define);
+        , define: &mut StructDefine) -> DescResult {
+        self.process_struct_define_field(context, define)
     }
 
     fn struct_define_end(&mut self, define: StructDefine) {

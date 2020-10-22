@@ -1,3 +1,4 @@
+use libresult::DescResult;
 use super::{GrammarParser, Grammar};
 use crate::grammar::{FunctionDefineReturnContext
     , FunctionDefineContext};
@@ -39,9 +40,9 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
             }
         }
         let (typ_attr, lengthen_attr, type_token) = self.typ_parse();
-        self.cb().function_define_return(FunctionDefineReturnContext::new_with_all(
+        check_desc_result!(self, self.cb().function_define_return(FunctionDefineReturnContext::new_with_all(
             typ_attr, lengthen_attr, type_token
-        ), define_context);
+        ), define_context));
     }
 }
 

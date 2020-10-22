@@ -1,3 +1,4 @@
+use libresult::DescResult;
 use libgrammar::token::{TokenValue, TokenData};
 use libgrammar::grammar::{FunctionDefineParamContext
     , FunctionDefineParamContextType
@@ -23,7 +24,7 @@ use crate::address::Address;
 
 impl<'a, F: Compile> Compiler<'a, F> {
     pub fn handle_function_named_stmt(&mut self, value: TokenValue
-        , define_context: &mut FunctionDefineContext) {
+        , define_context: &mut FunctionDefineContext) -> DescResult {
         let s = match value.token_data.expect("should not happend") {
             TokenData::Id(v) => {
                 v
@@ -39,11 +40,12 @@ impl<'a, F: Compile> Compiler<'a, F> {
         self.scope_context.enter_with_define_obj(
             DefineObject::new(define_context.define_obj_clone())
             , ScopeType::Function);
+        DescResult::Success
     }
 
     pub fn handle_function_define_param(&mut self, context: FunctionDefineParamContext
         , mut_context: &mut FunctionDefineParamMutContext
-        , define_context: &mut FunctionDefineContext) {
+        , define_context: &mut FunctionDefineContext) -> DescResult {
         let (name_token, t, typ_attr, lengthen_attr, param_no)
             = context.fields_move();
         let name = extract_token_data!(
@@ -51,7 +53,12 @@ impl<'a, F: Compile> Compiler<'a, F> {
            , Id);
         let typ = match t {
             FunctionDefineParamContextType::Token(token) => {
-                self.to_type(token)
+                match self.to_type(token) {
+                    Ok(ty) => ty,
+                    Err(err) => {
+                        return err;
+                    }
+                }
             },
             FunctionDefineParamContextType::Typ(ty) => {
                 ty
@@ -109,16 +116,24 @@ impl<'a, F: Compile> Compiler<'a, F> {
         let func_param_item = FunctionParamDataItem::new_with_lengthen(
             typ, typ_attr, lengthen_attr);
         self.cb.function_push_param_to_statement(func_param_item, define_context);
+        DescResult::Success
     }
 
     pub fn handle_function_define_return(&mut self, context: FunctionDefineReturnContext
-        , define_context: &FunctionDefineContext) {
+        , define_context: &FunctionDefineContext) -> DescResult {
         let (typ_attr, _, type_token) = context.fields_move();
+        let typ = match self.to_type(type_token) {
+            Ok(ty) => ty,
+            Err(err) => {
+                return err;
+            }
+        };
         let func_return_data = FunctionReturnData::new(
-            self.to_type(type_token), typ_attr);
+            typ, typ_attr);
         let func_return = FunctionReturn::new(func_return_data);
         self.scope_context.set_current_func_return(func_return.clone());
         self.cb.function_set_return_to_statement(func_return, define_context);
+        DescResult::Success
     }
 
     pub fn handle_function_define_start(&mut self) {

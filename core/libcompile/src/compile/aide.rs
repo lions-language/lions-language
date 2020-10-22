@@ -1,5 +1,6 @@
 use libstructtype::structure::{StructControl};
 use libgrammar::token::{TokenType, TokenValue, TokenData};
+use libresult::{DescResult};
 use libcommon::ptr::{RefPtr};
 use libgrammar::grammar::TypeToken;
 use libtype::{Type, Data, TypeValue
@@ -13,7 +14,7 @@ use super::{Compiler, Compile, TokenValueExpand
     , TypeTokenExpand, OwnershipMoveContext};
 
 impl<'a, F: Compile> Compiler<'a, F> {
-    pub fn to_type(&self, typ: TypeToken) -> Type {
+    pub fn to_type(&self, typ: TypeToken) -> Result<Type, DescResult> {
         typ.to_type::<F>(RefPtr::from_ref(self))
     }
 
@@ -126,14 +127,14 @@ impl AddressValueExpand for AddressValue {
 }
 
 impl TypeTokenExpand for TypeToken {
-    fn to_type<F: Compile>(self, cp: RefPtr) -> Type {
+    fn to_type<F: Compile>(self, cp: RefPtr) -> Result<Type, DescResult> {
         match self {
             TypeToken::Single(tv) => {
                 let token_data = tv.token_data().expect("should not happend");
                 let t = extract_token_data!(token_data, Id);
                 match Type::from_str(&t) {
                     Some(typ) => {
-                        typ
+                        Ok(typ)
                     },
                     None => {
                         let compiler = cp.as_ref::<Compiler<F>>();
@@ -149,12 +150,12 @@ impl TypeTokenExpand for TypeToken {
                                 println!("xxxxxxxxxxxxx {:?}", struct_obj);
                                 struct_obj.as_ref().name_ref();
                                 */
-                                Type::new_with_addrtyp(
+                                Ok(Type::new_with_addrtyp(
                                     TypeValue::Structure(Structure::new(struct_obj))
-                                    , TypeAddrType::Stack)
+                                    , TypeAddrType::Stack))
                             },
                             None => {
-                                unimplemented!("unknow type: {:?}", t);
+                                return Err(DescResult::Error(format!("undefine type: {:?}", t)));
                             }
                         }
                     }

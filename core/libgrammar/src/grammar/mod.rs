@@ -289,17 +289,14 @@ pub trait Grammar {
     fn operator_positive(&mut self, value: TokenValue) {
         value.print_token_type(Some("prefix operator:"));
     }
-    fn function_named_stmt(&mut self, func_name: TokenValue
-        , define_context: &mut FunctionDefineContext) {
-        /*
-         * 命名函数语句
-         * */
-        func_name.print_token_type(Some("named function stmt:"));
+    fn function_named_stmt(&mut self, _func_name: TokenValue
+        , _define_context: &mut FunctionDefineContext) -> DescResult {
+        unimplemented!();
     }
     fn function_object_method_stmt(&mut self
         , _object_type: TypeToken, _function_name: TokenValue
         , _mut_context: &mut ObjectFunctionDefineMutContext
-        , _define_context: &mut FunctionDefineContext) {
+        , _define_context: &mut FunctionDefineContext) -> DescResult {
         unimplemented!("function_object_memthod_stmt");
     }
     fn function_struct_method_stmt(&mut self) {
@@ -312,11 +309,12 @@ pub trait Grammar {
     }
     fn function_define_param(&mut self, context: FunctionDefineParamContext
         , _mut_context: &mut FunctionDefineParamMutContext
-        , _define_context: &mut FunctionDefineContext) {
+        , _define_context: &mut FunctionDefineContext) -> DescResult {
         unimplemented!();
     }
     fn function_define_return(&mut self, _context: FunctionDefineReturnContext
-        , _define_context: &mut FunctionDefineContext) {
+        , _define_context: &mut FunctionDefineContext) -> DescResult {
+        unimplemented!();
     }
     fn function_define_end(&mut self, _value: TokenValue
         , _define_context: &FunctionDefineContext) {
@@ -353,7 +351,7 @@ pub trait Grammar {
         unimplemented!();
     }
     fn struct_define_field(&mut self, _: StructDefineFieldContext
-        , _: &mut StructDefine) {
+        , _: &mut StructDefine) -> DescResult {
         unimplemented!();
     }
     fn struct_define_end(&mut self, _: StructDefine) {

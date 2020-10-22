@@ -1,3 +1,4 @@
+use libresult::DescResult;
 use libtype::{TypeAttrubute};
 use libtype::function::{FunctionParamLengthenAttr};
 use libtype::structure::{StructDefine};
@@ -181,10 +182,10 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         if let FunctionParamLengthenAttr::Lengthen = lengthen_attr {
             // *define_context.has_lengthen_param_mut() = true;
         };
-        self.grammar_context().cb.struct_define_field(
+        check_desc_result!(self, self.grammar_context().cb.struct_define_field(
             StructDefineFieldContext::new_with_all(
                 name_token.token_value(), type_token
-                , typ_attr), define);
+                , typ_attr), define));
     }
 }
 

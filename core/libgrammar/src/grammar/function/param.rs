@@ -1,3 +1,4 @@
+use libresult::DescResult;
 use libtype::{TypeAttrubute};
 use libtype::function::{FunctionParamLengthenAttr};
 use super::{GrammarParser, Grammar
@@ -118,7 +119,8 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                     /*
                      * 期望一个id作为参数名, 但是token不是id => 语法错误
                      * */
-                    parser.panic(&format!("expect id as param name, but found {:?}", token.context_ref().token_type()));
+                    parser.panic(&format!("expect id as param name, but found {:?}"
+                            , token.context_ref().token_type()));
                     return;
                 }
             }
@@ -178,10 +180,10 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         if let FunctionParamLengthenAttr::Lengthen = lengthen_attr {
             *define_context.has_lengthen_param_mut() = true;
         };
-        self.grammar_context().cb.function_define_param(
+        check_desc_result!(self, self.grammar_context().cb.function_define_param(
             FunctionDefineParamContext::new_with_all(
                 name_token.token_value(), FunctionDefineParamContextType::Token(type_token)
-                , typ_attr, lengthen_attr, param_no), mut_context, define_context);
+                , typ_attr, lengthen_attr, param_no), mut_context, define_context));
     }
 }
 
