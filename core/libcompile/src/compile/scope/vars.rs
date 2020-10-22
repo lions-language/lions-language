@@ -16,9 +16,6 @@ pub struct Variant {
 
 impl Variant {
     fn remove(&mut self, addr: &AddressKey) {
-        /*
-         * 如果连续地址队列为空, 则将 name 从变量中移除, 否则将其从连续地址中移除
-         * */
         match &mut self.consecutive_addr {
             Some(ks) => {
                 ks.remove(addr);
@@ -92,6 +89,9 @@ impl Variants {
         match self.vars.get_mut(name) {
             Some(vs) => {
                 vs.remove(addr);
+                /*
+                 * 如果连续地址队列为空, 则将 name 从变量中移除, 否则将其从连续地址中移除
+                 * */
                 if vs.consecutive_addr_is_empty() {
                     self.vars.remove(name);
                 }

@@ -194,18 +194,33 @@ impl<'a, F: Compile> Compiler<'a, F> {
                      * 左边是变量名
                      *  1. 告诉虚拟机释放原来指向的数据地址
                      *  2. 将编译期的 vars 中的地址更新为新的地址
+                     *  3. 告诉虚拟机 移动所有权
                      * */
-                    let mut var_ptr = match self.scope_context.find_variant_mut(&var_name) {
+                    let var_ptr = match self.scope_context.find_variant_mut(&var_name) {
                         Some(v) => v,
                         None => {
                             return DescResult::Error(
                                 format!("var: {:?} is not found", var_name));
                         }
                     };
-                    let var = var_ptr.as_mut::<Variant>();
+                    let var = var_ptr.as_ref::<Variant>();
                     let last_addr = var.addr_ref().addr_clone();
                     self.cb.delete_data(DeleteData::new_with_all(last_addr));
-                    *var.addr_mut() = expr_addr;
+                    self.cb.ownership_move(OwnershipMoveContext::new_with_all(
+                        var_addr.addr().addr(), expr_addr.addr_clone()));
+                    /*
+                     * 如果是移动的变量, 需要将被移动的变量从变量列表中移除
+                     * */
+                    match expr_context {
+                        ValueBufferItemContext::Variant(v) => {
+                            let var_name = v.as_ref::<String>();
+                            // println!("remove {}", var_name);
+                            self.scope_context.remove_variant_unchecked(
+                                expr_addr.addr_ref().addr_ref().scope_clone()
+                                , var_name, expr_addr.addr_ref().addr_ref());
+                        },
+                        _ => {}
+                    }
                 },
                 None => {
                 }
