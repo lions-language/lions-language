@@ -55,6 +55,9 @@ impl<T> Rand<T> for RandStack<T> {
 
     fn free(&mut self, index: MemoryValue) {
         let index = index.get_index_clone();
+        self.datas.remove(&index);
+        /*
+        let index = index.get_index_clone();
         if index == self.datas.len() - 1 {
             /*
              * 将要移除的是顶端元素
@@ -68,6 +71,7 @@ impl<T> Rand<T> for RandStack<T> {
              * */
             self.recycles.push(index);
         }
+        */
     }
 }
 

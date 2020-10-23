@@ -135,6 +135,20 @@ impl Scope {
         }
     }
 
+    pub fn free_data(&mut self, addr: MemoryValue
+        , mut memory: RefPtr) {
+        let memory = memory.as_mut::<ThreadMemory>();
+        match addr.addr_value_ref().typ_ref() {
+            AddressType::Stack => {
+                self.addr_mapping.remove(addr.addr_value_ref().addr_clone());
+                memory.stack_data.free(addr);
+            },
+            _ => {
+                unimplemented!();
+            }
+        }
+    }
+
     pub fn alloc_and_write_static(&mut self, addr: &AddressValue
         , static_addr: AddressKey) {
         /*

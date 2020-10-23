@@ -82,6 +82,13 @@ impl ThreadScope {
         */
     }
 
+    pub fn free_data(&mut self, addr: MemoryValue) {
+        let memory = RefPtr::from_ref::<ThreadMemory>(&self.memory);
+        let scope = addr.addr_value_ref().scope_clone();
+        self.scope_context.last_n_mut_unchecked(scope).free_data(
+            addr, memory);
+    }
+
     pub fn alloc_and_write_static(&mut self, addr: &AddressValue
         , static_addr: AddressKey) {
         let scope = addr.scope_clone();
