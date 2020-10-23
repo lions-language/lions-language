@@ -12,6 +12,7 @@ use libtype::{Type, Data, TypeValue
 use super::{Compiler, Compile, TokenValueExpand
     , CallFunctionContext, AddressValueExpand
     , TypeTokenExpand, OwnershipMoveContext};
+use crate::compile::value_buffer::{ValueBufferItemContext};
 
 impl<'a, F: Compile> Compiler<'a, F> {
     pub fn to_type(&self, typ: TypeToken) -> Result<Type, DescResult> {
@@ -35,10 +36,23 @@ impl<'a, F: Compile> Compiler<'a, F> {
     }
 
     pub fn cb_ownership_move(&mut self, addr: AddressKey
-        , src_addr: AddressValue) {
+        , src_addr: AddressValue, value_item_context: &ValueBufferItemContext) {
         self.cb.ownership_move(OwnershipMoveContext::new_with_all(
             addr, src_addr.clone()));
-        self.scope_context.recycle_address(src_addr);
+        self.scope_context.recycle_address(src_addr.clone());
+        /*
+         * 如果是移动的变量, 需要将被移动的变量从变量列表中移除
+         * */
+        match value_item_context {
+            ValueBufferItemContext::Variant(v) => {
+                let var_name = v.as_ref::<String>();
+                // println!("remove {}", var_name);
+                self.scope_context.remove_variant_unchecked(
+                    src_addr.addr_ref().scope_clone()
+                    , var_name, src_addr.addr_ref());
+            },
+            _ => {}
+        }
     }
 }
 

@@ -84,7 +84,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
                     addr.addr().addr(), src_addr.clone()));
                 */
                 self.cb_ownership_move(
-                    addr.addr().addr(), src_addr.clone());
+                    addr.addr().addr(), src_addr.clone(), value.context_ref());
+                /*
                 /*
                  * 如果是移动的变量, 需要将被移动的变量从变量列表中移除
                  * */
@@ -98,6 +99,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                     },
                     _ => {}
                 }
+                */
                 /*
                  * 回收索引
                  * */
@@ -215,7 +217,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
                         var_addr.addr().addr(), expr_addr.addr_clone()));
                     */
                     self.cb_ownership_move(
-                        var_addr.addr().addr(), expr_addr.addr_clone());
+                        var_addr.addr().addr(), expr_addr.addr_clone(), &expr_context);
+                    /*
                     /*
                      * 如果是移动的变量, 需要将被移动的变量从变量列表中移除
                      * */
@@ -229,10 +232,12 @@ impl<'a, F: Compile> Compiler<'a, F> {
                         },
                         _ => {}
                     }
+                    */
                 },
                 None => {
                     self.cb_ownership_move(
-                        var_addr.addr().addr(), expr_addr.addr_clone());
+                        var_addr.addr().addr(), expr_addr.addr_clone(), &expr_context);
+                    /*
                     /*
                      * 如果是移动的变量, 需要将被移动的变量从变量列表中移除
                      * */
@@ -246,6 +251,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                         },
                         _ => {}
                     }
+                    */
                 }
             }
         } else {

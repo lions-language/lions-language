@@ -200,7 +200,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 self.scope_context.recycle_address(value_addr.clone());
                 */
                 self.cb_ownership_move(
-                    addr.addr().addr(), value_addr.clone());
+                    addr.addr().addr(), value_addr.clone(), &value_context);
+                /*
                 match &value_context {
                     ValueBufferItemContext::Variant(v) => {
                         let var_name = v.as_ref::<String>();
@@ -211,6 +212,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                     _ => {
                     }
                 }
+                */
             } else if field_typ_attr.is_ref() {
                 // println!("add_ref: {:?} <= {:?}", addr.addr_ref(), value_addr);
                 self.cb.add_ref_param_addr(

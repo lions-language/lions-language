@@ -44,6 +44,10 @@ impl<'a, F: Compile> Compiler<'a, F> {
                             dst, src));
                         self.scope_context.recycle_address(src_addr.clone());
                         /*
+                        self.cb_ownership_move(
+                            dst, src, &value_context);
+                        */
+                        /*
                          * 移动 成员
                          * */
                         let so = s.struct_obj_ref().pop();
@@ -84,6 +88,10 @@ impl<'a, F: Compile> Compiler<'a, F> {
                         self.cb.ownership_move(OwnershipMoveContext::new_with_all(
                             dst, src));
                         self.scope_context.recycle_address(src_addr.clone());
+                        /*
+                        self.cb_ownership_move(
+                            dst, src, &value_context);
+                        */
                     }
                 }
                 /*
