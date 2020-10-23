@@ -271,6 +271,9 @@ pub trait Grammar {
     fn operator_equal(&mut self, value: TokenValue) -> DescResult {
         unimplemented!();
     }
+    fn operator_equal_equal(&mut self, value: TokenValue) -> DescResult {
+        unimplemented!();
+    }
     fn operator_prefix_increase(&mut self, value: TokenValue) {
         value.print_token_type(Some("prefix increase:"));
     }

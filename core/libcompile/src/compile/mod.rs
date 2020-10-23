@@ -371,6 +371,10 @@ impl<'a, F: Compile> Grammar for Compiler<'a, F> {
         self.operator_plus(value)
     }
 
+    fn operator_equal_equal(&mut self, value: TokenValue) -> DescResult {
+        self.operator_equal_equal(value)
+    }
+
     fn end(&mut self) -> DescResult {
         self.handle_end()
     }
