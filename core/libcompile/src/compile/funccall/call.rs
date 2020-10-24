@@ -8,11 +8,11 @@ use libtype::function::{FindFunctionContext, FindFunctionResult
     , FunctionReturnDataAttr, FunctionParamDataItem
     , FunctionReturnRefParam, AddressFunctionDefine
     , CallFunctionReturnData
-    , FunctionStatement};
+    , FunctionStatement, FindFunctionHandle};
 use libtype::instruction::{
     AddRefParamAddr, CallSelfFunction};
 use libtype::{AddressValue, AddressKey
-    , AddressType};
+    , AddressType, PackageType};
 use libgrammar::token::{TokenValue, TokenData};
 use libgrammar::grammar::{CallFuncScopeContext
     , CallFunctionContext as GrammarCallFunctionContext};
@@ -522,6 +522,57 @@ impl<'a, F: Compile> Compiler<'a, F> {
         DescResult::Success
     }
 
+    pub fn function_is_exist(&mut self, func_name: &str
+        , typ: Option<&Type>
+        , package_type: Option<&PackageType>
+        , mut param_typs: Vec<(Type, TypeAttrubute)>
+        , func_statement: &mut Option<FunctionStatement>
+        , func_define: &mut FunctionDefine)
+        -> Result<(bool, String), DescResult> {
+        let mut func_param_data = None;
+        let param_typs_len = param_typs.len();
+        if param_typs_len == 1 {
+            let (typ, typ_attr) = param_typs.remove(0);
+            func_param_data = Some(FunctionParamData::Single(
+                FunctionParamDataItem::new(typ, typ_attr)));
+        } else if param_typs_len > 1 {
+            let mut items = Vec::new();
+            while !param_typs.is_empty() {
+                let (typ, typ_attr) = param_typs.remove(0);
+                items.push(FunctionParamDataItem::new(typ, typ_attr));
+            }
+            func_param_data = Some(FunctionParamData::Multi(items));
+        }
+        let func_str = FunctionSplice::get_function_without_return_string_by_type(
+            func_name
+            , &func_param_data.as_ref(), &typ);
+        let find_func_context = FindFunctionContext {
+            func_name: func_name,
+            typ: typ,
+            package_typ: package_type,
+            func_str: &func_str,
+            module_str: self.module.name_ref()
+        };
+        let (exists, handle) = self.function_control.is_exists(&find_func_context);
+        if exists {
+            let h = Some(handle);
+            let func_res = self.function_control.find_function(&find_func_context, &h);
+            match func_res {
+                FindFunctionResult::Success(r) => {
+                    *func_define = r.func.func_define.clone();
+                    *func_statement = Some(r.func.func_statement_ref().clone());
+                },
+                FindFunctionResult::Panic(s) => {
+                    return Err(DescResult::Error(s));
+                },
+                _ => {
+                    panic!("find_function: should not happend");
+                }
+            }
+        }
+        Ok((exists, func_str))
+    }
+
     pub fn handle_call_function(&mut self
         , param_len: usize
         , call_context: GrammarCallFunctionContext) -> DescResult {
@@ -529,13 +580,14 @@ impl<'a, F: Compile> Compiler<'a, F> {
          * 1. 查找函数声明
          * */
         let mut return_is_alloc = false;
-        let mut func_define = FunctionDefine::new_invalid_addr();
         let mut func_ptr = call_context.func_ptr_clone();
+        let mut func_define = FunctionDefine::new_invalid_addr();
         let mut func_statement: Option<FunctionStatement> = None;
         if func_ptr.is_null() {
             /*
              * prepare 阶没有找到函数声明 => 查找
              * */
+            /*
             let mut param_typs = call_context.param_typs_clone();
             let mut func_param_data = None;
             let param_typs_len = param_typs.len();
@@ -577,6 +629,19 @@ impl<'a, F: Compile> Compiler<'a, F> {
                         panic!("find_function: should not happend");
                     }
                 }
+            } else {
+            */
+            let param_typs = call_context.param_typs_clone();
+            let (exists, func_str) = 
+                match self.function_is_exist(call_context.func_name_ref_unchecked()
+                , call_context.typ_ref().as_ref(), call_context.package_typ_ref().as_ref()
+                , param_typs, &mut func_statement, &mut func_define) {
+                Ok(r) => r,
+                Err(err) => {
+                    return err;
+                }
+            };
+            if exists {
             } else {
                 match call_context.module_str_ref() {
                     Some(_) => {
