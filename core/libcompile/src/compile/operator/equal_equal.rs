@@ -19,6 +19,8 @@ use crate::address::{Address};
 
 impl<'a, F: Compile> Compiler<'a, F> {
     pub fn operator_equal_equal(&mut self, _value: TokenValue) -> DescResult {
+        let right_expr_value = take_value_top!(self);
+        let left_expr_value = take_value_top!(self);
         DescResult::Success
     }
 }
