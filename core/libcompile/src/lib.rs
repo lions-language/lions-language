@@ -4,7 +4,13 @@
 extern crate libgrammar;
 
 macro_rules! take_value_top {
-    ($this:expr) => {
+    ($this:expr, $name:ident) => {
+        /*
+        let (format!("{}_tye, {}_addr, {}_typ_addr, {}_package_type, {}_package_str, {}_context"
+                , stringify!($name), stringify!($name)
+                , stringify!($name), stringify!($name)
+                , stringify!($name), stringify!($name)))
+        */
         match $this.scope_context.take_top_from_value_buffer() {
             Ok(v) => v,
             Err(err) => {

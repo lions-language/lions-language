@@ -606,18 +606,14 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                 func_define = FunctionDefine::new_addr(func_define_addr_value);
                             } else {
                                 return DescResult::Error(
-                                    format!("the {} function is not found 1", func_str));
+                                    format!("the {} function is not found", func_str));
                             }
                         } else {
                             return DescResult::Error(
-                                format!("the {} function is not found 2", func_str));
+                                format!("the {} function is not found", func_str));
                         }
                     }
                 }
-                /*
-                return DescResult::Error(
-                    format!("the {} function is not found 3", func_str));
-                */
             }
         } else {
             func_statement = Some(func_ptr.as_ref::<Function>().func_statement_ref().clone());
