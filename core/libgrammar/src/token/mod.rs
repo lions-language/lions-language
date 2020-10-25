@@ -56,6 +56,8 @@ pub enum TokenType {
     True,
     // false
     False,
+    // import
+    Import,
     // ->
     RightArrow,
     // (

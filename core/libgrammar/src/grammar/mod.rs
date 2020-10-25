@@ -544,6 +544,9 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
             TokenType::Structure => {
                 self.structure_process();
             },
+            TokenType::Import => {
+                self.import_process();
+            },
             _ => {
                 self.expression_process(token, express_context);
             }
@@ -780,6 +783,7 @@ mod structinit;
 mod process_if;
 mod boolean;
 mod equal;
+mod import;
 
 #[cfg(test)]
 mod test {

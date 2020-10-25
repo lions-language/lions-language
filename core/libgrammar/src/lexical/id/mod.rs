@@ -85,6 +85,13 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
         self.id_push_keyword_token(TokenType::Structure);
     }
 
+    fn id_kw_import(&mut self) {
+        /*
+         * struct
+         * */
+        self.id_push_keyword_token(TokenType::Import);
+    }
+
     fn id_kw_true(&mut self) {
         /*
          * true
@@ -167,6 +174,9 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
             },
             "false" => {
                 self.id_kw_false();
+            },
+            "import" => {
+                self.id_kw_import();
             },
             _ => {
                 self.id(&s);
