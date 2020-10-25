@@ -19,7 +19,8 @@ lazy_static!{
         phf_map! {
             "uint8:+(&uint8,&uint8)" => 0,
             "uint8:+(&uint8,&uint16)" => 1,
-            "uint8:to_str(&uint8)" => 2
+            "uint8:to_str(&uint8)" => 2,
+            "uint8:==(&uint8,&uint8)" => 3
         }
     };
     /*
@@ -125,12 +126,50 @@ lazy_static!{
             optcode: OptCode::RefUint8ToStr
         })
     };
+    /*
+     * &uint8 == &uint8 -> bool
+     * */
+    static ref REF_UINT8_EQUAL_EQUAL_OPERATOR_REF_UINT8_FUNCTION: Function = Function{
+        func_statement: FunctionStatement::new(
+            String::from(consts::OPERATOR_EQUAL_EQUAL_FUNCTION_NAME),
+            Some(FunctionParam::new(
+                FunctionParamData::Multi(
+                    vec![FunctionParamDataItem::new(
+                        Type::new_without_attr(
+                            TypeValue::Primeval(Primeval::new(
+                                PrimevalType::Uint8)))
+                        , TypeAttrubute::Ref
+                    ), FunctionParamDataItem::new(
+                        Type::new_without_attr(
+                            TypeValue::Primeval(Primeval::new(
+                                PrimevalType::Uint8)))
+                        , TypeAttrubute::Ref
+                    )])
+                )),
+            FunctionReturn::new(
+                FunctionReturnData::new_with_attr(
+                    Type::new_without_attr(
+                        TypeValue::Primeval(Primeval::new(
+                            PrimevalType::Boolean)))
+                    , TypeAttrubute::Move
+                    , FunctionReturnDataAttr::Create
+                    ),
+                ),
+            Some(Type::new_without_attr(
+                TypeValue::Primeval(Primeval::new(
+                        PrimevalType::Uint8))))
+        ),
+        func_define: FunctionDefine::Optcode(OptcodeFunctionDefine{
+            optcode: OptCode::RefUint8EqualEqualOperatorRefUint8
+        })
+    };
 
     static ref UINT8_FUNCTION_VEC: Vec<&'static Function> = {
         let mut v = Vec::with_capacity(UINT8_METHOD.len());
         v.push(&*REF_UINT8_PLUS_OPERATOR_REF_UINT8_FUNCTION);
         v.push(&*REF_UINT8_PLUS_OPERATOR_REF_UINT16_FUNCTION);
         v.push(&*REF_UINT8_TO_STR_FUNCTION);
+        v.push(&*REF_UINT8_EQUAL_EQUAL_OPERATOR_REF_UINT8_FUNCTION);
         v
     };
 }

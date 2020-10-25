@@ -13,7 +13,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
             = take_value_top!(self, left_expr_value).fields_move();
         let mut func_define = FunctionDefine::new_invalid_addr();
         let mut func_statement: Option<FunctionStatement> = None;
-        let param_typs = vec![(right_typ.clone(), right_typ_attr.clone())];
+        let param_typs = vec![(left_typ.clone(), left_typ_attr.clone())
+            , (right_typ.clone(), right_typ_attr.clone())];
         let (exists, func_str) = 
             match self.function_is_exist(consts::OPERATOR_EQUAL_EQUAL_FUNCTION_NAME
             , Some(&left_typ), None
