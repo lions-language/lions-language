@@ -245,6 +245,14 @@ pub struct EnterPointAccessContext {
     object_typ_attr: TypeAttrubute
 }
 
+#[derive(Debug, FieldGet
+    , NewWithAll, FieldGetMove
+    , Default)]
+pub struct OperatorEqualEqualContext {
+    value: TokenValue,
+    desc_ctx: DescContext
+}
+
 pub trait Grammar {
     // type IdUse;
     
@@ -271,7 +279,7 @@ pub trait Grammar {
     fn operator_equal(&mut self, value: TokenValue) -> DescResult {
         unimplemented!();
     }
-    fn operator_equal_equal(&mut self, value: TokenValue) -> DescResult {
+    fn operator_equal_equal(&mut self, context: OperatorEqualEqualContext) -> DescResult {
         unimplemented!();
     }
     fn operator_prefix_increase(&mut self, value: TokenValue) {

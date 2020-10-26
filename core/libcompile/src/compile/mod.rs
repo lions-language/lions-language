@@ -15,7 +15,8 @@ use libgrammar::grammar::{Grammar, CallFuncScopeContext
     , StructDefineFieldContext
     , ReturnStmtContext as GrammarReturnStmtContext
     , ObjectFunctionDefineMutContext, TypeToken
-    , EnterPointAccessContext, VarUpdateStmtContext};
+    , EnterPointAccessContext, VarUpdateStmtContext
+    , OperatorEqualEqualContext};
 use libgrammar::token::{TokenValue};
 use libtype::{Type, Data};
 use libtype::function::{Function, CallFunctionParamAddr
@@ -371,8 +372,8 @@ impl<'a, F: Compile> Grammar for Compiler<'a, F> {
         self.operator_plus(value)
     }
 
-    fn operator_equal_equal(&mut self, value: TokenValue) -> DescResult {
-        self.operator_equal_equal(value)
+    fn operator_equal_equal(&mut self, context: OperatorEqualEqualContext) -> DescResult {
+        self.operator_equal_equal(context)
     }
 
     fn end(&mut self) -> DescResult {

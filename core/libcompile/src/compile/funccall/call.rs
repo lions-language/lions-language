@@ -578,7 +578,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
     pub fn call_function(&mut self, func_statement: Option<FunctionStatement>
         , func_define: FunctionDefine, package_str: PackageStr
         , desc_ctx: DescContext
-        , param_len: usize, return_is_alloc: &mut bool) -> DescResult {
+        , param_len: usize) -> DescResult {
+        let mut return_is_alloc = false;
         let func_statement = if let Some(statement) = func_statement {
             statement
         } else {
@@ -590,7 +591,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
         let mut return_addr = Address::new(AddressValue::new_invalid());
         let mut scope = None;
         let desc_result = self.funccall_external_environment(&func_statement, param_len
-            , return_is_alloc, &mut move_param_contexts, &mut ref_param_addrs
+            , &mut return_is_alloc, &mut move_param_contexts, &mut ref_param_addrs
             , &mut return_ref_params, &mut return_addr, &mut scope);
         match desc_result {
             DescResult::Success => {
@@ -633,7 +634,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
             param_context: None,
             call_param_len: param_len,
             return_data: CallFunctionReturnData::new_with_all(
-                return_addr.addr_clone(), *return_is_alloc)
+                return_addr.addr_clone(), return_is_alloc)
         };
         self.cb.call_function(cc);
         self.cb_leave_scope();
@@ -669,7 +670,6 @@ impl<'a, F: Compile> Compiler<'a, F> {
         /*
          * 1. 查找函数声明
          * */
-        let mut return_is_alloc = false;
         let mut func_ptr = call_context.func_ptr_clone();
         let mut func_define = FunctionDefine::new_invalid_addr();
         let mut func_statement: Option<FunctionStatement> = None;
@@ -775,6 +775,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
             func_define = func_ptr.as_ref::<Function>().func_define_ref().clone();
         }
         /*
+        let mut return_is_alloc = false;
         let func_statement = if let Some(statement) = func_statement {
             statement
         } else {
@@ -860,7 +861,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
         */
         let desc_ctx = call_context.desc_ctx_clone();
         self.call_function(func_statement, func_define, call_context.package_str()
-            , desc_ctx, param_len, &mut return_is_alloc)
+            , desc_ctx, param_len)
     }
 }
 

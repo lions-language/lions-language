@@ -57,7 +57,8 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         };
         let r =  self.expression(t.token_attrubute().bp, express_context, &tp);
         if let DescResult::Error(err) = self.grammar_context().cb.operator_equal_equal(
-            t.token_value()) {
+            crate::grammar::OperatorEqualEqualContext::new_with_all(
+                t.token_value(), express_context.desc_ctx.clone())) {
             self.panic(&err);
         };
         r
