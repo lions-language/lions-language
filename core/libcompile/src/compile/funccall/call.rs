@@ -13,9 +13,11 @@ use libtype::instruction::{
     AddRefParamAddr, CallSelfFunction};
 use libtype::{AddressValue, AddressKey
     , AddressType, PackageType};
+use libtype::package::{PackageStr};
 use libgrammar::token::{TokenValue, TokenData};
 use libgrammar::grammar::{CallFuncScopeContext
-    , CallFunctionContext as GrammarCallFunctionContext};
+    , CallFunctionContext as GrammarCallFunctionContext
+    , DescContext};
 use libresult::*;
 use libcommon::ptr::RefPtr;
 use libcommon::address::{FunctionAddress};
@@ -573,6 +575,94 @@ impl<'a, F: Compile> Compiler<'a, F> {
         Ok((exists, func_str))
     }
 
+    pub fn call_function(&mut self, func_statement: Option<FunctionStatement>
+        , func_define: FunctionDefine, package_str: PackageStr
+        , desc_ctx: DescContext
+        , param_len: usize, return_is_alloc: &mut bool) -> DescResult {
+        let func_statement = if let Some(statement) = func_statement {
+            statement
+        } else {
+            panic!("func_statement is none: should not happend");
+        };
+        let mut move_param_contexts = Vec::new();
+        let mut ref_param_addrs = VecDeque::new();
+        let mut return_ref_params = HashMap::new();
+        let mut return_addr = Address::new(AddressValue::new_invalid());
+        let mut scope = None;
+        let desc_result = self.funccall_external_environment(&func_statement, param_len
+            , return_is_alloc, &mut move_param_contexts, &mut ref_param_addrs
+            , &mut return_ref_params, &mut return_addr, &mut scope);
+        match desc_result {
+            DescResult::Success => {
+            },
+            _ => {
+                return desc_result;
+            }
+        }
+        self.cb_enter_scope();
+        /*
+        while !param_refs.is_empty() {
+            let mut context = param_refs.remove(0).expect("param_refs.remove: should not happend");
+            // *context.addr_mut().addr_mut().scope_mut() = self.vm_scope_value;
+            self.cb.push_param_ref(context);
+        }
+        */
+        while !ref_param_addrs.is_empty() {
+            let ref_param = ref_param_addrs.remove(0)
+                .expect("ref_param.remove: should not happend");
+            self.cb.add_ref_param_addr(ref_param);
+        }
+        while !move_param_contexts.is_empty() {
+            let (move_index, typ, typ_attr, src_addr, value_context) =
+                move_param_contexts.remove(0);
+            /*
+             * NOTE
+             * 因为 process_param 中会让虚拟机执行移动操作
+             * 所以必须要在虚拟机进入作用域之后执行
+             * 如果 process_param 中存在移动, 则返回新的地址
+             *  如果不存在移动, 则返回输入的地址
+             * */
+            self.process_param(
+                &typ, &typ_attr, src_addr, move_index, value_context);
+        }
+        // let desc_ctx = call_context.desc_ctx_clone();
+        let cc = CallFunctionContext {
+            package_str: package_str,
+            func_define: func_define,
+            param_addrs: None,
+            param_context: None,
+            call_param_len: param_len,
+            return_data: CallFunctionReturnData::new_with_all(
+                return_addr.addr_clone(), *return_is_alloc)
+        };
+        self.cb.call_function(cc);
+        self.cb_leave_scope();
+        match scope {
+            Some(n) => {
+                return_addr.addr_mut().addr_mut_with_scope_minus(n);
+            },
+            None => {
+            }
+        }
+        /*
+         * 获取返回类型, 将其写入到队列中
+         * */
+        let return_data = &func_statement.func_return.data;
+        if !return_addr.is_invalid() {
+            let ta = if desc_ctx.typ_attr_ref().is_ref() {
+                desc_ctx.typ_attr()
+            } else {
+                return_data.typ_attr_ref().clone()
+            };
+            self.scope_context.push_with_addr_typattr_to_value_buffer(
+                return_data.typ.clone()
+                , return_addr, ta);
+        }
+        // self.compile_context.reset();
+        self.scope_context.leave_func_call();
+        DescResult::Success
+    }
+
     pub fn handle_call_function(&mut self
         , param_len: usize
         , call_context: GrammarCallFunctionContext) -> DescResult {
@@ -684,8 +774,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
             func_statement = Some(func_ptr.as_ref::<Function>().func_statement_ref().clone());
             func_define = func_ptr.as_ref::<Function>().func_define_ref().clone();
         }
-        // let func = func_ptr.as_ref::<Function>();
-        // let func_statement = func.func_statement_ref();
+        /*
         let func_statement = if let Some(statement) = func_statement {
             statement
         } else {
@@ -768,6 +857,10 @@ impl<'a, F: Compile> Compiler<'a, F> {
         // self.compile_context.reset();
         self.scope_context.leave_func_call();
         DescResult::Success
+        */
+        let desc_ctx = call_context.desc_ctx_clone();
+        self.call_function(func_statement, func_define, call_context.package_str()
+            , desc_ctx, param_len, &mut return_is_alloc)
     }
 }
 
