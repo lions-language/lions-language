@@ -476,14 +476,22 @@ pub type ExpressEndFunc<T, CB> = fn(&mut GrammarParser<T, CB>, &TokenVecItem<T, 
 pub type ParserEndFunc<T, CB> = fn(&mut GrammarParser<T, CB>, &Option<TokenPointer>) -> bool;
 
 pub struct ExpressContext<T: FnMut() -> CallbackReturnStatus, CB: Grammar> {
-    pub end_f: ExpressEndFunc<T, CB>
+    pub end_f: ExpressEndFunc<T, CB>,
+    desc_ctx: DescContext
 }
 
 impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> ExpressContext<T, CB> {
-    pub fn new(end_f: ExpressEndFunc<T, CB>) -> Self {
+    pub fn new_with_desc_ctx(end_f: ExpressEndFunc<T, CB>
+        , desc_ctx: DescContext) -> Self {
         Self {
-            end_f: end_f
+            end_f: end_f,
+            desc_ctx: desc_ctx
         }
+    }
+
+    pub fn new(end_f: ExpressEndFunc<T, CB>) -> Self {
+        ExpressContext::<T, CB>::new_with_desc_ctx(end_f
+            , DescContext::new(TypeAttrubute::Move))
     }
 }
 

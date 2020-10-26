@@ -178,7 +178,8 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         TokenMethodResult::Continue
     }
 
-    pub fn expression_process_start_with_parenthese(&mut self) -> TokenMethodResult {
+    pub fn expression_process_start_with_parenthese(&mut self, desc_ctx: crate::grammar::DescContext)
+        -> TokenMethodResult {
         /*
          * 表达式中遇到 ( 符号
          * 1. 先跳过  (

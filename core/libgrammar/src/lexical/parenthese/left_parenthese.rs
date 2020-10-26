@@ -9,7 +9,9 @@ impl LeftParentheseToken {
     fn nup<T: FnMut() -> CallbackReturnStatus, CB: Grammar>(token: &Token<T, CB>
         , grammar: &mut GrammarParser<T, CB>
         , express_context: &ExpressContext<T, CB>) -> TokenMethodResult {
-        grammar.expression_process_start_with_parenthese()
+        grammar.expression_process_start_with_parenthese(
+            crate::grammar::DescContext::new(
+                libtype::TypeAttrubute::Move))
     }
 
     fn led<T: FnMut() -> CallbackReturnStatus, CB: Grammar>(token: &Token<T, CB>, grammar: &mut GrammarParser<T, CB>, express_context: &ExpressContext<T, CB>) -> TokenMethodResult {
