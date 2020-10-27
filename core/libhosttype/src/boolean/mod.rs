@@ -17,7 +17,8 @@ use phf::phf_map;
 lazy_static!{
     static ref BOOLEAN_METHOD: phf::Map<&'static str, u32> = {
         phf_map! {
-            "boolean:==(&u8,&u8)" => 0,
+            "boolean:to_str(&boolean)" => 0,
+            "boolean:to_str(boolean)" => 1,
         }
     };
     /*
@@ -51,10 +52,42 @@ lazy_static!{
             optcode: OptCode::RefBooleanToStr
         })
     };
+    /*
+     * boolean to_str -> String
+     * */
+    static ref MOVE_BOOLEAN_TO_STR_FUNCTION: Function = Function{
+        func_statement: FunctionStatement::new(
+            String::from(consts::TO_STR_FUNCTION_NAME),
+            Some(FunctionParam::new(
+                FunctionParamData::Single(
+                    FunctionParamDataItem::new(
+                        Type::new_without_attr(
+                            TypeValue::Primeval(Primeval::new(
+                                PrimevalType::Boolean)))
+                        , TypeAttrubute::Move
+                    ))
+                )),
+            FunctionReturn::new(
+                FunctionReturnData::new_with_attr(
+                    Type::new_without_attr(
+                        TypeValue::Primeval(Primeval::new(
+                            PrimevalType::Str)))
+                    , TypeAttrubute::Move
+                    , FunctionReturnDataAttr::Create
+                    )
+                ),
+            Some(Type::new_without_attr(TypeValue::Primeval(Primeval::new(
+                        PrimevalType::Boolean))))
+        ),
+        func_define: FunctionDefine::Optcode(OptcodeFunctionDefine{
+            optcode: OptCode::RefBooleanToStr
+        })
+    };
 
     static ref FUNCTION_VEC: Vec<&'static Function> = {
         let mut v = Vec::with_capacity(BOOLEAN_METHOD.len());
         v.push(&*REF_BOOLEAN_TO_STR_FUNCTION);
+        v.push(&*MOVE_BOOLEAN_TO_STR_FUNCTION);
         v
     };
 }
