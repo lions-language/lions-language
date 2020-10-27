@@ -67,7 +67,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                  * */
                 return self.typesof_calc_primeval_type();
             },
-            TokenType::Multiplication => {
+            TokenType::Star => {
                 /*
                  * 指针
                  * */

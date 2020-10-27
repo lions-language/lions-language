@@ -73,7 +73,7 @@ pub enum TokenType {
     // }
     RightBigParenthese,
     // *
-    Multiplication,
+    Star,
     // /
     Division,
     // ;

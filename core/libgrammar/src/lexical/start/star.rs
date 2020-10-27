@@ -2,17 +2,17 @@ use crate::token::{TokenContext, Token, TokenAttrubute, TokenOperType, TokenMeth
 use crate::lexical::{CallbackReturnStatus};
 use crate::grammar::{GrammarParser, ExpressContext, Grammar};
 
-pub struct MultiplicationToken {
+pub struct StarToken {
 }
 
 lazy_static!{
-    static ref multiplication_token_attrubute: TokenAttrubute = TokenAttrubute{
+    static ref star_token_attrubute: TokenAttrubute = TokenAttrubute{
         bp: &21,
         oper_type: &TokenOperType::Operator
     };
 }
 
-impl MultiplicationToken {
+impl StarToken {
     fn nup<T: FnMut() -> CallbackReturnStatus, CB: Grammar>(token: &Token<T, CB>, grammar: &mut GrammarParser<T, CB>, express_context: &ExpressContext<T, CB>) -> TokenMethodResult {
         TokenMethodResult::None
     }
@@ -43,13 +43,13 @@ impl MultiplicationToken {
     }
 }
 
-impl MultiplicationToken {
+impl StarToken {
     pub fn new<T: FnMut() -> CallbackReturnStatus, CB: Grammar>(context: TokenContext) -> Token<T, CB> {
         Token{
             context: context,
-            attrubute: &*multiplication_token_attrubute,
-            nup: MultiplicationToken::nup,
-            led: MultiplicationToken::led
+            attrubute: &*star_token_attrubute,
+            nup: StarToken::nup,
+            led: StarToken::led
         }
     }
 }

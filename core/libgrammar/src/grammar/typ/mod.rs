@@ -67,7 +67,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
             TokenType::Id => {
                 typ_attr = TypeAttrubute::Move;
             },
-            TokenType::Multiplication => {
+            TokenType::Star => {
                 typ_attr = TypeAttrubute::Pointer;
                 self.skip_next_one();
             },

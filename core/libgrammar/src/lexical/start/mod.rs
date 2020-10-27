@@ -1,15 +1,15 @@
 use super::{LexicalParser, CallbackReturnStatus};
 use crate::token::{TokenType};
-use multiplication::MultiplicationToken;
+use star::StarToken;
 use crate::grammar::Grammar;
 
 impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
-    fn start_multiplication(&mut self) {
-        let context = self.build_token_context_without_data(TokenType::Multiplication);
-        self.push_to_token_buffer(MultiplicationToken::new(context));
+    fn start_star(&mut self) {
+        let context = self.build_token_context_without_data(TokenType::Star);
+        self.push_to_token_buffer(StarToken::new(context));
     }
 
-    fn start_multiplication_equal(&mut self) {
+    fn start_star_equal(&mut self) {
     }
 
     pub fn start_process(&mut self) {
@@ -26,13 +26,13 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
                     /*
                      * 乘等于
                      * */
-                    parser.start_multiplication_equal();
+                    parser.start_star_equal();
                 },
                 _ => {
                     /*
                      * 乘号
                      * */
-                    parser.start_multiplication();
+                    parser.start_star();
                 }
             }
         }, |parser| {
@@ -40,4 +40,4 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
     }
 }
 
-mod multiplication;
+mod star;
