@@ -124,6 +124,9 @@ impl VirtualMachine {
             OptCode::RefUint8ToStr => {
                 self.ref_uint8_to_str(value);
             },
+            OptCode::RefUint8EqualEqualOperatorRefUint8 => {
+                self.ref_uint8_equal_equal_operator_ref_uint8(value);
+            },
             OptCode::RefUint16ToStr => {
                 self.ref_uint16_to_str(value);
             },
