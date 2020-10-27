@@ -260,6 +260,9 @@ impl PrimevalControl {
             PrimevalType::Str => {
                 &mut self.string_method
             },
+            PrimevalType::Boolean => {
+                &mut self.boolean_method
+            },
             _ => {
                 unimplemented!();
             }
@@ -311,6 +314,9 @@ impl PrimevalControl {
             },
             PrimevalType::Str => {
                 &self.string_method
+            },
+            PrimevalType::Boolean => {
+                &self.boolean_method
             },
             _ => {
                 unimplemented!();

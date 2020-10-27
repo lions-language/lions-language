@@ -6,3 +6,4 @@ extern crate lazy_static;
 pub mod primeval;
 pub mod number;
 pub mod string;
+pub mod boolean;

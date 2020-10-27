@@ -33,7 +33,8 @@ pub struct PrimevalControl {
     uint64_method: PrimevalContext,
     float32_method: PrimevalContext,
     float64_method: PrimevalContext,
-    string_method: PrimevalContext
+    string_method: PrimevalContext,
+    boolean_method: PrimevalContext
 }
 
 impl PrimevalControl {
@@ -50,6 +51,7 @@ impl PrimevalControl {
             float32_method: PrimevalContext::new(),
             float64_method: PrimevalContext::new(),
             string_method: PrimevalContext::new(),
+            boolean_method: PrimevalContext::new(),
         }
     }
 }
@@ -84,6 +86,7 @@ use crate::number::uint32;
 use crate::number::uint8;
 use crate::number::uint16;
 use crate::string;
+use crate::boolean;
 pub fn primeval_method(typ: &Type, func_str: &str) -> Option<&'static Function> {
     match typ.typ_ref() {
         TypeValue::Primeval(p) => {
@@ -99,6 +102,9 @@ pub fn primeval_method(typ: &Type, func_str: &str) -> Option<&'static Function> 
                 },
                 PrimevalType::Str => {
                     string::get_method(func_str)
+                },
+                PrimevalType::Boolean => {
+                    boolean::get_method(func_str)
                 },
                 _ => {
                     unimplemented!();
