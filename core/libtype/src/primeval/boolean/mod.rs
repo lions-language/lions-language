@@ -12,6 +12,17 @@ pub struct Boolean {
 }
 
 impl Boolean {
+    pub fn to_std(&self) -> bool {
+        match self.value {
+            BooleanValue::True => {
+                true
+            },
+            BooleanValue::False => {
+                false
+            }
+        }
+    }
+
     pub fn new(value: BooleanValue) -> Self {
         Self {
             value: value

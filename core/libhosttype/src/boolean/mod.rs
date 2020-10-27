@@ -80,7 +80,7 @@ lazy_static!{
                         PrimevalType::Boolean))))
         ),
         func_define: FunctionDefine::Optcode(OptcodeFunctionDefine{
-            optcode: OptCode::RefBooleanToStr
+            optcode: OptCode::MoveBooleanToStr
         })
     };
 

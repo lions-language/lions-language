@@ -109,6 +109,27 @@ macro_rules! extract_primeval_utf8_str_move {
     }};
 }
 
+macro_rules! extract_primeval_boolean_ref {
+    ($data_ptr:expr, $typ:ident) => {{
+        let data = $data_ptr.as_ref::<Data>();
+        match data.value_ref() {
+            DataValue::Primeval(d) => {
+                match d {
+                    PrimevalData::Boolean(v) => {
+                        v.to_std()
+                    },
+                    _ => {
+                        unimplemented!("{:?}", d);
+                    }
+                }
+            },
+            _ => {
+                unimplemented!();
+            }
+        }
+    }};
+}
+
 impl VirtualMachine {
     pub fn call_primeval_function(&mut self, value: CallPrimevalFunction) {
         match &value.opt {
@@ -145,6 +166,12 @@ impl VirtualMachine {
             OptCode::MutRefStrPlusOperatorMoveStr => {
                 self.mut_ref_str_plus_operator_move_str(value);
             },
+            OptCode::RefBooleanToStr => {
+                self.ref_boolean_to_str(value);
+            },
+            OptCode::MoveBooleanToStr => {
+                self.move_boolean_to_str(value);
+            },
             _ => {
                 unimplemented!("{:?}", &value.opt);
             }
@@ -156,4 +183,5 @@ mod uint8;
 mod uint16;
 mod string;
 mod print;
+mod boolean;
 

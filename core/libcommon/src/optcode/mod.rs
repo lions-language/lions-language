@@ -15,5 +15,6 @@ pub enum OptCode {
     MutRefStrPlusOperatorMoveStr,
     MoveStrPlusOperatorRefStr,
     Println,
-    RefBooleanToStr
+    RefBooleanToStr,
+    MoveBooleanToStr
 }
