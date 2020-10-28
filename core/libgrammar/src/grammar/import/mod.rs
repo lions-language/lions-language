@@ -46,6 +46,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         let mut is = true;
         let mut local_obj = U8ArrayIsEqual::new(LOCAL.as_bytes());
         let mut grammar_ptr = RefPtr::from_ref(self);
+        let mut content = String::new();
         while is {
             self.lexical_parser.lookup_next_one_with_cb_wrap(|parser, c| {
                 match c {
@@ -75,7 +76,8 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                                  * 解析 local: 后面的 字符串 (遇到 " 结束)
                                  * */
                                 let grammar = grammar_ptr.as_mut::<GrammarParser<T, CB>>();
-                                grammar.parse_import_content();
+                                grammar.parse_import_content(&mut content);
+                                println!("{:?}", content);
                                 is = false;
                                 return;
                             },
@@ -91,9 +93,8 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         }
     }
 
-    fn parse_import_content(&mut self) {
+    fn parse_import_content(&mut self, content: &mut String) {
         let mut is = true;
-        let mut path = String::new();
         while is {
             self.lexical_parser.lookup_next_one_with_cb_wrap(|parser, c| {
                 match c {
@@ -102,7 +103,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                         parser.content_skip_next_one();
                     },
                     _ => {
-                        path.push(c);
+                        content.push(c);
                         parser.content_skip_next_one();
                     }
                 }
@@ -110,6 +111,5 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                 parser.panic("expect match \", but arrive IOEof");
             });
         }
-        panic!("{}", path);
     }
 }
