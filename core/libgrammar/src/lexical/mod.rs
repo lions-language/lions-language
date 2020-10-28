@@ -496,7 +496,7 @@ mod parenthese;
 mod square_brackets;
 mod big_parenthese;
 mod slash;
-mod start;
+mod star;
 mod operand;
 mod semicolon;
 mod whitespace;
