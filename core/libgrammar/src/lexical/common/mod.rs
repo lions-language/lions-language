@@ -113,6 +113,32 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
         true
     }
 
+    /*
+     * 在这一行中, 向后查看下一个字符, 直到不是空格为止
+     * */
+    pub fn lookup_next_one_not_spacewhite_in_this_line(&mut self) -> Option<char> {
+        let mut is = true;
+        let mut ret = None;
+        while is {
+            self.lookup_next_one_with_cb_wrap(|parser, c| {
+                match c {
+                    ' ' => {
+                        parser.content_skip_next_one();
+                    },
+                    '\r'|'\n' => {
+                        is = false;
+                    },
+                    _ => {
+                        ret = Some(c);
+                        is = false;
+                    }
+                }
+            }, |_| {
+            });
+        }
+        ret
+    }
+
     pub fn push_token_plus(&mut self) {
         let context = self.build_token_context_without_data(TokenType::Plus);
         self.push_to_token_buffer(plus::PlusToken::new(context));

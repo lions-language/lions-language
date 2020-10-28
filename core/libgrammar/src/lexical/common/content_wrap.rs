@@ -86,5 +86,9 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
             }
         }
     }
+
+    pub fn content_skip_next_one(&mut self) {
+        self.content.skip_next_one();
+    }
 }
 

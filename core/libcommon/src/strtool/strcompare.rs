@@ -59,15 +59,21 @@ impl<'a> U8ArrayIsEqual<'a> {
 mod test {
     use super::*;
 
-    #[ignore]
+    // #[ignore]
     #[test]
     fn u8_array_is_equal_dynamic_match_test() {
         let s = "123";
-        let d = ['1', '2', '4', '3'];
+        let d = ['1', '2', '3', '4'];
         let mut obj = U8ArrayIsEqual::new(s.as_bytes());
         for item in d.iter() {
             match obj.dynamic_match(*item) {
-                U8ArrayIsEqualResult::Match(_) => {
+                U8ArrayIsEqualResult::Match(size) => {
+                    /*
+                     * 如果:
+                     *  s = "123"
+                     *  d = ["1", "2", "3", "4"]
+                     * 也会进到这里, 所以业务需要判断后面的字符是否需要关心
+                     * */
                     println!("match ...");
                     break;
                 },
