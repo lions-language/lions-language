@@ -36,7 +36,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
     }
 
     fn import_prefix_match(&mut self, local_obj: &mut U8ArrayIsEqual
-        , import_prefix: &'static str
+        , import_prefix: consts::ImportPrefixType
         , parser: &mut LexicalParser<T, CB>, c: char, is: &mut bool
         , content: &mut String) -> bool {
         match local_obj.dynamic_match(c) {
@@ -91,16 +91,16 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                         parser.content_skip_next_one();
                         let grammar = grammar_ptr.as_mut::<GrammarParser<T, CB>>();
                         grammar.cb().import_stmt(ImportStmtContext::new_with_all(
-                                consts::IMPORT_LOCAL, content.clone()));
+                                consts::ImportPrefixType::Local, content.clone()));
                     },
                     _ => {
                         let grammar = grammar_ptr.as_mut::<GrammarParser<T, CB>>();
                         if_true_return!(grammar.import_prefix_match(&mut local_obj
-                                , consts::IMPORT_LOCAL, parser, c, &mut is, &mut content));
+                                , consts::ImportPrefixType::Local, parser, c, &mut is, &mut content));
                         if_true_return!(grammar.import_prefix_match(&mut packages_obj
-                                , consts::IMPORT_PACKAGE, parser, c, &mut is, &mut content));
+                                , consts::ImportPrefixType::Package, parser, c, &mut is, &mut content));
                         if_true_return!(grammar.import_prefix_match(&mut system_obj
-                                , consts::IMPORT_SYSTEM, parser, c, &mut is, &mut content));
+                                , consts::ImportPrefixType::System, parser, c, &mut is, &mut content));
                         parser.content_skip_next_one();
                         no_prefix.push(c);
                     }

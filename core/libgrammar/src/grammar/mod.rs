@@ -3,6 +3,7 @@ use crate::lexical::{LexicalParser, CallbackReturnStatus, TokenVecItem, TokenPoi
 use crate::token::{TokenType, TokenValue, TokenMethodResult};
 use libcommon::ptr::{RefPtr, HeapPtr};
 use libcommon::address::{FunctionAddrValue};
+use libcommon::consts::{ImportPrefixType};
 use libtype::{Type, PackageType, TypeAttrubute
     , function::FunctionParamLengthenAttr
     , structure::StructDefine};
@@ -257,7 +258,7 @@ pub struct OperatorEqualEqualContext {
     , NewWithAll, FieldGetMove
     , Default)]
 pub struct ImportStmtContext {
-    prefix: &'static str,
+    prefix: ImportPrefixType,
     content: String
 }
 
