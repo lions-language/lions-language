@@ -30,6 +30,14 @@ macro_rules! check_desc_result {
     };
 }
 
+macro_rules! if_true_return {
+    ($e:expr) => {
+        if $e {
+            return;
+        }
+    }
+}
+
 pub mod lexical;
 pub mod grammar;
 mod control;
