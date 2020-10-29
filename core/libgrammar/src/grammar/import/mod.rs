@@ -5,7 +5,7 @@ use libcommon::strtool::strcompare::{U8ArrayIsEqual
 use libcommon::ptr::{RefPtr};
 use libcommon::consts;
 use super::{GrammarParser, Grammar, NextToken, ExpressContext
-    , ReturnStmtContext};
+    , ReturnStmtContext, ImportStmtContext};
 use crate::lexical::{CallbackReturnStatus, TokenVecItem, TokenPointer};
 use crate::token::{TokenType, TokenValue};
 
@@ -36,7 +36,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
     }
 
     fn import_prefix_match(&mut self, local_obj: &mut U8ArrayIsEqual
-        , import_typ: &'static str
+        , import_prefix: &'static str
         , parser: &mut LexicalParser<T, CB>, c: char, is: &mut bool
         , content: &mut String) -> bool {
         match local_obj.dynamic_match(c) {
@@ -58,6 +58,8 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                  * */
                 self.parse_import_content(content);
                 *is = false;
+                self.cb().import_stmt(ImportStmtContext::new_with_all(
+                        import_prefix, content.clone()));
                 return true;
             },
             _ => {
@@ -87,6 +89,9 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                          * */
                         is = false;
                         parser.content_skip_next_one();
+                        let grammar = grammar_ptr.as_mut::<GrammarParser<T, CB>>();
+                        grammar.cb().import_stmt(ImportStmtContext::new_with_all(
+                                consts::IMPORT_LOCAL, content.clone()));
                     },
                     _ => {
                         let grammar = grammar_ptr.as_mut::<GrammarParser<T, CB>>();

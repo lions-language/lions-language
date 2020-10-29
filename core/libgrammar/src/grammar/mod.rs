@@ -253,6 +253,14 @@ pub struct OperatorEqualEqualContext {
     desc_ctx: DescContext
 }
 
+#[derive(Debug, FieldGet
+    , NewWithAll, FieldGetMove
+    , Default)]
+pub struct ImportStmtContext {
+    prefix: &'static str,
+    content: String
+}
+
 pub trait Grammar {
     // type IdUse;
     
@@ -461,6 +469,9 @@ pub trait Grammar {
         unimplemented!();
     }
     fn leave_point_access(&mut self) {
+        unimplemented!();
+    }
+    fn import_stmt(&mut self, _context: ImportStmtContext) {
         unimplemented!();
     }
 }

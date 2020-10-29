@@ -16,7 +16,7 @@ use libgrammar::grammar::{Grammar, CallFuncScopeContext
     , ReturnStmtContext as GrammarReturnStmtContext
     , ObjectFunctionDefineMutContext, TypeToken
     , EnterPointAccessContext, VarUpdateStmtContext
-    , OperatorEqualEqualContext};
+    , OperatorEqualEqualContext, ImportStmtContext};
 use libgrammar::token::{TokenValue};
 use libtype::{Type, Data};
 use libtype::function::{Function, CallFunctionParamAddr
@@ -545,6 +545,10 @@ impl<'a, F: Compile> Grammar for Compiler<'a, F> {
     fn leave_point_access(&mut self) {
         self.process_leave_point_access();
     }
+
+    fn import_stmt(&mut self, context: ImportStmtContext) {
+        self.process_import_stmt(context);
+    }
 }
 
 impl<'a, F: Compile> Compiler<'a, F> {
@@ -590,6 +594,7 @@ mod structinit;
 mod point_access;
 mod process_if;
 mod boolean;
+mod import;
 
 #[cfg(test)]
 mod test {
