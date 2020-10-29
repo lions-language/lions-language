@@ -2,15 +2,11 @@ use libresult::{DescResult};
 use libcommon::strtool::strcompare::{U8ArrayIsEqual
     , U8ArrayIsEqualResult};
 use libcommon::ptr::{RefPtr};
+use libcommon::consts;
 use super::{GrammarParser, Grammar, NextToken, ExpressContext
     , ReturnStmtContext};
 use crate::lexical::{CallbackReturnStatus, TokenVecItem, TokenPointer};
 use crate::token::{TokenType, TokenValue};
-
-const LOCAL: &'static str = "local";
-const PATH: &'static str = "path";
-const PACKAGES: &'static str = "packages";
-const SYSTEM: &'static str = "system";
 
 impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, CB> {
     pub fn import_process(&mut self) {
@@ -44,7 +40,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
          * */
         self.lexical_parser.content_skip_next_one();
         let mut is = true;
-        let mut local_obj = U8ArrayIsEqual::new(LOCAL.as_bytes());
+        let mut local_obj = U8ArrayIsEqual::new(consts::IMPORT_LOCAL.as_bytes());
         let mut grammar_ptr = RefPtr::from_ref(self);
         let mut content = String::new();
         while is {
@@ -59,7 +55,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                     },
                     _ => {
                         match local_obj.dynamic_match(c) {
-                            U8ArrayIsEqualResult::Match(size) => {
+                            U8ArrayIsEqualResult::Match(_) => {
                                 parser.content_skip_next_one();
                                 parser.lookup_next_one_with_cb_wrap(|parser, c| {
                                     if c == ':' {
