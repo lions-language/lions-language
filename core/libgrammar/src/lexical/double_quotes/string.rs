@@ -17,7 +17,7 @@ lazy_static!{
 }
 
 impl StringToken {
-    fn nup<T: FnMut() -> CallbackReturnStatus, CB: Grammar>(
+    fn nup<T: FnMut() -> CallbackReturnStatus, CB: Grammar + Clone>(
         token: &Token<T, CB>, grammar: &mut GrammarParser<T, CB>
         , express_context: &ExpressContext<T, CB>) -> TokenMethodResult {
         grammar.string_process(DescContext::new(
@@ -27,7 +27,8 @@ impl StringToken {
 }
 
 impl StringToken {
-    pub fn new<T: FnMut() -> CallbackReturnStatus, CB: Grammar>(context: TokenContext) -> Token<T, CB> {
+    pub fn new<T: FnMut() -> CallbackReturnStatus, CB: Grammar + Clone>(
+        context: TokenContext) -> Token<T, CB> {
         Token{
             context: context,
             attrubute: &*id_token_attrubute,

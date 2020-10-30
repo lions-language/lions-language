@@ -484,7 +484,7 @@ pub trait Grammar {
     }
 }
 
-enum NextToken<T: FnMut() -> CallbackReturnStatus, CB: Grammar> {
+enum NextToken<T: FnMut() -> CallbackReturnStatus, CB: Grammar + Clone> {
     True(TokenVecItem<T, CB>),
     False(TokenPointer)
 }

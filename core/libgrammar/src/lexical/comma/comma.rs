@@ -10,17 +10,20 @@ lazy_static!{
 }
 
 impl CommaToken {
-    fn nup<T: FnMut() -> CallbackReturnStatus, CB: Grammar>(token: &Token<T, CB>, grammar: &mut GrammarParser<T, CB>, express_context: &ExpressContext<T, CB>) -> TokenMethodResult {
+    fn nup<T: FnMut() -> CallbackReturnStatus, CB: Grammar + Clone>(
+        token: &Token<T, CB>, grammar: &mut GrammarParser<T, CB>, express_context: &ExpressContext<T, CB>) -> TokenMethodResult {
         TokenMethodResult::None
     }
 
-    fn led<T: FnMut() -> CallbackReturnStatus, CB: Grammar>(token: &Token<T, CB>, grammar: &mut GrammarParser<T, CB>, express_context: &ExpressContext<T, CB>) -> TokenMethodResult {
+    fn led<T: FnMut() -> CallbackReturnStatus, CB: Grammar + Clone>(
+        token: &Token<T, CB>, grammar: &mut GrammarParser<T, CB>, express_context: &ExpressContext<T, CB>) -> TokenMethodResult {
         TokenMethodResult::None
     }
 }
 
 impl CommaToken {
-    pub fn new<T: FnMut() -> CallbackReturnStatus, CB: Grammar>(context: TokenContext) -> Token<T, CB> {
+    pub fn new<T: FnMut() -> CallbackReturnStatus, CB: Grammar + Clone>(
+        context: TokenContext) -> Token<T, CB> {
         Token{
             context: context,
             attrubute: &*comma_token_attrubute,

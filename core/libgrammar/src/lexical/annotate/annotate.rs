@@ -8,7 +8,7 @@ pub struct AnnotateToken {
 }
 
 impl AnnotateToken {
-    fn nup<T: FnMut() -> CallbackReturnStatus, CB: Grammar>(
+    fn nup<T: FnMut() -> CallbackReturnStatus, CB: Grammar + Clone>(
         token: &Token<T, CB>, grammar: &mut GrammarParser<T, CB>
         , express_context: &ExpressContext<T, CB>) -> TokenMethodResult {
         /*
@@ -21,7 +21,8 @@ impl AnnotateToken {
 }
 
 impl AnnotateToken {
-    pub fn new<T: FnMut() -> CallbackReturnStatus, CB: Grammar>(context: TokenContext) -> Token<T, CB> {
+    pub fn new<T: FnMut() -> CallbackReturnStatus, CB: Grammar + Clone>(
+        context: TokenContext) -> Token<T, CB> {
         Token{
             context: context,
             attrubute: token::default_token_attrubute(),
