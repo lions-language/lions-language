@@ -4,7 +4,7 @@ use super::{GrammarParser, Grammar, NextToken, ExpressContext
 use crate::lexical::{CallbackReturnStatus, TokenVecItem, TokenPointer};
 use crate::token::{TokenType, TokenValue};
 
-impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar + Clone> GrammarParser<'a, T, CB> {
+impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, CB> {
     pub fn var_process(&mut self) {
         let mut context = VarStmtContext::default();
         /*

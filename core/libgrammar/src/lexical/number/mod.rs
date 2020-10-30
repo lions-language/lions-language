@@ -16,7 +16,7 @@ enum BeforeChange {
     Float(f64)
 }
 
-impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar + Clone> LexicalParser<T, CB> {
+impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
     fn number_is_8(&self, c: char) -> Option<u8> {
         if c >= '0' && c <= '7' {
             return Some(c as u8 - '0' as u8);

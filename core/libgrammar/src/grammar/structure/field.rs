@@ -9,7 +9,7 @@ use crate::grammar::{FunctionDefineParamMutContext
 use crate::lexical::{CallbackReturnStatus, TokenVecItem, TokenPointer};
 use crate::token::{TokenType};
 
-impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar + Clone> GrammarParser<'a, T, CB> {
+impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, CB> {
     pub fn struct_parse_field_list(&mut self, define_context: &mut StructDefineContext
         , define: &mut StructDefine) {
         /*

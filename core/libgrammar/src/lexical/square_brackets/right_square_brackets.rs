@@ -9,7 +9,7 @@ impl RightSquareBracketsToken {
 }
 
 impl RightSquareBracketsToken {
-    pub fn new<T: FnMut() -> CallbackReturnStatus, CB: Grammar + Clone>(context: TokenContext) -> Token<T, CB> {
+    pub fn new<T: FnMut() -> CallbackReturnStatus, CB: Grammar>(context: TokenContext) -> Token<T, CB> {
         Token{
             context: context,
             attrubute: token::default_token_attrubute(),

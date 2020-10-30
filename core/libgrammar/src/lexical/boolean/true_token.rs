@@ -21,7 +21,7 @@ lazy_static!{
 }
 
 impl TrueToken {
-    fn nup<T: FnMut() -> CallbackReturnStatus, CB: Grammar + Clone>(
+    fn nup<T: FnMut() -> CallbackReturnStatus, CB: Grammar>(
         token: &Token<T, CB>, grammar: &mut GrammarParser<T, CB>
         , express_context: &ExpressContext<T, CB>) -> TokenMethodResult {
         grammar.true_process(DescContext::new(
@@ -31,8 +31,7 @@ impl TrueToken {
 }
 
 impl TrueToken {
-    pub fn new<T: FnMut() -> CallbackReturnStatus, CB: Grammar + Clone>(
-        context: TokenContext) -> Token<T, CB> {
+    pub fn new<T: FnMut() -> CallbackReturnStatus, CB: Grammar>(context: TokenContext) -> Token<T, CB> {
         Token{
             context: context,
             attrubute: &*TRUE_TOKEN_ATTRUBUTE,

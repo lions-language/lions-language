@@ -2,7 +2,7 @@ use crate::lexical::{LexicalParser, CallbackReturnStatus};
 use libcommon::strtool::strcompare::{U8ArrayIsEqual, U8ArrayIsEqualResult};
 use crate::grammar::Grammar;
 
-impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar + Clone> LexicalParser<T, CB> {
+impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
     /*
      * 匹配字符串
      * 1. 如果匹配到了输入的字符串, 就返回 true

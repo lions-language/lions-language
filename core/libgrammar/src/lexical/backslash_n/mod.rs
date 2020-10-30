@@ -2,7 +2,7 @@ use super::{LexicalParser, CallbackReturnStatus};
 use crate::token::{TokenType};
 use crate::grammar::Grammar;
 
-impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar + Clone> LexicalParser<T, CB> {
+impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
     pub fn backslash_n(&mut self) {
         // 跳过 \n 号
         self.content.skip_next_one();

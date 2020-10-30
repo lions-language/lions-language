@@ -7,7 +7,7 @@ use crate::lexical::{CallbackReturnStatus
 use crate::token::{TokenMethodResult
     , TokenType, TokenData};
 
-impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar + Clone> GrammarParser<'a, T, CB> {
+impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, CB> {
     pub fn funccall_process(&mut self, backtrack_len: usize
         , scope_context: CallFuncScopeContext) {
         let mut call_context = CallFunctionContext::default();

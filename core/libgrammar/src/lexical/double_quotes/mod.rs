@@ -5,7 +5,7 @@ use crate::grammar::Grammar;
 use libtype::primeval::{PrimevalType, PrimevalData};
 use libtype::primeval::string::{Str, StrValue};
 
-impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar + Clone> LexicalParser<T, CB> {
+impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
     pub fn double_quotes_process_vecu8(&mut self) -> Vec<u8> {
         // 跳过双引号
         self.content.skip_next_one();

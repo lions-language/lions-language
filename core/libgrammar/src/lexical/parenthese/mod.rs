@@ -1,7 +1,7 @@
 use super::{LexicalParser, CallbackReturnStatus};
 use crate::grammar::Grammar;
 
-impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar + Clone> LexicalParser<T, CB> {
+impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
     pub fn parenthese_left_process(&mut self) {
         /*
          * 跳过 (

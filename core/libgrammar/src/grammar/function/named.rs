@@ -6,7 +6,7 @@ use crate::token::{TokenValue};
 use crate::grammar::{FunctionDefineContext
     , FunctionDefineParamMutContext};
   
-impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar + Clone> GrammarParser<'a, T, CB> {
+impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, CB> {
     pub fn function_named(&mut self) {
         /*
          * 含有名称 function

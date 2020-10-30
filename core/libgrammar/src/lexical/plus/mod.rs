@@ -3,7 +3,7 @@ use crate::grammar::Grammar;
 
 use crate::token::{TokenType};
 
-impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar + Clone> LexicalParser<T, CB> {
+impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
     fn plus(&mut self) {
         self.push_token_plus();
     }

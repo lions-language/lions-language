@@ -5,7 +5,7 @@ use crate::grammar::{FunctionDefineReturnContext
 use crate::lexical::{CallbackReturnStatus};
 use crate::token::{TokenType};
 
-impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar + Clone> GrammarParser<'a, T, CB> {
+impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, CB> {
     pub fn function_parse_return(&mut self, define_context: &mut FunctionDefineContext) {
         /*
          * 参数解析完成之后, 被调用

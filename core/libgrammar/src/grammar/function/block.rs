@@ -3,7 +3,7 @@ use crate::lexical::{CallbackReturnStatus};
 use crate::token::{TokenType};
 use crate::grammar::{FunctionDefineContext};
 
-impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar + Clone> GrammarParser<'a, T, CB> {
+impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, CB> {
     pub fn function_parse_block(&mut self
         , define_context: &mut FunctionDefineContext) {
         /*

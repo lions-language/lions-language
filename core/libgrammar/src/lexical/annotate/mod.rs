@@ -2,7 +2,7 @@ use super::{LexicalParser, CallbackReturnStatus};
 use crate::token::{TokenType, TokenData};
 use crate::grammar::Grammar;
 
-impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar + Clone> LexicalParser<T, CB> {
+impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
     pub fn push_token_annotate(&mut self, content: Vec<u8>) {
         /*
          * TODO: 目前的做法是忽略注释

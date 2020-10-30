@@ -16,7 +16,7 @@ lazy_static!{
 }
 
 impl NumberToken {
-    fn nup<T: FnMut() -> CallbackReturnStatus, CB: Grammar + Clone>(token: &Token<T, CB>, grammar: &mut GrammarParser<T, CB>, express_context: &ExpressContext<T, CB>) -> TokenMethodResult {
+    fn nup<T: FnMut() -> CallbackReturnStatus, CB: Grammar>(token: &Token<T, CB>, grammar: &mut GrammarParser<T, CB>, express_context: &ExpressContext<T, CB>) -> TokenMethodResult {
         grammar.number_process(DescContext::new(
                 TypeAttrubute::default()));
         TokenMethodResult::End
@@ -24,7 +24,7 @@ impl NumberToken {
 }
 
 impl NumberToken {
-    pub fn new<T: FnMut() -> CallbackReturnStatus, CB: Grammar + Clone>(context: TokenContext) -> Token<T, CB> {
+    pub fn new<T: FnMut() -> CallbackReturnStatus, CB: Grammar>(context: TokenContext) -> Token<T, CB> {
         Token{
             context: context,
             attrubute: &*number_token_attrubute,

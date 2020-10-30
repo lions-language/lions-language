@@ -3,7 +3,7 @@ use crate::token::{TokenType};
 use star::StarToken;
 use crate::grammar::Grammar;
 
-impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar + Clone> LexicalParser<T, CB> {
+impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
     fn start_star(&mut self) {
         let context = self.build_token_context_without_data(TokenType::Star);
         self.push_to_token_buffer(StarToken::new(context));

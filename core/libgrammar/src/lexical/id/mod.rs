@@ -6,7 +6,7 @@ use crate::grammar::Grammar;
 use libtype::primeval::{PrimevalType, PrimevalData
     , boolean::Boolean, boolean::BooleanValue};
 
-impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar + Clone> LexicalParser<T, CB> {
+impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
     fn id_push_keyword_token(&mut self, token_type: TokenType) {
         self.push_nooperate_nodata_token_to_token_buffer(token_type);
     }

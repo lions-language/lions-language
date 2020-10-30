@@ -14,7 +14,7 @@ pub struct PlusToken {
 }
 
 impl PlusToken {
-    fn nup<T: FnMut() -> CallbackReturnStatus, CB: Grammar + Clone>(token: &Token<T, CB>, grammar: &mut GrammarParser<T, CB>, express_context: &ExpressContext<T, CB>) -> TokenMethodResult {
+    fn nup<T: FnMut() -> CallbackReturnStatus, CB: Grammar>(token: &Token<T, CB>, grammar: &mut GrammarParser<T, CB>, express_context: &ExpressContext<T, CB>) -> TokenMethodResult {
         /*
          * 移除 token
          * */
@@ -48,7 +48,7 @@ impl PlusToken {
         r
     }
 
-    fn led<T: FnMut() -> CallbackReturnStatus, CB: Grammar + Clone>(token: &Token<T, CB>, grammar: &mut GrammarParser<T, CB>, express_context: &ExpressContext<T, CB>) -> TokenMethodResult {
+    fn led<T: FnMut() -> CallbackReturnStatus, CB: Grammar>(token: &Token<T, CB>, grammar: &mut GrammarParser<T, CB>, express_context: &ExpressContext<T, CB>) -> TokenMethodResult {
         /*
          * 移除 + token
          * */
@@ -84,7 +84,7 @@ impl PlusToken {
 }
 
 impl PlusToken {
-    pub fn new<T: FnMut() -> CallbackReturnStatus, CB: Grammar + Clone>(context: TokenContext) -> Token<T, CB> {
+    pub fn new<T: FnMut() -> CallbackReturnStatus, CB: Grammar>(context: TokenContext) -> Token<T, CB> {
         Token{
             context: context,
             attrubute: &*PLUS_TOKEN_ATTRUBUTE,

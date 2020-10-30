@@ -13,7 +13,7 @@ enum FunctionType {
     StructMethod
 }
 
-impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar + Clone> GrammarParser<'a, T, CB> {
+impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, CB> {
     pub fn function_process(&mut self) {
         /*
          * 跳过 function 关键字

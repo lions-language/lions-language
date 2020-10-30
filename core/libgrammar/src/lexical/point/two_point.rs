@@ -10,17 +10,17 @@ lazy_static!{
 }
 
 impl TwoPointToken {
-    fn nup<T: FnMut() -> CallbackReturnStatus, CB: Grammar + Clone>(_token: &Token<T, CB>, _grammar: &mut GrammarParser<T, CB>, _express_context: &ExpressContext<T, CB>) -> TokenMethodResult {
+    fn nup<T: FnMut() -> CallbackReturnStatus, CB: Grammar>(_token: &Token<T, CB>, _grammar: &mut GrammarParser<T, CB>, _express_context: &ExpressContext<T, CB>) -> TokenMethodResult {
         TokenMethodResult::None
     }
 
-    fn led<T: FnMut() -> CallbackReturnStatus, CB: Grammar + Clone>(_token: &Token<T, CB>, _grammar: &mut GrammarParser<T, CB>, _express_context: &ExpressContext<T, CB>) -> TokenMethodResult {
+    fn led<T: FnMut() -> CallbackReturnStatus, CB: Grammar>(_token: &Token<T, CB>, _grammar: &mut GrammarParser<T, CB>, _express_context: &ExpressContext<T, CB>) -> TokenMethodResult {
         TokenMethodResult::None
     }
 }
 
 impl TwoPointToken {
-    pub fn new<T: FnMut() -> CallbackReturnStatus, CB: Grammar + Clone>(context: TokenContext) -> Token<T, CB> {
+    pub fn new<T: FnMut() -> CallbackReturnStatus, CB: Grammar>(context: TokenContext) -> Token<T, CB> {
         Token{
             context: context,
             attrubute: &*TWO_POINT_TOKEN_ATTRUBUTE,

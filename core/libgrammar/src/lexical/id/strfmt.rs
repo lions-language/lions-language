@@ -2,7 +2,7 @@ use super::super::{LexicalParser, CallbackReturnStatus};
 use libcommon::strtool::strcompare::{U8ArrayIsEqual};
 use crate::grammar::Grammar;
 
-impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar + Clone> LexicalParser<T, CB> {
+impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
     fn id_kw_strfmt_process_next_is_strend(&mut self) -> bool {
         /*
          * 检测下一个字符是否是字符串结束符
