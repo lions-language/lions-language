@@ -252,6 +252,7 @@ mod memory;
 mod test {
     use libgrammar::lexical::VecU8;
     use libgrammar::lexical::LexicalParser;
+    use libgrammar::lexical::IoAttribute;
     use libgrammar::grammar::GrammarParser;
     use libgrammar::lexical::CallbackReturnStatus;
     use libgrammar::grammar::GrammarContext;
@@ -291,10 +292,12 @@ mod test {
                 panic!("read file error, err: {}", err);
             }
         };
-        let lexical_parser = LexicalParser::new(file.clone(), || -> CallbackReturnStatus {
+        let io_attr = IoAttribute::new_with_all(1);
+        let lexical_parser = LexicalParser::new(file.clone(), io_attr.clone()
+            , || -> CallbackReturnStatus {
             let mut v = Vec::new();
             let f_ref = f.by_ref();
-            match f_ref.take(1).read_to_end(&mut v) {
+            match f_ref.take(io_attr.read_once_max_clone() as u64).read_to_end(&mut v) {
                 Ok(len) => {
                     if len == 0 {
                         return CallbackReturnStatus::End;
