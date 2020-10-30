@@ -502,12 +502,12 @@ pub type ExpressEndFunc<T, CB> = fn(&mut GrammarParser<T, CB>, &TokenVecItem<T, 
  * */
 pub type ParserEndFunc<T, CB> = fn(&mut GrammarParser<T, CB>, &Option<TokenPointer>) -> bool;
 
-pub struct ExpressContext<T: FnMut() -> CallbackReturnStatus, CB: Grammar> {
+pub struct ExpressContext<T: FnMut() -> CallbackReturnStatus, CB: Grammar + Clone> {
     pub end_f: ExpressEndFunc<T, CB>,
     desc_ctx: DescContext
 }
 
-impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> ExpressContext<T, CB> {
+impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar + Clone> ExpressContext<T, CB> {
     pub fn new_with_desc_ctx(end_f: ExpressEndFunc<T, CB>
         , desc_ctx: DescContext) -> Self {
         Self {
@@ -522,12 +522,12 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> ExpressContext<T, CB> {
     }
 }
 
-pub struct GrammarParser<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> {
+pub struct GrammarParser<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar + Clone> {
     lexical_parser: LexicalParser<T, CB>,
     context: &'a mut GrammarContext<CB>
 }
 
-impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, CB> {
+impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar + Clone> GrammarParser<'a, T, CB> {
     pub fn parser(&mut self) {
         self.parser_inner(|_, _| -> bool {
             false

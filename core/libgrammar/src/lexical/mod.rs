@@ -117,7 +117,7 @@ pub type TokenVecItem<T, CB> = token::Token<T, CB>;
 pub struct TokenPointer(usize);
 
 impl TokenPointer {
-    pub fn from_ref<T: FnMut() -> CallbackReturnStatus, CB: Grammar>(item: &TokenVecItem<T, CB>) -> Self {
+    pub fn from_ref<T: FnMut() -> CallbackReturnStatus, CB: Grammar + Clone>(item: &TokenVecItem<T, CB>) -> Self {
         Self(item as *const TokenVecItem<T, CB> as usize)
     }
 
@@ -129,7 +129,7 @@ impl TokenPointer {
         self.0 == 0
     }
 
-    pub fn as_ref<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar>(&self) -> &'a TokenVecItem<T, CB> {
+    pub fn as_ref<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar + Clone>(&self) -> &'a TokenVecItem<T, CB> {
         unsafe {
             (self.0 as *const TokenVecItem<T, CB>).as_ref().expect("should not happend")
         }
@@ -148,7 +148,7 @@ impl TokenPointer {
     }
 }
 
-pub struct LexicalParser<T: FnMut() -> CallbackReturnStatus, CB: Grammar> {
+pub struct LexicalParser<T: FnMut() -> CallbackReturnStatus, CB: Grammar + Clone> {
     file: String,
     line: u64,
     col: u64,
@@ -159,7 +159,7 @@ pub struct LexicalParser<T: FnMut() -> CallbackReturnStatus, CB: Grammar> {
     backtrack_point: usize
 }
 
-impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
+impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar + Clone> LexicalParser<T, CB> {
     /*
     fn lookup_next_n(&mut self, n: usize) -> Option<&TokenVecItem> {
         let tokens_len = self.tokens_buffer.len();
@@ -460,7 +460,7 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
 
 }
 
-impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
+impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar + Clone> LexicalParser<T, CB> {
     pub fn get_file(&self) -> &String {
         &self.file
     }

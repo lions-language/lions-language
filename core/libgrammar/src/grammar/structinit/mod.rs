@@ -10,7 +10,7 @@ use crate::lexical::{CallbackReturnStatus
 use crate::token::{TokenMethodResult
     , TokenType, TokenData};
 
-impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, CB> {
+impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar + Clone> GrammarParser<'a, T, CB> {
     pub fn structinit_process(&mut self, backtrack_len: usize
         , scope_context: CallFuncScopeContext) {
         /*

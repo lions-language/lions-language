@@ -7,7 +7,7 @@ use super::{GrammarParser, Grammar
 use crate::lexical::{CallbackReturnStatus};
 use crate::token::{TokenType};
 
-impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, CB> {
+impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar + Clone> GrammarParser<'a, T, CB> {
     pub fn and_process(&mut self) {
         /*
          * 跳过 `&`

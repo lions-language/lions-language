@@ -34,7 +34,7 @@ macro_rules! expression_check_end {
     }
 }
 
-impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, CB> {
+impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar + Clone> GrammarParser<'a, T, CB> {
     pub fn expression_end_normal(grammar: &mut GrammarParser<T, CB>
         , token: &TokenVecItem<T, CB>) -> TokenMethodResult {
         // println!("normal end ... ");

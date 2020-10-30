@@ -2,7 +2,7 @@ use super::{GrammarParser, Grammar};
 use crate::lexical::{CallbackReturnStatus, TokenVecItem, TokenPointer};
 use crate::token::{TokenType, TokenValue};
 
-impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, CB> {
+impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar + Clone> GrammarParser<'a, T, CB> {
     pub fn process_block(&mut self) {
         /*
          * 跳过 `{`

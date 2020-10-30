@@ -8,7 +8,7 @@ use crate::grammar::{FunctionDefineContext
     , FunctionDefineParamContext
     , FunctionDefineParamContextType};
   
-impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, CB> {
+impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar + Clone> GrammarParser<'a, T, CB> {
     pub fn function_object_method(&mut self) {
         let mut define_context = FunctionDefineContext::new_with_all(false, HeapPtr::new_null());
         /*

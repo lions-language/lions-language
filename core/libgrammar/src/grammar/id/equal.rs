@@ -9,7 +9,7 @@ use crate::grammar::{GrammarParser, Grammar
 use crate::lexical::{CallbackReturnStatus};
 use crate::token::{TokenType, TokenData};
 
-impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, CB> {
+impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar + Clone> GrammarParser<'a, T, CB> {
     pub fn id_process_equal(&mut self, name: Option<String>) {
         /*
          * 跳过 = token

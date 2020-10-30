@@ -7,7 +7,7 @@ use super::{GrammarParser, Grammar
 use crate::lexical::{CallbackReturnStatus};
 use crate::token::{TokenType, TokenData, TokenMethodResult};
 
-impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, CB> {
+impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar + Clone> GrammarParser<'a, T, CB> {
     pub fn equal_process(&mut self, express_context: &ExpressContext<T, CB>) -> TokenMethodResult {
         /*
          * 移除 = token

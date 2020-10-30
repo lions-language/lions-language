@@ -287,14 +287,14 @@ type NupFunc<T, CB> = fn(token: &Token<T, CB>, grammar: &mut GrammarParser<T, CB
 type LedFunc<T, CB> = fn(token: &Token<T, CB>, grammar: &mut GrammarParser<T, CB>
     , express_context: &ExpressContext<T, CB>) -> TokenMethodResult;
 
-pub struct Token<T: FnMut() -> CallbackReturnStatus, CB: Grammar> {
+pub struct Token<T: FnMut() -> CallbackReturnStatus, CB: Grammar + Clone> {
     pub context: TokenContext,
     pub attrubute: &'static TokenAttrubute,
     pub nup: NupFunc<T, CB>,
     pub led: LedFunc<T, CB>
 }
 
-impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> Token<T, CB> {
+impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar + Clone> Token<T, CB> {
     pub fn context_ref(&self) -> &TokenContext {
         &self.context
     }
@@ -324,11 +324,11 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> Token<T, CB> {
     }
 }
 
-pub fn default_nup<T: FnMut() -> CallbackReturnStatus, CB: Grammar>(token: &Token<T, CB>, grammar: &mut GrammarParser<T, CB>, express_context: &ExpressContext<T, CB>) -> TokenMethodResult {
+pub fn default_nup<T: FnMut() -> CallbackReturnStatus, CB: Grammar + Clone>(token: &Token<T, CB>, grammar: &mut GrammarParser<T, CB>, express_context: &ExpressContext<T, CB>) -> TokenMethodResult {
     TokenMethodResult::None
 }
 
-pub fn default_led<T: FnMut() -> CallbackReturnStatus, CB: Grammar>(token: &Token<T, CB>, grammar: &mut GrammarParser<T, CB>, express_context: &ExpressContext<T, CB>) -> TokenMethodResult {
+pub fn default_led<T: FnMut() -> CallbackReturnStatus, CB: Grammar + Clone>(token: &Token<T, CB>, grammar: &mut GrammarParser<T, CB>, express_context: &ExpressContext<T, CB>) -> TokenMethodResult {
     TokenMethodResult::None
 }
 
@@ -347,7 +347,7 @@ pub struct NoOperateToken {
 }
 
 impl NoOperateToken {
-    pub fn new<T: FnMut() -> CallbackReturnStatus, CB: Grammar>(context: TokenContext) -> Token<T, CB> {
+    pub fn new<T: FnMut() -> CallbackReturnStatus, CB: Grammar + Clone>(context: TokenContext) -> Token<T, CB> {
         Token{
             context: context,
             attrubute: &*NOOPERATE_TOKEN_ATTRUBUTE,

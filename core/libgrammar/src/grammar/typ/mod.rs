@@ -5,7 +5,7 @@ use crate::token::{TokenType, TokenData};
 use libtype::{Type, TypeValue, TypeAttrubute, Primeval, Structure};
 use libtype::function::{FunctionParamLengthenAttr};
 
-impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, CB> {
+impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar + Clone> GrammarParser<'a, T, CB> {
     fn typ_startwith_id(&mut self) -> TypeToken {
         /*
          * take id token

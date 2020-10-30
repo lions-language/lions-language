@@ -1,7 +1,7 @@
 use super::{LexicalParser, CallbackReturnStatus};
 use crate::grammar::Grammar;
 
-impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
+impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar + Clone> LexicalParser<T, CB> {
     /*
      * 对存在 cb 的情况下, lookup_next_one 的封装
      * */

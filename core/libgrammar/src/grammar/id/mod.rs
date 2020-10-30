@@ -7,7 +7,7 @@ use super::{GrammarParser, Grammar
 use crate::lexical::{CallbackReturnStatus, TokenPointer};
 use crate::token::{TokenType, TokenData};
 
-impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, CB> {
+impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar + Clone> GrammarParser<'a, T, CB> {
     pub fn id_process_id(&mut self, desc_ctx: DescContext) {
         let mut token_value = self.take_next_one().token_value();
         let mut lengthen_offset = 0;

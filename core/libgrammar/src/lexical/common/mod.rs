@@ -6,7 +6,7 @@ use crate::lexical::parenthese::right_parenthese;
 use crate::lexical::whitespace::newline;
 use crate::grammar::Grammar;
 
-impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
+impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar + Clone> LexicalParser<T, CB> {
     fn escape_change_select(&mut self, c: char) -> Option<char> {
         let mut r = None;
         match c {
