@@ -479,7 +479,7 @@ pub trait Grammar {
     fn leave_point_access(&mut self) {
         unimplemented!();
     }
-    fn import_stmt(&mut self, _context: ImportStmtContext) {
+    fn import_stmt(&mut self, _context: ImportStmtContext) -> DescResult {
         unimplemented!();
     }
 }

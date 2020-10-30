@@ -546,8 +546,8 @@ impl<'a, F: Compile> Grammar for Compiler<'a, F> {
         self.process_leave_point_access();
     }
 
-    fn import_stmt(&mut self, context: ImportStmtContext) {
-        self.process_import_stmt(context);
+    fn import_stmt(&mut self, context: ImportStmtContext) -> DescResult {
+        self.process_import_stmt(context)
     }
 }
 

@@ -58,8 +58,8 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                  * */
                 self.parse_import_content(content);
                 *is = false;
-                self.cb().import_stmt(ImportStmtContext::new(
-                        import_prefix, content));
+                check_desc_result!(self, self.cb().import_stmt(ImportStmtContext::new(
+                        import_prefix, content)));
                 return true;
             },
             _ => {
@@ -90,8 +90,8 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                         is = false;
                         parser.content_skip_next_one();
                         let grammar = grammar_ptr.as_mut::<GrammarParser<T, CB>>();
-                        grammar.cb().import_stmt(ImportStmtContext::new(
-                                consts::ImportPrefixType::Local, &content));
+                        check_desc_result!(grammar, grammar.cb().import_stmt(ImportStmtContext::new(
+                                consts::ImportPrefixType::Local, &content)));
                     },
                     _ => {
                         let grammar = grammar_ptr.as_mut::<GrammarParser<T, CB>>();
