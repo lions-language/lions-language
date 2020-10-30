@@ -254,12 +254,19 @@ pub struct OperatorEqualEqualContext {
     desc_ctx: DescContext
 }
 
-#[derive(Debug, FieldGet
-    , NewWithAll, FieldGetMove
-    , Default)]
-pub struct ImportStmtContext {
-    prefix: ImportPrefixType,
-    content: String
+#[derive(Debug, Default)]
+pub struct ImportStmtContext<'a> {
+    pub prefix: ImportPrefixType,
+    pub content: &'a str
+}
+
+impl<'a> ImportStmtContext<'a> {
+    pub fn new(prefix: ImportPrefixType, content: &'a str) -> Self {
+        Self {
+            prefix: prefix,
+            content: content
+        }
+    }
 }
 
 pub trait Grammar {
