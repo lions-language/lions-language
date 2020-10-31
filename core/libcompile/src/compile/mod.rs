@@ -337,6 +337,9 @@ impl InputContext {
     }
 }
 
+pub struct ImportData {
+}
+
 pub struct Compiler<'a, F: Compile> {
     function_control: FunctionControl,
     struct_control: StructControl,
@@ -348,7 +351,8 @@ pub struct Compiler<'a, F: Compile> {
     package_str: &'a str,
     compile_context: CompileContext,
     vm_scope_value: usize,
-    cb: F
+    cb: F,
+    import_datas: HashMap<String, ImportData>
 }
 
 impl<'a, F: Compile> Grammar for Compiler<'a, F> {
@@ -567,7 +571,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
             package_str: package_str,
             compile_context: CompileContext::default(),
             vm_scope_value: 0,
-            cb: cb
+            cb: cb,
+            import_datas: HashMap::new()
         }
     }
 }
