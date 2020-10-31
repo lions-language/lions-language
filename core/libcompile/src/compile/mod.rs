@@ -41,6 +41,7 @@ use libtype::{AddressKey, AddressValue};
 use libtype::package::{PackageStr};
 use libstructtype::structure::{StructControl};
 use libmacro::{FieldGet, FieldGetClone, FieldGetMove, NewWithAll};
+use std::collections::HashMap;
 use crate::address;
 use crate::address::PackageIndex;
 use crate::static_dispatch::{StaticVariantDispatch};

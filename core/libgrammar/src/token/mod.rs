@@ -58,6 +58,8 @@ pub enum TokenType {
     False,
     // import
     Import,
+    // relmod
+    Relmod,
     // ->
     RightArrow,
     // (
