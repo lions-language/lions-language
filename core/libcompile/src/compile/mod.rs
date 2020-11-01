@@ -16,7 +16,8 @@ use libgrammar::grammar::{Grammar, CallFuncScopeContext
     , ReturnStmtContext as GrammarReturnStmtContext
     , ObjectFunctionDefineMutContext, TypeToken
     , EnterPointAccessContext, VarUpdateStmtContext
-    , OperatorEqualEqualContext, ImportStmtContext};
+    , OperatorEqualEqualContext, ImportStmtContext
+    , RelmodStmtContext};
 use libgrammar::token::{TokenValue};
 use libtype::{Type, Data};
 use libtype::function::{Function, CallFunctionParamAddr
@@ -308,7 +309,8 @@ pub trait Compile {
 }
 
 pub enum FileType {
-    Main
+    Main,
+    Mod
 }
 
 #[derive(FieldGet)]
@@ -554,6 +556,10 @@ impl<'a, F: Compile> Grammar for Compiler<'a, F> {
     fn import_stmt(&mut self, context: ImportStmtContext) -> DescResult {
         self.process_import_stmt(context)
     }
+
+    fn relmod_stmt(&mut self, context: RelmodStmtContext) -> DescResult {
+        self.process_relmod_stmt(context)
+    }
 }
 
 impl<'a, F: Compile> Compiler<'a, F> {
@@ -601,11 +607,13 @@ mod point_access;
 mod process_if;
 mod boolean;
 mod import;
+mod relmod;
 
 #[cfg(test)]
 mod test {
     use libgrammar::lexical::VecU8;
     use libgrammar::lexical::LexicalParser;
+    use libgrammar::lexical::IoAttribute;
     use libgrammar::grammar::GrammarParser;
     use libgrammar::lexical::CallbackReturnStatus;
     use libgrammar::grammar::GrammarContext;
@@ -632,10 +640,12 @@ mod test {
                 panic!("read file error");
             }
         };
-        let lexical_parser = LexicalParser::new(file.clone(), || -> CallbackReturnStatus {
+        let io_attr = IoAttribute::new_with_all(1);
+        let lexical_parser = LexicalParser::new(file.clone(), io_attr.clone()
+            , || -> CallbackReturnStatus {
             let mut v = Vec::new();
             let f_ref = f.by_ref();
-            match f_ref.take(1).read_to_end(&mut v) {
+            match f_ref.take(io_attr.read_once_max_clone() as u64).read_to_end(&mut v) {
                 Ok(len) => {
                     if len == 0 {
                         return CallbackReturnStatus::End;
