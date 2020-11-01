@@ -260,6 +260,13 @@ pub struct ImportStmtContext<'a> {
     pub content: &'a str
 }
 
+#[derive(Debug, FieldGet
+    , NewWithAll, FieldGetMove
+    , Default)]
+pub struct RelmodStmtContext {
+    pub content: String
+}
+
 impl<'a> ImportStmtContext<'a> {
     pub fn new(prefix: ImportPrefixType, content: &'a str) -> Self {
         Self {
@@ -480,6 +487,9 @@ pub trait Grammar {
         unimplemented!();
     }
     fn import_stmt(&mut self, _context: ImportStmtContext) -> DescResult {
+        unimplemented!();
+    }
+    fn relmod_stmt(&mut self, _context: RelmodStmtContext) -> DescResult {
         unimplemented!();
     }
 }
