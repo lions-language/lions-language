@@ -20,13 +20,26 @@ impl<'a, F: Compile> Compiler<'a, F> {
         }
     }
 
-    fn import_local(&mut self, path: &str) -> DescResult {
+    fn import_local(&mut self, content: &str) -> DescResult {
         /*
-         * 判断路径是否存在
+         * 检测路径是否是目录
          * */
-        if !Path::new(path).exists() {
+        let path = Path::new(content);
+        if !path.exists() {
             return DescResult::Error(
-                format!("import path: {:?} is not found", path));
+                format!("import path: {:?} is not found", content));
+        }
+        if !path.is_dir() {
+            return DescResult::Error(
+                format!("import path: {:?} is not dir", content));
+        }
+        /*
+         * 检测路径是否包含 mod.lions
+         * */
+        if !path.join(libcommon::consts::MOD_LIONS_NAME).as_path().exists() {
+            return DescResult::Error(
+                format!("{} does not exist in the path of import"
+                    , libcommon::consts::MOD_LIONS_NAME));
         }
         DescResult::Success
     }

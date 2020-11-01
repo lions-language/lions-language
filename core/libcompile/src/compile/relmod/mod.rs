@@ -21,6 +21,27 @@ impl<'a, F: Compile> Compiler<'a, F> {
                     format!("relmod stmt must be use in mod.lions"));
             }
         }
+        /*
+         * 检测路径是否是目录
+         * */
+        let content = context.fields_move();
+        let path = Path::new(&content);
+        if !path.exists() {
+            return DescResult::Error(
+                format!("relmod path: {:?} is not found", content));
+        }
+        if !path.is_dir() {
+            return DescResult::Error(
+                format!("relmod path: {:?} is not dir", content));
+        }
+        /*
+         * 检测路径是否包含 mod.lions, 如果存在就报错 (relmod 指定的目录不能含有其他 mod)
+         * */
+        if path.join(libcommon::consts::MOD_LIONS_NAME).as_path().exists() {
+            return DescResult::Error(
+                format!("{} cannot exist in the directory specified by relmod"
+                    , libcommon::consts::MOD_LIONS_NAME));
+        }
         DescResult::Success
     }
 }

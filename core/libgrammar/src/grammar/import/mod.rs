@@ -91,7 +91,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                         parser.content_skip_next_one();
                         let grammar = grammar_ptr.as_mut::<GrammarParser<T, CB>>();
                         check_desc_result!(grammar, grammar.cb().import_stmt(ImportStmtContext::new(
-                                consts::ImportPrefixType::Local, &content)));
+                                consts::ImportPrefixType::Local, &no_prefix)));
                     },
                     _ => {
                         let grammar = grammar_ptr.as_mut::<GrammarParser<T, CB>>();

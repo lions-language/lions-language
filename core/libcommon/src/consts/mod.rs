@@ -3,6 +3,8 @@ pub const IMPORT_PATH: &'static str = "path";
 pub const IMPORT_PACKAGE: &'static str = "package";
 pub const IMPORT_SYSTEM: &'static str = "system";
 
+pub const MOD_LIONS_NAME: &'static str = "mod.lions";
+
 #[derive(Debug)]
 pub enum ImportPrefixType {
     Local,
