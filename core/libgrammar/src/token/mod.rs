@@ -60,6 +60,8 @@ pub enum TokenType {
     Import,
     // relmod
     Relmod,
+    // module
+    Module,
     // ->
     RightArrow,
     // (

@@ -114,14 +114,24 @@ pub struct StructInitContext {
 
 #[derive(Debug, FieldGet, NewWithAll, FieldGetMove
     , FieldGetClone
-    , Clone, Default)]
+    , Clone)]
 pub struct DescContext {
-    typ_attr: TypeAttrubute
+    typ_attr: TypeAttrubute,
+    star_prefix: bool
+}
+
+impl Default for DescContext {
+    fn default() -> Self {
+        Self {
+            typ_attr: TypeAttrubute::default(),
+            star_prefix: false
+        }
+    }
 }
 
 impl DescContext {
     pub fn new(typ_attr: TypeAttrubute) -> Self {
-        DescContext::new_with_all(typ_attr)
+        DescContext::new_with_all(typ_attr, false)
     }
 }
 
@@ -265,6 +275,13 @@ pub struct ImportStmtContext<'a> {
     , Default)]
 pub struct RelmodStmtContext {
     pub content: String
+}
+
+#[derive(Debug, FieldGet
+    , NewWithAll, FieldGetMove
+    , Default)]
+pub struct ModuleStmtContext {
+    pub value: TokenValue
 }
 
 impl<'a> ImportStmtContext<'a> {
@@ -490,6 +507,9 @@ pub trait Grammar {
         unimplemented!();
     }
     fn relmod_stmt(&mut self, _context: RelmodStmtContext) -> DescResult {
+        unimplemented!();
+    }
+    fn module_stmt(&mut self, _context: ModuleStmtContext) -> DescResult {
         unimplemented!();
     }
 }
@@ -834,6 +854,7 @@ mod equal;
 mod import;
 mod relmod;
 mod star;
+mod module;
 
 #[cfg(test)]
 mod test {

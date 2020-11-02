@@ -14,13 +14,13 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
          * 如果不是 id 就不符合语法, 只有 id 才可以获取地址指向的内存
          * */
         self.skip_next_one();
-        self.expect_next_token_unchecked(|parser, tp| {
+        self.expect_next_token_unchecked(|grammar, tp| {
             let token = tp.as_ref::<T, CB>();
             match token.context_token_type() {
                 TokenType::Id => {
                 },
                 _ => {
-                    parser.panic(
+                    grammar.panic(
                         &format!("expect id after `*`, but meet {:?}", token.context_token_type()));
                 }
             }
