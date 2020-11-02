@@ -17,7 +17,7 @@ use libgrammar::grammar::{Grammar, CallFuncScopeContext
     , ObjectFunctionDefineMutContext, TypeToken
     , EnterPointAccessContext, VarUpdateStmtContext
     , OperatorEqualEqualContext, ImportStmtContext
-    , RelmodStmtContext};
+    , RelmodStmtContext, ModuleStmtContext};
 use libgrammar::token::{TokenValue};
 use libtype::{Type, Data};
 use libtype::function::{Function, CallFunctionParamAddr
@@ -560,6 +560,10 @@ impl<'a, F: Compile> Grammar for Compiler<'a, F> {
     fn relmod_stmt(&mut self, context: RelmodStmtContext) -> DescResult {
         self.process_relmod_stmt(context)
     }
+
+    fn module_stmt(&mut self, context: ModuleStmtContext) -> DescResult {
+        self.process_module_stmt(context)
+    }
 }
 
 impl<'a, F: Compile> Compiler<'a, F> {
@@ -608,6 +612,8 @@ mod process_if;
 mod boolean;
 mod import;
 mod relmod;
+mod process_module;
+mod package;
 
 #[cfg(test)]
 mod test {

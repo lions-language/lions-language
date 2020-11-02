@@ -615,6 +615,9 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
             TokenType::Relmod => {
                 self.relmod_process();
             },
+            TokenType::Module => {
+                self.module_process();
+            },
             _ => {
                 self.expression_process(token, express_context);
             }
