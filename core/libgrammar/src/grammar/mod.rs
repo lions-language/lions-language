@@ -833,6 +833,7 @@ mod boolean;
 mod equal;
 mod import;
 mod relmod;
+mod star;
 
 #[cfg(test)]
 mod test {
