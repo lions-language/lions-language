@@ -4,6 +4,7 @@ use libtype::instruction::{ConditionStmt, BlockDefine
     , ConditionStmtTrue
     , JumpType};
 use libgrammar::grammar::{ModuleStmtContext};
+use libgrammar::token::{TokenData};
 use libcommon::consts::{ImportPrefixType};
 use std::path::Path;
 use crate::compile::{Compile, Compiler, FileType};
@@ -24,6 +25,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
         /*
          * 将 module name 记录在 package global data 中
          * */
+        let module_name = context.fields_move();
         DescResult::Success
     }
 }

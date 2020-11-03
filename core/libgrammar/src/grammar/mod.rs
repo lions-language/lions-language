@@ -281,7 +281,7 @@ pub struct RelmodStmtContext {
     , NewWithAll, FieldGetMove
     , Default)]
 pub struct ModuleStmtContext {
-    pub value: TokenValue
+    pub module_name: String
 }
 
 impl<'a> ImportStmtContext<'a> {

@@ -1,7 +1,7 @@
 use libresult::{DescResult};
 use super::{GrammarParser, Grammar
     , ModuleStmtContext};
-use crate::token::TokenType;
+use crate::token::{TokenType, TokenData};
 use crate::lexical::{CallbackReturnStatus};
 
 impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, CB> {
@@ -25,7 +25,10 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
             }
         }, "id after module");
         let t = self.take_next_one();
+        let module_name = extract_token_data!(
+            t.token_value().token_data().expect("should not happend")
+            , Id);
         check_desc_result!(self, self.cb().module_stmt(
-            ModuleStmtContext::new_with_all(t.token_value())));
+            ModuleStmtContext::new_with_all(module_name)));
     }
 }
