@@ -17,7 +17,8 @@ use libgrammar::grammar::{Grammar, CallFuncScopeContext
     , ObjectFunctionDefineMutContext, TypeToken
     , EnterPointAccessContext, VarUpdateStmtContext
     , OperatorEqualEqualContext, ImportStmtContext
-    , RelmodStmtContext, ModuleStmtContext};
+    , RelmodStmtContext, ModuleStmtContext
+    , UseStmtContext};
 use libgrammar::token::{TokenValue};
 use libtype::{Type, Data};
 use libtype::function::{Function, CallFunctionParamAddr
@@ -310,7 +311,8 @@ pub trait Compile {
 
 pub enum FileType {
     Main,
-    Mod
+    Mod,
+    RELMOD
 }
 
 #[derive(FieldGet)]
@@ -564,6 +566,10 @@ impl<'a, F: Compile> Grammar for Compiler<'a, F> {
     fn module_stmt(&mut self, context: ModuleStmtContext) -> DescResult {
         self.process_module_stmt(context)
     }
+
+    fn use_stmt(&mut self, context: UseStmtContext) -> DescResult {
+        self.process_use_stmt(context)
+    }
 }
 
 impl<'a, F: Compile> Compiler<'a, F> {
@@ -614,6 +620,7 @@ mod import;
 mod relmod;
 mod process_module;
 mod package;
+mod process_use;
 
 #[cfg(test)]
 mod test {
