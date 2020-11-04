@@ -284,6 +284,13 @@ pub struct ModuleStmtContext {
     pub module_name: String
 }
 
+#[derive(Debug, FieldGet
+    , NewWithAll, FieldGetMove
+    , Default)]
+pub struct UseStmtContext {
+    pub content: String
+}
+
 impl<'a> ImportStmtContext<'a> {
     pub fn new(prefix: ImportPrefixType, content: &'a str) -> Self {
         Self {
@@ -512,6 +519,9 @@ pub trait Grammar {
     fn module_stmt(&mut self, _context: ModuleStmtContext) -> DescResult {
         unimplemented!();
     }
+    fn use_stmt(&mut self, _context: UseStmtContext) -> DescResult {
+        unimplemented!();
+    }
 }
 
 enum NextToken<T: FnMut() -> CallbackReturnStatus, CB: Grammar> {
@@ -617,6 +627,9 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
             },
             TokenType::Module => {
                 self.module_process();
+            },
+            TokenType::Use => {
+                self.use_process();
             },
             _ => {
                 self.expression_process(token, express_context);
