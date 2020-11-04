@@ -62,6 +62,8 @@ pub enum TokenType {
     Relmod,
     // module
     Module,
+    // use
+    Use,
     // ->
     RightArrow,
     // (

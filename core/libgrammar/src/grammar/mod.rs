@@ -858,6 +858,7 @@ mod import;
 mod relmod;
 mod star;
 mod module;
+mod process_use;
 
 #[cfg(test)]
 mod test {
