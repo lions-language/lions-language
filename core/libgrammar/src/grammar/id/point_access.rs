@@ -10,7 +10,8 @@ use crate::lexical::{CallbackReturnStatus};
 use crate::token::{TokenType, TokenData};
 
 impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, CB> {
-    pub fn id_process_point(&mut self, backtrack_len: usize
+    pub fn id_process_point(&mut self, desc_ctx: DescContext
+        , backtrack_len: usize
         , scope_context: CallFuncScopeContext) {
         self.id_process_id(scope_context.desc_ctx_clone());
         /*
@@ -61,7 +62,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
             }
         }
         self.cb().leave_point_access();
-        self.id_after_process_id_without_next(None);
+        self.id_after_process_id_without_next(desc_ctx, None);
     }
 }
 

@@ -32,7 +32,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
             extract_token_data!(token_value.token_data_ref().as_ref().expect("should not happend")
                 , Id).to_string();
         let context = LoadVariantContext::new_with_all(
-            token_value, None, desc_ctx.typ_attr, lengthen_offset);
+            token_value, None, desc_ctx.typ_attr_clone(), lengthen_offset);
         match self.grammar_context().cb.load_variant(context) {
             DescResult::Error(e) => {
                 self.panic(&e);
@@ -40,17 +40,18 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
             _ => {
             }
         }
-        self.id_after_process_id_without_next(Some(name));
+        self.id_after_process_id_without_next(desc_ctx, Some(name));
     }
 
     /*
      * 如果匹配 => 返回 true, 否则返回 false
      * */
-    fn id_after_process_id_with_next(&mut self, tp: &TokenPointer, name: Option<String>) -> bool {
+    fn id_after_process_id_with_next(&mut self, desc_ctx: DescContext
+        , tp: &TokenPointer, name: Option<String>) -> bool {
         let next = tp.as_ref::<T, CB>();
         match next.context_token_type() {
             TokenType::Equal => {
-                self.id_process_equal(name);
+                self.id_process_equal(desc_ctx, name);
                 return true;
             },
             _ => {
@@ -59,14 +60,15 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         false
     }
 
-    fn id_after_process_id_without_next(&mut self, name: Option<String>) -> bool {
+    fn id_after_process_id_without_next(&mut self, desc_ctx: DescContext
+        , name: Option<String>) -> bool {
         let tp = match self.lookup_next_one_ptr() {
             Some(tp) => tp,
             None => {
                 return false;
             }
         };
-        self.id_after_process_id_with_next(&tp, name)
+        self.id_after_process_id_with_next(desc_ctx, &tp, name)
     }
 
     pub fn id_process_three_point(&mut self) -> usize {
@@ -152,7 +154,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                     },
                     TokenType::Point => {
                         let bl = self.restore_from_backtrack_point();
-                        self.id_process_point(bl, scope_context);
+                        self.id_process_point(desc_ctx, bl, scope_context);
                         return;
                     },
                     TokenType::ColonColon => {

@@ -4,13 +4,13 @@ use libtype::package::{PackageStr};
 use libresult::DescResult;
 use crate::grammar::{GrammarParser, Grammar
     , ExpressContext
-    , VarUpdateStmtContext, LoadVariantContext
+    , VarUpdateStmtContext, ValueUpdateStmtContext
     , DescContext, EnterPointAccessContext};
 use crate::lexical::{CallbackReturnStatus};
 use crate::token::{TokenType, TokenData};
 
 impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, CB> {
-    pub fn id_process_equal(&mut self, name: Option<String>) {
+    pub fn id_process_equal(&mut self, desc_ctx: DescContext, name: Option<String>) {
         /*
          * 跳过 = token
          * */
@@ -22,8 +22,13 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
             parser.expression_process(&tp
                 , &ExpressContext::new(GrammarParser::<T, CB>::expression_end_normal));
         }, "expression");
-        check_desc_result!(self, self.cb().var_update_stmt(VarUpdateStmtContext::new_with_all(
-                    name)));
+        if *desc_ctx.star_prefix_ref() {
+            check_desc_result!(self, self.cb().value_update_stmt(ValueUpdateStmtContext::new_with_all(
+            )))
+        } else {
+            check_desc_result!(self, self.cb().var_update_stmt(VarUpdateStmtContext::new_with_all(
+                        name)));
+        }
     }
 }
  

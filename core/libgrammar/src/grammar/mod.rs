@@ -37,6 +37,11 @@ pub struct VarUpdateStmtContext {
     name: Option<String>
 }
 
+#[derive(Default, FieldGet, NewWithAll
+    , FieldGetMove)]
+pub struct ValueUpdateStmtContext {
+}
+
 impl Default for VarStmtContext {
     fn default() -> Self {
         Self {
@@ -436,6 +441,9 @@ pub trait Grammar {
         unimplemented!("var stmt end");
     }
     fn var_update_stmt(&mut self, _context: VarUpdateStmtContext) -> DescResult {
+        unimplemented!();
+    }
+    fn value_update_stmt(&mut self, _context: ValueUpdateStmtContext) -> DescResult {
         unimplemented!();
     }
     fn return_stmt(&mut self, _context: ReturnStmtContext) -> DescResult {
