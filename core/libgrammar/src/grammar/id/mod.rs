@@ -145,6 +145,11 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                     TokenType::LeftParenthese => {
                         let bl = self.restore_from_backtrack_point();
                         self.funccall_process(bl, scope_context);
+                        if *desc_ctx.star_prefix_ref() {
+                            self.id_after_process_id_without_next(desc_ctx, None);
+                        } else {
+                            self.panic("the left side cannot be assigned");
+                        }
                         return;
                     },
                     TokenType::LeftBigParenthese => {
