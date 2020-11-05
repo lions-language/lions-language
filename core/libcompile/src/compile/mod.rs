@@ -16,6 +16,7 @@ use libgrammar::grammar::{Grammar, CallFuncScopeContext
     , ReturnStmtContext as GrammarReturnStmtContext
     , ObjectFunctionDefineMutContext, TypeToken
     , EnterPointAccessContext, VarUpdateStmtContext
+    , ValueUpdateStmtContext
     , OperatorEqualEqualContext, ImportStmtContext
     , RelmodStmtContext, ModuleStmtContext
     , UseStmtContext};
@@ -462,6 +463,10 @@ impl<'a, F: Compile> Grammar for Compiler<'a, F> {
 
     fn var_update_stmt(&mut self, context: VarUpdateStmtContext) -> DescResult {
         self.handle_var_update_stmt(context)
+    }
+
+    fn value_update_stmt(&mut self, context: ValueUpdateStmtContext) -> DescResult {
+        self.handle_value_update_stmt(context)
     }
 
     fn return_stmt(&mut self, context: GrammarReturnStmtContext) -> DescResult {

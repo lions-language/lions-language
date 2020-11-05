@@ -6,7 +6,8 @@ use libtype::{PackageType, PackageTypeValue
     , Type, TypeAttrubute};
 use libtype::instruction::{UpdateRefParamAddr
     , DeleteData};
-use libgrammar::grammar::{VarStmtContext, VarUpdateStmtContext};
+use libgrammar::grammar::{VarStmtContext, VarUpdateStmtContext
+    , ValueUpdateStmtContext};
 use crate::address::Address;
 use crate::compile::{Compile, Compiler, OwnershipMoveContext};
 use crate::compile::scope::vars::Variant;
@@ -219,7 +220,6 @@ impl<'a, F: Compile> Compiler<'a, F> {
                     self.cb_ownership_move(
                         var_addr.addr().addr(), expr_addr.addr_clone(), &expr_context);
                     /*
-                    /*
                      * 如果是移动的变量, 需要将被移动的变量从变量列表中移除
                      * */
                     match expr_context {
@@ -232,7 +232,6 @@ impl<'a, F: Compile> Compiler<'a, F> {
                         },
                         _ => {}
                     }
-                    */
                 },
                 None => {
                     self.cb_ownership_move(
@@ -256,6 +255,79 @@ impl<'a, F: Compile> Compiler<'a, F> {
             }
         } else {
             unimplemented!();
+        }
+        DescResult::Success
+    }
+
+    pub fn handle_value_update_stmt(&mut self, context: ValueUpdateStmtContext) -> DescResult {
+        let name = context.fields_move();
+        /*
+         * 等号右边的
+         * */
+        let right_value = match self.scope_context.take_top_from_value_buffer() {
+            Ok(v) => v,
+            Err(e) => {
+                return e;
+            }
+        };
+        /*
+         * 等号左边的
+         * */
+        let left_value = match self.scope_context.take_top_from_value_buffer() {
+            Ok(v) => v,
+            Err(e) => {
+                return e;
+            }
+        };
+        let (var_typ, var_addr, var_typ_attr, var_package_type, var_package_str, var_context)
+            = left_value.fields_move();
+        let (expr_typ, expr_addr, expr_typ_attr, expr_package_type, expr_package_str, expr_context)
+            = right_value.fields_move();
+        /*
+         * 检测: 如果 var 不是引用, 就是不允许的
+         * */
+        if !var_typ_attr.is_ref_as_assign() {
+            return DescResult::Error(
+                format!("left stmt must be ref"));
+        }
+        /*
+         * 检测: 如果 expr 不是可以移动的, 这种赋值语句是无法成立的
+         * */
+        if !expr_typ_attr.is_move_as_assign() {
+            return DescResult::Error(
+                format!("right stmt must be move, don't is ref"));
+        }
+        /*
+         * 检测: 左右类型是否匹配
+         * */
+        if var_typ.typ_ref() != expr_typ.typ_ref() {
+            return DescResult::Error(
+                format!("typ not match! left typ: {:?}, but right typ: {:?}"
+                    , var_typ, expr_typ));
+        }
+        /*
+         * 告诉虚拟机, 将 左边地址指向的内存数据 改为 右边地址指向的内存数据
+         * 并将右边的地址数据移除
+         * */
+        self.cb.delete_data(DeleteData::new_with_all(var_addr.addr_clone()));
+        /*
+        self.cb.ownership_move(OwnershipMoveContext::new_with_all(
+            var_addr.addr().addr(), expr_addr.addr_clone()));
+        */
+        self.cb_ownership_move(
+            var_addr.addr().addr(), expr_addr.addr_clone(), &expr_context);
+        /*
+         * 如果是移动的变量, 需要将被移动的变量从变量列表中移除
+         * */
+        match expr_context {
+            ValueBufferItemContext::Variant(v) => {
+                let var_name = v.as_ref::<String>();
+                // println!("remove {}", var_name);
+                self.scope_context.remove_variant_unchecked(
+                    expr_addr.addr_ref().addr_ref().scope_clone()
+                    , var_name, expr_addr.addr_ref().addr_ref());
+            },
+            _ => {}
         }
         DescResult::Success
     }
