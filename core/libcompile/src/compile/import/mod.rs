@@ -79,7 +79,6 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 }
             }
         });
-        let mut package_index = PackageIndex::new();
         let mut static_stream = StaticStream::new();
         let mut static_variant_dispatch = StaticVariantDispatch::new(&mut static_stream);
         let package_str = String::from("test");
@@ -88,7 +87,6 @@ impl<'a, F: Compile> Compiler<'a, F> {
             cb: Compiler::new(&module
                     , self.cb, InputContext::new(InputAttribute::new(
                             FileType::Mod))
-                    , &mut package_index
                     , &mut static_variant_dispatch
                     , &package_str)
         };

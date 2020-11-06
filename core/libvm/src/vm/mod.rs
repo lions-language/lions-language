@@ -317,7 +317,6 @@ mod test {
         let mut func_ds = ds_ptr.clone();
         let mut fdd = FunctionDefineDispatch::new(func_ds.as_mut::<DefineStream>());
         let mut bdd = BlockDefineDispatch::new(&mut ds);
-        let mut package_index = PackageIndex::new();
         let mut static_variant_dispatch = StaticVariantDispatch::new(
             &mut ss);
         let mut package_str = String::from("test");
@@ -334,7 +333,6 @@ mod test {
                 &module,
                 &mut bytecode,
                 InputContext::new(InputAttribute::new(FileType::Main)),
-                &mut package_index,
                 &mut static_variant_dispatch,
                 &package_str
             )

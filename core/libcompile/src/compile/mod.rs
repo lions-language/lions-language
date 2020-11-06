@@ -352,7 +352,6 @@ pub struct Compiler<'a, F: Compile> {
     module: &'a Module,
     scope_context: ScopeContext,
     input_context: InputContext,
-    package_index: &'a mut PackageIndex,
     static_variant_dispatch: &'a mut StaticVariantDispatch<'a>,
     package_str: &'a str,
     compile_context: CompileContext,
@@ -579,7 +578,6 @@ impl<'a, F: Compile> Grammar for Compiler<'a, F> {
 
 impl<'a, F: Compile> Compiler<'a, F> {
     pub fn new(module: &'a Module, cb: &'a mut F, input_context: InputContext
-        , package_index: &'a mut PackageIndex
         , static_variant_dispatch: &'a mut StaticVariantDispatch<'a>
         , package_str: &'a str) -> Self {
         Self {
@@ -588,7 +586,6 @@ impl<'a, F: Compile> Compiler<'a, F> {
             module: module,
             scope_context: ScopeContext::new(),
             input_context: input_context,
-            package_index: package_index,
             static_variant_dispatch: static_variant_dispatch,
             package_str: package_str,
             compile_context: CompileContext::default(),
