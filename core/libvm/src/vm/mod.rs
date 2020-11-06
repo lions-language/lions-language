@@ -252,12 +252,11 @@ mod memory;
 mod test {
     use libgrammar::lexical::VecU8;
     use libgrammar::lexical::LexicalParser;
-    use libgrammar::lexical::IoAttribute;
     use libgrammar::grammar::GrammarParser;
     use libgrammar::lexical::CallbackReturnStatus;
     use libgrammar::grammar::GrammarContext;
     use libtype::module::Module;
-    use libcompile::compile::{FileType, InputAttribute, InputContext};
+    use libcompile::compile::{FileType, InputAttribute, InputContext, IoAttribute};
     use libcompile::define_dispatch::{FunctionDefineDispatch, BlockDefineDispatch};
     use libcompile::static_dispatch::{StaticVariantDispatch};
     use libcompile::static_stream::{StaticStream};
@@ -293,7 +292,8 @@ mod test {
             }
         };
         let io_attr = IoAttribute::new_with_all(1);
-        let lexical_parser = LexicalParser::new(file.clone(), io_attr.clone()
+        let io_attr_clone = io_attr.clone();
+        let lexical_parser = LexicalParser::new(file.clone()
             , || -> CallbackReturnStatus {
             let mut v = Vec::new();
             let f_ref = f.by_ref();
@@ -334,7 +334,7 @@ mod test {
                 &mut bytecode,
                 InputContext::new(InputAttribute::new(FileType::Main)),
                 &mut static_variant_dispatch,
-                &package_str
+                &package_str, io_attr_clone
             )
         };
         let mut grammar_parser = GrammarParser::new(lexical_parser, &mut grammar_context);

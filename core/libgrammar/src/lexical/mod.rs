@@ -149,12 +149,6 @@ impl TokenPointer {
     }
 }
 
-#[derive(NewWithAll, FieldGet, FieldGetClone
-    , Clone)]
-pub struct IoAttribute {
-    read_once_max: usize
-}
-
 pub struct LexicalParser<T: FnMut() -> CallbackReturnStatus, CB: Grammar> {
     file: String,
     line: u64,
@@ -163,8 +157,7 @@ pub struct LexicalParser<T: FnMut() -> CallbackReturnStatus, CB: Grammar> {
     cb: T,
     tokens_buffer: Vec<TokenVecItem<T, CB>>,
     index: usize,
-    backtrack_point: usize,
-    io_attr: IoAttribute
+    backtrack_point: usize
 }
 
 impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
@@ -473,7 +466,7 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
         &self.file
     }
 
-    pub fn new(file: String, io_attr: IoAttribute, cb: T) -> LexicalParser<T, CB> {
+    pub fn new(file: String, cb: T) -> LexicalParser<T, CB> {
         let parser = LexicalParser{
             file: file,
             line: 1,
@@ -482,8 +475,7 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
             cb: cb,
             tokens_buffer: Vec::new(),
             index: 0,
-            backtrack_point: 0,
-            io_attr: io_attr
+            backtrack_point: 0
         };
         parser
     }

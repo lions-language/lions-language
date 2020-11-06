@@ -346,6 +346,12 @@ impl InputContext {
 pub struct ImportData {
 }
 
+#[derive(NewWithAll, FieldGet, FieldGetClone
+    , Clone)]
+pub struct IoAttribute {
+    read_once_max: usize
+}
+
 pub struct Compiler<'a, F: Compile> {
     function_control: FunctionControl,
     struct_control: StructControl,
@@ -357,7 +363,8 @@ pub struct Compiler<'a, F: Compile> {
     compile_context: CompileContext,
     vm_scope_value: usize,
     cb: &'a mut F,
-    import_datas: HashMap<String, ImportData>
+    import_datas: HashMap<String, ImportData>,
+    io_attr: IoAttribute
 }
 
 impl<'a, F: Compile> Grammar for Compiler<'a, F> {
@@ -579,7 +586,7 @@ impl<'a, F: Compile> Grammar for Compiler<'a, F> {
 impl<'a, F: Compile> Compiler<'a, F> {
     pub fn new(module: &'a Module, cb: &'a mut F, input_context: InputContext
         , static_variant_dispatch: &'a mut StaticVariantDispatch<'a>
-        , package_str: &'a str) -> Self {
+        , package_str: &'a str, io_attr: IoAttribute) -> Self {
         Self {
             function_control: FunctionControl::new(),
             struct_control: StructControl::new(),
@@ -591,7 +598,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
             compile_context: CompileContext::default(),
             vm_scope_value: 0,
             cb: cb,
-            import_datas: HashMap::new()
+            import_datas: HashMap::new(),
+            io_attr: io_attr
         }
     }
 }
@@ -656,7 +664,7 @@ mod test {
             }
         };
         let io_attr = IoAttribute::new_with_all(1);
-        let lexical_parser = LexicalParser::new(file.clone(), io_attr.clone()
+        let lexical_parser = LexicalParser::new(file.clone()
             , || -> CallbackReturnStatus {
             let mut v = Vec::new();
             let f_ref = f.by_ref();
@@ -684,7 +692,7 @@ mod test {
                             FileType::Main))
                     , &mut package_index
                     , &mut static_variant_dispatch
-                    , &package_str)
+                    , &package_str, io_attr)
         };
         let mut grammar_parser = GrammarParser::new(lexical_parser, &mut grammar_context);
         grammar_parser.parser();

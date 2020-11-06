@@ -4,7 +4,7 @@ use libtype::instruction::{ConditionStmt, BlockDefine
     , ConditionStmtTrue
     , JumpType};
 use libgrammar::lexical::{LexicalParser, CallbackReturnStatus
-    , IoAttribute, VecU8};
+    , VecU8};
 use libgrammar::grammar::{ImportStmtContext
     , GrammarContext, GrammarParser};
 use libcommon::consts::{ImportPrefixType};
@@ -13,7 +13,7 @@ use std::path::Path;
 use std::io::Read;
 use crate::compile::{Compile, Compiler
     , InputContext, InputAttribute
-    , FileType};
+    , FileType, IoAttribute};
 use crate::address::PackageIndex;
 use crate::static_stream::StaticStream;
 use crate::static_dispatch::{StaticVariantDispatch};
@@ -61,8 +61,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 panic!("read file error");
             }
         };
-        let io_attr = IoAttribute::new_with_all(1);
-        let lexical_parser = LexicalParser::new(file.clone(), io_attr.clone()
+        let io_attr = self.io_attr.clone();
+        let lexical_parser = LexicalParser::new(file.clone()
             , || -> CallbackReturnStatus {
             let mut v = Vec::new();
             let f_ref = f.by_ref();
@@ -88,7 +88,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                     , self.cb, InputContext::new(InputAttribute::new(
                             FileType::Mod))
                     , &mut static_variant_dispatch
-                    , &package_str)
+                    , &package_str, self.io_attr.clone())
         };
         let mut grammar_parser = GrammarParser::new(lexical_parser, &mut grammar_context);
         grammar_parser.parser();
