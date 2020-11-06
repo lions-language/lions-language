@@ -357,7 +357,7 @@ pub struct Compiler<'a, F: Compile> {
     package_str: &'a str,
     compile_context: CompileContext,
     vm_scope_value: usize,
-    cb: F,
+    cb: &'a mut F,
     import_datas: HashMap<String, ImportData>
 }
 
@@ -578,7 +578,7 @@ impl<'a, F: Compile> Grammar for Compiler<'a, F> {
 }
 
 impl<'a, F: Compile> Compiler<'a, F> {
-    pub fn new(module: &'a Module, cb: F, input_context: InputContext
+    pub fn new(module: &'a Module, cb: &'a mut F, input_context: InputContext
         , package_index: &'a mut PackageIndex
         , static_variant_dispatch: &'a mut StaticVariantDispatch<'a>
         , package_str: &'a str) -> Self {

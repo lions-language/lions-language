@@ -324,14 +324,15 @@ mod test {
         let mut link = Link::new(ds_ptr
             , ss_ptr);
         let module = Module::new(String::from("main"));
+        let mut bytecode = Bytecode::new(
+                &mut link
+                , &mut fdd
+                , &mut bdd
+            );
         let mut grammar_context = GrammarContext{
             cb: Compiler::new(
                 &module,
-                Bytecode::new(
-                    &mut link
-                    , &mut fdd
-                    , &mut bdd
-                ),
+                &mut bytecode,
                 InputContext::new(InputAttribute::new(FileType::Main)),
                 &mut package_index,
                 &mut static_variant_dispatch,
