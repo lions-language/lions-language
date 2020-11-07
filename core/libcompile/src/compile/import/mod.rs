@@ -46,7 +46,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
         /*
          * 检测路径是否包含 mod.lions
          * */
-        if !path.join(libcommon::consts::MOD_LIONS_NAME).as_path().exists() {
+        let mod_path = path.join(libcommon::consts::MOD_LIONS_NAME).as_path();
+        if mod_path.exists() {
             return DescResult::Error(
                 format!("{} does not exist in the path of import"
                     , libcommon::consts::MOD_LIONS_NAME));
@@ -54,15 +55,21 @@ impl<'a, F: Compile> Compiler<'a, F> {
         /*
          * 解析 main.lions
          * */
-        let file = String::from("main.lions");
-        let mut f = match std::fs::File::open(&file) {
+        let mod_path_str = match mod_path.to_str() {
+            Some(s) => s,
+            None => {
+                return DescResult::Error(
+                    format!("mod.lions path is not utf8"));
+            }
+        };
+        let mut f = match std::fs::File::open(mod_path_str) {
             Ok(f) => f,
             Err(_err) => {
                 panic!("read file error");
             }
         };
         let io_attr = self.io_attr.clone();
-        let lexical_parser = LexicalParser::new(file.clone()
+        let lexical_parser = LexicalParser::new(mod_path_str.to_string()
             , || -> CallbackReturnStatus {
             let mut v = Vec::new();
             let f_ref = f.by_ref();
@@ -81,14 +88,20 @@ impl<'a, F: Compile> Compiler<'a, F> {
         });
         let mut static_stream = StaticStream::new();
         let mut static_variant_dispatch = StaticVariantDispatch::new(&mut static_stream);
-        let package_str = String::from("test");
+        /*
+         * 解析 mod.lions 文件中的 module 语句, 将 module 取出来
+         * TODO:
+         *  遇到 main 文件, 应该解析的时候自动将 Module 设置为 main
+         *  遇到 mod.lions 文件中的 module, 将 module 信息更新
+         *  所以: module 语句必须卸载开头
+         * */
         let module = Module::new(String::from("main"));
         let mut grammar_context = GrammarContext{
             cb: Compiler::new(&module
                     , self.cb, InputContext::new(InputAttribute::new(
                             FileType::Mod))
                     , &mut static_variant_dispatch
-                    , &package_str, self.io_attr.clone())
+                    , self.package_str, self.io_attr.clone())
         };
         let mut grammar_parser = GrammarParser::new(lexical_parser, &mut grammar_context);
         grammar_parser.parser();
