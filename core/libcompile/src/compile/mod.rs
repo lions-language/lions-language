@@ -636,7 +636,6 @@ mod process_use;
 mod test {
     use libgrammar::lexical::VecU8;
     use libgrammar::lexical::LexicalParser;
-    use libgrammar::lexical::IoAttribute;
     use libgrammar::grammar::GrammarParser;
     use libgrammar::lexical::CallbackReturnStatus;
     use libgrammar::grammar::GrammarContext;
@@ -647,10 +646,10 @@ mod test {
     use std::fs;
     use std::io::Read;
 
-    struct TestComplie {
+    struct TestCompile {
     }
 
-    impl Compile for TestComplie {
+    impl Compile for TestCompile {
     }
 
     #[test]
@@ -664,6 +663,7 @@ mod test {
             }
         };
         let io_attr = IoAttribute::new_with_all(1);
+        let io_attr_clone = io_attr.clone();
         let lexical_parser = LexicalParser::new(file.clone()
             , || -> CallbackReturnStatus {
             let mut v = Vec::new();
@@ -686,13 +686,13 @@ mod test {
         let mut static_variant_dispatch = StaticVariantDispatch::new(&mut static_stream);
         let package_str = String::from("test");
         let module = Module::new(String::from("main"));
+        let mut test_compile = TestCompile{};
         let mut grammar_context = GrammarContext{
             cb: Compiler::new(&module
-                    , TestComplie{}, InputContext::new(InputAttribute::new(
+                    , &mut test_compile, InputContext::new(InputAttribute::new(
                             FileType::Main))
-                    , &mut package_index
                     , &mut static_variant_dispatch
-                    , &package_str, io_attr)
+                    , &package_str, io_attr_clone)
         };
         let mut grammar_parser = GrammarParser::new(lexical_parser, &mut grammar_context);
         grammar_parser.parser();
