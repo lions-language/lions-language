@@ -31,9 +31,15 @@ impl ModuleStack {
         &self.stack.last().expect("should not happend").module
     }
 
-    pub fn new(first: Module) -> Self {
+    pub fn new_with_first(first: Module) -> Self {
         Self {
             stack: vec![ModuleItem::new(first)]
+        }
+    }
+
+    pub fn new() -> Self {
+        Self {
+            stack: Vec::new()
         }
     }
 }

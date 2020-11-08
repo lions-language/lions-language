@@ -95,9 +95,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
          *  遇到 mod.lions 文件中的 module, 将 module 信息更新
          *  所以: module 语句必须卸载开头
          * */
-        let module = Module::new(String::from("main"));
         let mut grammar_context = GrammarContext{
-            cb: Compiler::new(&module
+            cb: Compiler::new(self.module_stack, None
                     , self.cb, InputContext::new(InputAttribute::new(
                             FileType::Mod))
                     , &mut static_variant_dispatch

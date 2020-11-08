@@ -355,7 +355,7 @@ pub struct IoAttribute {
 pub struct Compiler<'a, F: Compile> {
     function_control: FunctionControl,
     struct_control: StructControl,
-    module: &'a Module,
+    module_stack: &'a mut ModuleStack,
     scope_context: ScopeContext,
     input_context: InputContext,
     static_variant_dispatch: &'a mut StaticVariantDispatch<'a>,
@@ -584,13 +584,19 @@ impl<'a, F: Compile> Grammar for Compiler<'a, F> {
 }
 
 impl<'a, F: Compile> Compiler<'a, F> {
-    pub fn new(module: &'a Module, cb: &'a mut F, input_context: InputContext
+    pub fn new(module_stack: &'a mut ModuleStack, module: Option<Module>
+        , cb: &'a mut F, input_context: InputContext
         , static_variant_dispatch: &'a mut StaticVariantDispatch<'a>
         , package_str: &'a str, io_attr: IoAttribute) -> Self {
+        match module {
+            Some(m) => module_stack.push(m),
+            None => {
+            }
+        }
         Self {
             function_control: FunctionControl::new(),
             struct_control: StructControl::new(),
-            module: module,
+            module_stack: module_stack,
             scope_context: ScopeContext::new(),
             input_context: input_context,
             static_variant_dispatch: static_variant_dispatch,
@@ -686,9 +692,10 @@ mod test {
         let mut static_variant_dispatch = StaticVariantDispatch::new(&mut static_stream);
         let package_str = String::from("test");
         let module = Module::new(String::from("main"));
+        let module_stack = ModuleStack::new();
         let mut test_compile = TestCompile{};
         let mut grammar_context = GrammarContext{
-            cb: Compiler::new(&module
+            cb: Compiler::new(&mut module_stack, Some(module)
                     , &mut test_compile, InputContext::new(InputAttribute::new(
                             FileType::Main))
                     , &mut static_variant_dispatch

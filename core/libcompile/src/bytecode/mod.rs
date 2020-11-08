@@ -288,7 +288,9 @@ mod test {
     use libgrammar::lexical::CallbackReturnStatus;
     use libgrammar::grammar::GrammarContext;
     use libtype::module::Module;
-    use crate::compile::{Compiler, InputContext, InputAttribute, FileType};
+    use crate::compile::{Compiler, InputContext, InputAttribute, FileType
+        , IoAttribute};
+    use crate::module::{ModuleStack};
     use crate::address::{PackageIndex};
     use crate::define_stream::DefineStream;
     use crate::static_dispatch::{StaticVariantDispatch};
@@ -313,10 +315,12 @@ mod test {
                 panic!("read file error");
             }
         };
+        let io_attr = IoAttribute::new_with_all(1);
+        let io_attr_clone = io_attr.clone();
         let lexical_parser = LexicalParser::new(file.clone(), || -> CallbackReturnStatus {
             let mut v = Vec::new();
             let f_ref = f.by_ref();
-            match f_ref.take(1).read_to_end(&mut v) {
+            match f_ref.take(io_attr.read_once_max_clone() as u64).read_to_end(&mut v) {
                 Ok(len) => {
                     if len == 0 {
                         return CallbackReturnStatus::End;
@@ -338,17 +342,18 @@ mod test {
         let package_str = String::from("test");
         let mut test_writer = TestWriter{};
         let module = Module::new(String::from("main"));
-        let mut grammar_context = GrammarContext{
-            cb: Compiler::new(
-                &module,
-                Bytecode::new(
+        let mut module_stack = ModuleStack::new();
+        let mut bytecode = Bytecode::new(
                     &mut test_writer
                     , &mut fdd
-                    , &mut bdd),
+                    , &mut bdd);
+        let mut grammar_context = GrammarContext{
+            cb: Compiler::new(
+                &mut module_stack, Some(module),
+                &mut bytecode,
                 InputContext::new(InputAttribute::new(FileType::Main)),
-                &mut package_index,
                 &mut static_variant_dispatch,
-                &package_str
+                &package_str, io_attr_clone
             )
         };
         let mut grammar_parser = GrammarParser::new(lexical_parser, &mut grammar_context);
