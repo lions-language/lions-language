@@ -553,7 +553,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
             typ: typ,
             package_typ: package_type,
             func_str: &func_str,
-            module_str: self.module.name_ref()
+            module_str: self.module_stack.current().name_ref()
         };
         let (exists, handle) = self.function_control.is_exists(&find_func_context);
         if exists {

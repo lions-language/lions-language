@@ -46,8 +46,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
         /*
          * 检测路径是否包含 mod.lions
          * */
-        let mod_path = path.join(libcommon::consts::MOD_LIONS_NAME).as_path();
-        if mod_path.exists() {
+        let mod_path = path.join(libcommon::consts::MOD_LIONS_NAME);
+        if mod_path.as_path().exists() {
             return DescResult::Error(
                 format!("{} does not exist in the path of import"
                     , libcommon::consts::MOD_LIONS_NAME));
@@ -55,7 +55,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
         /*
          * 解析 main.lions
          * */
-        let mod_path_str = match mod_path.to_str() {
+        let mod_path_str = match mod_path.as_path().to_str() {
             Some(s) => s,
             None => {
                 return DescResult::Error(

@@ -257,6 +257,7 @@ mod test {
     use libgrammar::grammar::GrammarContext;
     use libtype::module::Module;
     use libcompile::compile::{FileType, InputAttribute, InputContext, IoAttribute};
+    use libcompile::module::{ModuleStack};
     use libcompile::define_dispatch::{FunctionDefineDispatch, BlockDefineDispatch};
     use libcompile::static_dispatch::{StaticVariantDispatch};
     use libcompile::static_stream::{StaticStream};
@@ -323,6 +324,7 @@ mod test {
         let mut link = Link::new(ds_ptr
             , ss_ptr);
         let module = Module::new(String::from("main"));
+        let mut module_stack = ModuleStack::new();
         let mut bytecode = Bytecode::new(
                 &mut link
                 , &mut fdd
@@ -330,7 +332,7 @@ mod test {
             );
         let mut grammar_context = GrammarContext{
             cb: Compiler::new(
-                &module,
+                &mut module_stack, Some(module),
                 &mut bytecode,
                 InputContext::new(InputAttribute::new(FileType::Main)),
                 &mut static_variant_dispatch,

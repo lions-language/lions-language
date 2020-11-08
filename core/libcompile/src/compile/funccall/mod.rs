@@ -85,7 +85,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
             typ: call_context.typ_ref().as_ref(),
             package_typ: call_scope_context.package_type_ref().as_ref(),
             func_str: &func_str,
-            module_str: self.module.name_ref()
+            module_str: self.module_stack.current().name_ref()
         };
         let (exists, handle) = self.function_control.is_exists(&find_func_context);
         if exists {

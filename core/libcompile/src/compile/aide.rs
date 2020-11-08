@@ -153,7 +153,7 @@ impl TypeTokenExpand for TypeToken {
                     None => {
                         let compiler = cp.as_ref::<Compiler<F>>();
                         match compiler.struct_control.find_define(
-                            compiler.module.name_ref()
+                            compiler.module_stack.current().name_ref()
                             , &t) {
                             Some(sd) => {
                                 // println!("--- {:?}, {:?}", sd, StructObject::from_ref(sd));

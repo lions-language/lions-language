@@ -692,7 +692,7 @@ mod test {
         let mut static_variant_dispatch = StaticVariantDispatch::new(&mut static_stream);
         let package_str = String::from("test");
         let module = Module::new(String::from("main"));
-        let module_stack = ModuleStack::new();
+        let mut module_stack = ModuleStack::new();
         let mut test_compile = TestCompile{};
         let mut grammar_context = GrammarContext{
             cb: Compiler::new(&mut module_stack, Some(module)

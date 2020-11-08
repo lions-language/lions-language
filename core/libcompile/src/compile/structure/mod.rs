@@ -44,7 +44,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
 
     pub fn process_struct_define_end(&mut self, define: StructDefine) {
         self.struct_control.add_define(
-            self.module.name_clone()
+            self.module_stack.current().name_clone()
             , define.name_ref().clone()
             , define);
     }

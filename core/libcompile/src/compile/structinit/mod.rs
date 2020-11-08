@@ -20,7 +20,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
     pub fn process_struct_init_start(&mut self
         , init_context: &mut StructInitContext) -> DescResult {
         let de = match self.struct_control.find_define(
-            self.module.name_ref(), init_context.struct_name_ref()) {
+            self.module_stack.current().name_ref(), init_context.struct_name_ref()) {
             Some(define) => {
                 define
             },
