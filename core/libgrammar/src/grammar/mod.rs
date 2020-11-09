@@ -570,9 +570,16 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> ExpressContext<T, CB> {
     }
 }
 
+#[derive(Default, FieldGet
+    , FieldGetClone)]
+struct StmtCounter {
+    available_stmt_count: usize
+}
+
 pub struct GrammarParser<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> {
     lexical_parser: LexicalParser<T, CB>,
-    context: &'a mut GrammarContext<CB>
+    context: &'a mut GrammarContext<CB>,
+    counter_stack: libcommon::datastructure::stack::Stack<StmtCounter>
 }
 
 impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, CB> {
@@ -583,6 +590,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
     }
 
     fn parser_inner(&mut self, cb: ParserEndFunc<T, CB>) {
+        self.counter_stack.push(StmtCounter::default());
         loop {
             // match self.lexical_parser.lookup_next_one_ptr() {
             let tp = self.skip_white_space_token();
@@ -605,15 +613,22 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                 }
             }
         }
+        self.counter_stack.pop();
     }
 
     fn select_with_exprcontext(&mut self, token: &TokenPointer, express_context: &ExpressContext<T, CB>) {
+        enum StmtType {
+            Available,
+            Annotate
+        }
+        let mut stmt_type = StmtType::Available;
         match token.as_ref::<T, CB>().context_ref().token_type() {
             TokenType::If => {
                 self.if_process();
             },
             TokenType::Annotate => {
                 self.annotate_process();
+                stmt_type = StmtType::Annotate;
             },
             TokenType::Function => {
                 self.function_process();
@@ -641,6 +656,13 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
             },
             _ => {
                 self.expression_process(token, express_context);
+            }
+        }
+        match stmt_type {
+            StmtType::Available => {
+                *self.counter_stack.top_mut_unchecked().available_stmt_count_mut() += 1;
+            },
+            StmtType::Annotate => {
             }
         }
     }
@@ -851,7 +873,8 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
             grammar_context: &'a mut GrammarContext<CB>) -> Self {
         Self {
             lexical_parser: lexical_parser,
-            context: grammar_context
+            context: grammar_context,
+            counter_stack: libcommon::datastructure::stack::Stack::new()
         }
     }
 }

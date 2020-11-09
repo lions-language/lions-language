@@ -28,6 +28,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         let module_name = extract_token_data!(
             t.token_value().token_data().expect("should not happend")
             , Id);
+        println!("{:?}", self.counter_stack.top_ref_unchecked().available_stmt_count_ref());
         check_desc_result!(self, self.cb().module_stmt(
             ModuleStmtContext::new_with_all(module_name)));
     }
