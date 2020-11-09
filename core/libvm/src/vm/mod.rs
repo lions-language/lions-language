@@ -266,6 +266,7 @@ mod test {
 
     use std::fs;
     use std::io::Read;
+    use std::path::Path;
 
     // use rust_parse::cmd::CCmd;
 
@@ -285,13 +286,14 @@ mod test {
             }
         };
         */
-        let file = String::from("main.lions");
+        let file = String::from("tests/main.lions");
         let mut f = match fs::File::open(&file) {
             Ok(f) => f,
             Err(err) => {
                 panic!("read file error, err: {}", err);
             }
         };
+        let path_buf = Path::new(&file).to_path_buf();
         let io_attr = IoAttribute::new_with_all(1);
         let io_attr_clone = io_attr.clone();
         let lexical_parser = LexicalParser::new(file.clone()
@@ -334,7 +336,8 @@ mod test {
             cb: Compiler::new(
                 &mut module_stack, Some(module),
                 &mut bytecode,
-                InputContext::new(InputAttribute::new(FileType::Main)),
+                InputContext::new(InputAttribute::new(FileType::Main)
+                    , path_buf),
                 &mut static_variant_dispatch,
                 &package_str, io_attr_clone
             )

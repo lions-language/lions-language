@@ -52,6 +52,7 @@ use crate::module::ModuleStack;
 use scope::context::ScopeContext;
 use crate::define_dispatch::{function::FunctionStatementObject};
 use crate::define::{DefineObject};
+use std::path::PathBuf;
 
 #[derive(Debug)]
 pub struct StaticContext {
@@ -332,13 +333,15 @@ impl InputAttribute {
 
 #[derive(FieldGet)]
 pub struct InputContext {
-    attr: InputAttribute
+    attr: InputAttribute,
+    root_path: PathBuf
 }
 
 impl InputContext {
-    pub fn new(attr: InputAttribute) -> Self {
+    pub fn new(attr: InputAttribute, root_path: PathBuf) -> Self {
         Self {
-            attr: attr
+            attr: attr,
+            root_path: root_path
         }
     }
 }

@@ -34,7 +34,16 @@ impl<'a, F: Compile> Compiler<'a, F> {
         /*
          * 检测路径是否是目录
          * */
-        let path = Path::new(content);
+        let path = match self.input_context.root_path.parent() {
+            Some(p) => {
+                p.join(content)
+            },
+            None => {
+                unimplemented!("path root is none");
+            }
+        };
+        let path_buf = path.to_path_buf();
+        // let path = Path::new(content);
         if !path.exists() {
             return DescResult::Error(
                 format!("import path: {:?} is not found", content));
@@ -47,13 +56,13 @@ impl<'a, F: Compile> Compiler<'a, F> {
          * 检测路径是否包含 mod.lions
          * */
         let mod_path = path.join(libcommon::consts::MOD_LIONS_NAME);
-        if mod_path.as_path().exists() {
+        if !mod_path.as_path().exists() {
             return DescResult::Error(
                 format!("{} does not exist in the path of import"
                     , libcommon::consts::MOD_LIONS_NAME));
         }
         /*
-         * 解析 main.lions
+         * 解析 mod.lions
          * */
         let mod_path_str = match mod_path.as_path().to_str() {
             Some(s) => s,
@@ -65,7 +74,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
         let mut f = match std::fs::File::open(mod_path_str) {
             Ok(f) => f,
             Err(_err) => {
-                panic!("read file error");
+                return DescResult::Error(
+                    format!("read file: {:?} error", mod_path_str));
             }
         };
         let io_attr = self.io_attr.clone();
@@ -98,7 +108,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
         let mut grammar_context = GrammarContext{
             cb: Compiler::new(self.module_stack, None
                     , self.cb, InputContext::new(InputAttribute::new(
-                            FileType::Mod))
+                            FileType::Mod), path_buf)
                     , &mut static_variant_dispatch
                     , self.package_str, self.io_attr.clone())
         };
