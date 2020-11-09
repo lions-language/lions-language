@@ -3,6 +3,7 @@ use libtype::instruction::{ConditionStmt, BlockDefine
     , Instruction, Jump
     , ConditionStmtTrue
     , JumpType};
+use libtype::module::{Module};
 use libgrammar::grammar::{ModuleStmtContext};
 use libgrammar::token::{TokenData};
 use libcommon::consts::{ImportPrefixType};
@@ -22,10 +23,21 @@ impl<'a, F: Compile> Compiler<'a, F> {
                     format!("module stmt must be use in mod.lions"));
             }
         }
+        let (module_name, available_stmt_count, counter_len) = context.fields_move();
+        /*
+         * module 必须是 mod.lions 文件的第一个有效语句
+         * */
+        if !(counter_len == 1 && available_stmt_count == 0) {
+            return DescResult::Error(
+                format!("module stmt must appear on the first line"));
+        }
+        /*
+         * 写入到 module_stack 中
+         * */
+        self.module_stack.push(Module::new(module_name));
         /*
          * 将 module name 记录在 package global data 中
          * */
-        let module_name = context.fields_move();
         DescResult::Success
     }
 }

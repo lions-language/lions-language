@@ -1,4 +1,5 @@
 use libtype::module::{Module};
+use libcommon::datastructure::stack::Stack;
 use std::collections::HashMap;
 
 pub struct UndefineFunction {
@@ -23,27 +24,33 @@ impl ModuleItem {
 }
 
 pub struct ModuleStack {
-    stack: Vec<ModuleItem>
+    stack: Stack<ModuleItem>
 }
 
 impl ModuleStack {
     pub fn current(&self) -> &Module {
-        &self.stack.last().expect("should not happend").module
+        &self.stack.top_ref_unchecked().module
     }
 
     pub fn push(&mut self, module: Module) {
         self.stack.push(ModuleItem::new(module));
     }
 
+    pub fn pop(&mut self) -> Option<ModuleItem> {
+        self.stack.pop()
+    }
+
     pub fn new_with_first(first: Module) -> Self {
+        let mut stack = Stack::new();
+        stack.push(ModuleItem::new(first));
         Self {
-            stack: vec![ModuleItem::new(first)]
+            stack: stack
         }
     }
 
     pub fn new() -> Self {
         Self {
-            stack: Vec::new()
+            stack: Stack::new()
         }
     }
 }

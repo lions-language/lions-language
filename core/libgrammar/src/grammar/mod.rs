@@ -286,7 +286,9 @@ pub struct RelmodStmtContext {
     , NewWithAll, FieldGetMove
     , Default)]
 pub struct ModuleStmtContext {
-    pub module_name: String
+    pub module_name: String,
+    pub available_stmt_count: usize,
+    pub counter_len: usize
 }
 
 #[derive(Debug, FieldGet

@@ -25,6 +25,10 @@ impl<T> Stack<T> {
         self.datas.back_mut().expect("should not happend: stack top_mut is empty")
     }
 
+    pub fn len(&self) -> usize {
+        self.datas.len()
+    }
+
     pub fn pop(&mut self) -> Option<T> {
         self.datas.pop_back()
     }

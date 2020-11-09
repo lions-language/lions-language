@@ -28,8 +28,10 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         let module_name = extract_token_data!(
             t.token_value().token_data().expect("should not happend")
             , Id);
-        println!("{:?}", self.counter_stack.top_ref_unchecked().available_stmt_count_ref());
+        let available_stmt_count = self.counter_stack.top_ref_unchecked().available_stmt_count_clone();
+        let counter_stack_len = self.counter_stack.len();
         check_desc_result!(self, self.cb().module_stmt(
-            ModuleStmtContext::new_with_all(module_name)));
+            ModuleStmtContext::new_with_all(module_name, available_stmt_count
+                , counter_stack_len)));
     }
 }
