@@ -19,7 +19,7 @@ use libgrammar::grammar::{Grammar, CallFuncScopeContext
     , ValueUpdateStmtContext
     , OperatorEqualEqualContext, ImportStmtContext
     , RelmodStmtContext, ModuleStmtContext
-    , UseStmtContext, EndContext};
+    , UseStmtContext, EndContext, FirstStmtContext};
 use libgrammar::token::{TokenValue};
 use libtype::{Type, Data};
 use libtype::function::{Function, CallFunctionParamAddr
@@ -584,6 +584,10 @@ impl<'a, F: Compile> Grammar for Compiler<'a, F> {
     fn use_stmt(&mut self, context: UseStmtContext) -> DescResult {
         self.process_use_stmt(context)
     }
+
+    fn first_stmt(&mut self, context: FirstStmtContext) -> DescResult {
+        self.process_first_stmt(context)
+    }
 }
 
 impl<'a, F: Compile> Compiler<'a, F> {
@@ -640,6 +644,7 @@ mod relmod;
 mod process_module;
 mod package;
 mod process_use;
+mod process_first;
 
 #[cfg(test)]
 mod test {

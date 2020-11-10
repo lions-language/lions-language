@@ -314,6 +314,12 @@ pub struct EndContext {
     counter_len: usize
 }
 
+#[derive(Debug, FieldGet
+    , NewWithAll, FieldGetMove
+    , Default)]
+pub struct FirstStmtContext {
+}
+
 pub trait Grammar {
     // type IdUse;
     
@@ -539,6 +545,9 @@ pub trait Grammar {
     fn use_stmt(&mut self, _context: UseStmtContext) -> DescResult {
         unimplemented!();
     }
+    fn first_stmt(&mut self, _context: FirstStmtContext) -> DescResult {
+        unimplemented!();
+    }
 }
 
 enum NextToken<T: FnMut() -> CallbackReturnStatus, CB: Grammar> {
@@ -671,6 +680,12 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         }
         match stmt_type {
             StmtType::Available => {
+                if self.counter_stack.top_ref_unchecked().available_stmt_count_clone() == 0 {
+                    /*
+                     * 第一条语句
+                     * */
+                    self.first_stmt_process();
+                }
                 *self.counter_stack.top_mut_unchecked().available_stmt_count_mut() += 1;
             },
             StmtType::Annotate => {
@@ -914,6 +929,7 @@ mod relmod;
 mod star;
 mod module;
 mod process_use;
+mod process_first;
 
 #[cfg(test)]
 mod test {

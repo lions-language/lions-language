@@ -32,9 +32,9 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 format!("module stmt must appear on the first line"));
         }
         /*
-         * 写入到 module_stack 中
+         * 因为 mod.lions 在 import 的时候写入了 module_stack, 所以这里要更新module_name
          * */
-        self.module_stack.push(Module::new(module_name));
+        self.module_stack.set_current_module(Module::new(module_name));
         /*
          * 将 module name 记录在 package global data 中
          * */

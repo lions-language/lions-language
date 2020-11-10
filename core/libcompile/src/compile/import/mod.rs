@@ -99,12 +99,10 @@ impl<'a, F: Compile> Compiler<'a, F> {
         let mut static_stream = StaticStream::new();
         let mut static_variant_dispatch = StaticVariantDispatch::new(&mut static_stream);
         /*
-         * 解析 mod.lions 文件中的 module 语句, 将 module 取出来
-         * TODO:
-         *  遇到 main 文件, 应该解析的时候自动将 Module 设置为 main
-         *  遇到 mod.lions 文件中的 module, 将 module 信息更新
-         *  所以: module 语句必须卸载开头
+         * 1. 放入一个空的 module, 用于后面判断 module 语句是否存在
+         * 2. 遇到 mod.lions 文件中的 module, 将 module 信息更新
          * */
+        self.module_stack.push_null();
         let mut grammar_context = GrammarContext{
             cb: Compiler::new(self.module_stack, None
                     , self.cb, InputContext::new(InputAttribute::new(
