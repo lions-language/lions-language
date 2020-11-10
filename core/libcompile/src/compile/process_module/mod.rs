@@ -33,6 +33,10 @@ impl<'a, F: Compile> Compiler<'a, F> {
         }
         /*
          * 因为 mod.lions 在 import 的时候写入了 module_stack, 所以这里要更新module_name
+         * TODO:
+         *  这里需要记录 相对源码根路径的完整 module str
+         *      context 中传入当前 mod.lions 的路径; root_path 在 compile 中; 通过 path_diff
+         *      找到相差路径
          * */
         self.module_stack.set_current_module(Module::new(module_name));
         /*

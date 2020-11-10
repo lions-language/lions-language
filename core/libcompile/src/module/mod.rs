@@ -47,6 +47,10 @@ impl ModuleStack {
         &self.stack.top_ref_unchecked().module
     }
 
+    pub fn current_mut(&mut self) -> &mut Module {
+        &mut self.stack.top_mut_unchecked().module
+    }
+
     pub fn push(&mut self, module: Module) {
         self.stack.push(ModuleItem::new(module));
     }
