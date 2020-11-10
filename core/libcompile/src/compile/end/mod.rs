@@ -3,19 +3,20 @@ use libtype::function::{FindFunctionContext, FindFunctionResult
     , Function, CallFunctionReturnData};
 use libtype::AddressValue;
 use libtype::package::{PackageStr};
+use libgrammar::grammar::{EndContext};
 use libcommon::ptr::{RefPtr};
 use libresult::*;
 use crate::compile::{Compile, Compiler, FileType
     , CallFunctionContext};
 
 impl<'a, F: Compile> Compiler<'a, F> {
-    pub fn handle_end(&mut self) -> DescResult {
+    pub fn handle_end(&mut self, end_context: EndContext) -> DescResult {
         match self.input_context.attr_ref().file_typ_ref() {
             FileType::Main => {
                 return self.handle_main_end();
             },
             FileType::Mod => {
-                self.handle_mod_end();
+                self.handle_mod_end(end_context);
             },
             _ => {
                 unimplemented!("compile handle_end unimplemented");
@@ -79,7 +80,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
         DescResult::Success
     }
 
-    fn handle_mod_end(&mut self) -> DescResult {
+    fn handle_mod_end(&mut self, end_context: EndContext) -> DescResult {
         self.module_stack.pop();
         DescResult::Success
     }

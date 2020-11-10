@@ -19,7 +19,7 @@ use libgrammar::grammar::{Grammar, CallFuncScopeContext
     , ValueUpdateStmtContext
     , OperatorEqualEqualContext, ImportStmtContext
     , RelmodStmtContext, ModuleStmtContext
-    , UseStmtContext};
+    , UseStmtContext, EndContext};
 use libgrammar::token::{TokenValue};
 use libtype::{Type, Data};
 use libtype::function::{Function, CallFunctionParamAddr
@@ -395,8 +395,8 @@ impl<'a, F: Compile> Grammar for Compiler<'a, F> {
         self.operator_equal_equal(context)
     }
 
-    fn end(&mut self) -> DescResult {
-        self.handle_end()
+    fn end(&mut self, context: EndContext) -> DescResult {
+        self.handle_end(context)
     }
 
     fn function_named_stmt(&mut self, value: TokenValue

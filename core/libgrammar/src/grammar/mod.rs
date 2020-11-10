@@ -307,6 +307,13 @@ impl<'a> ImportStmtContext<'a> {
     }
 }
 
+#[derive(Debug, FieldGet
+    , NewWithAll, FieldGetMove
+    , Default)]
+pub struct EndContext {
+    counter_len: usize
+}
+
 pub trait Grammar {
     // type IdUse;
     
@@ -511,7 +518,7 @@ pub trait Grammar {
     fn anonymous_block_end(&mut self) {
         println!("anonymous block end");
     }
-    fn end(&mut self) -> DescResult {
+    fn end(&mut self, _context: EndContext) -> DescResult {
         DescResult::Success
     }
     fn enter_point_access(&mut self, _context: EnterPointAccessContext) {
@@ -604,7 +611,9 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                     self.select(&p);
                 },
                 None => {
-                    match self.cb().end() {
+                    let available_stmt_count =
+                        self.counter_stack.top_ref_unchecked().available_stmt_count_clone();
+                    match self.cb().end(EndContext::new_with_all(available_stmt_count)) {
                         DescResult::Error(e) => {
                             self.panic(&e);
                         },
