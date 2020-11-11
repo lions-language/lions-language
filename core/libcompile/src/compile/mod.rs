@@ -334,14 +334,23 @@ impl InputAttribute {
 #[derive(FieldGet)]
 pub struct InputContext {
     attr: InputAttribute,
-    root_path: PathBuf
+    /*
+     * 根路径
+     * */
+    root_path: PathBuf,
+    /*
+     * 模块根路径
+     * */
+    module_root_path: PathBuf
 }
 
 impl InputContext {
-    pub fn new(attr: InputAttribute, root_path: PathBuf) -> Self {
+    pub fn new(attr: InputAttribute, root_path: PathBuf
+        , module_root_path: PathBuf) -> Self {
         Self {
             attr: attr,
-            root_path: root_path
+            root_path: root_path,
+            module_root_path: module_root_path
         }
     }
 }
@@ -642,7 +651,6 @@ mod boolean;
 mod import;
 mod relmod;
 mod process_module;
-mod package;
 mod process_use;
 mod process_first;
 

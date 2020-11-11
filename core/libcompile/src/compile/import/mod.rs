@@ -34,6 +34,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
         /*
          * 检测路径是否是目录
          * */
+        /*
         let path = match self.input_context.root_path.parent() {
             Some(p) => {
                 p.join(content)
@@ -42,7 +43,10 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 unimplemented!("path root is none");
             }
         };
-        let path_buf = path.to_path_buf();
+        */
+        let root_path = self.input_context.root_path.clone();
+        let path = root_path.join(content);
+        // let path_buf = path.to_path_buf();
         // let path = Path::new(content);
         if !path.exists() {
             return DescResult::Error(
@@ -106,7 +110,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
         let mut grammar_context = GrammarContext{
             cb: Compiler::new(self.module_stack, None
                     , self.cb, InputContext::new(InputAttribute::new(
-                            FileType::Mod), path_buf)
+                            FileType::Mod), root_path, path)
                     , &mut static_variant_dispatch
                     , self.package_str, self.io_attr.clone())
         };

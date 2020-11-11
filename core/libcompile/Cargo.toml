@@ -15,3 +15,4 @@ libtypecontrol = { path = "../libtypecontrol" }
 libstructtype = { path = "../libstructtype" }
 libresult = { path = "../libresult" }
 libmacro = { path = "../libmacro" }
+pathdiff = { version = "0.2.0" }
