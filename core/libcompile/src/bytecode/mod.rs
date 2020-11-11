@@ -299,6 +299,7 @@ mod test {
 
     use std::fs;
     use std::io::Read;
+    use std::path::Path;
 
     struct TestWriter {
     }
@@ -315,6 +316,7 @@ mod test {
                 panic!("read file error");
             }
         };
+        let path_buf = Path::new(&file).parent().expect("should not happend").to_path_buf();
         let io_attr = IoAttribute::new_with_all(1);
         let io_attr_clone = io_attr.clone();
         let lexical_parser = LexicalParser::new(file.clone(), || -> CallbackReturnStatus {
@@ -334,7 +336,9 @@ mod test {
             }
         });
         let mut ds = DefineStream::new();
-        let mut fdd = FunctionDefineDispatch::new(&mut ds);
+        let mut ds_ptr = RefPtr::from_ref::<DefineStream>(&ds);
+        let mut func_ds = ds_ptr.clone();
+        let mut fdd = FunctionDefineDispatch::new(func_ds.as_mut::<DefineStream>());
         let mut bdd = BlockDefineDispatch::new(&mut ds);
         let mut static_stream = StaticStream::new();
         let mut static_variant_dispatch = StaticVariantDispatch::new(&mut static_stream);
@@ -351,7 +355,8 @@ mod test {
             cb: Compiler::new(
                 &mut module_stack, Some(module),
                 &mut bytecode,
-                InputContext::new(InputAttribute::new(FileType::Main)),
+                InputContext::new(InputAttribute::new(FileType::Main)
+                    , path_buf.clone(), path_buf),
                 &mut static_variant_dispatch,
                 &package_str, io_attr_clone
             )

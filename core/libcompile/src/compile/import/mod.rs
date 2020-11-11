@@ -34,16 +34,6 @@ impl<'a, F: Compile> Compiler<'a, F> {
         /*
          * 检测路径是否是目录
          * */
-        /*
-        let path = match self.input_context.root_path.parent() {
-            Some(p) => {
-                p.join(content)
-            },
-            None => {
-                unimplemented!("path root is none");
-            }
-        };
-        */
         let root_path = self.input_context.root_path.clone();
         let path = root_path.join(content);
         // let path_buf = path.to_path_buf();

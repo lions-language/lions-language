@@ -667,6 +667,7 @@ mod test {
 
     use std::fs;
     use std::io::Read;
+    use std::path::Path;
 
     struct TestCompile {
     }
@@ -684,6 +685,7 @@ mod test {
                 panic!("read file error");
             }
         };
+        let path_buf = Path::new(&file).parent().expect("should not happend").to_path_buf();
         let io_attr = IoAttribute::new_with_all(1);
         let io_attr_clone = io_attr.clone();
         let lexical_parser = LexicalParser::new(file.clone()
@@ -713,7 +715,7 @@ mod test {
         let mut grammar_context = GrammarContext{
             cb: Compiler::new(&mut module_stack, Some(module)
                     , &mut test_compile, InputContext::new(InputAttribute::new(
-                            FileType::Main))
+                            FileType::Main), path_buf.clone(), path_buf.clone())
                     , &mut static_variant_dispatch
                     , &package_str, io_attr_clone)
         };
