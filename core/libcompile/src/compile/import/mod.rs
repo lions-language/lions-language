@@ -116,14 +116,23 @@ impl<'a, F: Compile> Compiler<'a, F> {
         /*
          * module 解析完成之后, 将 module 从 stack 中 pop 出来
          * */
-        let module_name = match self.module_stack.pop() {
+        let (module, _, _) = match self.module_stack.pop() {
             Some(value) => {
-                value
+                value.fields_move()
             },
             None => {
                 unreachable!();
             }
         };
+        let (module_name, module_str) = module.fields_move();
+        /*
+         * TODO: 先判断是否存在
+         * */
+        if self.imports_mapping.exists(&module_name) {
+            return DescResult::Error(
+                format!("imported \"{}\" is imported repeatedly", module_name));
+        }
+        self.imports_mapping.add(module_name, module_str);
         DescResult::Success
     }
 }

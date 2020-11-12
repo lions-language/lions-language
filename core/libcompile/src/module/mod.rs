@@ -1,5 +1,6 @@
 use libtype::module::{Module};
 use libcommon::datastructure::stack::Stack;
+use libmacro::{FieldGet, FieldGetMove};
 use std::collections::HashMap;
 
 pub struct UndefineFunction {
@@ -9,6 +10,7 @@ pub struct UndefFuncs {
     funcs: HashMap<String, UndefineFunction>
 }
 
+#[derive(FieldGet, FieldGetMove)]
 pub struct ModuleItem {
     module: Module,
     undef_funcs: UndefFuncs,

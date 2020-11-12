@@ -39,6 +39,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
          *      找到相差路径
          * */
         self.module_stack.init_current_module();
+        *self.module_stack.current_mut().name_mut() = module_name;
         /*
          * 将 module name 记录在 package global data 中
          * */
