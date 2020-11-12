@@ -55,7 +55,12 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 format!("{} does not exist in the path of import"
                     , libcommon::consts::MOD_LIONS_NAME));
         }
-        let path_diff = pathdiff::diff_paths(&path, &root_path);
+        let path_diff = match pathdiff::diff_paths(&path, &root_path) {
+            Some(pd) => pd,
+            None => {
+                unreachable!();
+            }
+        };
         /*
          * 解析 mod.lions
          * */
@@ -97,7 +102,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
          * 1. 放入一个空的 module, 用于后面判断 module 语句是否存在
          * 2. 遇到 mod.lions 文件中的 module, 将 module 信息更新
          * */
-        self.module_stack.push_null();
+        self.module_stack.push(Module::new_module_str(
+                path_diff.as_path().to_str().expect("path_diff to_str error").to_string()));
         let mut grammar_context = GrammarContext{
             cb: Compiler::new(self.module_stack, None
                     , self.cb, InputContext::new(InputAttribute::new(

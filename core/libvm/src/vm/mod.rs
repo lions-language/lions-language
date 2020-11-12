@@ -325,7 +325,7 @@ mod test {
         let mut package_str = String::from("test");
         let mut link = Link::new(ds_ptr
             , ss_ptr);
-        let module = Module::new(String::from("main"));
+        let module = Module::new(String::from("main"), String::from("main"));
         let mut module_stack = ModuleStack::new();
         let mut bytecode = Bytecode::new(
                 &mut link

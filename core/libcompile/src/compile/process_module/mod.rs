@@ -38,7 +38,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
          *      context 中传入当前 mod.lions 的路径; root_path 在 compile 中; 通过 path_diff
          *      找到相差路径
          * */
-        self.module_stack.set_current_module(Module::new(module_name));
+        self.module_stack.init_current_module();
         /*
          * 将 module name 记录在 package global data 中
          * */

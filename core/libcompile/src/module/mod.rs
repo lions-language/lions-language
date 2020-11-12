@@ -16,24 +16,15 @@ pub struct ModuleItem {
 }
 
 impl ModuleItem {
-    fn set_module(&mut self, module: Module) {
-        *&mut self.module = module;
+    fn init_module(&mut self) {
         self.inited = true;
-    }
-
-    pub fn new_null() -> Self {
-        Self {
-            module: Module::default(),
-            undef_funcs: UndefFuncs::new(),
-            inited: false
-        }
     }
 
     pub fn new(module: Module) -> Self {
         Self {
             module: module,
             undef_funcs: UndefFuncs::new(),
-            inited: true
+            inited: false
         }
     }
 }
@@ -55,16 +46,12 @@ impl ModuleStack {
         self.stack.push(ModuleItem::new(module));
     }
 
-    pub fn push_null(&mut self) {
-        self.stack.push(ModuleItem::new_null());
-    }
-
     pub fn pop(&mut self) -> Option<ModuleItem> {
         self.stack.pop()
     }
 
-    pub fn set_current_module(&mut self, module: Module) {
-        *&mut self.stack.top_mut_unchecked().set_module(module);
+    pub fn init_current_module(&mut self) {
+        *&mut self.stack.top_mut_unchecked().init_module();
     }
 
     pub fn current_module_is_valid(&mut self) -> bool {
