@@ -55,6 +55,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 format!("{} does not exist in the path of import"
                     , libcommon::consts::MOD_LIONS_NAME));
         }
+        let path_diff = pathdiff::diff_paths(&path, &root_path);
         /*
          * 解析 mod.lions
          * */
@@ -106,6 +107,17 @@ impl<'a, F: Compile> Compiler<'a, F> {
         };
         let mut grammar_parser = GrammarParser::new(lexical_parser, &mut grammar_context);
         grammar_parser.parser();
+        /*
+         * module 解析完成之后, 将 module 从 stack 中 pop 出来
+         * */
+        let module_name = match self.module_stack.pop() {
+            Some(value) => {
+                value
+            },
+            None => {
+                unreachable!();
+            }
+        };
         DescResult::Success
     }
 }

@@ -16,7 +16,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 return self.handle_main_end();
             },
             FileType::Mod => {
-                self.handle_mod_end(end_context);
+                // self.handle_mod_end(end_context);
             },
             _ => {
                 unimplemented!("compile handle_end unimplemented");

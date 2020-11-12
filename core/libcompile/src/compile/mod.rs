@@ -375,7 +375,7 @@ pub struct Compiler<'a, F: Compile> {
     compile_context: CompileContext,
     vm_scope_value: usize,
     cb: &'a mut F,
-    import_datas: HashMap<String, ImportData>,
+    imports_mapping: imports_mapping::ImportsMapping,
     io_attr: IoAttribute
 }
 
@@ -620,7 +620,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
             compile_context: CompileContext::default(),
             vm_scope_value: 0,
             cb: cb,
-            import_datas: HashMap::new(),
+            imports_mapping: imports_mapping::ImportsMapping::new(),
             io_attr: io_attr
         }
     }
@@ -653,6 +653,7 @@ mod relmod;
 mod process_module;
 mod process_use;
 mod process_first;
+mod imports_mapping;
 
 #[cfg(test)]
 mod test {
