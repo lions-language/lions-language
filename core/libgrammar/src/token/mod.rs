@@ -64,6 +64,8 @@ pub enum TokenType {
     Module,
     // use
     Use,
+    // as
+    As,
     // ->
     RightArrow,
     // (

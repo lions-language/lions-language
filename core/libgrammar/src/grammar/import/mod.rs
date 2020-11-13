@@ -7,7 +7,7 @@ use libcommon::consts;
 use super::{GrammarParser, Grammar, NextToken, ExpressContext
     , ReturnStmtContext, ImportStmtContext};
 use crate::lexical::{CallbackReturnStatus, TokenVecItem, TokenPointer};
-use crate::token::{TokenType, TokenValue};
+use crate::token::{TokenType, TokenData};
 
 impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, CB> {
     pub fn import_process(&mut self) {
@@ -35,6 +35,47 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         }
     }
 
+    fn import_as(&mut self) -> Option<String> {
+        /*
+         * 查看是否有 as 存在
+         * */
+        let tp = match self.lookup_next_one_ptr() {
+            Some(tp) => tp,
+            None => {
+                /*
+                 * import "" 后面是文件结尾 => 语法正确, 不需要处理
+                 * */
+                return None;
+            }
+        };
+        let token = tp.as_ref::<T, CB>();
+        match token.context_token_type() {
+            TokenType::As => {
+                self.skip_next_one();
+                self.expect_next_token(|grammar, tp| {
+                    let token = tp.as_ref::<T, CB>();
+                    match token.context_token_type() {
+                        TokenType::Id => {
+                        },
+                        _ => {
+                            grammar.panic(
+                                &format!("expect id after module, but meet {:?}"
+                                    , token.context_token_type()));
+                        }
+                    }
+                }, "id after module");
+                let t = self.take_next_one();
+                let alias = extract_token_data!(
+                    t.token_value().token_data().expect("should not happend")
+                    , Id);
+                Some(alias)
+            },
+            _ => {
+                None
+            }
+        }
+    }
+
     fn import_prefix_match(&mut self, local_obj: &mut U8ArrayIsEqual
         , import_prefix: consts::ImportPrefixType
         , parser: &mut LexicalParser<T, CB>, c: char, is: &mut bool
@@ -58,6 +99,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                  * */
                 self.parse_import_content(content);
                 *is = false;
+                let alias = self.import_as();
                 check_desc_result!(self, self.cb().import_stmt(ImportStmtContext::new(
                         import_prefix, content)));
                 return true;
@@ -90,6 +132,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                         is = false;
                         parser.content_skip_next_one();
                         let grammar = grammar_ptr.as_mut::<GrammarParser<T, CB>>();
+                        let alias = grammar.import_as();
                         check_desc_result!(grammar, grammar.cb().import_stmt(ImportStmtContext::new(
                                 consts::ImportPrefixType::Local, &no_prefix)));
                     },
