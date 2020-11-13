@@ -22,7 +22,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
     pub fn process_import_stmt(&mut self, context: ImportStmtContext) -> DescResult {
         match &context.prefix {
             ImportPrefixType::Local => {
-                return self.import_local(context.content);
+                return self.import_local(context.content, context.alias);
             },
             _ => {
                 unimplemented!("{:?}", context.prefix);
@@ -30,7 +30,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
         }
     }
 
-    fn import_local(&mut self, content: &str) -> DescResult {
+    fn import_local(&mut self, content: &str, alias: Option<String>) -> DescResult {
         /*
          * 检测路径是否是目录
          * */
@@ -132,7 +132,13 @@ impl<'a, F: Compile> Compiler<'a, F> {
             return DescResult::Error(
                 format!("imported \"{}\" is imported repeatedly", module_name));
         }
-        self.imports_mapping.add(module_name, module_str);
+        let import_key = match alias {
+            Some(a) => a,
+            None => {
+                module_name
+            }
+        };
+        self.imports_mapping.add(import_key, module_str);
         DescResult::Success
     }
 }

@@ -272,7 +272,8 @@ pub struct OperatorEqualEqualContext {
 #[derive(Debug, Default)]
 pub struct ImportStmtContext<'a> {
     pub prefix: ImportPrefixType,
-    pub content: &'a str
+    pub content: &'a str,
+    pub alias: Option<String>
 }
 
 #[derive(Debug, FieldGet
@@ -299,10 +300,12 @@ pub struct UseStmtContext {
 }
 
 impl<'a> ImportStmtContext<'a> {
-    pub fn new(prefix: ImportPrefixType, content: &'a str) -> Self {
+    pub fn new(prefix: ImportPrefixType, content: &'a str
+        , alias: Option<String>) -> Self {
         Self {
             prefix: prefix,
-            content: content
+            content: content,
+            alias: alias
         }
     }
 }

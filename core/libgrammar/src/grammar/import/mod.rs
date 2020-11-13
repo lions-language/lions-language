@@ -101,7 +101,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                 *is = false;
                 let alias = self.import_as();
                 check_desc_result!(self, self.cb().import_stmt(ImportStmtContext::new(
-                        import_prefix, content)));
+                        import_prefix, content, alias)));
                 return true;
             },
             _ => {
@@ -134,7 +134,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                         let grammar = grammar_ptr.as_mut::<GrammarParser<T, CB>>();
                         let alias = grammar.import_as();
                         check_desc_result!(grammar, grammar.cb().import_stmt(ImportStmtContext::new(
-                                consts::ImportPrefixType::Local, &no_prefix)));
+                                consts::ImportPrefixType::Local, &no_prefix, alias)));
                     },
                     _ => {
                         let grammar = grammar_ptr.as_mut::<GrammarParser<T, CB>>();
