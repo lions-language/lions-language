@@ -101,15 +101,32 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         lengthen_offset
     }
 
+    fn id_process_coloncolon(&mut self, desc_ctx: DescContext) {
+        let mut t = self.take_next_one();
+        let module_str = extract_token_data!(
+            t.token_value().token_data().expect("should not happend")
+            , Id);
+        /*
+         * 跳过 ::
+         * */
+        self.skip_next_one();
+        self.id_process_inner(desc_ctx, Some(module_str));
+    }
+
     pub fn id_process(&mut self, desc_ctx: DescContext) {
+        self.id_process_inner(desc_ctx, None);
+    }
+
+    fn id_process_inner(&mut self, desc_ctx: DescContext
+        , module_str: Option<String>) {
         /*
          * 1. 判断是否是函数调用
          * */
         // println!("{:?}", &desc_ctx);
-        let scope_context = CallFuncScopeContext{
+        let mut scope_context = CallFuncScopeContext{
             package_type: Some(PackageType::new(PackageTypeValue::Crate)),
             package_str: PackageStr::Itself,
-            module_str: None,
+            module_str: module_str,
             desc_ctx: desc_ctx.clone()
         };
         self.set_backtrack_point();
@@ -161,10 +178,9 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                         return;
                     },
                     TokenType::ColonColon => {
-                        /*
-                         * TODO 填充 scope_context 中的 module_str
-                         * */
-                        unimplemented!();
+                        let bl = self.restore_from_backtrack_point();
+                        self.id_process_coloncolon(desc_ctx);
+                        return;
                     },
                     _ => {
                         self.restore_from_backtrack_point();

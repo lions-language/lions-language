@@ -125,9 +125,6 @@ impl<'a, F: Compile> Compiler<'a, F> {
             }
         };
         let (module_name, module_str) = module.fields_move();
-        /*
-         * TODO: 先判断是否存在
-         * */
         if self.imports_mapping.exists(&module_name) {
             return DescResult::Error(
                 format!("imported \"{}\" is imported repeatedly", module_name));
