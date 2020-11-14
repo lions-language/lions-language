@@ -18,7 +18,7 @@ use libmacro::{FieldGet, NewWithAll
 pub struct CallFuncScopeContext {
     package_type: Option<PackageType>,
     package_str: PackageStr,
-    module_str: Option<String>,
+    module_prefix: Option<String>,
     desc_ctx: DescContext
 }
 
@@ -630,6 +630,12 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                             self.panic(&e);
                         },
                         _ => {
+                            if self.counter_stack.top_ref_unchecked().available_stmt_count_clone() == 0 {
+                                /*
+                                 * 第一条语句
+                                 * */
+                                self.first_stmt_process();
+                            }
                         }
                     }
                     break;
