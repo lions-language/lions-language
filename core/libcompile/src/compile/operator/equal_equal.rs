@@ -28,7 +28,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
             , (right_typ.clone(), right_typ_attr.clone())];
         let (exists, func_str) = 
             match self.function_is_exist(consts::OPERATOR_EQUAL_EQUAL_FUNCTION_NAME
-            , Some(&left_typ), None
+            , Some(&left_typ), None, &None
             , param_typs, &mut func_statement, &mut func_define) {
             Ok(r) => r,
             Err(err) => {

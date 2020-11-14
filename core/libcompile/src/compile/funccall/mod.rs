@@ -55,6 +55,27 @@ impl<'a, F: Compile> Compiler<'a, F> {
     fn handle_call_function_prepare_no_point_access(&mut self
         , call_scope_context: CallFuncScopeContext
         , call_context: &mut GrammarCallFunctionContext) -> DescResult {
+        let (package_type, package_str, module_prefix, desc_ctx) =
+            call_scope_context.fields_move();
+        /*
+         * 根据 module_prefix 计算 module_str
+         * */
+        let module_str = match module_prefix {
+            Some(mp) => {
+                match self.imports_mapping.get_clone(&mp) {
+                    Some(v) => {
+                        Some(v)
+                    },
+                    None => {
+                        return DescResult::Error(
+                            format!("{} is not found", mp));
+                    }
+                }
+            },
+            None => {
+                None
+            }
+        };
         self.scope_context.enter_func_call();
         /*
          * 1. 查找函数声明
@@ -79,13 +100,16 @@ impl<'a, F: Compile> Compiler<'a, F> {
         let func_str = FunctionSplice::get_function_without_return_string_by_type(
             call_context.func_name_ref_unchecked()
             , &func_param_data.as_ref(), &call_context.typ_ref().as_ref());
-        call_context.set_desc_ctx(call_scope_context.desc_ctx_clone());
+        call_context.set_desc_ctx(desc_ctx);
         let find_func_context = FindFunctionContext {
             func_name: call_context.func_name_ref_unchecked(),
             typ: call_context.typ_ref().as_ref(),
-            package_typ: call_scope_context.package_type_ref().as_ref(),
+            package_typ: package_type.as_ref(),
             func_str: &func_str,
-            module_str: self.module_stack.current().name_ref()
+            module_str: match &module_str {
+                Some(ms) => ms,
+                None => self.module_stack.current().name_ref()
+            }
         };
         let (exists, handle) = self.function_control.is_exists(&find_func_context);
         if exists {
@@ -107,9 +131,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 }
             };
             call_context.set_func_ptr(func_ptr);
-            call_context.set_package_str(call_scope_context.package_str());
+            call_context.set_package_str(package_str);
         } else {
-            let (package_type, package_str, module_str, _) = call_scope_context.fields_move();
             // call_context.set_func_name(func_str);
             call_context.set_package_str(package_str);
             call_context.set_package_typ(package_type);

@@ -156,8 +156,6 @@ impl<'a, F: Compile> Compiler<'a, F> {
             func_str: func.func_statement_ref().statement_full_str().to_string(),
             is_overload: if define_context.has_lengthen_param_clone() {false} else {true}
         };
-        // println!("{:?}", context);
-        // // println!("{:?}", func);
         self.function_control.add_function(context, None, func);
         self.scope_context.leave();
     }

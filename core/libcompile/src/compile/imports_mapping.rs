@@ -13,6 +13,17 @@ impl ImportsMapping {
         self.imports.contains_key(name)
     }
 
+    pub fn get_clone(&mut self, name: &str) -> Option<String> {
+        match self.imports.get(name) {
+            Some(v) => {
+                Some(v.to_string())
+            },
+            None => {
+                None
+            }
+        }
+    }
+
     pub fn new() -> Self {
         Self {
             imports: HashMap::new()

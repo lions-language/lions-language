@@ -2,10 +2,12 @@ use libtype::function::{Function
     , FindFunctionHandle};
 use std::collections::HashMap;
 
+#[derive(Debug)]
 struct FunctionSet {
     funcs: HashMap<String, Function>
 }
 
+#[derive(Debug)]
 pub struct Container {
     mods: HashMap<String, FunctionSet>
 }
@@ -103,6 +105,7 @@ impl Container {
                 } else {
                     match HandleType::from(h.typ_ref()) {
                         HandleType::FunctionSet => {
+                            println!("{:?}", func_str);
                             h.as_ref::<FunctionSet>().funcs.get(func_str)
                         },
                         HandleType::Function => {
@@ -209,9 +212,10 @@ mod test {
         let container = Container::new();
         let ms = "1";
         let fs = "2";
-        let (exists, handle) = container.is_exists(ms, fs);
+        let fname = "3";
+        let (exists, handle) = container.is_exists(ms, fname, fs);
         if !exists {
-            container.find(ms, fs, &Some(handle));
+            container.find(ms, fname, fs, &Some(handle));
         }
     }
 }
