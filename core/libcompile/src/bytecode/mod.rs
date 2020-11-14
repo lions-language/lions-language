@@ -288,6 +288,8 @@ mod test {
     use libgrammar::lexical::CallbackReturnStatus;
     use libgrammar::grammar::GrammarContext;
     use libtype::module::Module;
+    use libtypecontrol::function::FunctionControl;
+    use libstructtype::structure::{StructControl};
     use crate::compile::{Compiler, InputContext, InputAttribute, FileType
         , IoAttribute};
     use crate::module::{ModuleStack};
@@ -345,8 +347,10 @@ mod test {
         let mut package_index = PackageIndex::new();
         let package_str = String::from("test");
         let mut test_writer = TestWriter{};
-        let module = Module::new(String::from("main"));
+        let module = Module::new(String::from("main"), String::from("main"));
         let mut module_stack = ModuleStack::new();
+        let mut function_control = FunctionControl::new();
+        let mut struct_control = StructControl::new();
         let mut bytecode = Bytecode::new(
                     &mut test_writer
                     , &mut fdd
@@ -358,7 +362,9 @@ mod test {
                 InputContext::new(InputAttribute::new(FileType::Main)
                     , path_buf.clone(), path_buf),
                 &mut static_variant_dispatch,
-                &package_str, io_attr_clone
+                &package_str, io_attr_clone,
+                &mut function_control,
+                &mut struct_control
             )
         };
         let mut grammar_parser = GrammarParser::new(lexical_parser, &mut grammar_context);

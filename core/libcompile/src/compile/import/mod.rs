@@ -8,6 +8,7 @@ use libgrammar::lexical::{LexicalParser, CallbackReturnStatus
 use libgrammar::grammar::{ImportStmtContext
     , GrammarContext, GrammarParser};
 use libcommon::consts::{ImportPrefixType};
+use libcommon::ptr::{RefPtr};
 use libtype::module::Module;
 use std::path::Path;
 use std::io::Read;
@@ -96,8 +97,10 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 }
             }
         });
-        let mut static_stream = StaticStream::new();
-        let mut static_variant_dispatch = StaticVariantDispatch::new(&mut static_stream);
+        // let mut static_stream = StaticStream::new();
+        // let mut static_variant_dispatch = StaticVariantDispatch::new(&mut static_stream);
+        let mut static_dispatch_ptr = RefPtr::from_ref(self.static_variant_dispatch);
+        let mut static_variant_dispatch = static_dispatch_ptr.as_mut::<StaticVariantDispatch>();
         /*
          * 1. 放入一个空的 module, 用于后面判断 module 语句是否存在
          * 2. 遇到 mod.lions 文件中的 module, 将 module 信息更新
@@ -108,8 +111,9 @@ impl<'a, F: Compile> Compiler<'a, F> {
             cb: Compiler::new(self.module_stack, None
                     , self.cb, InputContext::new(InputAttribute::new(
                             FileType::Mod), root_path, path)
-                    , &mut static_variant_dispatch
-                    , self.package_str, self.io_attr.clone())
+                    , static_variant_dispatch
+                    , self.package_str, self.io_attr.clone()
+                    , self.function_control, self.struct_control)
         };
         let mut grammar_parser = GrammarParser::new(lexical_parser, &mut grammar_context);
         grammar_parser.parser();

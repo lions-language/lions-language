@@ -365,8 +365,8 @@ pub struct IoAttribute {
 }
 
 pub struct Compiler<'a, F: Compile> {
-    function_control: FunctionControl,
-    struct_control: StructControl,
+    function_control: &'a mut FunctionControl,
+    struct_control: &'a mut StructControl,
     module_stack: &'a mut ModuleStack,
     scope_context: ScopeContext,
     input_context: InputContext,
@@ -603,15 +603,17 @@ impl<'a, F: Compile> Compiler<'a, F> {
     pub fn new(module_stack: &'a mut ModuleStack, module: Option<Module>
         , cb: &'a mut F, input_context: InputContext
         , static_variant_dispatch: &'a mut StaticVariantDispatch<'a>
-        , package_str: &'a str, io_attr: IoAttribute) -> Self {
+        , package_str: &'a str, io_attr: IoAttribute
+        , function_control: &'a mut FunctionControl
+        , struct_control: &'a mut StructControl) -> Self {
         match module {
             Some(m) => module_stack.push(m),
             None => {
             }
         }
         Self {
-            function_control: FunctionControl::new(),
-            struct_control: StructControl::new(),
+            function_control: function_control,
+            struct_control: struct_control,
             module_stack: module_stack,
             scope_context: ScopeContext::new(),
             input_context: input_context,
@@ -710,15 +712,19 @@ mod test {
         let mut static_stream = StaticStream::new();
         let mut static_variant_dispatch = StaticVariantDispatch::new(&mut static_stream);
         let package_str = String::from("test");
-        let module = Module::new(String::from("main"));
+        let module = Module::new(String::from("main"), String::from("main"));
         let mut module_stack = ModuleStack::new();
         let mut test_compile = TestCompile{};
+        let mut function_control = FunctionControl::new();
+        let mut struct_control = StructControl::new();
         let mut grammar_context = GrammarContext{
             cb: Compiler::new(&mut module_stack, Some(module)
                     , &mut test_compile, InputContext::new(InputAttribute::new(
                             FileType::Main), path_buf.clone(), path_buf.clone())
                     , &mut static_variant_dispatch
-                    , &package_str, io_attr_clone)
+                    , &package_str, io_attr_clone
+                    , &mut function_control
+                    , &mut struct_control)
         };
         let mut grammar_parser = GrammarParser::new(lexical_parser, &mut grammar_context);
         grammar_parser.parser();

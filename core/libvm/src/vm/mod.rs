@@ -256,6 +256,8 @@ mod test {
     use libgrammar::lexical::CallbackReturnStatus;
     use libgrammar::grammar::GrammarContext;
     use libtype::module::Module;
+    use libtypecontrol::function::FunctionControl;
+    use libstructtype::structure::{StructControl};
     use libcompile::compile::{FileType, InputAttribute, InputContext, IoAttribute};
     use libcompile::module::{ModuleStack};
     use libcompile::define_dispatch::{FunctionDefineDispatch, BlockDefineDispatch};
@@ -327,6 +329,8 @@ mod test {
             , ss_ptr);
         let module = Module::new(String::from("main"), String::from("main"));
         let mut module_stack = ModuleStack::new();
+        let mut function_control = FunctionControl::new();
+        let mut struct_control = StructControl::new();
         let mut bytecode = Bytecode::new(
                 &mut link
                 , &mut fdd
@@ -339,7 +343,9 @@ mod test {
                 InputContext::new(InputAttribute::new(FileType::Main)
                     , path_buf.clone(), path_buf.clone()),
                 &mut static_variant_dispatch,
-                &package_str, io_attr_clone
+                &package_str, io_attr_clone,
+                &mut function_control,
+                &mut struct_control
             )
         };
         let mut grammar_parser = GrammarParser::new(lexical_parser, &mut grammar_context);
