@@ -264,6 +264,7 @@ mod test {
     use libcompile::static_dispatch::{StaticVariantDispatch};
     use libcompile::static_stream::{StaticStream};
     use libcompile::address::PackageIndex;
+    use libcompile::package::{Package, PackageContext};
     use super::*;
 
     use std::fs;
@@ -331,6 +332,8 @@ mod test {
         let mut module_stack = ModuleStack::new();
         let mut function_control = FunctionControl::new();
         let mut struct_control = StructControl::new();
+        let package = Package::<String>::new();
+        let mut package_context = PackageContext::new(&package);
         let mut bytecode = Bytecode::new(
                 &mut link
                 , &mut fdd
@@ -345,7 +348,8 @@ mod test {
                 &mut static_variant_dispatch,
                 &package_str, io_attr_clone,
                 &mut function_control,
-                &mut struct_control
+                &mut struct_control,
+                &mut package_context
             )
         };
         let mut grammar_parser = GrammarParser::new(lexical_parser, &mut grammar_context);

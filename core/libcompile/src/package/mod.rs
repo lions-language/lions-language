@@ -7,6 +7,14 @@ pub struct Package<P: AsRef<Path>> {
     mapping: HashMap<String, P>
 }
 
+impl<P: AsRef<Path>> Package<P> {
+    pub fn new() -> Self {
+        Self {
+            mapping: HashMap::new()
+        }
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct PackageContext {
     package: RefPtr

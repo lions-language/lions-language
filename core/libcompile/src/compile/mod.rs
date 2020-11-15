@@ -52,6 +52,7 @@ use crate::module::ModuleStack;
 use scope::context::ScopeContext;
 use crate::define_dispatch::{function::FunctionStatementObject};
 use crate::define::{DefineObject};
+use crate::package::PackageContext;
 use std::path::{Path, PathBuf};
 
 #[derive(Debug)]
@@ -376,7 +377,8 @@ pub struct Compiler<'a, F: Compile> {
     vm_scope_value: usize,
     cb: &'a mut F,
     imports_mapping: imports_mapping::ImportsMapping,
-    io_attr: IoAttribute
+    io_attr: IoAttribute,
+    package_context: &'a mut PackageContext
 }
 
 impl<'a, F: Compile> Grammar for Compiler<'a, F> {
@@ -605,7 +607,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
         , static_variant_dispatch: &'a mut StaticVariantDispatch<'a>
         , package_str: &'a str, io_attr: IoAttribute
         , function_control: &'a mut FunctionControl
-        , struct_control: &'a mut StructControl) -> Self {
+        , struct_control: &'a mut StructControl
+        , package_context: &'a mut PackageContext) -> Self {
         match module {
             Some(m) => module_stack.push(m),
             None => {
@@ -623,7 +626,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
             vm_scope_value: 0,
             cb: cb,
             imports_mapping: imports_mapping::ImportsMapping::new(),
-            io_attr: io_attr
+            io_attr: io_attr,
+            package_context: package_context
         }
     }
 }
@@ -666,6 +670,7 @@ mod test {
     use libgrammar::grammar::GrammarContext;
     use libtype::module::Module;
     use crate::static_stream::StaticStream;
+    use crate::package::Package;
     use super::*;
 
     use std::fs;
@@ -717,6 +722,8 @@ mod test {
         let mut test_compile = TestCompile{};
         let mut function_control = FunctionControl::new();
         let mut struct_control = StructControl::new();
+        let package = Package::<String>::new();
+        let mut package_context = PackageContext::new(&package);
         let mut grammar_context = GrammarContext{
             cb: Compiler::new(&mut module_stack, Some(module)
                     , &mut test_compile, InputContext::new(InputAttribute::new(
@@ -724,7 +731,8 @@ mod test {
                     , &mut static_variant_dispatch
                     , &package_str, io_attr_clone
                     , &mut function_control
-                    , &mut struct_control)
+                    , &mut struct_control
+                    , &mut package_context)
         };
         let mut grammar_parser = GrammarParser::new(lexical_parser, &mut grammar_context);
         grammar_parser.parser();
