@@ -52,7 +52,7 @@ use crate::module::ModuleStack;
 use scope::context::ScopeContext;
 use crate::define_dispatch::{function::FunctionStatementObject};
 use crate::define::{DefineObject};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 #[derive(Debug)]
 pub struct StaticContext {
