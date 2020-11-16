@@ -670,7 +670,7 @@ mod test {
     use libgrammar::grammar::GrammarContext;
     use libtype::module::Module;
     use crate::static_stream::StaticStream;
-    use crate::package::Package;
+    use crate::package::{Package, PackageControl};
     use super::*;
 
     use std::fs;
@@ -723,7 +723,8 @@ mod test {
         let mut function_control = FunctionControl::new();
         let mut struct_control = StructControl::new();
         let package = Package::<String>::new();
-        let mut package_context = PackageContext::new(&package);
+        let package_control = PackageControl::new();
+        let mut package_context = PackageContext::new(&package, &package_control);
         let mut grammar_context = GrammarContext{
             cb: Compiler::new(&mut module_stack, Some(module)
                     , &mut test_compile, InputContext::new(InputAttribute::new(

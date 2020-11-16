@@ -264,7 +264,7 @@ mod test {
     use libcompile::static_dispatch::{StaticVariantDispatch};
     use libcompile::static_stream::{StaticStream};
     use libcompile::address::PackageIndex;
-    use libcompile::package::{Package, PackageContext};
+    use libcompile::package::{Package, PackageContext, PackageControl};
     use super::*;
 
     use std::fs;
@@ -333,7 +333,8 @@ mod test {
         let mut function_control = FunctionControl::new();
         let mut struct_control = StructControl::new();
         let package = Package::<String>::new();
-        let mut package_context = PackageContext::new(&package);
+        let package_control = PackageControl::new();
+        let mut package_context = PackageContext::new(&package, &package_control);
         let mut bytecode = Bytecode::new(
                 &mut link
                 , &mut fdd
