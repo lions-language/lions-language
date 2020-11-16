@@ -297,6 +297,7 @@ mod test {
     use crate::define_stream::DefineStream;
     use crate::static_dispatch::{StaticVariantDispatch};
     use crate::static_stream::{StaticStream};
+    use crate::package::{Package, PackageContext};
     use super::*;
 
     use std::fs;
@@ -355,6 +356,8 @@ mod test {
                     &mut test_writer
                     , &mut fdd
                     , &mut bdd);
+        let package = Package::<String>::new();
+        let mut package_context = PackageContext::new(&package);
         let mut grammar_context = GrammarContext{
             cb: Compiler::new(
                 &mut module_stack, Some(module),
@@ -364,7 +367,8 @@ mod test {
                 &mut static_variant_dispatch,
                 &package_str, io_attr_clone,
                 &mut function_control,
-                &mut struct_control
+                &mut struct_control,
+                &mut package_context
             )
         };
         let mut grammar_parser = GrammarParser::new(lexical_parser, &mut grammar_context);
