@@ -28,12 +28,6 @@ use crate::define::{DefineObject};
 pub trait Writer {
     fn write(&mut self, _: Instruction) {
     }
-    fn current_index(&self) -> usize {
-        unimplemented!();
-    }
-    fn set_jump(&mut self, _: usize, _: Jump) {
-        unimplemented!();
-    }
 }
 
 pub struct Bytecode<'a, 'b, F: Writer> {
@@ -200,7 +194,7 @@ impl<'a, 'b, F: Writer> Compile for Bytecode<'a, 'b, F> {
 
     fn current_index(&self) -> usize {
         if self.define_stack.is_empty() {
-            self.writer.current_index()
+            0
         } else {
             self.define_stack.current_index()
         }
@@ -224,7 +218,6 @@ impl<'a, 'b, F: Writer> Compile for Bytecode<'a, 'b, F> {
 
     fn set_jump(&mut self, index: usize, jump: Jump) {
         if self.define_stack.is_empty() {
-            self.writer.set_jump(index, jump);
         } else {
             self.define_stack.set_jump(index, jump);
         }

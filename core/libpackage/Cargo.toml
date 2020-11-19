@@ -10,3 +10,7 @@ edition = "2018"
 libmacro = { path = "../libmacro" }
 libcommon = { path = "../libcommon" }
 libcompile = { path = "../libcompile" }
+libgrammar = { path = "../libgrammar" }
+libtypecontrol = { path = "../libtypecontrol" }
+libtype = { path = "../libtype" }
+libstructtype = { path = "../libstructtype" }
