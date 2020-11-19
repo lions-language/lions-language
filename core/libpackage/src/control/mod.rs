@@ -4,11 +4,12 @@ use libgrammar::grammar::GrammarParser;
 use libgrammar::lexical::CallbackReturnStatus;
 use libgrammar::grammar::GrammarContext;
 use libtype::module::Module;
+use libtype::instruction::{Instruction};
 use libtypecontrol::function::FunctionControl;
 use libstructtype::structure::{StructControl};
 use libcompile::compile::{FileType, InputAttribute, InputContext, IoAttribute
     , Compiler};
-use libcompile::bytecode::{Bytecode};
+use libcompile::bytecode::{self, Bytecode};
 use libcompile::module::{ModuleStack};
 use libcompile::define_dispatch::{FunctionDefineDispatch, BlockDefineDispatch};
 use libcompile::define_stream::{DefineStream};
@@ -16,8 +17,9 @@ use libcompile::static_dispatch::{StaticVariantDispatch};
 use libcompile::static_stream::{StaticStream};
 use libcompile::address::PackageIndex;
 use libcompile::package::{Package, PackageContext, PackageControl};
-
 use libcommon::ptr::RefPtr;
+use libcommon::consts;
+use libcommon::exception;
 use crate::config::{PackageConfig, PackageConfigItem};
 use std::path::Path;
 use std::fs;
@@ -25,6 +27,14 @@ use std::io::Read;
 
 struct Control<P: AsRef<Path>> {
     config: PackageConfig<P>
+}
+
+struct InnerWriter {
+}
+
+impl bytecode::Writer for InnerWriter {
+    fn write(&mut self, ins: Instruction) {
+    }
 }
 
 impl<P: AsRef<Path>> Control<P> {
@@ -40,8 +50,12 @@ impl<P: AsRef<Path>> Control<P> {
     }
 
     fn process_compile(&mut self, name: &str, item: &PackageConfigItem<P>) {
-        let file = String::from("main.lions");
-        let mut f = match fs::File::open(&file) {
+        /*
+         * 获取包路径, 拼接成 package_path/lib.lions
+         * */
+        let file: &Path = item.path.as_ref();
+        let lib_file = file.join(consts::LIB_LIONS_NAME);
+        let mut f = match fs::File::open(&lib_file) {
             Ok(f) => f,
             Err(_err) => {
                 panic!("read file error");
@@ -50,7 +64,14 @@ impl<P: AsRef<Path>> Control<P> {
         let path_buf = Path::new(&file).parent().expect("should not happend").to_path_buf();
         let io_attr = IoAttribute::new_with_all(1);
         let io_attr_clone = io_attr.clone();
-        let lexical_parser = LexicalParser::new(file.clone(), || -> CallbackReturnStatus {
+        let file_name = match file.to_str() {
+            Some(s) => s.to_string(),
+            None => {
+                exception::exit("the path is illegal, please use utf8 encoding path");
+                return;
+            }
+        };
+        let lexical_parser = LexicalParser::new(file_name, || -> CallbackReturnStatus {
             let mut v = Vec::new();
             let f_ref = f.by_ref();
             match f_ref.take(io_attr.read_once_max_clone() as u64).read_to_end(&mut v) {
@@ -75,13 +96,13 @@ impl<P: AsRef<Path>> Control<P> {
         let mut static_variant_dispatch = StaticVariantDispatch::new(&mut static_stream);
         let mut package_index = PackageIndex::new();
         let package_str = String::from("test");
-        let mut test_writer = TestWriter{};
+        let mut inner_writer = InnerWriter{};
         let module = Module::new(String::from("main"), String::from("main"));
         let mut module_stack = ModuleStack::new();
         let mut function_control = FunctionControl::new();
         let mut struct_control = StructControl::new();
         let mut bytecode = Bytecode::new(
-                    &mut test_writer
+                    &mut inner_writer
                     , &mut fdd
                     , &mut bdd);
         let package = Package::<String>::new();
