@@ -314,6 +314,7 @@ pub trait Compile {
 
 pub enum FileType {
     Main,
+    Lib,
     Mod,
     RELMOD
 }

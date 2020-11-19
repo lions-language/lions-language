@@ -62,7 +62,7 @@ impl<P: AsRef<Path>> Control<P> {
             }
         };
         let path_buf = Path::new(&file).parent().expect("should not happend").to_path_buf();
-        let io_attr = IoAttribute::new_with_all(1);
+        let io_attr = IoAttribute::new_with_all(item.read_once_max);
         let io_attr_clone = io_attr.clone();
         let file_name = match file.to_str() {
             Some(s) => s.to_string(),
@@ -88,16 +88,15 @@ impl<P: AsRef<Path>> Control<P> {
             }
         });
         let mut ds = DefineStream::new();
-        let mut ds_ptr = RefPtr::from_ref::<DefineStream>(&ds);
+        let ds_ptr = RefPtr::from_ref::<DefineStream>(&ds);
         let mut func_ds = ds_ptr.clone();
         let mut fdd = FunctionDefineDispatch::new(func_ds.as_mut::<DefineStream>());
         let mut bdd = BlockDefineDispatch::new(&mut ds);
         let mut static_stream = StaticStream::new();
         let mut static_variant_dispatch = StaticVariantDispatch::new(&mut static_stream);
-        let mut package_index = PackageIndex::new();
-        let package_str = String::from("test");
+        let package_str = name;
         let mut inner_writer = InnerWriter{};
-        let module = Module::new(String::from("main"), String::from("main"));
+        let module = Module::new(String::from(consts::LIB_NAME), String::from(consts::LIB_NAME));
         let mut module_stack = ModuleStack::new();
         let mut function_control = FunctionControl::new();
         let mut struct_control = StructControl::new();
@@ -112,10 +111,10 @@ impl<P: AsRef<Path>> Control<P> {
             cb: Compiler::new(
                 &mut module_stack, Some(module),
                 &mut bytecode,
-                InputContext::new(InputAttribute::new(FileType::Main)
+                InputContext::new(InputAttribute::new(FileType::Lib)
                     , path_buf.clone(), path_buf),
                 &mut static_variant_dispatch,
-                &package_str, io_attr_clone,
+                package_str, io_attr_clone,
                 &mut function_control,
                 &mut struct_control,
                 &mut package_context

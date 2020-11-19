@@ -4,15 +4,18 @@ use std::collections::HashMap;
 #[derive(Debug)]
 pub struct PackageConfigItem<P: AsRef<Path>> {
     pub is_compile: bool,
+    pub read_once_max: usize,
     pub path: P,
     pub lib_path: Option<String>
 }
 
 impl<P: AsRef<Path>> PackageConfigItem<P> {
-    pub fn new(is_compile: bool, path: P
+    pub fn new(is_compile: bool
+        , read_once_max: usize, path: P
         , lib_path: Option<String>) -> Self {
         Self {
             is_compile: is_compile,
+            read_once_max: read_once_max,
             path: path,
             lib_path: lib_path
         }

@@ -16,7 +16,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 return self.handle_main_end();
             },
             FileType::Mod => {
-                // self.handle_mod_end(end_context);
+            },
+            FileType::Lib => {
             },
             _ => {
                 unimplemented!("compile handle_end unimplemented");
@@ -77,11 +78,6 @@ impl<'a, F: Compile> Compiler<'a, F> {
             return DescResult::Error(
                 String::from("the main function must exist in main.lions"));
         }
-        DescResult::Success
-    }
-
-    fn handle_mod_end(&mut self, end_context: EndContext) -> DescResult {
-        self.module_stack.pop();
         DescResult::Success
     }
 }
