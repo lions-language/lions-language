@@ -12,6 +12,6 @@ impl Default for PackageStr {
 }
 
 #[derive(Debug)]
-pub struct PackageBuffer {
+pub struct PackageBufferPtr {
 }
 
