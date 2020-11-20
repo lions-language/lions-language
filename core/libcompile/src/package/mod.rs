@@ -1,3 +1,4 @@
+use libtype::package::{PackageBuffer};
 use libcommon::ptr::RefPtr;
 use std::path::Path;
 use std::collections::HashMap;
@@ -13,10 +14,6 @@ impl<P: AsRef<Path>> Package<P> {
             mapping: HashMap::new()
         }
     }
-}
-
-#[derive(Debug)]
-pub struct PackageBuffer {
 }
 
 #[derive(Debug)]

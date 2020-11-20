@@ -10,3 +10,8 @@ impl Default for PackageStr {
         PackageStr::Empty
     }
 }
+
+#[derive(Debug)]
+pub struct PackageBuffer {
+}
+

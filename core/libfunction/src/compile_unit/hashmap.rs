@@ -105,7 +105,6 @@ impl Container {
                 } else {
                     match HandleType::from(h.typ_ref()) {
                         HandleType::FunctionSet => {
-                            println!("{:?}", func_str);
                             h.as_ref::<FunctionSet>().funcs.get(func_str)
                         },
                         HandleType::Function => {
