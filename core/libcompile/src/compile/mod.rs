@@ -379,12 +379,12 @@ pub struct Compiler<'a, F: Compile> {
     cb: &'a mut F,
     imports_mapping: imports_mapping::ImportsMapping,
     io_attr: IoAttribute,
-    package_context: &'a mut PackageContext
+    package_context: &'a PackageContext
 }
 
 impl<'a, F: Compile> Grammar for Compiler<'a, F> {
     fn const_number(&mut self, context: ConstNumberContext) {
-	self.const_number(context);
+	   self.const_number(context);
     }
 
     fn const_string(&mut self, context: ConstStringContext) {
@@ -609,7 +609,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
         , package_str: &'a str, io_attr: IoAttribute
         , function_control: &'a mut FunctionControl
         , struct_control: &'a mut StructControl
-        , package_context: &'a mut PackageContext) -> Self {
+        , package_context: &'a PackageContext) -> Self {
         match module {
             Some(m) => module_stack.push(m),
             None => {
@@ -734,7 +734,7 @@ mod test {
                     , &package_str, io_attr_clone
                     , &mut function_control
                     , &mut struct_control
-                    , &mut package_context)
+                    , &package_context)
         };
         let mut grammar_parser = GrammarParser::new(lexical_parser, &mut grammar_context);
         grammar_parser.parser();

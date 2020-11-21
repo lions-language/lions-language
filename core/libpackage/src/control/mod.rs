@@ -25,8 +25,7 @@ use std::path::Path;
 use std::fs;
 use std::io::Read;
 
-struct Control<P: AsRef<Path>> {
-    config: PackageConfig<P>
+struct Control {
 }
 
 struct InnerWriter {
@@ -37,24 +36,26 @@ impl bytecode::Writer for InnerWriter {
     }
 }
 
-impl<P: AsRef<Path>> Control<P> {
-    pub fn compile(&mut self, package_context: &mut PackageContext)
+impl Control {
+    pub fn compile<P: AsRef<Path>>(&mut self, config: PackageConfig<P>
+        , package_context: &mut PackageContext)
         -> Vec<PackageBuffer> {
         let mut obj = RefPtr::from_ref(self);
-        let control = obj.as_mut::<Control<P>>();
+        let control = obj.as_mut::<Control>();
         let mut package_buffers = Vec::new();
-        for (name, item) in self.config.into_iter() {
+        for (name, item) in config.into_iter() {
             if item.is_compile {
                 package_buffers.push(
-                    control.process_compile(name, item, package_context));
+                    control.single_compile(name, item, package_context));
             } else {
             }
         }
         package_buffers
     }
 
-    fn process_compile(&mut self, name: &str, item: &PackageConfigItem<P>
-        , package_context: &mut PackageContext) -> PackageBuffer {
+    pub fn single_compile<P: AsRef<Path>>(
+        &mut self, name: &str, item: &PackageConfigItem<P>
+        , package_context: &PackageContext) -> PackageBuffer {
         /*
          * 获取包路径, 拼接成 package_path/lib.lions
          * */
@@ -63,7 +64,8 @@ impl<P: AsRef<Path>> Control<P> {
         let mut f = match fs::File::open(&lib_file) {
             Ok(f) => f,
             Err(_err) => {
-                panic!("read file error");
+                exception::exit(format!("read file {:?} error", lib_file));
+                panic!("");
             }
         };
         let path_buf = Path::new(&file).parent().expect("should not happend").to_path_buf();
@@ -129,18 +131,28 @@ impl<P: AsRef<Path>> Control<P> {
         }
     }
 
-    pub fn new(config: PackageConfig<P>) -> Self {
+    pub fn new() -> Self {
         Self {
-            config: config
         }
     }
 }
 
 #[cfg(test)]
 mod test {
+    use super::*;
+    use std::path::PathBuf;
+
     #[test]
     // #[ignore]
-    fn control_test() {
+    fn process_compile_test() {
+        let package = Package::<PathBuf>::new();
+        let package_control = PackageControl::new();
+        let package_context = PackageContext::new(&package, &package_control);
+        let config_item = PackageConfigItem::<PathBuf>::new(
+            true, 1, Path::new("libmath").to_path_buf(), None);
+        let mut control = Control::new();
+        control.single_compile::<PathBuf>("libmath"
+            , &config_item, &package_context);
     }
 }
 

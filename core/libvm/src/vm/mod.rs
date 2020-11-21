@@ -334,7 +334,7 @@ mod test {
         let mut struct_control = StructControl::new();
         let package = Package::<String>::new();
         let package_control = PackageControl::new();
-        let mut package_context = PackageContext::new(&package, &package_control);
+        let package_context = PackageContext::new(&package, &package_control);
         let mut bytecode = Bytecode::new(
                 &mut link
                 , &mut fdd
@@ -350,7 +350,7 @@ mod test {
                 &package_str, io_attr_clone,
                 &mut function_control,
                 &mut struct_control,
-                &mut package_context
+                &package_context
             )
         };
         let mut grammar_parser = GrammarParser::new(lexical_parser, &mut grammar_context);
