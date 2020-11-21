@@ -15,8 +15,8 @@ use libcompile::define_dispatch::{FunctionDefineDispatch, BlockDefineDispatch};
 use libcompile::define_stream::{DefineStream};
 use libcompile::static_dispatch::{StaticVariantDispatch};
 use libcompile::static_stream::{StaticStream};
-use libcompile::address::PackageIndex;
-use libcompile::package::{Package, PackageContext, PackageControl};
+use libcompile::package::{Package, PackageContext, PackageControl
+    , PackageBuffer};
 use libcommon::ptr::RefPtr;
 use libcommon::consts;
 use libcommon::exception;
@@ -33,23 +33,28 @@ struct InnerWriter {
 }
 
 impl bytecode::Writer for InnerWriter {
-    fn write(&mut self, ins: Instruction) {
+    fn write(&mut self, _ins: Instruction) {
     }
 }
 
 impl<P: AsRef<Path>> Control<P> {
-    pub fn execute(&mut self) {
+    pub fn compile(&mut self, package_context: &mut PackageContext)
+        -> Vec<PackageBuffer> {
         let mut obj = RefPtr::from_ref(self);
         let control = obj.as_mut::<Control<P>>();
+        let mut package_buffers = Vec::new();
         for (name, item) in self.config.into_iter() {
             if item.is_compile {
-                control.process_compile(name, item);
+                package_buffers.push(
+                    control.process_compile(name, item, package_context));
             } else {
             }
         }
+        package_buffers
     }
 
-    fn process_compile(&mut self, name: &str, item: &PackageConfigItem<P>) {
+    fn process_compile(&mut self, name: &str, item: &PackageConfigItem<P>
+        , package_context: &mut PackageContext) -> PackageBuffer {
         /*
          * 获取包路径, 拼接成 package_path/lib.lions
          * */
@@ -68,7 +73,7 @@ impl<P: AsRef<Path>> Control<P> {
             Some(s) => s.to_string(),
             None => {
                 exception::exit("the path is illegal, please use utf8 encoding path");
-                return;
+                panic!("");
             }
         };
         let lexical_parser = LexicalParser::new(file_name, || -> CallbackReturnStatus {
@@ -104,9 +109,6 @@ impl<P: AsRef<Path>> Control<P> {
                     &mut inner_writer
                     , &mut fdd
                     , &mut bdd);
-        let package = Package::<String>::new();
-        let package_control = PackageControl::new();
-        let mut package_context = PackageContext::new(&package, &package_control);
         let mut grammar_context = GrammarContext{
             cb: Compiler::new(
                 &mut module_stack, Some(module),
@@ -117,11 +119,14 @@ impl<P: AsRef<Path>> Control<P> {
                 package_str, io_attr_clone,
                 &mut function_control,
                 &mut struct_control,
-                &mut package_context
+                package_context
             )
         };
         let mut grammar_parser = GrammarParser::new(lexical_parser, &mut grammar_context);
         grammar_parser.parser();
+        PackageBuffer{
+            function_control: function_control
+        }
     }
 
     pub fn new(config: PackageConfig<P>) -> Self {

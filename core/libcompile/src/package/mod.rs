@@ -1,3 +1,4 @@
+use libtypecontrol::function::FunctionControl;
 use libcommon::ptr::RefPtr;
 use std::path::Path;
 use std::collections::HashMap;
@@ -15,16 +16,19 @@ impl<P: AsRef<Path>> Package<P> {
     }
 }
 
-#[derive(Debug)]
 pub struct PackageBuffer {
+    pub function_control: FunctionControl
 }
 
-#[derive(Debug)]
 pub struct PackageControl {
     buffer: HashMap<String, PackageBuffer>
 }
 
 impl PackageControl {
+    pub fn insert(&mut self, name: String, buffer: PackageBuffer) {
+        self.buffer.insert(name, buffer);
+    }
+
     pub fn new() -> Self {
         Self {
             buffer: HashMap::new()
@@ -52,6 +56,14 @@ impl PackageContext {
 
     pub fn package_mut<P: AsRef<Path>>(&mut self) -> &mut Package<P> {
         self.package.as_mut::<Package<P>>()
+    }
+
+    pub fn package_control_ref(&self) -> &PackageControl {
+        self.package_control.as_ref::<PackageControl>()
+    }
+
+    pub fn package_control_mut(&mut self) -> &mut PackageControl {
+        self.package_control.as_mut::<PackageControl>()
     }
 
     pub fn new<P: AsRef<Path>>(package: &Package<P>
