@@ -37,20 +37,15 @@ impl bytecode::Writer for InnerWriter {
 }
 
 impl Control {
-    pub fn compile<P: AsRef<Path>>(&mut self, config: PackageConfig<P>
-        , package_context: &mut PackageContext)
-        -> Vec<PackageBuffer> {
+    pub fn compile<P: AsRef<Path>>(&mut self, config: PackageConfig<P>) {
         let mut obj = RefPtr::from_ref(self);
         let control = obj.as_mut::<Control>();
-        let mut package_buffers = Vec::new();
         for (name, item) in config.into_iter() {
             if item.is_compile {
-                package_buffers.push(
-                    control.single_compile(name, item, package_context));
+                // control.single_compile(name, item, package_context);
             } else {
             }
         }
-        package_buffers
     }
 
     pub fn single_compile<P: AsRef<Path>>(
