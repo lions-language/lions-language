@@ -728,7 +728,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
             let param_typs = call_context.param_typs_clone();
             let (exists, func_str) = 
                 match self.function_is_exist(call_context.func_name_ref_unchecked()
-                , call_context.typ_ref().as_ref(), call_context.package_typ_ref().as_ref()
+                , call_context.typ_ref().as_ref(), call_context.package_str_ref()
                 , call_context.module_str_ref()
                 , param_typs, &mut func_statement, &mut func_define) {
                 Ok(r) => r,

@@ -6,6 +6,7 @@ use libmacro::{FieldGet, FieldGetMove, NewWithAll
     , FieldGetClone};
 use libresult::DescResult;
 use crate::{AddressKey, AddressValue};
+use crate::package::{PackageStr};
 use std::hash::Hash;
 use std::cmp::{PartialEq, Eq};
 use std::collections::VecDeque;
@@ -332,7 +333,7 @@ pub enum AddFunctionResult {
 pub struct FindFunctionContext<'a> {
     pub func_name: &'a str,
     pub typ: Option<&'a Type>,
-    pub package_typ: Option<&'a PackageType>,
+    pub package_str: PackageStr,
     pub func_str: &'a str,
     /*
      * 当前的 mod, 用于类型中方法的重载
@@ -344,13 +345,13 @@ pub struct FindFunctionContext<'a> {
  * 添加函数上下文
  * */
 #[derive(Debug)]
-pub struct AddFunctionContext<'a> {
+pub struct AddFunctionContext {
     /*
      * 通过typ 区别应该存储在哪个对象中
      * */
     pub func_name: String,
     pub typ: Option<Type>,
-    pub package_typ: Option<&'a PackageType>,
+    pub package_str: PackageStr,
     pub func_str: String,
     pub module_str: String,
     /*

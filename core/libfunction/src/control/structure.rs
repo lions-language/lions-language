@@ -5,6 +5,7 @@ use libtype::function::{FunctionControlInterface
     , FindFunctionHandle};
 use libtype::{Type, PackageTypeValue
     , TypeValue};
+use libtype::package::{PackageStr};
 use libcommon::ptr::{RefPtr};
 use crate::compile_unit;
 use super::{StructFunctionControl};
@@ -12,9 +13,9 @@ use std::collections::{HashMap};
 
 impl FunctionControlInterface for StructFunctionControl {
     fn is_exists(&self, context: &FindFunctionContext) -> (bool, FindFunctionHandle) {
-        let pt = context.package_typ.expect("must be specify package type");
-        match pt.typ_ref() {
-            PackageTypeValue::Crate => {
+        let ps = &context.package_str;
+        match ps {
+            PackageStr::Itself => {
                 match self.handler(self.typ_from_find_unchecked(context)) {
                     Some(h) => {
                         h.is_exists(context)
@@ -32,9 +33,9 @@ impl FunctionControlInterface for StructFunctionControl {
 
     fn find_function<'a>(&'a self, context: &FindFunctionContext
         , handle: &'a Option<FindFunctionHandle>) -> FindFunctionResult {
-        let pt = context.package_typ.expect("must be specify package type");
-        match pt.typ_ref() {
-            PackageTypeValue::Crate => {
+        let ps = &context.package_str;
+        match ps {
+            PackageStr::Itself => {
                 match self.handler(self.typ_from_find_unchecked(context)) {
                     Some(h) => {
                         h.find_function(context, handle)
@@ -52,9 +53,9 @@ impl FunctionControlInterface for StructFunctionControl {
 
     fn add_function(&mut self, context: AddFunctionContext
         , handle: Option<FindFunctionHandle>, func: Function) -> AddFunctionResult {
-        let pt = context.package_typ.expect("must be specify package type");
-        match pt.typ_ref() {
-            PackageTypeValue::Crate => {
+        let ps = &context.package_str;
+        match ps {
+            PackageStr::Itself => {
                 // println!("{:?}", func);
                 self.handler_mut(self.typ_from_add_unchecked(&context))
                     .as_mut::<compile_unit::Handler>().add_function(context, handle, func)

@@ -4,14 +4,15 @@ use libtype::function::{FunctionControlInterface
     , Function, FindFuncSuccess
     , FindFunctionHandle};
 use libtype::PackageTypeValue;
+use libtype::package::{PackageStr};
 use crate::compile_unit;
 use super::{NotypeFunctionControl};
 
 impl FunctionControlInterface for NotypeFunctionControl {
     fn is_exists(&self, context: &FindFunctionContext) -> (bool, FindFunctionHandle) {
-        let pt = context.package_typ.expect("must be specify package type");
-        match pt.typ_ref() {
-            PackageTypeValue::Crate => {
+        let ps = &context.package_str;
+        match ps {
+            PackageStr::Itself => {
                 self.compile_unit_handler.is_exists(context)
             },
             _ => {
@@ -22,9 +23,9 @@ impl FunctionControlInterface for NotypeFunctionControl {
 
     fn find_function<'a>(&'a self, context: &FindFunctionContext
         , handle: &'a Option<FindFunctionHandle>) -> FindFunctionResult {
-        let pt = context.package_typ.expect("must be specify package type");
-        match pt.typ_ref() {
-            PackageTypeValue::Crate => {
+        let ps = &context.package_str;
+        match ps {
+            PackageStr::Itself => {
                 self.compile_unit_handler.find_function(context, handle)
             },
             _ => {
@@ -35,9 +36,9 @@ impl FunctionControlInterface for NotypeFunctionControl {
 
     fn add_function(&mut self, context: AddFunctionContext
         , handle: Option<FindFunctionHandle>, func: Function) -> AddFunctionResult {
-        let pt = context.package_typ.expect("must be specify package type");
-        match pt.typ_ref() {
-            PackageTypeValue::Crate => {
+        let ps = &context.package_str;
+        match ps {
+            PackageStr::Itself => {
                 self.compile_unit_handler.add_function(context, handle, func)
             },
             _ => {

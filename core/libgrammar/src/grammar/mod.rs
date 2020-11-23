@@ -16,8 +16,6 @@ use libmacro::{FieldGet, NewWithAll
 #[derive(FieldGet, FieldGetClone
     , FieldGetMove)]
 pub struct CallFuncScopeContext {
-    package_type: Option<PackageType>,
-    package_str: PackageStr,
     module_prefix: Option<String>,
     desc_ctx: DescContext
 }
@@ -69,7 +67,6 @@ pub struct LoadVariantContext {
 pub struct CallFunctionContext {
     func_ptr: RefPtr,
     package_str: PackageStr,
-    package_typ: Option<PackageType>,
     module_str: Option<String>,
     typ: Option<Type>,
     func_name: Option<String>,
@@ -83,9 +80,6 @@ impl CallFunctionContext {
     }
     pub fn set_package_str(&mut self,  package_str: PackageStr) {
         *&mut self.package_str = package_str;
-    }
-    pub fn set_package_typ(&mut self, package_typ: Option<PackageType>) {
-        *&mut self.package_typ = package_typ;
     }
     pub fn set_module_str(&mut self, module_str: Option<String>) {
         *&mut self.module_str = module_str;

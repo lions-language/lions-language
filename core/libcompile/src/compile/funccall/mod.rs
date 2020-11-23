@@ -55,7 +55,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
     fn handle_call_function_prepare_no_point_access(&mut self
         , call_scope_context: CallFuncScopeContext
         , call_context: &mut GrammarCallFunctionContext) -> DescResult {
-        let (package_type, package_str, module_prefix, desc_ctx) =
+        let (module_prefix, desc_ctx) =
             call_scope_context.fields_move();
         /*
          * 根据 module_prefix 计算 module_str
@@ -135,7 +135,6 @@ impl<'a, F: Compile> Compiler<'a, F> {
         } else {
             // call_context.set_func_name(func_str);
             call_context.set_package_str(package_str);
-            call_context.set_package_typ(package_type);
             call_context.set_module_str(module_str);
             /*
             return DescResult::Error(

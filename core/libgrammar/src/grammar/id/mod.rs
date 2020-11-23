@@ -124,8 +124,6 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
          * */
         // println!("{:?}", &desc_ctx);
         let mut scope_context = CallFuncScopeContext{
-            package_type: Some(PackageType::new(PackageTypeValue::Crate)),
-            package_str: PackageStr::Itself,
             module_prefix: module_prefix,
             desc_ctx: desc_ctx.clone()
         };
