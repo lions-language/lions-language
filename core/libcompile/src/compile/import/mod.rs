@@ -25,6 +25,9 @@ impl<'a, F: Compile> Compiler<'a, F> {
             ImportPrefixType::Local => {
                 return self.import_local(context.content, context.alias);
             },
+            ImportPrefixType::Package => {
+                return self.import_package(context.content, context.alias);
+            },
             _ => {
                 unimplemented!("{:?}", context.prefix);
             }
@@ -141,6 +144,49 @@ impl<'a, F: Compile> Compiler<'a, F> {
             }
         };
         self.imports_mapping.add(import_key, module_str);
+        DescResult::Success
+    }
+
+    fn import_package(&mut self, content: &str, alias: Option<String>) -> DescResult {
+        /*
+         * 将 content 中的第一个 段 拿出来
+         * */
+        let mut prefix_index = None;
+        for (i, c) in content.chars().enumerate() {
+            if c == ':' {
+                prefix_index = Some(i);
+                break;
+            }
+        }
+        let index = match prefix_index {
+            Some(index) => index,
+            None => {
+                return DescResult::Error(
+                    format!("after package must be exist `:`"));
+            }
+        };
+        if index == content.len() - 1 {
+            /*
+             * : 在最后
+             * */
+            return DescResult::Error(
+                format!("must be speical module path after `:`"));
+        }
+        /*
+         * 从 PackageContext 中查询
+         * */
+        /*
+         * 写入到 import mapping 中
+         * */
+        /*
+        let import_key = match alias {
+            Some(a) => a,
+            None => {
+                module_name
+            }
+        };
+        self.imports_mapping.add(import_key, module_str);
+        */
         DescResult::Success
     }
 }
