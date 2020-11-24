@@ -1,7 +1,9 @@
+use libcommon::ptr::{RefPtr};
+
 #[derive(Debug, Clone)]
 pub enum PackageStr {
     Itself,
-    Third(String),
+    Third(PackageBufferPtr),
     Empty
 }
 
@@ -11,7 +13,8 @@ impl Default for PackageStr {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct PackageBufferPtr {
+    pub function_control: RefPtr
 }
 

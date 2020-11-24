@@ -171,6 +171,17 @@ impl<'a, F: Compile> Compiler<'a, F> {
         /*
          * 从 PackageContext 中查询
          * */
+        let package_name = &content[0..index];
+        let module_str = &content[index..];
+        let package_buffer_ptr = match self.package_context.package_control_ref().get_ptr_clone(
+            package_name) {
+            Some(bp) => bp,
+            None => {
+                return DescResult::Error(
+                    format!("package: {} is not found", package_name));
+            }
+        };
+        let package_str = PackageStr::Third(package_buffer_ptr);
         /*
          * 写入到 import mapping 中
          * */
