@@ -1,22 +1,17 @@
 use libresult::{DescResult};
-use libtype::instruction::{ConditionStmt, BlockDefine
-    , Instruction, Jump
-    , ConditionStmtTrue
-    , JumpType};
+use libtype::module::Module;
+use libtype::package::PackageStr;
 use libgrammar::lexical::{LexicalParser, CallbackReturnStatus
     , VecU8};
 use libgrammar::grammar::{ImportStmtContext
     , GrammarContext, GrammarParser};
 use libcommon::consts::{ImportPrefixType};
 use libcommon::ptr::{RefPtr};
-use libtype::module::Module;
-use std::path::Path;
 use std::io::Read;
 use crate::compile::{Compile, Compiler
     , InputContext, InputAttribute
-    , FileType, IoAttribute};
-use crate::address::PackageIndex;
-use crate::static_stream::StaticStream;
+    , FileType};
+use crate::compile::imports_mapping::{ImportItem};
 use crate::static_dispatch::{StaticVariantDispatch};
 
 impl<'a, F: Compile> Compiler<'a, F> {
@@ -143,7 +138,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 module_name
             }
         };
-        self.imports_mapping.add(import_key, module_str);
+        self.imports_mapping.add(import_key, ImportItem::new_with_all(
+                module_str, PackageStr::Itself));
         DescResult::Success
     }
 

@@ -526,7 +526,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
 
     pub fn function_is_exist(&mut self, func_name: &str
         , typ: Option<&Type>
-        , package_type: Option<&PackageType>
+        , package_str: PackageStr
         , module_str: &Option<String>
         , mut param_typs: Vec<(Type, TypeAttrubute)>
         , func_statement: &mut Option<FunctionStatement>
@@ -552,7 +552,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
         let find_func_context = FindFunctionContext {
             func_name: func_name,
             typ: typ,
-            package_typ: package_type,
+            package_str: package_str,
             func_str: &func_str,
             module_str: match module_str {
                 Some(v) => v,
@@ -728,7 +728,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
             let param_typs = call_context.param_typs_clone();
             let (exists, func_str) = 
                 match self.function_is_exist(call_context.func_name_ref_unchecked()
-                , call_context.typ_ref().as_ref(), call_context.package_str_ref()
+                , call_context.typ_ref().as_ref(), call_context.package_str_clone()
                 , call_context.module_str_ref()
                 , param_typs, &mut func_statement, &mut func_define) {
                 Ok(r) => r,

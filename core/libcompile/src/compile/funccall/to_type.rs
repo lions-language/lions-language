@@ -58,7 +58,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 let find_func_context = FindFunctionContext {
                     func_name: &func_name,
                     typ: Some(&input_typ),
-                    package_typ: input_package_type.as_ref(),
+                    package_str: input_package_str.clone(),
                     func_str: &expect_func_str,
                     module_str: self.module_stack.current().name_ref()
                 };

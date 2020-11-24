@@ -10,6 +10,7 @@ use libtype::function::{FindFunctionContext, FindFunctionResult
     , CallFunctionReturnData};
 use libtype::{AddressValue
     , AddressType};
+use libtype::package::{PackageStr};
 use libgrammar::token::{TokenValue, TokenData};
 use libgrammar::grammar::{CallFuncScopeContext
     , CallFunctionContext as GrammarCallFunctionContext};
@@ -60,11 +61,12 @@ impl<'a, F: Compile> Compiler<'a, F> {
         /*
          * 根据 module_prefix 计算 module_str
          * */
-        let module_str = match module_prefix {
+        let (module_str, package_str) = match module_prefix {
             Some(mp) => {
                 match self.imports_mapping.get_clone(&mp) {
                     Some(v) => {
-                        Some(v)
+                        let (ms, ps) = v.fields_move();
+                        (Some(ms), ps)
                     },
                     None => {
                         return DescResult::Error(
@@ -73,7 +75,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 }
             },
             None => {
-                None
+                (None, PackageStr::Itself)
             }
         };
         self.scope_context.enter_func_call();
@@ -104,7 +106,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
         let find_func_context = FindFunctionContext {
             func_name: call_context.func_name_ref_unchecked(),
             typ: call_context.typ_ref().as_ref(),
-            package_typ: package_type.as_ref(),
+            package_str: package_str.clone(),
             func_str: &func_str,
             module_str: match &module_str {
                 Some(ms) => ms,
