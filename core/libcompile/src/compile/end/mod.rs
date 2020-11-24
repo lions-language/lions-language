@@ -31,11 +31,10 @@ impl<'a, F: Compile> Compiler<'a, F> {
          * 查找 main 函数的声明
          * 1. main 函数必须在 main.lions 中定义, 否则报错
          * */
-        let package_typ = PackageType::new(PackageTypeValue::Crate);
         let context = FindFunctionContext{
             func_name: "main",
             typ: None,
-            package_typ: Some(&package_typ),
+            package_str: PackageStr::Itself,
             func_str: "main()",
             module_str: self.module_stack.current().name_ref()
         };

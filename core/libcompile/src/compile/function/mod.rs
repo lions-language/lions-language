@@ -15,6 +15,7 @@ use libtype::{PackageType, PackageTypeValue
     , AddressKey, AddressValue
     , AddressType};
 use libtype::instruction::{JumpType, Jump};
+use libtype::package::{PackageStr};
 use crate::compile::{Compile, Compiler, FunctionNamedStmtContext
     , TypeTokenExpand};
 use crate::compile::scope::vars::Variant;
@@ -146,11 +147,10 @@ impl<'a, F: Compile> Compiler<'a, F> {
         // println!("{:?}", self.scope_context.get_current_func_return_ref());
         let func = self.cb.function_define_end(define_context);
         // println!("{:?}", func.func_statement_ref().statement_full_str());
-        let package_typ = PackageType::new(PackageTypeValue::Crate);
         let context = AddFunctionContext{
             func_name: func.func_statement_ref().func_name_clone(),
             typ: func.func_statement_ref().typ_clone(),
-            package_typ: Some(&package_typ),
+            package_str: PackageStr::Itself,
             module_str: self.module_stack.current().to_str().to_string(),
             // func_str: func.func_statement_ref().func_name.clone()
             func_str: func.func_statement_ref().statement_full_str().to_string(),
