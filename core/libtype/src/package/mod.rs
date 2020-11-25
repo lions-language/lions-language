@@ -15,6 +15,7 @@ impl Default for PackageStr {
 
 #[derive(Debug, Clone)]
 pub struct PackageBufferPtr {
-    pub function_control: RefPtr
+    pub function_control: RefPtr,
+    pub module_mapping: RefPtr
 }
 

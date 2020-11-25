@@ -31,6 +31,28 @@ impl<'a, F: Compile> Compiler<'a, F> {
 
     fn import_local(&mut self, content: &str, alias: Option<String>) -> DescResult {
         /*
+         * 首先检测是否编译过
+         * */
+        match self.module_mapping.get(content) {
+            Some(module_name) => {
+            let import_key = match alias {
+                Some(a) => a,
+                None => {
+                    module_name.clone()
+                }
+            };
+            if self.imports_mapping.exists(&import_key) {
+                return DescResult::Error(
+                    format!("imported \"{}\" is imported repeatedly", import_key));
+            }
+            self.imports_mapping.add(import_key, ImportItem::new_with_all(
+                    content.to_string(), PackageStr::Itself));
+                return DescResult::Success;
+            },
+            None => {
+            }
+        }
+        /*
          * 检测路径是否是目录
          * */
         let root_path = self.input_context.root_path.clone();
@@ -129,16 +151,16 @@ impl<'a, F: Compile> Compiler<'a, F> {
             }
         };
         let (module_name, module_str) = module.fields_move();
-        if self.imports_mapping.exists(&module_name) {
-            return DescResult::Error(
-                format!("imported \"{}\" is imported repeatedly", module_name));
-        }
         let import_key = match alias {
             Some(a) => a,
             None => {
                 module_name.clone()
             }
         };
+        if self.imports_mapping.exists(&import_key) {
+            return DescResult::Error(
+                format!("imported \"{}\" is imported repeatedly", import_key));
+        }
         self.imports_mapping.add(import_key, ImportItem::new_with_all(
                 module_str.clone(), PackageStr::Itself));
         self.module_mapping.add(module_str, module_name);
@@ -175,7 +197,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
          * */
         let package_name = &content[0..index];
         let module_str = &content[index..];
-        let package_buffer_ptr = match self.package_context.package_control_ref().get_ptr_clone(
+        let (package_buffer, package_buffer_ptr)
+            = match self.package_context.package_control_ref().get_ptr_clone(
             package_name) {
             Some(bp) => bp,
             None => {
@@ -184,18 +207,29 @@ impl<'a, F: Compile> Compiler<'a, F> {
             }
         };
         let package_str = PackageStr::Third(package_buffer_ptr);
+        let module_name = match package_buffer.module_mapping.get(module_str) {
+            Some(module_name) => module_name,
+            None => {
+                return DescResult::Error(
+                    format!("module: {} is not found in package: {}"
+                        , module_str, package_name));
+            }
+        };
         /*
          * 写入到 import mapping 中
          * */
-        /*
         let import_key = match alias {
             Some(a) => a,
             None => {
-                module_name
+                module_name.clone()
             }
         };
-        self.imports_mapping.add(import_key, module_str);
-        */
+        if self.imports_mapping.exists(&import_key) {
+            return DescResult::Error(
+                format!("imported \"{}\" is imported repeatedly", import_key));
+        }
+        self.imports_mapping.add(import_key, ImportItem::new_with_all(
+                module_str.to_string(), package_str));
         DescResult::Success
     }
 }

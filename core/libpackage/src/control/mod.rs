@@ -10,7 +10,7 @@ use libstructtype::structure::{StructControl};
 use libcompile::compile::{FileType, InputAttribute, InputContext, IoAttribute
     , Compiler};
 use libcompile::bytecode::{self, Bytecode};
-use libcompile::module::{ModuleStack};
+use libcompile::module::{ModuleStack, ModuleMapping};
 use libcompile::define_dispatch::{FunctionDefineDispatch, BlockDefineDispatch};
 use libcompile::define_stream::{DefineStream};
 use libcompile::static_dispatch::{StaticVariantDispatch};
@@ -102,27 +102,30 @@ impl Control {
         let mut module_stack = ModuleStack::new();
         let mut function_control = FunctionControl::new();
         let mut struct_control = StructControl::new();
+        let mut module_mapping = ModuleMapping::new();
         let mut bytecode = Bytecode::new(
                     &mut inner_writer
                     , &mut fdd
                     , &mut bdd);
         let mut grammar_context = GrammarContext{
             cb: Compiler::new(
-                &mut module_stack, Some(module),
-                &mut bytecode,
-                InputContext::new(InputAttribute::new(FileType::Lib)
-                    , path_buf.clone(), path_buf),
-                &mut static_variant_dispatch,
-                package_str, io_attr_clone,
-                &mut function_control,
-                &mut struct_control,
-                package_context
+                &mut module_stack, Some(module)
+                , &mut bytecode
+                , InputContext::new(InputAttribute::new(FileType::Lib)
+                    , path_buf.clone(), path_buf)
+                , &mut static_variant_dispatch
+                , package_str, io_attr_clone
+                , &mut function_control
+                , &mut struct_control
+                , package_context
+                , &mut module_mapping
             )
         };
         let mut grammar_parser = GrammarParser::new(lexical_parser, &mut grammar_context);
         grammar_parser.parser();
         PackageBuffer{
-            function_control: function_control
+            function_control: function_control,
+            module_mapping: module_mapping
         }
     }
 

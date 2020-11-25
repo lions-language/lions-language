@@ -1,6 +1,7 @@
 use libtypecontrol::function::FunctionControl;
 use libcommon::ptr::RefPtr;
 use libtype::package::{PackageBufferPtr};
+use crate::module::{ModuleMapping};
 use std::path::Path;
 use std::collections::HashMap;
 
@@ -18,13 +19,15 @@ impl<P: AsRef<Path>> Package<P> {
 }
 
 pub struct PackageBuffer {
-    pub function_control: FunctionControl
+    pub function_control: FunctionControl,
+    pub module_mapping: ModuleMapping
 }
 
 impl From<&PackageBuffer> for PackageBufferPtr {
     fn from(v: &PackageBuffer) -> Self {
         Self {
-            function_control: RefPtr::from_ref(&v.function_control)
+            function_control: RefPtr::from_ref(&v.function_control),
+            module_mapping: RefPtr::from_ref(&v.module_mapping)
         }
     }
 }
@@ -42,10 +45,10 @@ impl PackageControl {
         self.buffer.get(name)
     }
 
-    pub fn get_ptr_clone(&self, name: &str) -> Option<PackageBufferPtr> {
+    pub fn get_ptr_clone(&self, name: &str) -> Option<(&PackageBuffer, PackageBufferPtr)> {
         match self.buffer.get(name) {
             Some(b) => {
-                Some(b.into())
+                Some((b, b.into()))
             },
             None => {
                 None
