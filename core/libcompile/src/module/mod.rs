@@ -82,5 +82,29 @@ impl ModuleStack {
     }
 }
 
+pub struct ModuleMapping {
+    /*
+     * key: module_str
+     * value: module_name
+     * */
+    str_name: HashMap<String, String>
+}
+
+impl ModuleMapping {
+    pub fn add(&mut self, module_str: String, module_name: String) {
+        self.str_name.insert(module_str, module_name);
+    }
+
+    pub fn get(&self, module_str: &str) -> Option<&String> {
+        self.str_name.get(module_str)
+    }
+
+    pub fn new() -> Self {
+        Self {
+            str_name: HashMap::new()
+        }
+    }
+}
+
 mod undefine_function;
 

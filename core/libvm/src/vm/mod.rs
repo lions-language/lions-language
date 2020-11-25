@@ -265,6 +265,7 @@ mod test {
     use libcompile::static_stream::{StaticStream};
     use libcompile::address::PackageIndex;
     use libcompile::package::{Package, PackageContext, PackageControl};
+    use libcompile::module::{ModuleMapping};
     use super::*;
 
     use std::fs;
@@ -335,6 +336,7 @@ mod test {
         let package = Package::<String>::new();
         let package_control = PackageControl::new();
         let package_context = PackageContext::new(&package, &package_control);
+        let mut module_mapping = ModuleMapping::new();
         let mut bytecode = Bytecode::new(
                 &mut link
                 , &mut fdd
@@ -350,7 +352,8 @@ mod test {
                 &package_str, io_attr_clone,
                 &mut function_control,
                 &mut struct_control,
-                &package_context
+                &package_context,
+                &mut module_mapping
             )
         };
         let mut grammar_parser = GrammarParser::new(lexical_parser, &mut grammar_context);

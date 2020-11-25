@@ -48,7 +48,7 @@ use std::collections::HashMap;
 use crate::address;
 use crate::address::PackageIndex;
 use crate::static_dispatch::{StaticVariantDispatch};
-use crate::module::ModuleStack;
+use crate::module::{ModuleStack, ModuleMapping};
 use scope::context::ScopeContext;
 use crate::define_dispatch::{function::FunctionStatementObject};
 use crate::define::{DefineObject};
@@ -379,7 +379,8 @@ pub struct Compiler<'a, F: Compile> {
     cb: &'a mut F,
     imports_mapping: imports_mapping::ImportsMapping,
     io_attr: IoAttribute,
-    package_context: &'a PackageContext
+    package_context: &'a PackageContext,
+    module_mapping: &'a mut ModuleMapping
 }
 
 impl<'a, F: Compile> Grammar for Compiler<'a, F> {
@@ -609,7 +610,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
         , package_str: &'a str, io_attr: IoAttribute
         , function_control: &'a mut FunctionControl
         , struct_control: &'a mut StructControl
-        , package_context: &'a PackageContext) -> Self {
+        , package_context: &'a PackageContext
+        , module_mapping: &'a mut ModuleMapping) -> Self {
         match module {
             Some(m) => module_stack.push(m),
             None => {
@@ -628,7 +630,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
             cb: cb,
             imports_mapping: imports_mapping::ImportsMapping::new(),
             io_attr: io_attr,
-            package_context: package_context
+            package_context: package_context,
+            module_mapping: module_mapping
         }
     }
 }
@@ -726,6 +729,7 @@ mod test {
         let package = Package::<String>::new();
         let package_control = PackageControl::new();
         let mut package_context = PackageContext::new(&package, &package_control);
+        let mut module_mapping = ModuleMapping::new();
         let mut grammar_context = GrammarContext{
             cb: Compiler::new(&mut module_stack, Some(module)
                     , &mut test_compile, InputContext::new(InputAttribute::new(
@@ -734,7 +738,8 @@ mod test {
                     , &package_str, io_attr_clone
                     , &mut function_control
                     , &mut struct_control
-                    , &package_context)
+                    , &package_context
+                    , &mut module_mapping)
         };
         let mut grammar_parser = GrammarParser::new(lexical_parser, &mut grammar_context);
         grammar_parser.parser();

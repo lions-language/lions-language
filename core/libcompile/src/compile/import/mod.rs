@@ -112,7 +112,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
                     , static_variant_dispatch
                     , self.package_str, self.io_attr.clone()
                     , self.function_control, self.struct_control
-                    , self.package_context)
+                    , self.package_context
+                    , self.module_mapping)
         };
         let mut grammar_parser = GrammarParser::new(lexical_parser, &mut grammar_context);
         grammar_parser.parser();
