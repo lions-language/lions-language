@@ -285,7 +285,7 @@ mod test {
     use libstructtype::structure::{StructControl};
     use crate::compile::{Compiler, InputContext, InputAttribute, FileType
         , IoAttribute};
-    use crate::module::{ModuleStack};
+    use crate::module::{ModuleStack, ModuleMapping};
     use crate::address::{PackageIndex};
     use crate::define_stream::DefineStream;
     use crate::static_dispatch::{StaticVariantDispatch};
@@ -351,7 +351,8 @@ mod test {
                     , &mut bdd);
         let package = Package::<String>::new();
         let package_control = PackageControl::new();
-        let mut package_context = PackageContext::new(&package, &package_control);
+        let package_context = PackageContext::new(&package, &package_control);
+        let mut module_mapping = ModuleMapping::new();
         let mut grammar_context = GrammarContext{
             cb: Compiler::new(
                 &mut module_stack, Some(module),
@@ -362,7 +363,8 @@ mod test {
                 &package_str, io_attr_clone,
                 &mut function_control,
                 &mut struct_control,
-                &mut package_context
+                &package_context,
+                &mut module_mapping
             )
         };
         let mut grammar_parser = GrammarParser::new(lexical_parser, &mut grammar_context);

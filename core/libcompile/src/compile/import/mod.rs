@@ -136,11 +136,12 @@ impl<'a, F: Compile> Compiler<'a, F> {
         let import_key = match alias {
             Some(a) => a,
             None => {
-                module_name
+                module_name.clone()
             }
         };
         self.imports_mapping.add(import_key, ImportItem::new_with_all(
-                module_str, PackageStr::Itself));
+                module_str.clone(), PackageStr::Itself));
+        self.module_mapping.add(module_str, module_name);
         DescResult::Success
     }
 
