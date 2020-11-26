@@ -1,12 +1,6 @@
-use libtype::{PackageType, PackageTypeValue
-    , TypeAttrubute};
-use libtype::package::{PackageStr};
-use libresult::DescResult;
 use super::{GrammarParser, Grammar
-    , CallFuncScopeContext, LoadVariantContext
     , DescContext, ConstNumberContext};
 use crate::lexical::{CallbackReturnStatus};
-use crate::token::{TokenType};
 
 impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, CB> {
     pub fn number_process(&mut self, desc_ctx: DescContext) {

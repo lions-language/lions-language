@@ -2,8 +2,7 @@ use libgrammar::token::{TokenValue, TokenData};
 use libgrammar::grammar::{LoadVariantContext};
 use libtype::function::{AddFunctionContext};
 use libtype::structure::{StructDefine};
-use libtype::{PackageType, PackageTypeValue
-    , AddressType, TypeAttrubute, TypeValue
+use libtype::{AddressType, TypeAttrubute, TypeValue
     , AddressKey, AddressValue};
 use libresult::DescResult;
 use libcommon::ptr::{RefPtr};

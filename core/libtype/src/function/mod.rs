@@ -1,4 +1,4 @@
-use super::{Type, PackageType, TypeAttrubute};
+use super::{Type, TypeAttrubute};
 use libcommon::address::{FunctionAddress, FunctionAddrValue};
 use libcommon::optcode::OptCode;
 use libcommon::ptr::RefPtr;

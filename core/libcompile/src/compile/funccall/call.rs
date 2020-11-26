@@ -12,7 +12,7 @@ use libtype::function::{FindFunctionContext, FindFunctionResult
 use libtype::instruction::{
     AddRefParamAddr, CallSelfFunction};
 use libtype::{AddressValue, AddressKey
-    , AddressType, PackageType};
+    , AddressType};
 use libtype::package::{PackageStr};
 use libgrammar::token::{TokenValue, TokenData};
 use libgrammar::grammar::{CallFuncScopeContext

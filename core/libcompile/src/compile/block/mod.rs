@@ -2,7 +2,6 @@ use libgrammar::token::{TokenValue, TokenData};
 use libgrammar::grammar::{BlockDefineContext};
 use libresult::DescResult;
 use libtype::function::{AddFunctionContext};
-use libtype::{PackageType, PackageTypeValue};
 use crate::compile::{Compile, Compiler, FunctionNamedStmtContext};
 use crate::compile::scope::{ScopeType};
 use crate::define::{DefineObject};

@@ -3,7 +3,6 @@ use libtype::function::{FunctionControlInterface
     , FindFunctionResult, AddFunctionResult
     , Function, FindFuncSuccess
     , FindFunctionHandle};
-use libtype::PackageTypeValue;
 use libtype::package::{PackageStr};
 use crate::compile_unit;
 use super::{NotypeFunctionControl};

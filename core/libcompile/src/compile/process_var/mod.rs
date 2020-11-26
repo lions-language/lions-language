@@ -1,8 +1,7 @@
 use libresult::{DescResult};
 use libgrammar::token::{TokenValue, TokenData};
 use libtype::function::{AddFunctionContext};
-use libtype::{PackageType, PackageTypeValue
-    , AddressType, AddressValue
+use libtype::{AddressType, AddressValue
     , Type, TypeAttrubute};
 use libtype::instruction::{UpdateRefParamAddr
     , DeleteData};

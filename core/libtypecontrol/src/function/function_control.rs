@@ -1,5 +1,5 @@
 use crate::function::{FunctionControl};
-use libtype::{Type, TypeValue, PackageType, PackageTypeValue};
+use libtype::{Type, TypeValue};
 use libtype::function::{FunctionControlInterface, Function};
 use libtype::function::{FindFunctionContext, FindFunctionResult
                         , AddFunctionContext, AddFunctionResult

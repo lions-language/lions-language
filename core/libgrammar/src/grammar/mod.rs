@@ -4,7 +4,7 @@ use crate::token::{TokenType, TokenValue, TokenMethodResult};
 use libcommon::ptr::{RefPtr, HeapPtr};
 use libcommon::address::{FunctionAddrValue};
 use libcommon::consts::{ImportPrefixType};
-use libtype::{Type, PackageType, TypeAttrubute
+use libtype::{Type, TypeAttrubute
     , function::FunctionParamLengthenAttr
     , structure::StructDefine};
 use libtype::function::{FindFunctionHandle};

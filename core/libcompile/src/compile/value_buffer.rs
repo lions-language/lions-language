@@ -1,5 +1,4 @@
-use libtype::{Type, PackageType
-    , PackageTypeValue, TypeAttrubute};
+use libtype::{Type, TypeAttrubute};
 use libtype::package::{PackageStr};
 use libmacro::{FieldGet, FieldGetClone
     , FieldGetMove};

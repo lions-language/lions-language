@@ -3,8 +3,7 @@ use libtype::function::{FunctionControlInterface
     , FindFunctionResult, AddFunctionResult
     , Function, FindFuncSuccess
     , FindFunctionHandle};
-use libtype::{Type, PackageTypeValue
-    , TypeValue};
+use libtype::{Type, TypeValue};
 use libtype::package::{PackageStr};
 use libcommon::ptr::{RefPtr};
 use crate::compile_unit;

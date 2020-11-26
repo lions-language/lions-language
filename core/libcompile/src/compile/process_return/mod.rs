@@ -3,8 +3,8 @@ use libgrammar::token::{TokenValue, TokenData};
 use libtype::function::{FunctionReturn
     , FunctionReturnDataAttr
     , FunctionReturnRefParam};
-use libtype::{PackageType, PackageTypeValue
-    , AddressType, AddressValue
+use libtype::{
+    AddressType, AddressValue
     , AddressKey
     , Type, TypeAttrubute};
 use libtype::instruction::{Jump, RemoveOwnership};

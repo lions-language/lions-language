@@ -1,5 +1,4 @@
-use libtype::{PackageType, PackageTypeValue
-    , TypeAttrubute};
+use libtype::{TypeAttrubute};
 use libtype::package::{PackageStr};
 use libresult::DescResult;
 use crate::grammar::{GrammarParser, Grammar

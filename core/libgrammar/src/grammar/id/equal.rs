@@ -1,13 +1,9 @@
-use libtype::{PackageType, PackageTypeValue
-    , TypeAttrubute};
-use libtype::package::{PackageStr};
 use libresult::DescResult;
 use crate::grammar::{GrammarParser, Grammar
     , ExpressContext
     , VarUpdateStmtContext, ValueUpdateStmtContext
-    , DescContext, EnterPointAccessContext};
+    , DescContext};
 use crate::lexical::{CallbackReturnStatus};
-use crate::token::{TokenType, TokenData};
 
 impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, CB> {
     pub fn id_process_equal(&mut self, desc_ctx: DescContext, name: Option<String>) {

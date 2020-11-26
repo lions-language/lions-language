@@ -10,8 +10,7 @@ use libtype::function::{AddFunctionContext
     , FunctionParamDataItem
     , FunctionReturnData, FunctionReturn
     , FunctionStatement};
-use libtype::{PackageType, PackageTypeValue
-    , TypeAttrubute, Type
+use libtype::{TypeAttrubute, Type
     , AddressKey, AddressValue
     , AddressType};
 use libtype::instruction::{JumpType, Jump};

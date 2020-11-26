@@ -1,4 +1,3 @@
-use libtype::{PackageType, PackageTypeValue};
 use libtype::function::{FindFunctionContext, FindFunctionResult
     , Function, CallFunctionReturnData};
 use libtype::AddressValue;

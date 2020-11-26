@@ -1,11 +1,8 @@
-use libtype::{PackageType, PackageTypeValue};
-use libtype::package::{PackageStr};
 use libresult::DescResult;
 use super::{GrammarParser, Grammar
-    , CallFuncScopeContext, LoadVariantContext
-    , DescContext, ExpressContext};
+    , ExpressContext};
 use crate::lexical::{CallbackReturnStatus};
-use crate::token::{TokenType, TokenData, TokenMethodResult};
+use crate::token::{TokenMethodResult};
 
 impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, CB> {
     pub fn equal_process(&mut self, express_context: &ExpressContext<T, CB>) -> TokenMethodResult {

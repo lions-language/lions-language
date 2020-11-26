@@ -285,31 +285,6 @@ impl Data {
     }
 }
 
-#[derive(Debug, Clone)]
-pub enum PackageTypeValue {
-    Crate,
-    Unknown
-}
-
-impl Default for PackageTypeValue {
-    fn default() -> Self {
-        PackageTypeValue::Unknown
-    }
-}
-
-#[derive(Debug, Clone, Default, FieldGet, FieldGetClone)]
-pub struct PackageType {
-    typ: PackageTypeValue
-}
-
-impl PackageType {
-    pub fn new(typ: PackageTypeValue) -> Self {
-        Self {
-            typ: typ
-        }
-    }
-}
-
 impl Default for Type {
     fn default() -> Self {
         Type::new(TypeValue::Empty, TypeAttrubute::Move)
