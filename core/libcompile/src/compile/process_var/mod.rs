@@ -149,9 +149,9 @@ impl<'a, F: Compile> Compiler<'a, F> {
          * 变量是移动类型 => 1. 将变量原来指向的内存释放掉(告诉虚拟机释放);
          *                   2. 为变量绑定新的地址(编译期)
          * */
-        let (var_typ, var_addr, var_typ_attr, var_package_type, var_package_str, var_context)
+        let (var_typ, var_addr, var_typ_attr, var_package_str, var_context)
             = left_value.fields_move();
-        let (expr_typ, expr_addr, expr_typ_attr, expr_package_type, expr_package_str, expr_context)
+        let (expr_typ, expr_addr, expr_typ_attr, expr_package_str, expr_context)
             = right_value.fields_move();
         if var_typ.typ_ref() != expr_typ.typ_ref() {
             return DescResult::Error(
@@ -279,9 +279,9 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 return e;
             }
         };
-        let (var_typ, var_addr, var_typ_attr, var_package_type, var_package_str, var_context)
+        let (var_typ, var_addr, var_typ_attr, var_package_str, var_context)
             = left_value.fields_move();
-        let (expr_typ, expr_addr, expr_typ_attr, expr_package_type, expr_package_str, expr_context)
+        let (expr_typ, expr_addr, expr_typ_attr, expr_package_str, expr_context)
             = right_value.fields_move();
         /*
          * 检测: 如果 var 不是引用, 就是不允许的

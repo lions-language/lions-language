@@ -20,7 +20,6 @@ pub struct ValueBufferItem {
     pub typ: Type,
     pub addr: Address,
     pub typ_attr: TypeAttrubute,
-    pub package_type: Option<PackageType>,
     pub package_str: PackageStr,
     pub context: ValueBufferItemContext
 }
@@ -69,7 +68,6 @@ impl ValueBuffer {
             typ: typ,
             addr: addr,
             typ_attr: TypeAttrubute::Move,
-            package_type: None,
             package_str: PackageStr::Empty,
             context: ValueBufferItemContext::Null
         });
@@ -81,7 +79,6 @@ impl ValueBuffer {
             typ: typ,
             addr: addr,
             typ_attr: typ_attr,
-            package_type: None,
             package_str: PackageStr::Empty,
             context: ValueBufferItemContext::Null
         });
@@ -93,7 +90,6 @@ impl ValueBuffer {
             typ: typ,
             addr: addr,
             typ_attr: TypeAttrubute::Move,
-            package_type: None,
             package_str: PackageStr::Empty,
             context: context
         });
@@ -105,7 +101,6 @@ impl ValueBuffer {
             typ: typ,
             addr: addr,
             typ_attr: typ_attr,
-            package_type: None,
             package_str: PackageStr::Empty,
             context: context
         });

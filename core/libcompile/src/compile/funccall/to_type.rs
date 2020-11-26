@@ -21,7 +21,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
         , is_auto_call_totype: bool)
         -> Result<(Type, TypeAttrubute, AddressValue), DescResult> {
         // let input_typ = input_value.typ_ref();
-        let (input_typ, input_addr, input_typ_attr, input_package_type
+        let (input_typ, input_addr, input_typ_attr
             , input_package_str, input_value_context) = input_value.fields_move();
         if !is_auto_call_totype {
             /*

@@ -241,7 +241,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
 
     pub fn fetch_value_buffer(&mut self, input_value: ValueBufferItem, expect_typ: &Type)
         -> (Type, TypeAttrubute, AddressValue) {
-        let (input_typ, input_addr, input_typ_attr, _
+        let (input_typ, input_addr, input_typ_attr
             , _, _) = input_value.fields_move();
         return (input_typ, input_typ_attr, input_addr.addr());
     }
