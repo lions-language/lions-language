@@ -196,7 +196,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
          * 从 PackageContext 中查询
          * */
         let package_name = &content[0..index];
-        let module_str = &content[index..];
+        let module_str = &content[index+1..];
         let (package_buffer, package_buffer_ptr)
             = match self.package_context.package_control_ref().get_ptr_clone(
             package_name) {

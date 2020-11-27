@@ -77,7 +77,7 @@ impl Control {
                 panic!("");
             }
         };
-        let path_buf = Path::new(&file).parent().expect("should not happend").to_path_buf();
+        let path_buf = Path::new(&lib_file).parent().expect("should not happend").to_path_buf();
         let io_attr = IoAttribute::new_with_all(item.read_once_max);
         let io_attr_clone = io_attr.clone();
         let file_name = match file.to_str() {
