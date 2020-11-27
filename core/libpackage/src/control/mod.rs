@@ -55,7 +55,14 @@ impl Control {
          * 获取包路径, 拼接成 package_path/lib.lions
          * */
         let file: &Path = item.path.as_ref();
-        let lib_file = file.join(consts::LIB_LIONS_NAME);
+        let lib_file = match &item.lib_path {
+            Some(lib_path) => {
+                file.join(lib_path).join(consts::LIB_LIONS_NAME)
+            },
+            None => {
+                file.join(consts::LIB_LIONS_NAME)
+            }
+        };
         let mut f = match fs::File::open(&lib_file) {
             Ok(f) => f,
             Err(_err) => {

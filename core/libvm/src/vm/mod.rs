@@ -334,20 +334,21 @@ mod test {
         let mut function_control = FunctionControl::new();
         let mut struct_control = StructControl::new();
         let package = Package::<String>::new();
-        let package_control = PackageControl::new();
+        let mut package_control = PackageControl::new();
         {
             /*
              * 添加 一个 package
              * */
-            let package = Package::<PathBuf>::new();
-            let package_control = PackageControl::new();
-            let package_context = PackageContext::new(&package, &package_control);
-            let config_item = libpackage::config::PackageConfigItem::<PathBuf>::new(
-                true, 1, Path::new("libmath").to_path_buf(), None);
+            let this_package = Package::<PathBuf>::new();
+            let this_package_control = PackageControl::new();
+            let this_package_context = PackageContext::new(&this_package, &this_package_control);
+            let this_package_name = "libnet";
+            let this_config_item = libpackage::config::PackageConfigItem::<PathBuf>::new(
+                true, 1, Path::new("tests/packages").join(this_package_name).to_path_buf(), None);
             let mut control = libpackage::control::Control::new();
-            let package_buffer = control.single_compile::<PathBuf>("libmath"
-                , &config_item, &package_context);
-            // package_control.insert(package_buffer);
+            let this_package_buffer = control.single_compile::<PathBuf>(this_package_name
+                , &this_config_item, &this_package_context);
+            package_control.insert(this_package_name.to_string(), this_package_buffer);
         }
         let package_context = PackageContext::new(&package, &package_control);
         let mut module_mapping = ModuleMapping::new();
