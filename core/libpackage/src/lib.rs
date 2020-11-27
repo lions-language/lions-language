@@ -1,2 +1,2 @@
-mod config;
-mod control;
+pub mod config;
+pub mod control;

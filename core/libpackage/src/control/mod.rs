@@ -25,7 +25,7 @@ use std::path::Path;
 use std::fs;
 use std::io::Read;
 
-struct Control {
+pub struct Control {
 }
 
 struct InnerWriter {
@@ -59,7 +59,14 @@ impl Control {
         let mut f = match fs::File::open(&lib_file) {
             Ok(f) => f,
             Err(_err) => {
-                exception::exit(format!("read file {:?} error", lib_file));
+                match lib_file.to_str() {
+                    Some(s) => {
+                        exception::exit(format!("read file {} error", s));
+                    },
+                    None => {
+                        exception::exit(format!("read file {:?} error", lib_file));
+                    }
+                }
                 panic!("");
             }
         };

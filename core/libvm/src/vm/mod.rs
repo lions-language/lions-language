@@ -270,7 +270,7 @@ mod test {
 
     use std::fs;
     use std::io::Read;
-    use std::path::Path;
+    use std::path::{Path, PathBuf};
 
     // use rust_parse::cmd::CCmd;
 
@@ -335,6 +335,20 @@ mod test {
         let mut struct_control = StructControl::new();
         let package = Package::<String>::new();
         let package_control = PackageControl::new();
+        {
+            /*
+             * 添加 一个 package
+             * */
+            let package = Package::<PathBuf>::new();
+            let package_control = PackageControl::new();
+            let package_context = PackageContext::new(&package, &package_control);
+            let config_item = libpackage::config::PackageConfigItem::<PathBuf>::new(
+                true, 1, Path::new("libmath").to_path_buf(), None);
+            let mut control = libpackage::control::Control::new();
+            let package_buffer = control.single_compile::<PathBuf>("libmath"
+                , &config_item, &package_context);
+            // package_control.insert(package_buffer);
+        }
         let package_context = PackageContext::new(&package, &package_control);
         let mut module_mapping = ModuleMapping::new();
         let mut bytecode = Bytecode::new(
@@ -344,16 +358,16 @@ mod test {
             );
         let mut grammar_context = GrammarContext{
             cb: Compiler::new(
-                &mut module_stack, Some(module),
-                &mut bytecode,
-                InputContext::new(InputAttribute::new(FileType::Main)
-                    , path_buf.clone(), path_buf.clone()),
-                &mut static_variant_dispatch,
-                &package_str, io_attr_clone,
-                &mut function_control,
-                &mut struct_control,
-                &package_context,
-                &mut module_mapping
+                &mut module_stack, Some(module)
+                , &mut bytecode
+                , InputContext::new(InputAttribute::new(FileType::Main)
+                    , path_buf.clone(), path_buf.clone())
+                , &mut static_variant_dispatch
+                , &package_str, io_attr_clone
+                , &mut function_control
+                , &mut struct_control
+                , &package_context
+                , &mut module_mapping
             )
         };
         let mut grammar_parser = GrammarParser::new(lexical_parser, &mut grammar_context);
