@@ -9,6 +9,8 @@ use super::{NotypeFunctionControl};
 
 impl FunctionControlInterface for NotypeFunctionControl {
     fn is_exists(&self, context: &FindFunctionContext) -> (bool, FindFunctionHandle) {
+        self.compile_unit_handler.is_exists(context)
+        /*
         let ps = &context.package_str;
         match ps {
             PackageStr::Itself => {
@@ -18,10 +20,13 @@ impl FunctionControlInterface for NotypeFunctionControl {
                 unimplemented!();
             }
         }
+        */
     }
 
     fn find_function<'a>(&'a self, context: &FindFunctionContext
         , handle: &'a Option<FindFunctionHandle>) -> FindFunctionResult {
+        self.compile_unit_handler.find_function(context, handle)
+        /*
         let ps = &context.package_str;
         match ps {
             PackageStr::Itself => {
@@ -31,6 +36,7 @@ impl FunctionControlInterface for NotypeFunctionControl {
                 unimplemented!();
             }
         }
+        */
     }
 
     fn add_function(&mut self, context: AddFunctionContext
