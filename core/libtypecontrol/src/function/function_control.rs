@@ -15,7 +15,7 @@ impl FunctionControl {
             , context).is_exists(context)
     }
 
-    pub fn find_function<'a>(&'a mut self, context: &FindFunctionContext
+    pub fn find_function<'a>(&'a mut self, context: &'a FindFunctionContext
         , handle: &'a Option<FindFunctionHandle>) -> FindFunctionResult {
         self.find_instance_find(&context.typ, &context.package_str
             , context).find_function(context, handle)
@@ -31,9 +31,9 @@ impl FunctionControl {
      * 为了代码的可维护性, 将损失一些运行时开销 (但是牺牲的性能很少, 因为实例很少)
      * 因为无法在编译期确定返回类型, 所以 使用 dyn 获取实例对象 (运行时计算类型, 编译期预留指针空间)
      * */
-    fn find_instance_find(&mut self, typ: &Option<&Type>
-        , package_str: &PackageStr
-        , find_context: &FindFunctionContext) -> &mut dyn FunctionControlInterface {
+    fn find_instance_find<'a>(&'a mut self, typ: &Option<&Type>
+        , package_str: &'a PackageStr
+        , find_context: &FindFunctionContext) -> &'a dyn FunctionControlInterface {
         match typ {
             Some(ty) => {
                 match ty.typ_ref() {
@@ -58,10 +58,13 @@ impl FunctionControl {
                         PackageStr::Itself => {
                             &mut self.notype_function_control
                         },
-                        _ => {
+                        PackageStr::Third(pbp) => {
                             /*
                              * 如果是第三方包中的方法, 从第三方包中查找函数
                              * */
+                            &pbp.function_control.as_ref::<FunctionControl>().notype_function_control
+                        },
+                        _ => {
                             unimplemented!();
                         }
                     }
