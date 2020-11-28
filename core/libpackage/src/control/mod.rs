@@ -139,7 +139,8 @@ impl Control {
         grammar_parser.parser();
         PackageBuffer{
             function_control: function_control,
-            module_mapping: module_mapping
+            module_mapping: module_mapping,
+            define_stream: ds
         }
     }
 

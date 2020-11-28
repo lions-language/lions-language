@@ -113,6 +113,38 @@ impl LinkDefine {
         }
     }
 
+    pub fn call_package_func(&mut self, call_context: &mut CallFunction
+        , define_stream: RefPtr) {
+        let src_addr = match call_context.define_addr_mut() {
+            FunctionAddress::Define(v) => {
+                v
+            },
+            _ => {
+                unimplemented!();
+            }
+        };
+        /*
+        /*
+         * 如果定义过 => 直接将定义过的地址拿来
+         * */
+        if let Some(addr) = self.is_defined(src_addr) {
+            *src_addr = addr.clone();
+            return;
+        };
+        */
+        /*
+         * 修改地址
+         * */
+        let src_addr_clone = src_addr.clone();
+        *src_addr = self.alloc_func_define_addr(src_addr);
+        let mut ds = define_stream.clone();
+        let ds = ds.as_mut::<DefineStream>();
+        let define_block = ds.read(&src_addr_clone, true);
+        for mut instruction in define_block {
+            self.execute(instruction.as_mut::<Instruction>(), false);
+        }
+    }
+
     pub fn process_block_define(&mut self, block_define: &mut BlockDefine) {
         let src_addr = block_define.addr_mut();
         /*
@@ -162,12 +194,12 @@ impl LinkDefine {
                          * */
                         self.call_local_func(value);
                     },
-                    PackageStr::Third(_) => {
+                    PackageStr::Third(pbp) => {
                         /*
                          * 1. 遇到新的包, 需要获取包编译后的函数位置, 然后链接到这里来
                          * 2. 使用链接后的地址, 重写这里的 call 地址
                          * */
-                        unimplemented!();
+                        self.call_package_func(value, pbp.define_stream.clone());
                     },
                     _ => {
                         panic!("should not happend");

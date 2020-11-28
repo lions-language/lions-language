@@ -1,6 +1,7 @@
 use libtypecontrol::function::FunctionControl;
 use libcommon::ptr::RefPtr;
 use libtype::package::{PackageBufferPtr};
+use crate::define_stream::DefineStream;
 use crate::module::{ModuleMapping};
 use std::path::Path;
 use std::collections::HashMap;
@@ -20,14 +21,16 @@ impl<P: AsRef<Path>> Package<P> {
 
 pub struct PackageBuffer {
     pub function_control: FunctionControl,
-    pub module_mapping: ModuleMapping
+    pub module_mapping: ModuleMapping,
+    pub define_stream: DefineStream
 }
 
 impl From<&PackageBuffer> for PackageBufferPtr {
     fn from(v: &PackageBuffer) -> Self {
         Self {
             function_control: RefPtr::from_ref(&v.function_control),
-            module_mapping: RefPtr::from_ref(&v.module_mapping)
+            module_mapping: RefPtr::from_ref(&v.module_mapping),
+            define_stream: RefPtr::from_ref(&v.define_stream)
         }
     }
 }
