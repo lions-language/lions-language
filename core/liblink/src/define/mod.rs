@@ -54,7 +54,7 @@ impl LinkDefine {
          * */
         self.code_segment.push_back(instruction.clone());
         self.index += 1;
-        self.execute(instruction, true);
+        self.execute(instruction, true, None);
         /*
          * 修改地址完成 => 将 define_stream 中的指令拷贝到代码段中
          * */
@@ -109,12 +109,12 @@ impl LinkDefine {
         let ds = ds.as_mut::<DefineStream>();
         let define_block = ds.read(&src_addr_clone, true);
         for mut instruction in define_block {
-            self.execute(instruction.as_mut::<Instruction>(), false);
+            self.execute(instruction.as_mut::<Instruction>(), false, None);
         }
     }
 
     pub fn call_package_func(&mut self, call_context: &mut CallFunction
-        , define_stream: RefPtr) {
+        , define_stream: RefPtr, ps: &PackageStr) {
         let src_addr = match call_context.define_addr_mut() {
             FunctionAddress::Define(v) => {
                 v
@@ -141,7 +141,7 @@ impl LinkDefine {
         let ds = ds.as_mut::<DefineStream>();
         let define_block = ds.read(&src_addr_clone, true);
         for mut instruction in define_block {
-            self.execute(instruction.as_mut::<Instruction>(), false);
+            self.execute(instruction.as_mut::<Instruction>(), false, Some(ps));
         }
     }
 
@@ -163,7 +163,7 @@ impl LinkDefine {
         let ds = ds.as_mut::<DefineStream>();
         let define_block = ds.read(&src_addr_clone, true);
         for mut instruction in define_block {
-            self.execute(instruction.as_mut::<Instruction>(), false);
+            self.execute(instruction.as_mut::<Instruction>(), false, None);
         }
     }
 
@@ -182,12 +182,19 @@ impl LinkDefine {
         // *src_addr = self.alloc_func_define_addr(src_addr);
     }
 
-    fn execute(&mut self, instruction: &mut Instruction, is_first: bool) {
+    fn execute(&mut self, instruction: &mut Instruction, is_first: bool
+        , package_str: Option<&PackageStr>) {
         // println!("{:?}", instruction);
         match instruction {
             Instruction::CallFunction(value) => {
-                let ps = value.package_str_ref();
-                match ps {
+                // let ps = value.package_str_ref();
+                let ps = match package_str {
+                    Some(ps) => ps.clone(),
+                    None => {
+                        value.package_str_clone()
+                    }
+                };
+                match &ps {
                     PackageStr::Itself => {
                         /*
                          * 从 define_stream 中查找
@@ -199,7 +206,7 @@ impl LinkDefine {
                          * 1. 遇到新的包, 需要获取包编译后的函数位置, 然后链接到这里来
                          * 2. 使用链接后的地址, 重写这里的 call 地址
                          * */
-                        self.call_package_func(value, pbp.define_stream.clone());
+                        self.call_package_func(value, pbp.define_stream.clone(), &ps);
                     },
                     _ => {
                         panic!("should not happend");
@@ -219,7 +226,7 @@ impl LinkDefine {
                 /*
                  * 从 static_stream 中查找
                  * */
-                self.link_static.process(instruction);
+                self.link_static.process(instruction, package_str);
             },
             _ => {
             }

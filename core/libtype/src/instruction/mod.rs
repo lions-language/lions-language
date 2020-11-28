@@ -26,7 +26,8 @@ pub struct CallPrimevalFunction {
     pub return_data: CallFunctionReturnData
 }
 
-#[derive(Debug, FieldGet, Clone)]
+#[derive(Debug, FieldGet, Clone
+    , FieldGetClone)]
 pub struct CallFunction {
     pub package_str: PackageStr,
     pub define_addr: FunctionAddress,

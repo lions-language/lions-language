@@ -12,10 +12,17 @@ pub struct LinkStatic {
 }
 
 impl LinkStatic {
-    pub fn process(&mut self, instruction: &Instruction) {
+    pub fn process(&mut self, instruction: &Instruction
+        , package_str: Option<&PackageStr>) {
         match instruction {
             Instruction::ReadStaticVariant(value) => {
-                let ps = value.package_str_ref();
+                // let ps = value.package_str_ref();
+                let ps = match package_str {
+                    Some(ps) => ps.clone(),
+                    None => {
+                        value.package_str_clone()
+                    }
+                };
                 match ps {
                     PackageStr::Itself => {
                         /*
