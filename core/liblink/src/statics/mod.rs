@@ -12,7 +12,7 @@ pub struct LinkStatic {
 }
 
 impl LinkStatic {
-    pub fn process(&mut self, instruction: &Instruction
+    pub fn process(&mut self, instruction: &mut Instruction
         , package_str: Option<&PackageStr>) {
         match instruction {
             Instruction::ReadStaticVariant(value) => {
@@ -29,12 +29,18 @@ impl LinkStatic {
                          * 由于是自身包中的静态量 => 不用重新定义地址
                          * */
                     },
-                    _ => {
+                    PackageStr::Third(pbp) => {
                         /*
                          * 1. 查看是否加载过该包
                          *  未加载过: 读取包中的静态区域, 然后追加到这里, 并写入内存
                          * 2. 更改地址
                          * */
+                        let static_data = pbp.static_stream.as_ref::<StaticStream>().data_ref_unchecked(value.static_addr_ref());
+                        self.static_area.push_back(static_data.clone());
+                        let index = self.static_area.len() - 1;
+                        *value.static_addr_mut() = value.static_addr_ref().clone_use_index(index);
+                    },
+                    _ => {
                         unimplemented!();
                     }
                 }

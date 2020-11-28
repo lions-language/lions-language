@@ -317,6 +317,12 @@ impl AddressKey {
         o
     }
 
+    pub fn clone_use_index(&self, n: usize) -> Self {
+        let mut o = self.clone();
+        o.index = n as u64;
+        o
+    }
+
     pub fn new_single(index: u64) -> Self {
         AddressKey::new_with_all(index, 0, 0, 0, 0)
     }

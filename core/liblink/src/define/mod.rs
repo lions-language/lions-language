@@ -146,6 +146,7 @@ impl LinkDefine {
     }
 
     pub fn process_block_define(&mut self, block_define: &mut BlockDefine) {
+        panic!("{:?}", block_define);
         let src_addr = block_define.addr_mut();
         /*
          * 如果定义过 => 直接将定义过的地址拿来
