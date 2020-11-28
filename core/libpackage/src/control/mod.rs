@@ -140,7 +140,8 @@ impl Control {
         PackageBuffer{
             function_control: function_control,
             module_mapping: module_mapping,
-            define_stream: ds
+            define_stream: ds,
+            static_stream: static_stream
         }
     }
 

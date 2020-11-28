@@ -17,6 +17,7 @@ impl Default for PackageStr {
 pub struct PackageBufferPtr {
     pub function_control: RefPtr,
     pub module_mapping: RefPtr,
-    pub define_stream: RefPtr
+    pub define_stream: RefPtr,
+    pub static_stream: RefPtr
 }
 
