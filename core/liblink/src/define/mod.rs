@@ -17,6 +17,21 @@ use crate::statics::LinkStatic;
  *  1. 自身的定义的起始地址是0(自身包的定义写在最前面), 也就是说第三方包的起始地址至少是自身包的长度
  * */
 
+#[derive(PartialEq, Eq, Hash, Clone)]
+struct DefineUnique {
+    index: usize,
+    define_stream_ptr: RefPtr
+}
+
+impl DefineUnique {
+    fn new(index: usize, define_stream_ptr: RefPtr) -> Self {
+        Self {
+            index: index,
+            define_stream_ptr: define_stream_ptr
+        }
+    }
+}
+
 pub struct LinkDefine {
     define_stream: RefPtr,
     link_static: LinkStatic,
@@ -26,12 +41,12 @@ pub struct LinkDefine {
      * 作用:
      *  防止重复写入
      * */
-    define_mapping: HashMap<usize, FunctionAddrValue>,
+    define_mapping: HashMap<DefineUnique, FunctionAddrValue>,
     /*
      * 每次向 define_mapping 插入的时候, 需要向该数组中追加一个元素
      * 最后按照该数组中的值依次 拷贝 DefineStream 中对应的 DefineItem
      * */
-    define_seque: Vec<usize>,
+    define_seque: Vec<DefineUnique>,
     index: usize,
     code_segment: VecDeque<Instruction>,
     /*
@@ -67,10 +82,14 @@ impl LinkDefine {
          * 如果这样, 将导致 这里的 self 和 后面的 self.execute 在同一个作用域下的两个可变引用
          * 也就是借用检查器会不通过
          * */
+        /*
         let mut ds = self.define_stream.clone();
         let ds = ds.as_mut::<DefineStream>();
-        for index in self.define_seque.iter() {
-            self.code_segment.append(ds.get_all_ins_mut_unchecked(index.clone()).get_mut());
+        */
+        for du in self.define_seque.iter() {
+            let mut ds = du.define_stream_ptr.clone();
+            let ds = ds.as_mut::<DefineStream>();
+            self.code_segment.append(ds.get_all_ins_mut_unchecked(du.index.clone()).get_mut());
         }
         /*
          * print
@@ -84,7 +103,8 @@ impl LinkDefine {
         &mut self.link_static
     }
 
-    pub fn call_local_func(&mut self, call_context: &mut CallFunction) {
+    pub fn call_local_func(&mut self, call_context: &mut CallFunction
+        , define_stream: RefPtr) {
         let src_addr = match call_context.define_addr_mut() {
             FunctionAddress::Define(v) => {
                 v
@@ -96,7 +116,7 @@ impl LinkDefine {
         /*
          * 如果定义过 => 直接将定义过的地址拿来
          * */
-        if let Some(addr) = self.is_defined(src_addr) {
+        if let Some(addr) = self.is_defined(src_addr, define_stream.clone()) {
             *src_addr = addr.clone();
             return;
         };
@@ -104,7 +124,7 @@ impl LinkDefine {
          * 修改地址
          * */
         let src_addr_clone = src_addr.clone();
-        *src_addr = self.alloc_func_define_addr(src_addr);
+        *src_addr = self.alloc_func_define_addr(src_addr, define_stream);
         let mut ds = self.define_stream.clone();
         let ds = ds.as_mut::<DefineStream>();
         let define_block = ds.read(&src_addr_clone, true);
@@ -124,21 +144,18 @@ impl LinkDefine {
             }
         };
         /*
-        /*
          * 如果定义过 => 直接将定义过的地址拿来
-         * TODO
          * */
-        if let Some(addr) = self.is_defined(src_addr) {
+        if let Some(addr) = self.is_defined(src_addr, define_stream.clone()) {
             *src_addr = addr.clone();
             return;
         };
-        */
         /*
          * 修改地址
          * */
         let src_addr_clone = src_addr.clone();
-        *src_addr = self.alloc_func_define_addr(src_addr);
-        let mut ds = define_stream.clone();
+        *src_addr = self.alloc_func_define_addr(src_addr, define_stream.clone());
+        let mut ds = define_stream;
         let ds = ds.as_mut::<DefineStream>();
         let define_block = ds.read(&src_addr_clone, true);
         for mut instruction in define_block {
@@ -146,12 +163,13 @@ impl LinkDefine {
         }
     }
 
-    pub fn process_block_define(&mut self, block_define: &mut BlockDefine) {
+    pub fn process_block_define(&mut self, block_define: &mut BlockDefine
+        , define_stream: RefPtr) {
         let src_addr = block_define.addr_mut();
         /*
          * 如果定义过 => 直接将定义过的地址拿来
          * */
-        if let Some(addr) = self.is_defined(src_addr) {
+        if let Some(addr) = self.is_defined(src_addr, define_stream.clone()) {
             *src_addr = addr.clone();
             return;
         };
@@ -159,7 +177,7 @@ impl LinkDefine {
          * 修改地址
          * */
         let src_addr_clone = src_addr.clone();
-        *src_addr = self.alloc_func_define_addr(src_addr);
+        *src_addr = self.alloc_func_define_addr(src_addr, define_stream);
         let mut ds = self.define_stream.clone();
         let ds = ds.as_mut::<DefineStream>();
         let define_block = ds.read(&src_addr_clone, true);
@@ -200,7 +218,7 @@ impl LinkDefine {
                         /*
                          * 从 define_stream 中查找
                          * */
-                        self.call_local_func(value);
+                        self.call_local_func(value, self.define_stream.clone());
                     },
                     PackageStr::Third(pbp) => {
                         /*
@@ -215,10 +233,12 @@ impl LinkDefine {
                 }
             },
             Instruction::ConditionStmt(value) => {
-                self.process_block_define(value.true_handle_mut().define_mut());
+                self.process_block_define(value.true_handle_mut().define_mut()
+                    , self.define_stream.clone());
             },
             Instruction::ExecuteBlock(value) => {
-                self.process_block_define(value);
+                self.process_block_define(value
+                    , self.define_stream.clone());
             },
             Instruction::CallSelfFunction(value) => {
                 self.call_self_func(value);
@@ -234,16 +254,26 @@ impl LinkDefine {
         }
     }
 
-    fn is_defined(&mut self, src_addr: &FunctionAddrValue)
+    fn is_defined(&mut self, src_addr: &FunctionAddrValue, define_stream_ptr: RefPtr)
         -> Option<&FunctionAddrValue> {
-        self.define_mapping.get(src_addr.index_ref())
+        self.define_mapping.get(&DefineUnique{
+            index: src_addr.index_clone(),
+            define_stream_ptr: define_stream_ptr
+        })
+        // self.define_mapping.get(src_addr.index_ref())
     }
 
-    fn alloc_func_define_addr(&mut self, src_addr: &FunctionAddrValue)
+    fn alloc_func_define_addr(&mut self, src_addr: &FunctionAddrValue
+        , define_stream: RefPtr)
         -> FunctionAddrValue {
         // let src_index = src_addr.index_clone();
         // let src_length = src_addr.length_clone();
-        match self.define_mapping.get(src_addr.index_ref()) {
+        // match self.define_mapping.get(src_addr.index_ref()) {
+        let define_unique = DefineUnique{
+            index: src_addr.index_clone(),
+            define_stream_ptr: define_stream.clone()
+        };
+        match self.define_mapping.get(&define_unique) {
             Some(addr) => {
                 /*
                  * 存在 => 直接返回地址
@@ -256,19 +286,19 @@ impl LinkDefine {
                  * */
                 /*
                 */
-                let ds = self.define_stream.as_ref::<DefineStream>();
+                let ds = define_stream.as_ref::<DefineStream>();
                 let item_object = ds.item_clone_unchecked(src_addr);
                 let item = item_object.get();
                 let addr = FunctionAddrValue::new_valid(
                     self.index.clone(), item.length());
                 item_object.restore(item);
                 /*
-                let addr = FunctionAddrValue::new(
-                    self.index.clone(), src_addr.length_clone());
-                */
                 self.define_mapping.insert(
                     src_addr.index_clone(), addr.clone());
                 self.define_seque.push(src_addr.index_clone());
+                */
+                self.define_mapping.insert(define_unique.clone(), addr.clone());
+                self.define_seque.push(define_unique);
                 self.index += addr.length_clone();
                 addr
             }
