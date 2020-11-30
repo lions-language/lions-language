@@ -20,14 +20,14 @@ use crate::statics::LinkStatic;
 #[derive(PartialEq, Eq, Hash, Clone)]
 struct DefineUnique {
     index: usize,
-    define_stream_ptr: RefPtr
+    define_stream: RefPtr
 }
 
 impl DefineUnique {
-    fn new(index: usize, define_stream_ptr: RefPtr) -> Self {
+    fn new(index: usize, define_stream: RefPtr) -> Self {
         Self {
             index: index,
-            define_stream_ptr: define_stream_ptr
+            define_stream: define_stream
         }
     }
 }
@@ -87,7 +87,7 @@ impl LinkDefine {
         let ds = ds.as_mut::<DefineStream>();
         */
         for du in self.define_seque.iter() {
-            let mut ds = du.define_stream_ptr.clone();
+            let mut ds = du.define_stream.clone();
             let ds = ds.as_mut::<DefineStream>();
             self.code_segment.append(ds.get_all_ins_mut_unchecked(du.index.clone()).get_mut());
         }
@@ -254,11 +254,11 @@ impl LinkDefine {
         }
     }
 
-    fn is_defined(&mut self, src_addr: &FunctionAddrValue, define_stream_ptr: RefPtr)
+    fn is_defined(&mut self, src_addr: &FunctionAddrValue, define_stream: RefPtr)
         -> Option<&FunctionAddrValue> {
         self.define_mapping.get(&DefineUnique{
             index: src_addr.index_clone(),
-            define_stream_ptr: define_stream_ptr
+            define_stream: define_stream
         })
         // self.define_mapping.get(src_addr.index_ref())
     }
@@ -271,7 +271,7 @@ impl LinkDefine {
         // match self.define_mapping.get(src_addr.index_ref()) {
         let define_unique = DefineUnique{
             index: src_addr.index_clone(),
-            define_stream_ptr: define_stream.clone()
+            define_stream: define_stream.clone()
         };
         match self.define_mapping.get(&define_unique) {
             Some(addr) => {
