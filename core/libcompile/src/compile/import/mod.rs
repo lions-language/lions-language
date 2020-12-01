@@ -23,8 +23,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
             ImportPrefixType::Package => {
                 return self.import_package(context.content, context.alias);
             },
-            _ => {
-                unimplemented!("{:?}", context.prefix);
+            ImportPrefixType::System => {
+                return self.import_system(context.content, context.alias);
             }
         }
     }
@@ -168,6 +168,72 @@ impl<'a, F: Compile> Compiler<'a, F> {
     }
 
     fn import_package(&mut self, content: &str, alias: Option<String>) -> DescResult {
+        /*
+         * 将 content 中的第一个 段 拿出来
+         * */
+        let mut prefix_index = None;
+        for (i, c) in content.chars().enumerate() {
+            if c == ':' {
+                prefix_index = Some(i);
+                break;
+            }
+        }
+        let index = match prefix_index {
+            Some(index) => index,
+            None => {
+                return DescResult::Error(
+                    format!("after package must be exist `:`"));
+            }
+        };
+        if index == content.len() - 1 {
+            /*
+             * : 在最后
+             * */
+            return DescResult::Error(
+                format!("must be speical module path after `:`"));
+        }
+        /*
+         * 从 PackageContext 中查询
+         * */
+        let package_name = &content[0..index];
+        let module_str = &content[index+1..];
+        let (package_buffer, package_buffer_ptr)
+            = match self.package_context.package_control_ref().get_ptr_clone(
+            package_name) {
+            Some(bp) => bp,
+            None => {
+                return DescResult::Error(
+                    format!("package: {} is not found", package_name));
+            }
+        };
+        let package_str = PackageStr::Third(package_buffer_ptr);
+        let module_name = match package_buffer.module_mapping.get(module_str) {
+            Some(module_name) => module_name,
+            None => {
+                return DescResult::Error(
+                    format!("module: {} is not found in package: {}"
+                        , module_str, package_name));
+            }
+        };
+        /*
+         * 写入到 import mapping 中
+         * */
+        let import_key = match alias {
+            Some(a) => a,
+            None => {
+                module_name.clone()
+            }
+        };
+        if self.imports_mapping.exists(&import_key) {
+            return DescResult::Error(
+                format!("imported \"{}\" is imported repeatedly", import_key));
+        }
+        self.imports_mapping.add(import_key, ImportItem::new_with_all(
+                module_str.to_string(), package_str));
+        DescResult::Success
+    }
+
+    fn import_system(&mut self, content: &str, alias: Option<String>) -> DescResult {
         /*
          * 将 content 中的第一个 段 拿出来
          * */
