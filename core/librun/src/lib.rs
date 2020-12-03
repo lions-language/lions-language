@@ -7,9 +7,9 @@ pub enum Adapter {
 }
 
 pub struct RunData<P: AsRef<Path>> {
-    package_name: String,
-    package_item: PackageConfigItem<P>,
-    package_context: PackageContext
+    pub package_name: String,
+    pub package_item: PackageConfigItem<P>,
+    pub package_context: PackageContext
 }
 
 pub fn run<P: AsRef<Path>>(adapter: Adapter, data: RunData<P>) {

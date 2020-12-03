@@ -8,6 +8,7 @@ pub const LIB_NAME: &'static str = "lib";
 
 pub const MOD_LIONS_NAME: &'static str = "mod.lions";
 pub const LIB_LIONS_NAME: &'static str = "lib.lions";
+pub const MAIN_LIONS_NAME: &'static str = "main.lions";
 pub const LIONS_EXT: &'static str = ".lions";
 
 pub const STAR: &'static str = "*";

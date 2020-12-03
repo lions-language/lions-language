@@ -42,29 +42,29 @@ pub fn run<P: AsRef<Path>>(data: RunData<P>) {
      * 获取包路径, 拼接成 package_path/lib.lions
      * */
     let file: &Path = item.path.as_ref();
-    let lib_file = match &item.lib_path {
+    let main_file = match &item.lib_path {
         Some(lib_path) => {
-            file.join(lib_path).join(consts::LIB_LIONS_NAME)
+            file.join(lib_path).join(consts::MAIN_LIONS_NAME)
         },
         None => {
-            file.join(consts::LIB_LIONS_NAME)
+            file.join(consts::MAIN_LIONS_NAME)
         }
     };
-    let mut f = match fs::File::open(&lib_file) {
+    let mut f = match fs::File::open(&main_file) {
         Ok(f) => f,
         Err(_err) => {
-            match lib_file.to_str() {
+            match main_file.to_str() {
                 Some(s) => {
                     exception::exit(format!("read file {} error", s));
                 },
                 None => {
-                    exception::exit(format!("read file {:?} error", lib_file));
+                    exception::exit(format!("read file {:?} error", main_file));
                 }
             }
             panic!("");
         }
     };
-    let path_buf = Path::new(&lib_file).parent().expect("should not happend").to_path_buf();
+    let path_buf = Path::new(&main_file).parent().expect("should not happend").to_path_buf();
     let io_attr = IoAttribute::new_with_all(item.read_once_max);
     let io_attr_clone = io_attr.clone();
     let file_name = match file.to_str() {
@@ -124,5 +124,28 @@ pub fn run<P: AsRef<Path>>(data: RunData<P>) {
     };
     let mut grammar_parser = GrammarParser::new(lexical_parser, &mut grammar_context);
     grammar_parser.parser();
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+    use std::path::PathBuf;
+    use libpackage::control::Control;
+
+    #[test]
+    fn run_test() {
+        let package = Package::<PathBuf>::new();
+        let package_control = PackageControl::new();
+        let package_context = PackageContext::new(&package, &package_control);
+        let config_item = PackageConfigItem::<PathBuf>::new(
+            true, 1, Path::new(".").to_path_buf(), None);
+        let mut control = Control::new();
+        let run_data = RunData {
+            package_name: String::from("main"),
+            package_item: config_item,
+            package_context: package_context
+        };
+        run::<PathBuf>(run_data);
+    }
 }
 
