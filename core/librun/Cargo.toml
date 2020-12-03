@@ -14,3 +14,4 @@ libgrammar = { path = "../libgrammar" }
 libtypecontrol = { path = "../libtypecontrol" }
 libtype = { path = "../libtype" }
 libstructtype = { path = "../libstructtype" }
+libpackage = { path = "../libpackage" }
