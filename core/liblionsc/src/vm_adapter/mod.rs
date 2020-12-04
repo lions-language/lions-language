@@ -21,9 +21,9 @@ use liblink::link::Link;
 use std::path::Path;
 use std::fs;
 use std::io::Read;
-use crate::CompileData;
+use crate::{CompileData, CompileResult, VMCompileResult};
 
-pub fn compile_main<P: AsRef<Path>>(data: CompileData<P>) {
+pub fn compile_main<P: AsRef<Path>>(data: CompileData<P>) -> CompileResult {
     let name = &data.package_name;
     let item = &data.package_item;
     let package_context = &data.package_context;
@@ -85,7 +85,7 @@ pub fn compile_main<P: AsRef<Path>>(data: CompileData<P>) {
     let mut fdd = FunctionDefineDispatch::new(func_ds.as_mut::<DefineStream>());
     let mut bdd = BlockDefineDispatch::new(&mut ds);
     let mut static_stream = StaticStream::new();
-    let mut ss_ptr = RefPtr::from_ref::<StaticStream>(&static_stream);
+    let ss_ptr = RefPtr::from_ref::<StaticStream>(&static_stream);
     let mut static_variant_dispatch = StaticVariantDispatch::new(&mut static_stream);
     let package_str = name;
     let module = Module::new(String::from(consts::LIB_NAME), String::from(consts::LIB_NAME));
@@ -114,6 +114,9 @@ pub fn compile_main<P: AsRef<Path>>(data: CompileData<P>) {
     };
     let mut grammar_parser = GrammarParser::new(lexical_parser, &mut grammar_context);
     grammar_parser.parser();
+    CompileResult::VirtualMachine(VMCompileResult{
+        link: link
+    })
 }
 
 #[cfg(test)]

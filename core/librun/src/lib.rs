@@ -1,20 +1,16 @@
-use libcompile::package::{PackageContext};
-use libpackage::config::{PackageConfigItem};
-use std::path::Path;
+use liblink::link::{Link};
+
+pub struct VirtualMachineData {
+    link: Link
+}
 
 pub enum Adapter {
-    VirtualMachine
+    VirtualMachine(VirtualMachineData)
 }
 
-pub struct RunData<P: AsRef<Path>> {
-    pub package_name: String,
-    pub package_item: PackageConfigItem<P>,
-    pub package_context: PackageContext
-}
-
-pub fn run<P: AsRef<Path>>(adapter: Adapter, data: RunData<P>) {
+pub fn run(adapter: Adapter) {
     match adapter {
-        Adapter::VirtualMachine => {
+        Adapter::VirtualMachine(data) => {
             vm_adapter::run(data);
         }
     }
