@@ -15,3 +15,5 @@ libtypecontrol = { path = "../libtypecontrol" }
 libtype = { path = "../libtype" }
 libstructtype = { path = "../libstructtype" }
 libpackage = { path = "../libpackage" }
+liblink = { path = "../liblink" }
+libvm = { path = "../libvm" }

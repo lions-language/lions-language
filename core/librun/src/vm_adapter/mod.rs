@@ -21,6 +21,10 @@ use libcommon::ptr::RefPtr;
 use libcommon::consts;
 use libcommon::exception;
 use libpackage::config::{PackageConfig, PackageConfigItem};
+use liblink::define::LinkDefine;
+use liblink::statics::LinkStatic;
+use liblink::link::Link;
+use libvm::vm::VirtualMachine;
 use std::path::Path;
 use std::fs;
 use std::io::Read;
@@ -96,6 +100,7 @@ pub fn run<P: AsRef<Path>>(data: RunData<P>) {
     let mut fdd = FunctionDefineDispatch::new(func_ds.as_mut::<DefineStream>());
     let mut bdd = BlockDefineDispatch::new(&mut ds);
     let mut static_stream = StaticStream::new();
+    let mut ss_ptr = RefPtr::from_ref::<StaticStream>(&static_stream);
     let mut static_variant_dispatch = StaticVariantDispatch::new(&mut static_stream);
     let package_str = name;
     let mut inner_writer = InnerWriter{};
@@ -104,6 +109,7 @@ pub fn run<P: AsRef<Path>>(data: RunData<P>) {
     let mut function_control = FunctionControl::new();
     let mut struct_control = StructControl::new();
     let mut module_mapping = ModuleMapping::new();
+    let mut link = Link::new(ds_ptr, ss_ptr);
     let mut bytecode = Bytecode::new(
                 &mut inner_writer
                 , &mut fdd
@@ -124,6 +130,14 @@ pub fn run<P: AsRef<Path>>(data: RunData<P>) {
     };
     let mut grammar_parser = GrammarParser::new(lexical_parser, &mut grammar_context);
     grammar_parser.parser();
+    let entrance = link.call_main_instruction().clone();
+    /*
+     * 如果存在编译后的文件, 使用 LinkDefine 的读取功能 从文件中读取后实例化 LinkDefine
+     * */
+    let mut virtual_machine = VirtualMachine::new(
+        RefPtr::from_ref::<LinkDefine>(link.link_define())
+        , RefPtr::from_ref::<LinkStatic>(link.link_static()));
+    virtual_machine.run(entrance);
 }
 
 #[cfg(test)]

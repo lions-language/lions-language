@@ -119,7 +119,7 @@ impl VirtualMachine {
         ExecuteResult::Normal
     }
 
-    fn run(&mut self, entrance: Instruction) {
+    pub fn run(&mut self, entrance: Instruction) {
         // println!("{:?}", entrance);
         /*
          * main 函数被调用的时候, 编译期不会生成 enter scope 指令
