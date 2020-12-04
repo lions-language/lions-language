@@ -1,0 +1,18 @@
+[package]
+name = "liblionsc"
+version = "0.1.0"
+authors = ["lions-language <lions_language@163.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+libmacro = { path = "../libmacro" }
+libcommon = { path = "../libcommon" }
+libcompile = { path = "../libcompile" }
+libgrammar = { path = "../libgrammar" }
+libtypecontrol = { path = "../libtypecontrol" }
+libtype = { path = "../libtype" }
+libstructtype = { path = "../libstructtype" }
+libpackage = { path = "../libpackage" }
+liblink = { path = "../liblink" }
