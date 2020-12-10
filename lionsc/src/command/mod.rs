@@ -1,8 +1,9 @@
 use command_option::flag::{Flag};
 
-const COMPILE_TYPE: &str = "-t";
+const COMPILE_TYPE: &str = "-ct";
 const COMPILE_LIB: &str = "--lib";
 const COMPILE_BIN: &str = "--bin";
+const DEPEND_PACKAGE: &str = "-dp";
 
 pub enum CompileType {
     Bin,
@@ -23,9 +24,12 @@ pub struct CommandOption {
 pub fn parse() -> CommandOption {
     let mut command_option = CommandOption::default();
     let mut flag = Flag::new();
+    let compile_type = flag.reg_string(String::from(COMPILE_TYPE)
+        , String::from("localhost"), String::from("compile type --lib / --bin"));
+    let depend_package = flag.reg_string(String::from(DEPEND_PACKAGE)
+        , String::from(""), String::from("depend package"));
+    flag.parse();
     {
-        let compile_type = flag.reg_string(String::from(COMPILE_TYPE)
-            , String::from("localhost"), String::from("compile type --lib / --bin"));
         let compile_type = read_string!(compile_type);
         if compile_type == COMPILE_LIB {
             command_option.compile_type = CompileType::Lib;
@@ -33,7 +37,6 @@ pub fn parse() -> CommandOption {
             command_option.compile_type = CompileType::Bin;
         }
     }
-    flag.parse();
     command_option
 }
 
