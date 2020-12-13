@@ -1,11 +1,20 @@
-use crate::token::{self, TokenContext, Token};
-use crate::lexical::CallbackReturnStatus;
-use crate::grammar::Grammar;
+use crate::token::{self, TokenContext, Token, TokenMethodResult, TokenType};
+use crate::lexical::{CallbackReturnStatus, TokenVecItem, TokenPointer};
+use crate::grammar::{GrammarParser, ExpressContext, Grammar};
 
 pub struct LeftSquareBracketsToken {
 }
 
 impl LeftSquareBracketsToken {
+    fn nup<T: FnMut() -> CallbackReturnStatus, CB: Grammar>(token: &Token<T, CB>
+        , grammar: &mut GrammarParser<T, CB>
+        , express_context: &ExpressContext<T, CB>) -> TokenMethodResult {
+        unimplemented!("expression left square brackets: nup");
+    }
+
+    fn led<T: FnMut() -> CallbackReturnStatus, CB: Grammar>(token: &Token<T, CB>, grammar: &mut GrammarParser<T, CB>, express_context: &ExpressContext<T, CB>) -> TokenMethodResult {
+        TokenMethodResult::None
+    }
 }
 
 impl LeftSquareBracketsToken {
@@ -13,7 +22,7 @@ impl LeftSquareBracketsToken {
         Token{
             context: context,
             attrubute: token::default_token_attrubute(),
-            nup: token::default_nup,
+            nup: LeftSquareBracketsToken::nup,
             led: token::default_led
         }
     }
