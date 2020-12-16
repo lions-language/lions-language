@@ -13,3 +13,4 @@ fn main() {
 }
 
 mod command;
+mod compile;
