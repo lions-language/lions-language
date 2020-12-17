@@ -42,6 +42,10 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
         self.id_push_keyword_token(TokenType::ElseIf);
     }
 
+    fn id_kw_for(&mut self) {
+        self.id_push_keyword_token(TokenType::For);
+    }
+
     fn id_kw_strfmt(&mut self) {
         /*
          * strfmt""
@@ -178,6 +182,9 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
             },
             "elif" => {
                 self.id_kw_else_if();
+            },
+            "for" => {
+                self.id_kw_for();
             },
             "strfmt" => {
                 self.id_kw_strfmt();

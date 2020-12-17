@@ -42,6 +42,8 @@ pub enum TokenType {
     Else,
     // elif
     ElseIf,
+    // for
+    For,
     // func
     Function,
     // let
