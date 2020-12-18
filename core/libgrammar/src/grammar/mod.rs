@@ -933,6 +933,7 @@ mod star;
 mod module;
 mod process_use;
 mod process_first;
+mod process_for;
 
 #[cfg(test)]
 mod test {
