@@ -46,6 +46,10 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
         self.id_push_keyword_token(TokenType::For);
     }
 
+    fn id_kw_while(&mut self) {
+        self.id_push_keyword_token(TokenType::While);
+    }
+
     fn id_kw_strfmt(&mut self) {
         /*
          * strfmt""
@@ -185,6 +189,9 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
             },
             "for" => {
                 self.id_kw_for();
+            },
+            "while" => {
+                self.id_kw_while();
             },
             "strfmt" => {
                 self.id_kw_strfmt();
