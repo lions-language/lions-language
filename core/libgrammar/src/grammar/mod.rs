@@ -934,6 +934,7 @@ mod module;
 mod process_use;
 mod process_first;
 mod process_for;
+mod process_while;
 
 #[cfg(test)]
 mod test {
