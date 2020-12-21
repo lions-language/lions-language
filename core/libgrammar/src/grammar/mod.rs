@@ -241,6 +241,12 @@ pub struct IfStmtContext {
     condition_instructure_indexs: Vec<usize>
 }
 
+#[derive(Debug, Clone, Default
+    , FieldGet, FieldGetClone)]
+pub struct WhileStmtContext {
+    expr_result_addr: AddressValue
+}
+
 #[derive(Debug, FieldGet, FieldGetClone
     , NewWithAll, FieldGetMove
     , Default)]
@@ -512,6 +518,31 @@ pub trait Grammar {
         , _define_context: &mut BlockDefineContext) -> DescResult {
         /*
          * 整个 if 语句的结束
+         * */
+        unimplemented!();
+    }
+    fn while_stmt_start(&mut self, _stmt_context: &mut WhileStmtContext
+        , _define_context: &mut BlockDefineContext) -> DescResult {
+        /*
+         * 整个 while 语句开始
+         * */
+        unimplemented!();
+    }
+    fn while_stmt_expr_start(&mut self, _stmt_context: &mut WhileStmtContext
+        , _define_context: &mut BlockDefineContext) -> DescResult {
+        /*
+         * while 语句 过程中的 表达式开始
+         * */
+        unimplemented!();
+    }
+    fn while_stmt_expr_end(&mut self, _stmt_context: &mut WhileStmtContext
+        , _define_context: &mut BlockDefineContext) -> DescResult {
+        unimplemented!();
+    }
+    fn while_stmt_end(&mut self, _stmt_context: &mut WhileStmtContext
+        , _define_context: &mut BlockDefineContext) -> DescResult {
+        /*
+         * 整个 while 语句的结束
          * */
         unimplemented!();
     }
