@@ -680,6 +680,9 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
             TokenType::If => {
                 self.if_process();
             },
+            TokenType::While => {
+                self.while_process();
+            },
             TokenType::Annotate => {
                 self.annotate_process();
                 stmt_type = StmtType::Annotate;
