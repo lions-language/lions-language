@@ -11,7 +11,7 @@ use libgrammar::grammar::{Grammar, CallFuncScopeContext
     , FunctionDefineReturnContext
     , FunctionDefineContext
     , BlockDefineContext
-    , IfStmtContext
+    , IfStmtContext, WhileStmtContext
     , StructDefineFieldContext
     , ReturnStmtContext as GrammarReturnStmtContext
     , ObjectFunctionDefineMutContext, TypeToken
@@ -533,6 +533,26 @@ impl<'a, F: Compile> Grammar for Compiler<'a, F> {
     fn if_stmt_end(&mut self, stmt_context: &mut IfStmtContext
         , define_context: &mut BlockDefineContext) -> DescResult {
         self.process_if_stmt_end(stmt_context, define_context)
+    }
+
+    fn while_stmt_start(&mut self, stmt_context: &mut WhileStmtContext
+        , define_context: &mut BlockDefineContext) -> DescResult {
+        self.process_while_stmt_start(stmt_context, define_context)
+    }
+
+    fn while_stmt_expr_start(&mut self, stmt_context: &mut WhileStmtContext
+        , define_context: &mut BlockDefineContext) -> DescResult {
+        self.process_while_stmt_expr_start(stmt_context, define_context)
+    }
+
+    fn while_stmt_expr_end(&mut self, stmt_context: &mut WhileStmtContext
+        , define_context: &mut BlockDefineContext) -> DescResult {
+        self.process_while_stmt_expr_end(stmt_context, define_context)
+    }
+
+    fn while_stmt_end(&mut self, stmt_context: &mut WhileStmtContext
+        , define_context: &mut BlockDefineContext) -> DescResult {
+        self.process_while_stmt_end(stmt_context, define_context)
     }
 
     fn anonymous_block_start(&mut self) {
