@@ -664,6 +664,7 @@ mod process_module;
 mod process_use;
 mod process_first;
 mod imports_mapping;
+mod process_while;
 
 #[cfg(test)]
 mod test {
