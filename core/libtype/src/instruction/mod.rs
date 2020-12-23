@@ -176,6 +176,13 @@ pub struct ConditionStmt {
 
 #[derive(Debug, Clone, FieldGet, NewWithAll
     , FieldGetMove, FieldGetClone, Default)]
+pub struct WhileStmt {
+    expr_addr: AddressValue,
+    define: BlockDefine,
+}
+
+#[derive(Debug, Clone, FieldGet, NewWithAll
+    , FieldGetMove, FieldGetClone, Default)]
 pub struct DeleteData {
     addr: AddressValue
 }
@@ -202,6 +209,7 @@ pub enum Instruction {
     RemoveOwnership(RemoveOwnership),
     AddRefParamAddr(AddRefParamAddr),
     ConditionStmt(ConditionStmt),
+    WhileStmt(WhileStmt),
     ExecuteBlock(BlockDefine),
     DeleteData(DeleteData),
     EnterScope,
