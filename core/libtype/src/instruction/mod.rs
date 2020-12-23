@@ -178,7 +178,7 @@ pub struct ConditionStmt {
     , FieldGetMove, FieldGetClone, Default)]
 pub struct WhileStmt {
     expr_addr: AddressValue,
-    define: BlockDefine,
+    true_handle: ConditionStmtTrue
 }
 
 #[derive(Debug, Clone, FieldGet, NewWithAll

@@ -102,5 +102,9 @@ impl VirtualMachine {
     pub fn process_execute_block(&mut self, context: BlockDefine) -> ExecuteResult {
         self.execute_block(context.addr_ref())
     }
+
+    pub fn process_execute_block_ref(&mut self, context: &BlockDefine) -> ExecuteResult {
+        self.execute_block(context.addr_ref())
+    }
 }
 

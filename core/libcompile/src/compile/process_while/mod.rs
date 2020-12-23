@@ -42,9 +42,15 @@ impl<'a, F: Compile> Compiler<'a, F> {
     pub fn process_while_stmt_end(&mut self, stmt_context: &mut WhileStmtContext
         , define_context: &mut BlockDefineContext) -> DescResult {
         let cur_index = self.cb.current_index();
+        /*
+         * +1 的原因: 需要跳过 后面的 while_stmt 指令
+         * */
+        let jump = Jump::new_with_all(JumpType::Backward, 0);
         self.cb.while_stmt(WhileStmt::new_with_all(
                     stmt_context.expr_result_addr_clone()
-                    , BlockDefine::new_with_all(define_context.define_addr_clone())));
+                    , ConditionStmtTrue::new_with_all(
+                        BlockDefine::new_with_all(define_context.define_addr_clone())
+                        , jump)));
         DescResult::Success
     }
 }

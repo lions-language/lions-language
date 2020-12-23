@@ -94,6 +94,9 @@ impl VirtualMachine {
             Instruction::ConditionStmt(v) => {
                 return self.process_condition_stmt(v);
             },
+            Instruction::WhileStmt(v) => {
+                return self.process_while_stmt(v);
+            },
             Instruction::ReadStaticVariant(v) => {
                 self.read_static_variant(v);
             },
@@ -247,6 +250,7 @@ mod address;
 mod process_return;
 mod process_condition;
 mod memory;
+mod process_while;
 
 #[cfg(test)]
 mod test {
