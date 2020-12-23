@@ -1,5 +1,5 @@
 use libresult::{DescResult};
-use libtype::instruction::{ConditionStmt, BlockDefine
+use libtype::instruction::{WhileStmt, BlockDefine
     , Instruction, Jump
     , ConditionStmtTrue
     , JumpType};
@@ -42,6 +42,9 @@ impl<'a, F: Compile> Compiler<'a, F> {
     pub fn process_while_stmt_end(&mut self, stmt_context: &mut WhileStmtContext
         , define_context: &mut BlockDefineContext) -> DescResult {
         let cur_index = self.cb.current_index();
+        self.cb.while_stmt(WhileStmt::new_with_all(
+                    stmt_context.expr_result_addr_clone()
+                    , BlockDefine::new_with_all(define_context.define_addr_clone())));
         DescResult::Success
     }
 }

@@ -12,7 +12,8 @@ use libtype::instruction::{Instruction, CallPrimevalFunction
     , Jump, RemoveOwnership
     , CallSelfFunction
     , AddRefParamAddr, CallPrimevalFunctionParamContext
-    , ConditionStmt, BlockDefine, DeleteData};
+    , ConditionStmt, BlockDefine, DeleteData
+    , WhileStmt};
 use libgrammar::grammar::{FunctionDefineContext
     , BlockDefineContext};
 use crate::compile::{StaticContext, CallFunctionContext
@@ -185,6 +186,10 @@ impl<'a, 'b, F: Writer> Compile for Bytecode<'a, 'b, F> {
 
     fn condition_stmt(&mut self, context: ConditionStmt) {
         self.write(Instruction::ConditionStmt(context));
+    }
+
+    fn while_stmt(&mut self, context: WhileStmt) {
+        self.write(Instruction::WhileStmt(context));
     }
 
     fn jump(&mut self, context: Jump) -> usize {

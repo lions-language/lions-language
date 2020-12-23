@@ -36,7 +36,8 @@ use libtype::instruction::{
     , UpdateRefParamAddr
     , CallSelfFunction
     , CallPrimevalFunctionParamContext
-    , ConditionStmt, DeleteData};
+    , ConditionStmt, DeleteData
+    , WhileStmt};
 use libtypecontrol::function::FunctionControl;
 use libtype::module::Module;
 use libresult::*;
@@ -255,6 +256,10 @@ pub trait Compile {
     }
 
     fn condition_stmt(&mut self, _context: ConditionStmt) {
+        unimplemented!();
+    }
+
+    fn while_stmt(&mut self, _context: WhileStmt) {
         unimplemented!();
     }
 
