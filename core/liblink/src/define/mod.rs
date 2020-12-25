@@ -310,7 +310,7 @@ impl LinkDefine {
     }
 
     pub fn read(&self, addr: &FunctionAddrValue) -> LinkDefineBlock {
-        println!("read: {:?}", addr);
+        // println!("read: {:?}", addr);
         let pos = addr.index_clone();
         let length = addr.length_clone() + pos;
         LinkDefineBlock {
