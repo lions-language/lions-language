@@ -198,22 +198,22 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                 return TokenMethodResult::Panic;
             }
         };
-        self.expression(&0, &ExpressContext::new(GrammarParser::expression_end_right_parenthese), &tp)
+        self.expression(&0, &mut ExpressContext::new(GrammarParser::expression_end_right_parenthese), &tp)
     }
 
     pub fn expression_process_default_exprcontext(&mut self, token: &TokenPointer) {
-        self.expression(&0, &ExpressContext::new(
+        self.expression(&0, &mut ExpressContext::new(
                 GrammarParser::<T, CB>::expression_end_normal), token);
     }
 
-    pub fn expression_process(&mut self, token: &TokenPointer, express_context: &ExpressContext<T, CB>) {
+    pub fn expression_process(&mut self, token: &TokenPointer, express_context: &mut ExpressContext<T, CB>) {
         /*
          * 因为 0 比任何的操作数都要小, 所以可以将整个表达式遍历完全
          * */
         self.expression(&0, express_context, token);
     }
 
-    pub fn expression_process_without_token(&mut self, express_context: &ExpressContext<T, CB>) {
+    pub fn expression_process_without_token(&mut self, express_context: &mut ExpressContext<T, CB>) {
         match self.skip_white_space_token() {
             Some(tp) => {
                 self.expression_process(&tp, express_context);
@@ -246,7 +246,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
      * 3. token 的 led方法结束后, 下一个 token 应该是 操作符
      * 4. 提供一个函数指针, 用于判断是否结束 (不需要捕获周边环境, 所以使用函数指针, 提高性能)
      * */
-    pub fn expression(&mut self, operator_bp: &u8, express_context: &ExpressContext<T, CB>, input_token_ptr: &TokenPointer) -> TokenMethodResult {
+    pub fn expression(&mut self, operator_bp: &u8, express_context: &mut ExpressContext<T, CB>, input_token_ptr: &TokenPointer) -> TokenMethodResult {
         // expression_check_end!(self, express_context);
         let input_token = input_token_ptr.as_ref::<T, CB>();
         // println!("{:?}", input_token.context_token_type());
