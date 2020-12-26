@@ -596,17 +596,39 @@ pub type ExpressEndFunc<T, CB> = fn(&mut GrammarParser<T, CB>, &TokenVecItem<T, 
  * */
 pub type ParserEndFunc<T, CB> = fn(&mut GrammarParser<T, CB>, &Option<TokenPointer>) -> bool;
 
+pub enum NupContextValue {
+    PrefixPlusPlus(u8),
+    None
+}
+
+impl Default for NupContextValue {
+    fn default() -> Self {
+        NupContextValue::None
+    }
+}
+
+#[derive(Default, FieldGet)]
+pub struct NupContext {
+    value: NupContextValue
+}
+
 pub struct ExpressContext<T: FnMut() -> CallbackReturnStatus, CB: Grammar> {
     pub end_f: ExpressEndFunc<T, CB>,
-    desc_ctx: DescContext
+    desc_ctx: DescContext,
+    nup_context: NupContext
 }
 
 impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> ExpressContext<T, CB> {
+    pub fn restore_nup(&mut self) {
+        *&mut self.nup_context = NupContext::default();
+    }
+
     pub fn new_with_desc_ctx(end_f: ExpressEndFunc<T, CB>
         , desc_ctx: DescContext) -> Self {
         Self {
             end_f: end_f,
-            desc_ctx: desc_ctx
+            desc_ctx: desc_ctx,
+            nup_context: NupContext::default()
         }
     }
 
