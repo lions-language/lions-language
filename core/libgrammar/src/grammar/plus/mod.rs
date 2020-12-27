@@ -1,13 +1,22 @@
 use libresult::DescResult;
 use libtype::{TypeAttrubute};
 use super::{GrammarParser, Grammar
-    , ExpressContext, DescContext};
+    , ExpressContext, DescContext
+    , NupContextValue};
 use crate::lexical::{CallbackReturnStatus};
 use crate::token::{TokenMethodResult, TokenType};
 
 impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, CB> {
-    pub fn prefix_plus_plus_process(&mut self, express_context: &ExpressContext<T, CB>)
+    pub fn prefix_plus_plus_process(&mut self, express_context: &mut ExpressContext<T, CB>)
         -> TokenMethodResult {
+        match express_context.nup_context.value_ref() {
+            NupContextValue::PrefixPlusPlus(v) => {
+                *v += 1;
+            },
+            NupContextValue::None => {
+                *express_context.nup_context.value_mut() = NupContextValue::PrefixPlusPlus(0);
+            }
+        }
         /*
          * 移除 token
          * */
