@@ -1,8 +1,9 @@
 use libresult::DescResult;
+use libtype::{TypeAttrubute};
 use super::{GrammarParser, Grammar
-    , ExpressContext};
+    , ExpressContext, DescContext};
 use crate::lexical::{CallbackReturnStatus};
-use crate::token::{TokenMethodResult};
+use crate::token::{TokenMethodResult, TokenType};
 
 impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, CB> {
     pub fn prefix_plus_plus_process(&mut self, express_context: &ExpressContext<T, CB>)
@@ -26,14 +27,25 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                 return TokenMethodResult::Panic;
             }
         };
+        let mut r = TokenMethodResult::None;
         let next = tp.as_ref::<T, CB>();
-        let r = next.nup(self, express_context);
-        match r {
-            TokenMethodResult::None => {
-                self.panic(&format!("expect operand, but found: {:?}", next.context_token_type()));
-                return TokenMethodResult::Panic;
+        match next.context_token_type() {
+            TokenType::Id => {
+                self.id_process(DescContext::new(
+                        TypeAttrubute::Ref));
+            },
+            TokenType::PlusPlus => {
+                r = next.nup(self, express_context);
+                match r {
+                    TokenMethodResult::None => {
+                        self.panic(&format!("expect operand, but found: {:?}", next.context_token_type()));
+                    },
+                    _ => {
+                    }
+                }
             },
             _ => {
+                self.panic(&format!("expect id or ++, but found: {:?}", next.context_token_type()));
             }
         }
         self.grammar_context().cb.operator_prefix_increase(t.token_value());
