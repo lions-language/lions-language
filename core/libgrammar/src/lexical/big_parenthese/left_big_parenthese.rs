@@ -10,7 +10,7 @@ pub struct LeftBigParentheseToken {
 impl LeftBigParentheseToken {
     fn nup<T: FnMut() -> CallbackReturnStatus, CB: Grammar>(
         token: &Token<T, CB>, grammar: &mut GrammarParser<T, CB>
-        , express_context: &ExpressContext<T, CB>) -> TokenMethodResult {
+        , express_context: &mut ExpressContext<T, CB>) -> TokenMethodResult {
         grammar.process_block();
         TokenMethodResult::End
     }

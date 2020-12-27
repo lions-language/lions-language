@@ -10,7 +10,7 @@ pub struct AnnotateToken {
 impl AnnotateToken {
     fn nup<T: FnMut() -> CallbackReturnStatus, CB: Grammar>(
         token: &Token<T, CB>, grammar: &mut GrammarParser<T, CB>
-        , express_context: &ExpressContext<T, CB>) -> TokenMethodResult {
+        , express_context: &mut ExpressContext<T, CB>) -> TokenMethodResult {
         /*
          * 表达式中遇到注释 => 跳过
          * */
