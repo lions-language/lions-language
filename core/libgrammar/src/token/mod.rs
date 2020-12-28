@@ -336,11 +336,15 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> Token<T, CB> {
     }
 }
 
-pub fn default_nup<T: FnMut() -> CallbackReturnStatus, CB: Grammar>(token: &Token<T, CB>, grammar: &mut GrammarParser<T, CB>, express_context: &ExpressContext<T, CB>) -> TokenMethodResult {
+pub fn default_nup<T: FnMut() -> CallbackReturnStatus, CB: Grammar>(token: &Token<T, CB>
+    , grammar: &mut GrammarParser<T, CB>
+    , express_context: &mut ExpressContext<T, CB>) -> TokenMethodResult {
     TokenMethodResult::None
 }
 
-pub fn default_led<T: FnMut() -> CallbackReturnStatus, CB: Grammar>(token: &Token<T, CB>, grammar: &mut GrammarParser<T, CB>, express_context: &ExpressContext<T, CB>) -> TokenMethodResult {
+pub fn default_led<T: FnMut() -> CallbackReturnStatus, CB: Grammar>(token: &Token<T, CB>
+    , grammar: &mut GrammarParser<T, CB>
+    , express_context: &mut ExpressContext<T, CB>) -> TokenMethodResult {
     TokenMethodResult::None
 }
 
