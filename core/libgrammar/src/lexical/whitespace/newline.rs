@@ -6,7 +6,9 @@ pub struct NewLineToken {
 }
 
 impl NewLineToken {
-    fn nup<T: FnMut() -> CallbackReturnStatus, CB: Grammar>(token: &Token<T, CB>, grammar: &mut GrammarParser<T, CB>, express_context: &ExpressContext<T, CB>) -> TokenMethodResult {
+    fn nup<T: FnMut() -> CallbackReturnStatus, CB: Grammar>(token: &Token<T, CB>
+        , grammar: &mut GrammarParser<T, CB>
+        , express_context: &mut ExpressContext<T, CB>) -> TokenMethodResult {
         /*
          * 如果调用 nup 方法的时候, 遇到了 newline, 也就是期待一个操作数, 但是遇到了换行,
          * 操作数可能在下一面一行, 如:

@@ -13,12 +13,16 @@ lazy_static!{
 }
 
 impl StarToken {
-    fn nup<T: FnMut() -> CallbackReturnStatus, CB: Grammar>(token: &Token<T, CB>, grammar: &mut GrammarParser<T, CB>, express_context: &ExpressContext<T, CB>) -> TokenMethodResult {
+    fn nup<T: FnMut() -> CallbackReturnStatus, CB: Grammar>(token: &Token<T, CB>
+        , grammar: &mut GrammarParser<T, CB>
+        , express_context: &mut ExpressContext<T, CB>) -> TokenMethodResult {
         grammar.nup_star_process();
         TokenMethodResult::End
     }
 
-    fn led<T: FnMut() -> CallbackReturnStatus, CB: Grammar>(token: &Token<T, CB>, grammar: &mut GrammarParser<T, CB>, express_context: &ExpressContext<T, CB>) -> TokenMethodResult {
+    fn led<T: FnMut() -> CallbackReturnStatus, CB: Grammar>(token: &Token<T, CB>
+        , grammar: &mut GrammarParser<T, CB>
+        , express_context: &mut ExpressContext<T, CB>) -> TokenMethodResult {
         /*
          * 移除 * token
          * */
