@@ -14,13 +14,13 @@ pub struct PlusPlusToken {
 
 impl PlusPlusToken {
     fn nup<T: FnMut() -> CallbackReturnStatus, CB: Grammar>(token: &Token<T, CB>
-        , grammar: &mut GrammarParser<T, CB>, express_context: &ExpressContext<T, CB>)
+        , grammar: &mut GrammarParser<T, CB>, express_context: &mut ExpressContext<T, CB>)
         -> TokenMethodResult {
         grammar.prefix_plus_plus_process(express_context)
     }
 
     fn led<T: FnMut() -> CallbackReturnStatus, CB: Grammar>(token: &Token<T, CB>
-        , grammar: &mut GrammarParser<T, CB>, express_context: &ExpressContext<T, CB>)
+        , grammar: &mut GrammarParser<T, CB>, express_context: &mut ExpressContext<T, CB>)
         -> TokenMethodResult {
         grammar.suffix_plus_plus_process(express_context)
     }

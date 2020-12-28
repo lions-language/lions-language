@@ -297,7 +297,7 @@ impl TokenContext {
 type NupFunc<T, CB> = fn(token: &Token<T, CB>, grammar: &mut GrammarParser<T, CB>
     , express_context: &mut ExpressContext<T, CB>) -> TokenMethodResult;
 type LedFunc<T, CB> = fn(token: &Token<T, CB>, grammar: &mut GrammarParser<T, CB>
-    , express_context: &ExpressContext<T, CB>) -> TokenMethodResult;
+    , express_context: &mut ExpressContext<T, CB>) -> TokenMethodResult;
 
 pub struct Token<T: FnMut() -> CallbackReturnStatus, CB: Grammar> {
     pub context: TokenContext,
