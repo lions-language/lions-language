@@ -16,7 +16,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
          * */
         self.expect_next_token(|parser, tp| {
             parser.expression_process(&tp
-                , &ExpressContext::new(GrammarParser::<T, CB>::expression_end_normal));
+                , &mut ExpressContext::new(GrammarParser::<T, CB>::expression_end_normal));
         }, "expression");
         if *desc_ctx.star_prefix_ref() {
             check_desc_result!(self, self.cb().value_update_stmt(ValueUpdateStmtContext::new_with_all(

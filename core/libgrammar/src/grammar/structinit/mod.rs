@@ -103,7 +103,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
             , field_conext) {
             self.panic(&e);
         };
-        self.expression_process_without_token(&ExpressContext::new(
+        self.expression_process_without_token(&mut ExpressContext::new(
                 GrammarParser::<T, CB>::expression_end_structinit_list));
         if let DescResult::Error(e) = self.cb().struct_init_field_after_expr(init_context) {
             self.panic(&e);

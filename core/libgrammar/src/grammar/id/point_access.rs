@@ -45,14 +45,14 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         /*
          * 解析表达式
          * */
-        self.expression_process_without_token(&ExpressContext::new(
+        self.expression_process_without_token(&mut ExpressContext::new(
                 GrammarParser::expression_end_normal));
         while let Some(p) = self.skip_white_space_token() {
             let nt = p.as_ref::<T, CB>();
             match nt.context_token_type() {
                 TokenType::Point => {
                     self.skip_next_one();
-                    self.expression_process_without_token(&ExpressContext::new(
+                    self.expression_process_without_token(&mut ExpressContext::new(
                             GrammarParser::expression_end_normal));
                 },
                 _ => {

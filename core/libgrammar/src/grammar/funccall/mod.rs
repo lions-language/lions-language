@@ -62,7 +62,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
             _ => {
                 // println!("{:?}", tp.as_ref::<T, CB>().context_token_value_ref().token_data_ref());
                 self.cb().call_function_param_before_expr(param_len, &mut call_context);
-                self.expression_process(&tp, &ExpressContext::new(
+                self.expression_process(&tp, &mut ExpressContext::new(
                         GrammarParser::<T, CB>::expression_end_param_list));
                 self.cb().call_function_param_after_expr(param_len, &mut call_context);
                 param_len += 1;
@@ -90,7 +90,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                         }
                     }
                     self.cb().call_function_param_before_expr(param_len, &mut call_context);
-                    self.expression_process_without_token(&ExpressContext::new(
+                    self.expression_process_without_token(&mut ExpressContext::new(
                             GrammarParser::<T, CB>::expression_end_param_list));
                     self.cb().call_function_param_after_expr(param_len, &mut call_context);
                     param_len += 1;

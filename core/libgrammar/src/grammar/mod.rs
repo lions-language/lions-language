@@ -692,7 +692,8 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         self.counter_stack.pop();
     }
 
-    fn select_with_exprcontext(&mut self, token: &TokenPointer, express_context: &ExpressContext<T, CB>) {
+    fn select_with_exprcontext(&mut self, token: &TokenPointer
+        , express_context: &mut ExpressContext<T, CB>) {
         enum StmtType {
             Available,
             Annotate
@@ -754,7 +755,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
 
     fn select(&mut self, token: &TokenPointer) {
         self.select_with_exprcontext(token
-            , &ExpressContext::new(GrammarParser::<T, CB>::expression_end_normal));
+            , &mut ExpressContext::new(GrammarParser::<T, CB>::expression_end_normal));
     }
 
     fn token_is_white_space(&self, token: &TokenVecItem<T, CB>) -> bool {

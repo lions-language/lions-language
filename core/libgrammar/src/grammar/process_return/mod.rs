@@ -51,14 +51,14 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                     _ => {
                         is_exist_expr = true;
                         self.expression_process(&tp
-                            , &ExpressContext::new(GrammarParser::<T, CB>::expression_end_block));
+                            , &mut ExpressContext::new(GrammarParser::<T, CB>::expression_end_block));
                     }
                 }
             },
             _ => {
                 is_exist_expr = true;
                 self.expression_process(&tp
-                    , &ExpressContext::new(GrammarParser::<T, CB>::expression_end_block));
+                    , &mut ExpressContext::new(GrammarParser::<T, CB>::expression_end_block));
             }
         }
         let context = ReturnStmtContext{
