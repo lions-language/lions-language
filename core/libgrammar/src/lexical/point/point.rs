@@ -10,11 +10,15 @@ lazy_static!{
 }
 
 impl PointToken {
-    fn nup<T: FnMut() -> CallbackReturnStatus, CB: Grammar>(_token: &Token<T, CB>, _grammar: &mut GrammarParser<T, CB>, _express_context: &ExpressContext<T, CB>) -> TokenMethodResult {
+    fn nup<T: FnMut() -> CallbackReturnStatus, CB: Grammar>(_token: &Token<T, CB>
+        , _grammar: &mut GrammarParser<T, CB>
+        , _express_context: &mut ExpressContext<T, CB>) -> TokenMethodResult {
         TokenMethodResult::None
     }
 
-    fn led<T: FnMut() -> CallbackReturnStatus, CB: Grammar>(_token: &Token<T, CB>, _grammar: &mut GrammarParser<T, CB>, _express_context: &ExpressContext<T, CB>) -> TokenMethodResult {
+    fn led<T: FnMut() -> CallbackReturnStatus, CB: Grammar>(_token: &Token<T, CB>
+        , _grammar: &mut GrammarParser<T, CB>
+        , _express_context: &mut ExpressContext<T, CB>) -> TokenMethodResult {
         TokenMethodResult::None
     }
 }
