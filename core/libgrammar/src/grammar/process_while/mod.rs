@@ -32,7 +32,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         check_desc_result!(self, self.cb().while_stmt_start(&mut stmt_context, &mut define_context));
         check_desc_result!(self, self.cb().while_stmt_expr_start(&mut stmt_context, &mut define_context));
         self.expression_process(&tp
-            , &ExpressContext::new(GrammarParser::<T, CB>::expression_end_left_big_parenthese));
+            , &mut ExpressContext::new(GrammarParser::<T, CB>::expression_end_left_big_parenthese));
         check_desc_result!(self, self.cb().while_stmt_expr_end(&mut stmt_context, &mut define_context));
         /*
          * 解析 block

@@ -5,7 +5,7 @@ use crate::lexical::{CallbackReturnStatus};
 use crate::token::{TokenMethodResult};
 
 impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, CB> {
-    pub fn equal_process(&mut self, express_context: &ExpressContext<T, CB>) -> TokenMethodResult {
+    pub fn equal_process(&mut self, express_context: &mut ExpressContext<T, CB>) -> TokenMethodResult {
         /*
          * 移除 = token
          * */
@@ -32,7 +32,8 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         r
     }
 
-    pub fn equal_equal_process(&mut self, express_context: &ExpressContext<T, CB>) -> TokenMethodResult {
+    pub fn equal_equal_process(&mut self
+        , express_context: &mut ExpressContext<T, CB>) -> TokenMethodResult {
         /*
          * 移除 = token
          * */

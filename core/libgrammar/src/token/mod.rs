@@ -315,11 +315,13 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> Token<T, CB> {
         self.attrubute
     }
 
-    pub fn nup(&self, grammar: &mut GrammarParser<T, CB>, express_context: &ExpressContext<T, CB>) -> TokenMethodResult {
+    pub fn nup(&self, grammar: &mut GrammarParser<T, CB>
+        , express_context: &mut ExpressContext<T, CB>) -> TokenMethodResult {
         (self.nup)(self, grammar, express_context)
     }
 
-    pub fn led(&self, grammar: &mut GrammarParser<T, CB>, express_context: &ExpressContext<T, CB>) -> TokenMethodResult {
+    pub fn led(&self, grammar: &mut GrammarParser<T, CB>
+        , express_context: &mut ExpressContext<T, CB>) -> TokenMethodResult {
         (self.led)(self, grammar, express_context)
     }
 

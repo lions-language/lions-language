@@ -9,7 +9,7 @@ use crate::token::{TokenMethodResult, TokenType};
 impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, CB> {
     pub fn prefix_plus_plus_process(&mut self, express_context: &mut ExpressContext<T, CB>)
         -> TokenMethodResult {
-        match express_context.nup_context.value_ref() {
+        match express_context.nup_context.value_mut() {
             NupContextValue::PrefixPlusPlus(v) => {
                 *v += 1;
             },
@@ -61,7 +61,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         r
     }
 
-    pub fn suffix_plus_plus_process(&mut self, express_context: &ExpressContext<T, CB>)
+    pub fn suffix_plus_plus_process(&mut self, express_context: &mut ExpressContext<T, CB>)
         -> TokenMethodResult {
         /*
          * 移除 ++ token
