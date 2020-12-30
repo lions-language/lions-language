@@ -1,22 +1,23 @@
-use libresult::DescResult;
 use libtype::{TypeAttrubute};
 use super::{GrammarParser, Grammar
     , ExpressContext, DescContext
-    , NupContextValue};
+    , NupContextValue, PrefixPlusPlusContext};
 use crate::lexical::{CallbackReturnStatus};
 use crate::token::{TokenMethodResult, TokenType};
 
 impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, CB> {
     pub fn prefix_plus_plus_process(&mut self, express_context: &mut ExpressContext<T, CB>)
         -> TokenMethodResult {
-        match express_context.nup_context.value_mut() {
+        let count = match express_context.nup_context.value_mut() {
             NupContextValue::PrefixPlusPlus(v) => {
                 *v += 1;
+                *v
             },
             NupContextValue::None => {
                 *express_context.nup_context.value_mut() = NupContextValue::PrefixPlusPlus(0);
+                1
             }
-        }
+        };
         /*
          * 移除 token
          * */
@@ -57,7 +58,8 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                 self.panic(&format!("expect id or ++, but found: {:?}", next.context_token_type()));
             }
         }
-        self.grammar_context().cb.operator_prefix_increase(t.token_value());
+        self.grammar_context().cb.operator_prefix_plus_plus(
+            PrefixPlusPlusContext::new_with_all(t.token_value(), count));
         r
     }
 

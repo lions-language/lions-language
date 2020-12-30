@@ -269,6 +269,14 @@ pub struct OperatorEqualEqualContext {
     desc_ctx: DescContext
 }
 
+#[derive(Debug, FieldGet
+    , NewWithAll, FieldGetMove
+    , Default)]
+pub struct PrefixPlusPlusContext {
+    value: TokenValue,
+    symbol_count: u8
+}
+
 #[derive(Debug, Default)]
 pub struct ImportStmtContext<'a> {
     pub prefix: ImportPrefixType,
@@ -352,7 +360,7 @@ pub trait Grammar {
     fn operator_equal_equal(&mut self, context: OperatorEqualEqualContext) -> DescResult {
         unimplemented!();
     }
-    fn operator_prefix_increase(&mut self, value: TokenValue) {
+    fn operator_prefix_plus_plus(&mut self, _context: PrefixPlusPlusContext) {
         unimplemented!();
     }
     fn operator_suffix_increase(&mut self, value: TokenValue) {
