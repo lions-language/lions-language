@@ -13,7 +13,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
         use libtype::function::consts;
         let (_, symbol_count) = context.fields_move();
         let value = self.scope_context.top_n_with_panic_from_value_buffer(1);
-        let value_typ = value.typ_ref();
+        let value_typ = value.typ_clone();
         let value_typ_attr = value.typ_attr_ref();
         let mut func_define = FunctionDefine::new_invalid_addr();
         let mut func_statement: Option<FunctionStatement> = None;
