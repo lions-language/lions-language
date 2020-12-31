@@ -360,7 +360,7 @@ pub trait Grammar {
     fn operator_equal_equal(&mut self, context: OperatorEqualEqualContext) -> DescResult {
         unimplemented!();
     }
-    fn operator_prefix_plus_plus(&mut self, _context: PrefixPlusPlusContext) {
+    fn operator_prefix_plus_plus(&mut self, _context: PrefixPlusPlusContext) -> DescResult {
         unimplemented!();
     }
     fn operator_suffix_increase(&mut self, value: TokenValue) {
