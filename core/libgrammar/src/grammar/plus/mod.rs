@@ -1,3 +1,4 @@
+use libresult::DescResult;
 use libtype::{TypeAttrubute};
 use super::{GrammarParser, Grammar
     , ExpressContext, DescContext
@@ -42,8 +43,8 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
             TokenType::Id => {
                 self.id_process(DescContext::new(
                         TypeAttrubute::Ref));
-                self.grammar_context().cb.operator_prefix_plus_plus(
-                    PrefixPlusPlusContext::new_with_all(t.token_value(), count));
+                check_desc_result!(self, self.cb().operator_prefix_plus_plus(
+                    PrefixPlusPlusContext::new_with_all(t.token_value(), count)));
                 return TokenMethodResult::StmtEnd;
             },
             TokenType::PlusPlus => {
