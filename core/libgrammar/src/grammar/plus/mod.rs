@@ -37,15 +37,17 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                 return TokenMethodResult::Panic;
             }
         };
-        let mut r = TokenMethodResult::None;
         let next = tp.as_ref::<T, CB>();
         match next.context_token_type() {
             TokenType::Id => {
                 self.id_process(DescContext::new(
                         TypeAttrubute::Ref));
+                self.grammar_context().cb.operator_prefix_plus_plus(
+                    PrefixPlusPlusContext::new_with_all(t.token_value(), count));
+                return TokenMethodResult::StmtEnd;
             },
             TokenType::PlusPlus => {
-                r = next.nup(self, express_context);
+                let r = next.nup(self, express_context);
                 match r {
                     TokenMethodResult::None => {
                         self.panic(&format!("expect operand, but found: {:?}", next.context_token_type()));
@@ -53,14 +55,13 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                     _ => {
                     }
                 }
+                return r;
             },
             _ => {
                 self.panic(&format!("expect id or ++, but found: {:?}", next.context_token_type()));
+                panic!();
             }
         }
-        self.grammar_context().cb.operator_prefix_plus_plus(
-            PrefixPlusPlusContext::new_with_all(t.token_value(), count));
-        r
     }
 
     pub fn suffix_plus_plus_process(&mut self, express_context: &mut ExpressContext<T, CB>)
