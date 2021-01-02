@@ -39,9 +39,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
             return DescResult::Error(
                 format!("{} is undefine", func_str));
         }
-        let param_len = 2;
         self.call_function(func_statement, func_define, PackageStr::Empty
-            , desc_ctx, param_len)
+            , desc_ctx)
     }
 }
 
