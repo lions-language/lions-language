@@ -39,6 +39,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
             return DescResult::Error(
                 format!("{} is undefine", func_str));
         }
+        let param_len = func_statement.as_ref().unwrap().get_func_param_len();
         self.call_function(func_statement, func_define, PackageStr::Empty
             , desc_ctx, param_len)
     }
