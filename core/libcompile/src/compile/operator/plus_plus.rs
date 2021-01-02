@@ -31,8 +31,9 @@ impl<'a, F: Compile> Compiler<'a, F> {
             return DescResult::Error(
                 format!("{} is undefine", func_str));
         }
+        let param_len = 1;
         self.call_function(func_statement, func_define, PackageStr::Empty
-            , DescContext::new(TypeAttrubute::Ref))
+            , DescContext::new(TypeAttrubute::Ref), param_len)
     }
 }
 

@@ -581,14 +581,14 @@ impl<'a, F: Compile> Compiler<'a, F> {
 
     pub fn call_function(&mut self, func_statement: Option<FunctionStatement>
         , func_define: FunctionDefine, package_str: PackageStr
-        , desc_ctx: DescContext) -> DescResult {
+        , desc_ctx: DescContext
+        , param_len: usize) -> DescResult {
         let mut return_is_alloc = false;
         let func_statement = if let Some(statement) = func_statement {
             statement
         } else {
             panic!("func_statement is none: should not happend");
         };
-        let param_len = func_statement.get_func_param_len();
         let mut move_param_contexts = Vec::new();
         let mut ref_param_addrs = VecDeque::new();
         let mut return_ref_params = HashMap::new();
@@ -868,7 +868,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
         */
         let desc_ctx = call_context.desc_ctx_clone();
         self.call_function(func_statement, func_define, call_context.package_str()
-            , desc_ctx)
+            , desc_ctx, param_len)
     }
 }
 

@@ -40,7 +40,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 format!("{} is undefine", func_str));
         }
         self.call_function(func_statement, func_define, PackageStr::Empty
-            , desc_ctx)
+            , desc_ctx, param_len)
     }
 }
 
