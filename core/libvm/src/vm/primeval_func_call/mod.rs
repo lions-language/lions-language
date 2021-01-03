@@ -29,6 +29,30 @@ macro_rules! extract_primeval_number_ref {
     }};
 }
 
+macro_rules! extract_primeval_number_mut {
+    ($data_ptr:expr, $typ:ident) => {{
+        let data = $data_ptr.as_mut::<Data>();
+        match data.value_mut() {
+            DataValue::Primeval(d) => {
+                match d {
+                    PrimevalData::$typ(v) => {
+                        /*
+                         * clone: 数值拷贝 (可以忽略效率)
+                         * */
+                        v.as_mut().expect("should not happend").to_std_mut()
+                    },
+                    _ => {
+                        unimplemented!("extract primeval data: {:?}", data.value_ref());
+                    }
+                }
+            },
+            _ => {
+                panic!("expect extract primevate data, but meet {:?}", data.value_ref());
+            }
+        }
+    }};
+}
+
 macro_rules! extract_primeval_str_ref {
     ($data_ptr:expr, $typ:ident, $func:ident) => {{
         let data = $data_ptr.as_ref::<Data>();
@@ -147,6 +171,9 @@ impl VirtualMachine {
             },
             OptCode::RefUint8EqualEqualOperatorRefUint8 => {
                 self.ref_uint8_equal_equal_operator_ref_uint8(value);
+            },
+            OptCode::RefUint8PrefixPlusPlus => {
+                self.ref_uint8_prefix_plus_plus(value);
             },
             OptCode::RefUint16ToStr => {
                 self.ref_uint16_to_str(value);

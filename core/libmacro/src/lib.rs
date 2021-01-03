@@ -41,6 +41,10 @@ pub fn number_to_std_macro(input: TokenStream) -> TokenStream {
                 &self.value
             }
 
+            pub fn to_std_mut(&mut self) -> &mut #typ {
+                &mut self.value
+            }
+
             pub fn to_std_clone(&self) -> #typ {
                 self.value.clone()
             }

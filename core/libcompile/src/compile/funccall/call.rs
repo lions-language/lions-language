@@ -506,7 +506,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                         Address::new(addr)
                                     },
                                     FunctionReturnRefParam::Index(index) => {
-                                        Address::new(ref_param_addrs[*index].dst_addr_clone())
+                                        Address::new(ref_param_addrs[*index].dst_addr_ref().clone_with_scope_minus(1))
                                     }
                                 }
                             },

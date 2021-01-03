@@ -144,5 +144,20 @@ impl VirtualMachine {
                         result))));
         // self.thread_context.current_unchecked().print_stack_datas();
     }
+
+    pub fn ref_uint8_prefix_plus_plus(&mut self, value: CallPrimevalFunction) {
+        let param_compile_addr = AddressValue::new(
+            AddressType::AddrRef, AddressKey::new_with_all(0, 0, 0, 0, 0));
+        let mut param_value = self.thread_context.current_unchecked().get_data_unchecked(
+            &param_compile_addr, &self.link_static);
+        let param_value = extract_primeval_number_mut!(param_value, Uint8);
+        *param_value += 1;
+        /*
+         * 检测返回值是否有效
+         * */
+        if !*value.return_data.is_alloc_ref() {
+            return;
+        }
+    }
 }
 
