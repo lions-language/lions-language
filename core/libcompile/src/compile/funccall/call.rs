@@ -163,7 +163,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                                 , ia));
                                             return_ref_params.insert(i, addr_value);
                                         } else {
-                                            unimplemented!();
+                                            unimplemented!("FunctionParamLengthenAttr::Lengthen");
                                         }
                                     } else {
                                         /*
@@ -210,7 +210,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                             , return_ref_params);
                                         // return_ref_params.insert(0, addr_value);
                                     } else {
-                                        unimplemented!();
+                                        unimplemented!("FunctionParamLengthenAttr::Fixed, param_len == 1");
                                     }
                                 } else {
                                     /*
@@ -505,8 +505,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
                                         // *addr.typ_mut() = AddressType::AddrRef;
                                         Address::new(addr)
                                     },
-                                    FunctionReturnRefParam::Index(_) => {
-                                        unimplemented!();
+                                    FunctionReturnRefParam::Index(index) => {
+                                        Address::new(ref_param_addrs[*index].dst_addr_clone())
                                     }
                                 }
                             },
