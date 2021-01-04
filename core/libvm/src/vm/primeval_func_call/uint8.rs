@@ -8,10 +8,11 @@ use libtype::primeval::string::{Str, StrValue};
 use libtype::primeval::boolean::{Boolean, BooleanValue};
 use libtype::instruction::{CallPrimevalFunction};
 use libtype::function::{CallFunctionParamAddr};
+use libcommon::ptr::{RefPtr};
+use libcommon::exception;
 use crate::vm::{VirtualMachine, AddressControl};
 use crate::memory::{MemoryValue, Rand};
 use crate::memory::stack;
-use libcommon::ptr::{RefPtr};
 
 impl VirtualMachine {
     pub fn ref_uint8_plus_operator_ref_uint8(&mut self, value: CallPrimevalFunction) {
@@ -151,6 +152,10 @@ impl VirtualMachine {
         let mut param_value = self.thread_context.current_unchecked().get_data_unchecked(
             &param_compile_addr, &self.link_static);
         let param_value = extract_primeval_number_mut!(param_value, Uint8);
+        if param_value == &u8::max_value() {
+            exception::exit(format!("The maximum value of u8 is {}, cannot exceed it", u8::max_value()));
+            return;
+        }
         *param_value += 1;
         /*
          * 检测返回值是否有效
