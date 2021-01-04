@@ -4,7 +4,7 @@ use crate::token::{TokenContext, Token, TokenAttrubute, TokenOperType, TokenMeth
 
 lazy_static!{
     static ref left_angular_bracket_token_attrubute: TokenAttrubute = TokenAttrubute{
-        bp: &10,
+        bp: &12,
         oper_type: &TokenOperType::Operator
     };
 }

@@ -1001,6 +1001,7 @@ mod process_first;
 mod process_for;
 mod process_while;
 mod plus;
+mod angular_brackets;
 
 #[cfg(test)]
 mod test {
