@@ -4,37 +4,35 @@ use crate::grammar::Grammar;
 use crate::token::{TokenType};
 
 impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
-    fn plus(&mut self) {
-        let context = self.build_token_context_without_data(TokenType::Plus);
-        self.push_to_token_buffer(plus::PlusToken::new(context));
+    pub fn left_angular_bracket(&mut self) {
+        let context = self.build_token_context_without_data(TokenType::LeftAngularBracket);
+        self.push_to_token_buffer(left_angular_bracket::LeftAngularBracketToken::new(context));
     }
 
-    fn plus_plus(&mut self) {
-        /*
-         * 跳过 + 号
+    pub fn left_angular_bracket_equal(&mut self) {
+        /*=
+         * 跳过 <
          * */
         self.content.skip_next_one();
-        let context = self.build_token_context_without_data(TokenType::PlusPlus);
-        self.push_to_token_buffer(plus_plus::PlusPlusToken::new(context));
+        let context = self.build_token_context_without_data(TokenType::LeftAngularBracketEqual);
+        self.push_to_token_buffer(
+            left_angular_bracket_equal::LeftAngularBracketEqualToken::new(context));
     }
 
-    pub fn plus_process(&mut self) {
-        // 跳过 + 号
+    pub fn angular_brackets_left_process(&mut self) {
+        // 跳过 < 号
         self.content.skip_next_one();
         loop {
             match self.content.lookup_next_one() {
                 Some(c) => {
                     match c {
-                        '+' => {
-                            // ++
-                            self.plus_plus();
-                        },
                         '=' => {
-                            // +=
+                            // <=
+                            self.left_angular_bracket_equal();
                         },
                         _ => {
-                            // +
-                            self.plus();
+                            // <
+                            self.left_angular_bracket();
                         }
                     }
                     return;
@@ -55,6 +53,6 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
     }
 }
 
-pub mod plus;
-mod plus_plus;
+mod left_angular_bracket;
+mod left_angular_bracket_equal;
 

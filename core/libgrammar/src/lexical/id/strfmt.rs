@@ -1,8 +1,15 @@
 use super::super::{LexicalParser, CallbackReturnStatus};
 use libcommon::strtool::strcompare::{U8ArrayIsEqual};
 use crate::grammar::Grammar;
+use crate::token::{TokenType};
+use crate::lexical::plus::plus;
 
 impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
+    fn push_token_plus(&mut self) {
+        let context = self.build_token_context_without_data(TokenType::Plus);
+        self.push_to_token_buffer(plus::PlusToken::new(context));
+    }
+
     fn id_kw_strfmt_process_next_is_strend(&mut self) -> bool {
         /*
          * 检测下一个字符是否是字符串结束符

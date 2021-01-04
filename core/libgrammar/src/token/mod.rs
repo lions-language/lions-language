@@ -32,6 +32,10 @@ pub enum TokenType {
     Equal,
     // ==
     EqualEqual,
+    // <
+    LeftAngularBracket,
+    // <=
+    LeftAngularBracketEqual,
     // >
     RightAngularBracket,
     // \r | \r\n | \n

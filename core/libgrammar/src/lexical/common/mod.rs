@@ -139,11 +139,6 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
         ret
     }
 
-    pub fn push_token_plus(&mut self) {
-        let context = self.build_token_context_without_data(TokenType::Plus);
-        self.push_to_token_buffer(plus::PlusToken::new(context));
-    }
-
     pub fn push_token_left_parenthese(&mut self) {
         let context = self.build_token_context_without_data(TokenType::LeftParenthese);
         self.push_to_token_buffer(left_parenthese::LeftParentheseToken::new(context));
