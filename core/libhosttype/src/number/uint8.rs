@@ -22,6 +22,7 @@ lazy_static!{
             "uint8:to_str(&uint8)" => 2,
             "uint8:==(&uint8,&uint8)" => 3,
             "uint8:++x(&uint8)" => 4,
+            "uint8:<(&uint8,&uint8)" => 5,
         }
     };
     /*
@@ -196,6 +197,43 @@ lazy_static!{
             optcode: OptCode::RefUint8PrefixPlusPlus
         })
     };
+    /*
+     * &uint8 < &uint8 -> bool
+     * */
+    static ref REF_UINT8_LESS_THAN_OPERATOR_REF_UINT8_FUNCTION: Function = Function{
+        func_statement: FunctionStatement::new(
+            String::from(consts::OPERATOR_LESS_THAN_FUNCTION_NAME),
+            Some(FunctionParam::new(
+                FunctionParamData::Multi(
+                    vec![FunctionParamDataItem::new(
+                        Type::new_without_attr(
+                            TypeValue::Primeval(Primeval::new(
+                                PrimevalType::Uint8)))
+                        , TypeAttrubute::Ref
+                    ), FunctionParamDataItem::new(
+                        Type::new_without_attr(
+                            TypeValue::Primeval(Primeval::new(
+                                PrimevalType::Uint8)))
+                        , TypeAttrubute::Ref
+                    )])
+                )),
+            FunctionReturn::new(
+                FunctionReturnData::new_with_attr(
+                    Type::new_without_attr(
+                        TypeValue::Primeval(Primeval::new(
+                            PrimevalType::Boolean)))
+                    , TypeAttrubute::Move
+                    , FunctionReturnDataAttr::Create
+                    ),
+                ),
+            Some(Type::new_without_attr(
+                TypeValue::Primeval(Primeval::new(
+                        PrimevalType::Uint8))))
+        ),
+        func_define: FunctionDefine::Optcode(OptcodeFunctionDefine{
+            optcode: OptCode::RefUint8LessThanOperatorRefUint8
+        })
+    };
 
     static ref UINT8_FUNCTION_VEC: Vec<&'static Function> = {
         let mut v = Vec::with_capacity(UINT8_METHOD.len());
@@ -204,6 +242,7 @@ lazy_static!{
         v.push(&*REF_UINT8_TO_STR_FUNCTION);
         v.push(&*REF_UINT8_EQUAL_EQUAL_OPERATOR_REF_UINT8_FUNCTION);
         v.push(&*REF_UINT8_PREFIX_PLUS_PLUS_OPERATOR);
+        v.push(&*REF_UINT8_LESS_THAN_OPERATOR_REF_UINT8_FUNCTION);
         v
     };
 }

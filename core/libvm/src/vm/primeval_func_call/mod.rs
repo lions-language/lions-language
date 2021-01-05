@@ -172,6 +172,9 @@ impl VirtualMachine {
             OptCode::RefUint8EqualEqualOperatorRefUint8 => {
                 self.ref_uint8_equal_equal_operator_ref_uint8(value);
             },
+            OptCode::RefUint8LessThanOperatorRefUint8 => {
+                self.ref_uint8_less_than_operator_ref_uint8(value);
+            },
             OptCode::RefUint8PrefixPlusPlus => {
                 self.ref_uint8_prefix_plus_plus(value);
             },

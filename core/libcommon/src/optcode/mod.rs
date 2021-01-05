@@ -4,6 +4,7 @@ pub enum OptCode {
     RefUint8PlusOperatorRefUint16,
     RefUint8ToStr,
     RefUint8EqualEqualOperatorRefUint8,
+    RefUint8LessThanOperatorRefUint8,
     RefUint8PrefixPlusPlus,
     MoveUint16PlusOperatorRefUint8,
     RefUint16ToStr,

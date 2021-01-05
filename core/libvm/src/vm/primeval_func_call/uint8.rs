@@ -164,5 +164,42 @@ impl VirtualMachine {
             return;
         }
     }
+
+    pub fn ref_uint8_less_than_operator_ref_uint8(&mut self, value: CallPrimevalFunction) {
+        let left_param_compile_addr = AddressValue::new(
+            AddressType::AddrRef, AddressKey::new_with_all(0, 0, 0, 0, 0));
+        let left_param_value = self.thread_context.current_unchecked().get_data_unchecked(
+            &left_param_compile_addr, &self.link_static);
+        let left_param_value = extract_primeval_number_ref!(left_param_value, Uint8);
+        let right_param_compile_addr = AddressValue::new(
+            AddressType::AddrRef, AddressKey::new_with_all(1, 0, 0, 0, 0));
+        let right_param_value = self.thread_context.current_unchecked().get_data_unchecked(
+            &right_param_compile_addr, &self.link_static);
+        let right_param_value = extract_primeval_number_ref!(right_param_value, Uint8);
+        /*
+         * 计算返回值
+         * */
+        let result = if left_param_value < right_param_value {
+            Boolean::new(BooleanValue::True)
+        } else {
+            Boolean::new(BooleanValue::False)
+        };
+        /*
+         * 检测返回值是否有效
+         * */
+        if !*value.return_data.is_alloc_ref() {
+            return;
+        }
+        /*
+         * 返回值有效 => 将返回值写入到内存
+         * 注意: 返回值一定要写入到前一个作用域中
+         * */
+        self.thread_context.current_mut_unchecked().alloc_and_write_data(
+            &value.return_data.addr_value()
+            , Data::new(DataValue::Primeval(
+                    PrimevalData::Boolean(
+                        result))));
+        // self.thread_context.current_unchecked().print_stack_datas();
+    }
 }
 
