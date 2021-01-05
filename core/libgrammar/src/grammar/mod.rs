@@ -272,6 +272,14 @@ pub struct OperatorEqualEqualContext {
 #[derive(Debug, FieldGet
     , NewWithAll, FieldGetMove
     , Default)]
+pub struct OperatorLessThanContext {
+    value: TokenValue,
+    desc_ctx: DescContext
+}
+
+#[derive(Debug, FieldGet
+    , NewWithAll, FieldGetMove
+    , Default)]
 pub struct PrefixPlusPlusContext {
     value: TokenValue,
     symbol_count: u8
@@ -358,6 +366,9 @@ pub trait Grammar {
         unimplemented!();
     }
     fn operator_equal_equal(&mut self, context: OperatorEqualEqualContext) -> DescResult {
+        unimplemented!();
+    }
+    fn operator_less_than(&mut self, context: OperatorLessThanContext) -> DescResult {
         unimplemented!();
     }
     fn operator_prefix_plus_plus(&mut self, _context: PrefixPlusPlusContext) -> DescResult {

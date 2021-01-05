@@ -406,6 +406,7 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
             '-' => self.minus_process(),
             '*' => self.start_process(),
             '=' => self.equal_process(),
+            '<' => self.angular_brackets_left_process(),
             '`' => self.backticks_process(),
             '"' => self.double_quotes_process(),
             '(' => self.parenthese_left_process(),

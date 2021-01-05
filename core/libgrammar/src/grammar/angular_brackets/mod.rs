@@ -2,7 +2,7 @@ use libresult::DescResult;
 use libtype::{TypeAttrubute};
 use super::{GrammarParser, Grammar
     , ExpressContext, DescContext
-    , NupContextValue, PrefixPlusPlusContext};
+    , NupContextValue, OperatorLessThanContext};
 use crate::lexical::{CallbackReturnStatus};
 use crate::token::{TokenMethodResult, TokenType};
 
@@ -29,8 +29,8 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
             }
         };
         let r =  self.expression(t.token_attrubute().bp, express_context, &tp);
-        if let DescResult::Error(err) = self.grammar_context().cb.operator_equal_equal(
-            crate::grammar::OperatorEqualEqualContext::new_with_all(
+        if let DescResult::Error(err) = self.grammar_context().cb.operator_less_than(
+            crate::grammar::OperatorLessThanContext::new_with_all(
                 t.token_value(), express_context.desc_ctx.clone())) {
             self.panic(&err);
         };
