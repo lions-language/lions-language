@@ -4,7 +4,7 @@ use libtype::instruction::{WhileStmt, BlockDefine
     , ConditionStmtTrue
     , JumpType};
 use libgrammar::grammar::{WhileStmtContext, BlockDefineContext};
-use crate::compile::{Compile, Compiler};
+use crate::compile::{Compile, Compiler, AddressValueExpand};
 
 impl<'a, F: Compile> Compiler<'a, F> {
     pub fn process_while_stmt_start(&mut self, stmt_context: &mut WhileStmtContext
@@ -35,7 +35,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
             return DescResult::Error(
                 format!("expect boolean, but meet: {:?}", value.typ_ref()));
         }
-        *stmt_context.expr_result_addr_mut() = value.addr_ref().addr_clone();
+        *stmt_context.expr_result_addr_mut() = value.addr_ref().addr_ref().clone_with_scope_plus(1);
         DescResult::Success
     }
 
