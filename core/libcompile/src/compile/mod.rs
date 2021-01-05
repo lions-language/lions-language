@@ -18,7 +18,7 @@ use libgrammar::grammar::{Grammar, CallFuncScopeContext
     , EnterPointAccessContext, VarUpdateStmtContext
     , ValueUpdateStmtContext
     , OperatorEqualEqualContext, ImportStmtContext
-    , PrefixPlusPlusContext
+    , PrefixPlusPlusContext, OperatorLessThanContext
     , RelmodStmtContext, ModuleStmtContext
     , UseStmtContext, EndContext, FirstStmtContext};
 use libgrammar::token::{TokenValue};
@@ -416,6 +416,10 @@ impl<'a, F: Compile> Grammar for Compiler<'a, F> {
 
     fn operator_prefix_plus_plus(&mut self, context: PrefixPlusPlusContext) -> DescResult {
         self.prefix_plus_plus(context)
+    }
+
+    fn operator_less_than(&mut self, context: OperatorLessThanContext) -> DescResult {
+        self.operator_less_than(context)
     }
 
     fn end(&mut self, context: EndContext) -> DescResult {
