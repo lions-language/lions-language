@@ -194,7 +194,7 @@ impl VirtualMachine {
          * 返回值有效 => 将返回值写入到内存
          * 注意: 返回值一定要写入到前一个作用域中
          * */
-        self.thread_context.current_mut_unchecked().alloc_and_write_data(
+        self.thread_context.current_mut_unchecked().alloc_or_update_data(
             &value.return_data.addr_value()
             , Data::new(DataValue::Primeval(
                     PrimevalData::Boolean(

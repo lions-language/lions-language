@@ -70,6 +70,14 @@ impl ThreadScope {
         */
     }
 
+    pub fn alloc_or_update_data(&mut self, addr: &AddressValue
+        , data: Data) {
+        let memory = RefPtr::from_ref::<ThreadMemory>(&self.memory);
+        let scope = addr.scope_clone();
+        self.scope_context.last_n_mut_unchecked(scope).alloc_or_update_data(
+            addr, data, memory);
+    }
+
     pub fn alloc_and_write_data(&mut self, addr: &AddressValue
         , data: Data) {
         let memory = RefPtr::from_ref::<ThreadMemory>(&self.memory);

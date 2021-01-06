@@ -115,6 +115,33 @@ impl Scope {
         self.ref_param_addr_mapping.get_unwrap(addr).addr_value_ref()
     }
 
+    pub fn alloc_or_update_data(&mut self, addr: &AddressValue
+        , data: Data, mut memory: RefPtr) {
+        // println!("write: {:?} => {:?}", addr, &data);
+        let memory = memory.as_mut::<ThreadMemory>();
+        match addr.typ_ref() {
+            AddressType::Stack => {
+                /*
+                 * 1. 在栈区分配一个空间, 并将数据存入
+                 * 2. 将编译期的地址和实际的地址进行绑定
+                 * */
+                match memory.stack_data.get_mut(&MemoryValue::new(addr.clone())) {
+                    Some(v) => {
+                        *v = data;
+                    },
+                    None => {
+                        let stack_addr = memory.stack_data.alloc(addr.typ_clone(), data);
+                        self.addr_mapping.bind(addr.addr_clone()
+                            , stack_addr);
+                    }
+                }
+            },
+            _ => {
+                unimplemented!();
+            }
+        }
+    }
+
     pub fn alloc_and_write_data(&mut self, addr: &AddressValue
         , data: Data, mut memory: RefPtr) {
         // println!("write: {:?} => {:?}", addr, &data);
@@ -125,6 +152,9 @@ impl Scope {
                  * 1. 在栈区分配一个空间, 并将数据存入
                  * 2. 将编译期的地址和实际的地址进行绑定
                  * */
+                if memory.stack_data.exists(&MemoryValue::new(addr.clone())) {
+                    return;
+                }
                 let stack_addr = memory.stack_data.alloc(addr.typ_clone(), data);
                 self.addr_mapping.bind(addr.addr_clone()
                     , stack_addr);

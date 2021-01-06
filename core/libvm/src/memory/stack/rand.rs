@@ -43,6 +43,10 @@ impl<T> Rand<T> for RandStack<T> {
         self.datas.get_mut(&index.get_index_clone()).unwrap()
     }
 
+    fn get_mut(&mut self, index: &MemoryValue) -> Option<&mut T> {
+        self.datas.get_mut(&index.get_index_clone())
+    }
+
     fn take_unwrap(&mut self, index: &MemoryValue) -> T {
         let index = index.get_index_clone();
         /*
@@ -72,6 +76,13 @@ impl<T> Rand<T> for RandStack<T> {
             self.recycles.push(index);
         }
         */
+    }
+
+    fn exists(&self, index: &MemoryValue) -> bool {
+        match self.datas.get(&(index.get_index_clone() as usize)) {
+            Some(_) => true,
+            None => false
+        }
     }
 }
 
