@@ -20,8 +20,8 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
             Some(tp) => tp,
             None => {
                 /*
-                 * if 后面没有token
-                 *  => if 语句后面必须要有表达式
+                 * while 后面没有token
+                 *  => while 语句后面必须要有表达式
                  * */
                 self.panic("expect expr, but arrive IOEof");
                 return;
@@ -29,7 +29,6 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         };
         let mut stmt_context = WhileStmtContext::default();
         let mut define_context = BlockDefineContext::default();
-        check_desc_result!(self, self.cb().block_define_start(&mut define_context));
         check_desc_result!(self, self.cb().while_stmt_start(&mut stmt_context, &mut define_context));
         check_desc_result!(self, self.cb().while_stmt_expr_start(&mut stmt_context, &mut define_context));
         self.expression_process(&tp
@@ -38,6 +37,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         /*
          * 解析 block
          * */
+        check_desc_result!(self, self.cb().block_define_start(&mut define_context));
         self.expect_and_take_next_token_unchecked(TokenType::LeftBigParenthese);
         self.parse_block_content();
         self.skip_next_one();
