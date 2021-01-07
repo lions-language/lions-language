@@ -125,15 +125,19 @@ impl Scope {
                  * 1. 在栈区分配一个空间, 并将数据存入
                  * 2. 将编译期的地址和实际的地址进行绑定
                  * */
-                match memory.stack_data.get_mut(&MemoryValue::new(addr.clone())) {
-                    Some(v) => {
-                        *v = data;
-                    },
-                    None => {
-                        let stack_addr = memory.stack_data.alloc(addr.typ_clone(), data);
-                        self.addr_mapping.bind(addr.addr_clone()
-                            , stack_addr);
+                if self.addr_mapping.exists(addr.addr_ref()) {
+                    match memory.stack_data.get_mut(&MemoryValue::new(addr.clone())) {
+                        Some(v) => {
+                            *v = data;
+                        },
+                        None => {
+                            panic!("");
+                        }
                     }
+                } else {
+                    let stack_addr = memory.stack_data.alloc(addr.typ_clone(), data);
+                    self.addr_mapping.bind(addr.addr_clone()
+                        , stack_addr);
                 }
             },
             _ => {
