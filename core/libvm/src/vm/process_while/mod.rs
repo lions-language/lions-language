@@ -56,7 +56,6 @@ impl VirtualMachine {
         };
         match boolean_value.value_ref() {
             BooleanValue::True => {
-                /*
                 match self.process_execute_block_ref(expr_stmt_addr) {
                     ExecuteResult::ReturnFunc => {
                         return (ConditionResult::True, ExecuteResult::ReturnFunc);
@@ -67,7 +66,6 @@ impl VirtualMachine {
                         panic!("should not happend");
                     }
                 }
-                */
                 /*
                  * 执行 true block 的语句
                  * */
