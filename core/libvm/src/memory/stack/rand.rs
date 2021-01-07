@@ -43,6 +43,10 @@ impl<T> Rand<T> for RandStack<T> {
         self.datas.get_mut(&index.get_index_clone()).unwrap()
     }
 
+    fn get(&mut self, index: &MemoryValue) -> Option<&T> {
+        self.datas.get(&index.get_index_clone())
+    }
+
     fn get_mut(&mut self, index: &MemoryValue) -> Option<&mut T> {
         self.datas.get_mut(&index.get_index_clone())
     }

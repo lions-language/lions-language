@@ -39,6 +39,14 @@ impl AddressMapping {
                 , key, &self.maps))
     }
 
+    pub fn exists(&self, key: &AddressKey) -> bool {
+        if self.maps.get(&Key::from(key)).is_some() {
+            true
+        } else {
+            false
+        }
+    }
+
     pub fn print(&self) {
         for value in self.maps.iter() {
             println!("{:?}", value);

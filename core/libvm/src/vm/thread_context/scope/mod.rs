@@ -152,7 +152,7 @@ impl Scope {
                  * 1. 在栈区分配一个空间, 并将数据存入
                  * 2. 将编译期的地址和实际的地址进行绑定
                  * */
-                if memory.stack_data.exists(&MemoryValue::new(addr.clone())) {
+                if self.addr_mapping.exists(addr.addr_ref()) {
                     return;
                 }
                 let stack_addr = memory.stack_data.alloc(addr.typ_clone(), data);

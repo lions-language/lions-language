@@ -42,6 +42,7 @@ pub trait Rand<T> {
     fn take_unwrap(&mut self, _: &MemoryValue) -> T;
     fn get_unwrap(&self, index: &MemoryValue) -> &T;
     fn get_mut_unwrap(&mut self, index: &MemoryValue) -> &mut T;
+    fn get(&mut self, index: &MemoryValue) -> Option<&T>;
     fn get_mut(&mut self, index: &MemoryValue) -> Option<&mut T>;
     fn exists(&self, _: &MemoryValue) -> bool;
 }
