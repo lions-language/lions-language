@@ -1,5 +1,5 @@
 use libresult::{DescResult};
-use libtype::instruction::{ConditionStmt, BlockDefine
+use libtype::instruction::{IfStmt, BlockDefine
     , Instruction, Jump
     , ConditionStmtTrue
     , JumpType};
@@ -56,7 +56,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
          *  / 表达式为false情况下执行的块地址(这个时候无法知道false情况下的块地址, 所以暂时保留))
          * */
         // println!("{:?}, {:?}", stmt_context, define_context);
-        self.cb.condition_stmt(ConditionStmt::new_with_all(
+        self.cb.condition_stmt(IfStmt::new_with_all(
                 stmt_context.cur_expr_result_addr_clone()
                 , ConditionStmtTrue::new_with_all(
                     BlockDefine::new_with_all(define_context.define_addr_clone())

@@ -169,7 +169,7 @@ pub struct ConditionStmtTrue {
 
 #[derive(Debug, Clone, FieldGet, NewWithAll
     , FieldGetMove, FieldGetClone, Default)]
-pub struct ConditionStmt {
+pub struct IfStmt {
     expr_addr: AddressValue,
     true_handle: ConditionStmtTrue
 }
@@ -209,7 +209,7 @@ pub enum Instruction {
     Jump(Jump),
     RemoveOwnership(RemoveOwnership),
     AddRefParamAddr(AddRefParamAddr),
-    ConditionStmt(ConditionStmt),
+    ConditionStmt(IfStmt),
     WhileStmt(WhileStmt),
     ExecuteBlock(BlockDefine),
     DeleteData(DeleteData),

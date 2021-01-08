@@ -37,7 +37,7 @@ use libtype::instruction::{
     , UpdateRefParamAddr
     , CallSelfFunction
     , CallPrimevalFunctionParamContext
-    , ConditionStmt, DeleteData
+    , IfStmt, DeleteData
     , WhileStmt};
 use libtypecontrol::function::FunctionControl;
 use libtype::module::Module;
@@ -256,7 +256,7 @@ pub trait Compile {
         unimplemented!();
     }
 
-    fn condition_stmt(&mut self, _context: ConditionStmt) {
+    fn condition_stmt(&mut self, _context: IfStmt) {
         unimplemented!();
     }
 

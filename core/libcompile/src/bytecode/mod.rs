@@ -12,7 +12,7 @@ use libtype::instruction::{Instruction, CallPrimevalFunction
     , Jump, RemoveOwnership
     , CallSelfFunction
     , AddRefParamAddr, CallPrimevalFunctionParamContext
-    , ConditionStmt, BlockDefine, DeleteData
+    , IfStmt, BlockDefine, DeleteData
     , WhileStmt};
 use libgrammar::grammar::{FunctionDefineContext
     , BlockDefineContext};
@@ -184,7 +184,7 @@ impl<'a, 'b, F: Writer> Compile for Bytecode<'a, 'b, F> {
                     scope, addr_value)));
     }
 
-    fn condition_stmt(&mut self, context: ConditionStmt) {
+    fn condition_stmt(&mut self, context: IfStmt) {
         self.write(Instruction::ConditionStmt(context));
     }
 

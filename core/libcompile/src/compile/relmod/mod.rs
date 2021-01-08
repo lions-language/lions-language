@@ -1,6 +1,6 @@
 use libresult::{DescResult};
-use libtype::instruction::{ConditionStmt, BlockDefine
-    , Instruction, Jump
+use libtype::instruction::{
+    Instruction, Jump
     , ConditionStmtTrue
     , JumpType};
 use libgrammar::grammar::{RelmodStmtContext};

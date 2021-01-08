@@ -1,6 +1,6 @@
 use libcommon::address::{FunctionAddrValue};
 use liblink::{define::LinkDefine};
-use libtype::instruction::{ConditionStmt
+use libtype::instruction::{IfStmt
     , BlockDefine};
 use libtype::{Data, DataValue
     , primeval::PrimevalData
@@ -8,7 +8,7 @@ use libtype::{Data, DataValue
 use crate::vm::{VirtualMachine, ExecuteResult};
 
 impl VirtualMachine {
-    pub fn process_condition_stmt(&mut self, value: ConditionStmt) -> ExecuteResult {
+    pub fn process_condition_stmt(&mut self, value: IfStmt) -> ExecuteResult {
         let (expr_addr, true_handle) = value.fields_move();
         /*
          * 计算表达式的结果
