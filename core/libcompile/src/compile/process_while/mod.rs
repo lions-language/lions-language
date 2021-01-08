@@ -1,6 +1,6 @@
 use libresult::{DescResult};
 use libtype::instruction::{WhileStmt, BlockDefine
-    , Instruction, Jump
+    , ConditionStmt, Jump
     , ConditionStmtTrue
     , JumpType};
 use libgrammar::grammar::{WhileStmtContext, BlockDefineContext};
@@ -43,6 +43,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 format!("expect boolean, but meet: {:?}", value.typ_ref()));
         }
         *stmt_context.expr_result_addr_mut() = value.addr_ref().addr_clone();
+        self.cb.condition_stmt(ConditionStmt::new_with_all(
+                value.addr_ref().addr_clone()));
         DescResult::Success
     }
 

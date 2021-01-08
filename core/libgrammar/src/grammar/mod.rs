@@ -243,6 +243,12 @@ pub struct IfStmtContext {
 
 #[derive(Debug, Clone, Default
     , FieldGet, FieldGetClone)]
+pub struct ConditionStmtContext {
+    expr_result_addr: AddressValue
+}
+
+#[derive(Debug, Clone, Default
+    , FieldGet, FieldGetClone)]
 pub struct WhileStmtContext {
     expr_stmt_addr: FunctionAddrValue,
     expr_result_addr: AddressValue

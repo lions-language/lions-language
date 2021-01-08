@@ -232,7 +232,7 @@ impl LinkDefine {
                     }
                 }
             },
-            Instruction::ConditionStmt(value) => {
+            Instruction::IfStmt(value) => {
                 self.process_block_define(value.true_handle_mut().define_mut()
                     , self.define_stream.clone());
             },

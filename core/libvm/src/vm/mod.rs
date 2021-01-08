@@ -44,10 +44,18 @@ pub struct VirtualMachine {
     link_static: RefPtr,
 }
 
+#[derive(Debug)]
+pub enum ConditionResult {
+    True,
+    False
+}
+
+#[derive(Debug)]
 pub enum ExecuteResult {
     ReturnFunc,
     Jump(Jump),
-    Normal
+    Normal,
+    Condition(ConditionResult)
 }
 
 impl VirtualMachine {
@@ -90,6 +98,9 @@ impl VirtualMachine {
             },
             Instruction::ReturnStmt(v) => {
                 return self.process_return_stmt(v);
+            },
+            Instruction::IfStmt(v) => {
+                return self.process_if_stmt(v);
             },
             Instruction::ConditionStmt(v) => {
                 return self.process_condition_stmt(v);
@@ -251,6 +262,7 @@ mod process_return;
 mod process_if;
 mod memory;
 mod process_while;
+mod process_condition;
 
 #[cfg(test)]
 mod test {

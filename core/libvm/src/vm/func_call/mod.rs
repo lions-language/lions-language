@@ -73,7 +73,9 @@ impl VirtualMachine {
                             block.current_pos_clone(), block.block_length_clone()));
                 while let Some(ins) = block.get_next() {
                     // println!("{:?}, {:?}", i, ins);
-                    match self.execute(ins.clone(), &block.current_pos_clone(), &block.block_length_clone()) {
+                    let r = self.execute(ins.clone(), &block.current_pos_clone()
+                        , &block.block_length_clone());
+                    match r {
                         /*
                         ExecuteResult::ReturnFunc(addr) => {
                             /*
@@ -107,6 +109,9 @@ impl VirtualMachine {
                             block.update_by_jump(&jump);
                         },
                         ExecuteResult::Normal => {
+                        },
+                        ExecuteResult::Condition(_) => {
+                            break;
                         }
                     }
                 }

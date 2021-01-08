@@ -176,6 +176,12 @@ pub struct IfStmt {
 
 #[derive(Debug, Clone, FieldGet, NewWithAll
     , FieldGetMove, FieldGetClone, Default)]
+pub struct ConditionStmt {
+    expr_addr: AddressValue
+}
+
+#[derive(Debug, Clone, FieldGet, NewWithAll
+    , FieldGetMove, FieldGetClone, Default)]
 pub struct WhileStmt {
     expr_stmt_addr: BlockDefine,
     expr_addr: AddressValue,
@@ -209,7 +215,8 @@ pub enum Instruction {
     Jump(Jump),
     RemoveOwnership(RemoveOwnership),
     AddRefParamAddr(AddRefParamAddr),
-    ConditionStmt(IfStmt),
+    IfStmt(IfStmt),
+    ConditionStmt(ConditionStmt),
     WhileStmt(WhileStmt),
     ExecuteBlock(BlockDefine),
     DeleteData(DeleteData),

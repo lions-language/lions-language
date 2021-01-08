@@ -8,7 +8,7 @@ use libtype::{Data, DataValue
 use crate::vm::{VirtualMachine, ExecuteResult};
 
 impl VirtualMachine {
-    pub fn process_condition_stmt(&mut self, value: IfStmt) -> ExecuteResult {
+    pub fn process_if_stmt(&mut self, value: IfStmt) -> ExecuteResult {
         let (expr_addr, true_handle) = value.fields_move();
         /*
          * 计算表达式的结果
@@ -42,7 +42,8 @@ impl VirtualMachine {
                     },
                     ExecuteResult::Normal => {
                     },
-                    ExecuteResult::Jump(_) => {
+                    ExecuteResult::Jump(_)
+                        | ExecuteResult::Condition(_) => {
                         panic!("should not happend");
                     }
                 }
@@ -85,7 +86,8 @@ impl VirtualMachine {
         let mut block = ld.read(define_addr);
         while let Some(ins) = block.get_next() {
             // println!("{:?}", ins);
-            match self.execute(ins.clone(), &block.current_pos_clone(), &block.block_length_clone()) {
+            let r = self.execute(ins.clone(), &block.current_pos_clone(), &block.block_length_clone());
+            match r {
                 ExecuteResult::ReturnFunc => {
                     return ExecuteResult::ReturnFunc;
                 },
@@ -93,6 +95,9 @@ impl VirtualMachine {
                     block.update_by_jump(&jump);
                 },
                 ExecuteResult::Normal => {
+                },
+                ExecuteResult::Condition(_) => {
+                    return r;
                 }
             }
         }
