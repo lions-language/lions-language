@@ -581,6 +581,14 @@ impl<'a, F: Compile> Grammar for Compiler<'a, F> {
         self.process_anonymous_block_end();
     }
 
+    fn noenter_block_start(&mut self, define_context: &mut BlockDefineContext) {
+        self.process_noenter_block_start(define_context);
+    }
+
+    fn noenter_block_end(&mut self, define_context: &mut BlockDefineContext) {
+        self.process_noenter_block_end(define_context);
+    }
+
     fn struct_define_start(&mut self, define: &mut StructDefine) {
         self.process_struct_define_start(define);
     }

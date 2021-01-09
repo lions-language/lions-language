@@ -438,6 +438,12 @@ pub trait Grammar {
         -> DescResult {
         unimplemented!();
     }
+    fn noenter_block_start(&mut self, define_context: &mut BlockDefineContext) {
+        unimplemented!();
+    }
+    fn noenter_block_end(&mut self, define_context: &mut BlockDefineContext) {
+        unimplemented!();
+    }
     fn call_function_prepare(&mut self, _context: CallFuncScopeContext
         , _: &mut CallFunctionContext) -> DescResult {
         DescResult::Success
