@@ -17,6 +17,17 @@ impl<'a, F: Compile> Compiler<'a, F> {
         self.cb_leave_scope();
     }
 
+    pub fn process_noenter_block_start(&mut self, define_context: &mut BlockDefineContext) {
+        self.scope_context.enter(ScopeType::Block);
+        self.cb.enter_block_define(define_context);
+    }
+
+    pub fn process_noenter_block_end(&mut self, define_context: &mut BlockDefineContext) {
+        self.scope_context.leave();
+        let addr = self.cb.leave_block_define(DefineObject::new(define_context.define_obj_clone()));
+        *define_context.define_addr_mut() = addr;
+    }
+
     pub fn process_block_define_start(&mut self, define_context: &mut BlockDefineContext)
         -> DescResult {
         self.scope_context.enter(ScopeType::BlockDefine);
