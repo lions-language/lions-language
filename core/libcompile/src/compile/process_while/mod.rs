@@ -33,6 +33,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
         *expr_stmt_addr.valid_mut() = true;
         *expr_stmt_addr.length_mut() = cur_index - *expr_stmt_addr.index_ref() + 2;
         */
+        let expr_stmt_addr = stmt_context.expr_stmt_addr_mut();
         *expr_stmt_addr = define_context.define_addr_clone();
         let value = match self.scope_context.take_top_from_value_buffer() {
             Ok(v) => v,

@@ -564,7 +564,7 @@ impl<'a, F: Compile> Grammar for Compiler<'a, F> {
     }
 
     fn while_stmt_expr_end(&mut self, stmt_context: &mut WhileStmtContext
-        , define_context: BlockDefineContext) -> DescResult {
+        , define_context: &mut BlockDefineContext) -> DescResult {
         self.process_while_stmt_expr_end(stmt_context, define_context)
     }
 
