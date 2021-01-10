@@ -14,9 +14,11 @@ impl<'a, F: Compile> Compiler<'a, F> {
 
     pub fn process_while_stmt_expr_start(&mut self, stmt_context: &mut WhileStmtContext
         , define_context: &mut BlockDefineContext) -> DescResult {
+        /*
         let cur_index = self.cb.current_index();
         let expr_stmt_addr = stmt_context.expr_stmt_addr_mut();
         *expr_stmt_addr.index_mut() = cur_index + 1;
+        */
         DescResult::Success
     }
 
@@ -25,10 +27,13 @@ impl<'a, F: Compile> Compiler<'a, F> {
         /*
          * 获取表达式的计算结果地址
          * */
+        /*
         let cur_index = self.cb.current_index();
         let expr_stmt_addr = stmt_context.expr_stmt_addr_mut();
         *expr_stmt_addr.valid_mut() = true;
         *expr_stmt_addr.length_mut() = cur_index - *expr_stmt_addr.index_ref() + 2;
+        */
+        *expr_stmt_addr = define_context.define_addr_clone();
         let value = match self.scope_context.take_top_from_value_buffer() {
             Ok(v) => v,
             Err(e) => {
