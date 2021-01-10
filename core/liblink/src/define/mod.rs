@@ -237,6 +237,8 @@ impl LinkDefine {
                     , self.define_stream.clone());
             },
             Instruction::WhileStmt(value) => {
+                self.process_block_define(value.expr_stmt_addr_mut()
+                    , self.define_stream.clone());
                 self.process_block_define(value.true_handle_mut().define_mut()
                     , self.define_stream.clone());
             },

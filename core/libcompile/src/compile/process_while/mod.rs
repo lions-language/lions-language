@@ -49,8 +49,10 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 format!("expect boolean, but meet: {:?}", value.typ_ref()));
         }
         *stmt_context.expr_result_addr_mut() = value.addr_ref().addr_clone();
+        /*
         self.cb.condition_stmt(ConditionStmt::new_with_all(
                 value.addr_ref().addr_clone()));
+        */
         DescResult::Success
     }
 

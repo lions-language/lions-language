@@ -34,7 +34,6 @@ impl VirtualMachine {
     fn condition_handle(&mut self, expr_stmt_addr: &BlockDefine, expr_addr: &AddressValue
         , true_handle: &ConditionStmtTrue) -> (ConditionResult, ExecuteResult) {
         /*
-        /*
          * 计算表达式的结果
          * */
         let expr_value = self.thread_context.current_unchecked().get_data_unchecked(
@@ -86,7 +85,7 @@ impl VirtualMachine {
                 (ConditionResult::False, ExecuteResult::Normal)
             }
         }
-        */
+        /*
         let r = self.process_execute_block_ref(true_handle.define_ref());
         println!("{:?}", r);
         match r {
@@ -101,6 +100,7 @@ impl VirtualMachine {
             }
         }
         (ConditionResult::True, ExecuteResult::Jump(true_handle.jump_clone()))
+        */
     }
 }
 
