@@ -33,6 +33,16 @@ impl VirtualMachine {
 
     fn condition_handle(&mut self, expr_stmt_addr: &BlockDefine, expr_addr: &AddressValue
         , true_handle: &ConditionStmtTrue) -> (ConditionResult, ExecuteResult) {
+        match self.process_execute_block_ref(expr_stmt_addr) {
+            ExecuteResult::ReturnFunc => {
+                return (ConditionResult::True, ExecuteResult::ReturnFunc);
+            },
+            ExecuteResult::Normal => {
+            },
+            ExecuteResult::Jump(_) => {
+                panic!("should not happend");
+            }
+        }
         /*
          * 计算表达式的结果
          * */
@@ -56,16 +66,6 @@ impl VirtualMachine {
         };
         match boolean_value.value_ref() {
             BooleanValue::True => {
-                match self.process_execute_block_ref(expr_stmt_addr) {
-                    ExecuteResult::ReturnFunc => {
-                        return (ConditionResult::True, ExecuteResult::ReturnFunc);
-                    },
-                    ExecuteResult::Normal => {
-                    },
-                    ExecuteResult::Jump(_) => {
-                        panic!("should not happend");
-                    }
-                }
                 /*
                  * 执行 true block 的语句
                  * */
@@ -85,22 +85,6 @@ impl VirtualMachine {
                 (ConditionResult::False, ExecuteResult::Normal)
             }
         }
-        /*
-        let r = self.process_execute_block_ref(true_handle.define_ref());
-        println!("{:?}", r);
-        match r {
-            ExecuteResult::ReturnFunc => {
-                return (ConditionResult::True, ExecuteResult::ReturnFunc);
-            },
-            ExecuteResult::Normal => {
-            },
-            ExecuteResult::Jump(_)
-                | ExecuteResult::Condition(_) => {
-                panic!("should not happend");
-            }
-        }
-        (ConditionResult::True, ExecuteResult::Jump(true_handle.jump_clone()))
-        */
     }
 }
 
