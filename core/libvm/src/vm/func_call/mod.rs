@@ -109,9 +109,6 @@ impl VirtualMachine {
                             block.update_by_jump(&jump);
                         },
                         ExecuteResult::Normal => {
-                        },
-                        ExecuteResult::Condition(_) => {
-                            break;
                         }
                     }
                 }

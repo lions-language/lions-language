@@ -31,11 +31,13 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         let mut expr_define_context = BlockDefineContext::default();
         self.cb().noenter_block_start(&mut expr_define_context);
         check_desc_result!(self, self.cb().while_stmt_start(&mut stmt_context, &mut expr_define_context));
-        check_desc_result!(self, self.cb().while_stmt_expr_start(&mut stmt_context, &mut expr_define_context));
+        check_desc_result!(self, self.cb().while_stmt_expr_start(&mut stmt_context
+                , &mut expr_define_context));
         self.expression_process(&tp
             , &mut ExpressContext::new(GrammarParser::<T, CB>::expression_end_left_big_parenthese));
         self.cb().noenter_block_end(&mut expr_define_context);
-        check_desc_result!(self, self.cb().while_stmt_expr_end(&mut stmt_context, &mut expr_define_context));
+        check_desc_result!(self, self.cb().while_stmt_expr_end(&mut stmt_context
+                , &mut expr_define_context));
         /*
          * 解析 block
          * */

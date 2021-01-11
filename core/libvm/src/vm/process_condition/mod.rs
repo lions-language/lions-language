@@ -31,14 +31,11 @@ impl VirtualMachine {
         };
         match boolean_value.value_ref() {
             BooleanValue::True => {
-                println!("condition stmt true");
-                ExecuteResult::Condition(ConditionResult::True)
             },
             BooleanValue::False => {
-                println!("condition stmt false");
-                ExecuteResult::Condition(ConditionResult::False)
             }
         }
+        unimplemented!();
     }
 }
 

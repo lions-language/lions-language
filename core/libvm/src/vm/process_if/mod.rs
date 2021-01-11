@@ -42,8 +42,7 @@ impl VirtualMachine {
                     },
                     ExecuteResult::Normal => {
                     },
-                    ExecuteResult::Jump(_)
-                        | ExecuteResult::Condition(_) => {
+                    ExecuteResult::Jump(_) => {
                         panic!("should not happend");
                     }
                 }
@@ -95,9 +94,6 @@ impl VirtualMachine {
                     block.update_by_jump(&jump);
                 },
                 ExecuteResult::Normal => {
-                },
-                ExecuteResult::Condition(_) => {
-                    return r;
                 }
             }
         }

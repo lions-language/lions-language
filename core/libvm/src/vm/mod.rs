@@ -54,8 +54,7 @@ pub enum ConditionResult {
 pub enum ExecuteResult {
     ReturnFunc,
     Jump(Jump),
-    Normal,
-    Condition(ConditionResult)
+    Normal
 }
 
 impl VirtualMachine {
