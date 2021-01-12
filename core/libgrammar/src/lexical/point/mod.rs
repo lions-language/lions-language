@@ -22,6 +22,13 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
                     parser.content.skip_next_one();
                     parser.point_three();
                 },
+                '=' => {
+                    /*
+                     * ..=
+                     * */
+                    let context = parser.build_token_context_without_data(TokenType::TwoPointEqual);
+                    parser.push_to_token_buffer(two_point::TwoPointEqualToken::new(context));
+                },
                 _ => {
                     /*
                      * ..

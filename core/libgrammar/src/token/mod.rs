@@ -104,6 +104,8 @@ pub enum TokenType {
     Point,
     // ..
     TwoPoint,
+    // ..=
+    TwoPointEqual,
     // ...
     ThreePoint,
     // &
