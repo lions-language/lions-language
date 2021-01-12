@@ -1,4 +1,4 @@
-use crate::token::{TokenContext, TokenAttrubute, Token, TokenMethodResult};
+use crate::token::{TokenContext, TokenAttrubute, Token, TokenMethodResult, TokenOperType};
 use crate::lexical::CallbackReturnStatus;
 use crate::grammar::{GrammarParser, ExpressContext, Grammar};
 
@@ -9,8 +9,14 @@ pub struct TwoPointEqualToken {
 }
 
 lazy_static!{
-    static ref TWO_POINT_TOKEN_ATTRUBUTE: TokenAttrubute = TokenAttrubute::default();
-    static ref TWO_POINT_EQUAL_TOKEN_ATTRUBUTE: TokenAttrubute = TokenAttrubute::default();
+    static ref TWO_POINT_TOKEN_ATTRUBUTE: TokenAttrubute = TokenAttrubute{
+        bp: &1,
+        oper_type: &TokenOperType::Operator
+    };
+    static ref TWO_POINT_EQUAL_TOKEN_ATTRUBUTE: TokenAttrubute = TokenAttrubute {
+        bp: &1,
+        oper_type: &TokenOperType::Operator
+    };
 }
 
 impl TwoPointToken {
@@ -56,7 +62,7 @@ impl TwoPointEqualToken {
     pub fn new<T: FnMut() -> CallbackReturnStatus, CB: Grammar>(context: TokenContext) -> Token<T, CB> {
         Token{
             context: context,
-            attrubute: &*TWO_POINT_TOKEN_ATTRUBUTE,
+            attrubute: &*TWO_POINT_EQUAL_TOKEN_ATTRUBUTE,
             nup: TwoPointEqualToken::nup,
             led: TwoPointEqualToken::led
         }

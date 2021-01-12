@@ -287,6 +287,14 @@ pub struct OperatorLessThanContext {
 #[derive(Debug, FieldGet
     , NewWithAll, FieldGetMove
     , Default)]
+pub struct OperatorTwoPointContext {
+    value: TokenValue,
+    desc_ctx: DescContext
+}
+
+#[derive(Debug, FieldGet
+    , NewWithAll, FieldGetMove
+    , Default)]
 pub struct PrefixPlusPlusContext {
     value: TokenValue,
     symbol_count: u8
@@ -376,6 +384,9 @@ pub trait Grammar {
         unimplemented!();
     }
     fn operator_less_than(&mut self, context: OperatorLessThanContext) -> DescResult {
+        unimplemented!();
+    }
+    fn operator_two_point(&mut self, context: OperatorTwoPointContext) -> DescResult {
         unimplemented!();
     }
     fn operator_prefix_plus_plus(&mut self, _context: PrefixPlusPlusContext) -> DescResult {
@@ -1026,6 +1037,7 @@ mod process_for;
 mod process_while;
 mod plus;
 mod angular_brackets;
+mod two_point;
 
 #[cfg(test)]
 mod test {

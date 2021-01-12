@@ -96,7 +96,8 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
                                     None => {
                                         match (self.cb)() {
                                             CallbackReturnStatus::Continue(content) => {
-                                                *(&mut self.content) = content;
+                                                // *(&mut self.content) = content;
+                                                self.content.append(content);
                                                 if let Some(ch) = self.content.lookup_next_n(2) {
                                                     after_point_c = ch;
                                                 } else {
@@ -104,13 +105,15 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
                                                     // 所以这里是肯定不会发生的, 如果发生了,
                                                     // 说明 cb 中返回的 content 是空的
                                                     // (代码逻辑错误)
-                                                    panic!("should not happend");
+                                                    panic!("should not happend 1");
                                                 }
                                             },
                                             CallbackReturnStatus::End => {
                                                 // 源码遇到这种情况: xxx. EOF
                                                 // 也就是说点号后面是结尾 => 语法错误
-                                                self.panic("expect number after or method after point, but found a EOF");
+                                                self.panic(
+                                                    "expect number after or method after point\
+                                                    , but found a EOF");
                                             }
                                         }
                                     }
