@@ -206,7 +206,8 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                 GrammarParser::<T, CB>::expression_end_normal), token);
     }
 
-    pub fn expression_process(&mut self, token: &TokenPointer, express_context: &mut ExpressContext<T, CB>) {
+    pub fn expression_process(&mut self, token: &TokenPointer
+        , express_context: &mut ExpressContext<T, CB>) {
         /*
          * 因为 0 比任何的操作数都要小, 所以可以将整个表达式遍历完全
          * */

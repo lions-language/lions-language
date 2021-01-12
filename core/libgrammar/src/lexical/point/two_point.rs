@@ -27,9 +27,9 @@ impl TwoPointToken {
     }
 
     fn led<T: FnMut() -> CallbackReturnStatus, CB: Grammar>(_token: &Token<T, CB>
-        , _grammar: &mut GrammarParser<T, CB>
-        , _express_context: &mut ExpressContext<T, CB>) -> TokenMethodResult {
-        TokenMethodResult::None
+        , grammar: &mut GrammarParser<T, CB>
+        , express_context: &mut ExpressContext<T, CB>) -> TokenMethodResult {
+        grammar.two_point_process(express_context)
     }
 }
 
