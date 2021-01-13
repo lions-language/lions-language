@@ -41,6 +41,9 @@ impl PrimevalType {
             },
             PrimevalType::OrderSeque => {
                 "orderseque"
+            },
+            PrimevalType::Any => {
+                "any"
             }
         }
     }

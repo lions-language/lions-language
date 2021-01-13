@@ -28,7 +28,8 @@ pub enum PrimevalType {
     Float64,
     Str,
     Boolean,
-    OrderSeque
+    OrderSeque,
+    Any
 }
 
 #[derive(Debug, Clone, FieldGet)]
