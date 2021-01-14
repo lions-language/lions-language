@@ -1038,6 +1038,7 @@ mod process_while;
 mod plus;
 mod angular_brackets;
 mod two_point;
+mod process_loop;
 
 #[cfg(test)]
 mod test {
