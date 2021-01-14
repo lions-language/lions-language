@@ -62,6 +62,8 @@ pub enum TokenType {
     Return,
     // struct
     Structure,
+    // interface
+    Interface,
     // true
     True,
     // false
