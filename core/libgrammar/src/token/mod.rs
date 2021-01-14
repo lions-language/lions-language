@@ -50,6 +50,8 @@ pub enum TokenType {
     For,
     // while
     While,
+    // loop
+    Loop,
     // func
     Function,
     // let
