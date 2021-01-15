@@ -254,6 +254,12 @@ pub struct WhileStmtContext {
     expr_result_addr: AddressValue
 }
 
+#[derive(Debug, Clone, Default
+    , FieldGet, FieldGetClone)]
+pub struct LoopStmtContext {
+    block_addr: AddressValue
+}
+
 #[derive(Debug, FieldGet, FieldGetClone
     , NewWithAll, FieldGetMove
     , Default)]
@@ -589,6 +595,20 @@ pub trait Grammar {
          * */
         unimplemented!();
     }
+    fn loop_stmt_start(&mut self, _stmt_context: &mut LoopStmtContext
+        , _define_context: &mut BlockDefineContext) -> DescResult {
+        /*
+         * 整个 loop 语句开始
+         * */
+        unimplemented!();
+    }
+    fn loop_stmt_end(&mut self, _stmt_context: &mut LoopStmtContext
+        , _define_context: &mut BlockDefineContext) -> DescResult {
+        /*
+         * 整个 loop 语句开始
+         * */
+        unimplemented!();
+    }
     fn anonymous_block_start(&mut self) {
         println!("anonymous block start");
     }
@@ -748,6 +768,9 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
             },
             TokenType::While => {
                 self.while_process();
+            },
+            TokenType::Loop => {
+                self.loop_process();
             },
             TokenType::Annotate => {
                 self.annotate_process();
