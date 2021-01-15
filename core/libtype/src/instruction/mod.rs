@@ -190,6 +190,12 @@ pub struct WhileStmt {
 
 #[derive(Debug, Clone, FieldGet, NewWithAll
     , FieldGetMove, FieldGetClone, Default)]
+pub struct LoopStmt {
+    true_handle: ConditionStmtTrue
+}
+
+#[derive(Debug, Clone, FieldGet, NewWithAll
+    , FieldGetMove, FieldGetClone, Default)]
 pub struct DeleteData {
     addr: AddressValue
 }

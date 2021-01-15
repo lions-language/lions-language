@@ -12,6 +12,7 @@ use libgrammar::grammar::{Grammar, CallFuncScopeContext
     , FunctionDefineContext
     , BlockDefineContext
     , IfStmtContext, WhileStmtContext
+    , LoopStmtContext
     , StructDefineFieldContext
     , ReturnStmtContext as GrammarReturnStmtContext
     , ObjectFunctionDefineMutContext, TypeToken
@@ -39,6 +40,7 @@ use libtype::instruction::{
     , CallSelfFunction
     , CallPrimevalFunctionParamContext
     , IfStmt, DeleteData
+    , LoopStmt
     , WhileStmt, ConditionStmt};
 use libtypecontrol::function::FunctionControl;
 use libtype::module::Module;
@@ -266,6 +268,10 @@ pub trait Compile {
     }
 
     fn while_stmt(&mut self, _context: WhileStmt) {
+        unimplemented!();
+    }
+
+    fn loop_stmt(&mut self, _context: LoopStmt) {
         unimplemented!();
     }
 
@@ -578,6 +584,16 @@ impl<'a, F: Compile> Grammar for Compiler<'a, F> {
         self.process_while_stmt_end(stmt_context, define_context)
     }
 
+    fn loop_stmt_start(&mut self, stmt_context: &mut LoopStmtContext
+        , define_context: &mut BlockDefineContext) -> DescResult {
+        self.process_loop_stmt_start(stmt_context, define_context)
+    }
+
+    fn loop_stmt_end(&mut self, stmt_context: &mut LoopStmtContext
+        , define_context: &mut BlockDefineContext) -> DescResult {
+        self.process_loop_stmt_end(stmt_context, define_context)
+    }
+
     fn anonymous_block_start(&mut self) {
         self.process_anonymous_block_start();
     }
@@ -716,6 +732,7 @@ mod process_use;
 mod process_first;
 mod imports_mapping;
 mod process_while;
+mod process_loop;
 
 #[cfg(test)]
 mod test {
