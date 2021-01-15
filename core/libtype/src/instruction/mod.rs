@@ -224,6 +224,7 @@ pub enum Instruction {
     IfStmt(IfStmt),
     ConditionStmt(ConditionStmt),
     WhileStmt(WhileStmt),
+    LoopStmt(LoopStmt),
     ExecuteBlock(BlockDefine),
     DeleteData(DeleteData),
     EnterScope,
