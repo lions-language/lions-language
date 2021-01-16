@@ -1,6 +1,6 @@
 use libcommon::address::{FunctionAddrValue};
 use liblink::{define::LinkDefine};
-use libtype::instruction::{WhileStmt
+use libtype::instruction::{LoopStmt
     , BlockDefine, ConditionStmtTrue};
 use libtype::{Data, DataValue
     , primeval::PrimevalData
@@ -14,11 +14,11 @@ enum ConditionResult {
 }
 
 impl VirtualMachine {
-    pub fn process_loop_stmt(&mut self, value: WhileStmt) -> ExecuteResult {
-        let (expr_stmt_addr, expr_addr, true_handle) = value.fields_move();
+    pub fn process_loop_stmt(&mut self, value: LoopStmt) -> ExecuteResult {
+        let (true_handle) = value.fields_move();
         let mut execute_result = ExecuteResult::Normal;
         loop {
-            let (cond_res, exe_res) = self.condition_handle(&expr_stmt_addr, &expr_addr, &true_handle);
+            let (cond_res, exe_res) = self.loop_condition_handle(&true_handle);
             execute_result = exe_res;
             match cond_res {
                 ConditionResult::True => {
@@ -31,7 +31,7 @@ impl VirtualMachine {
         execute_result
     }
 
-    fn condition_handle(&mut self, expr_stmt_addr: &BlockDefine, expr_addr: &AddressValue
+    fn loop_condition_handle(&mut self
         , true_handle: &ConditionStmtTrue) -> (ConditionResult, ExecuteResult) {
         match self.process_execute_block_ref(expr_stmt_addr) {
             ExecuteResult::ReturnFunc => {
