@@ -107,6 +107,9 @@ impl VirtualMachine {
             Instruction::WhileStmt(v) => {
                 return self.process_while_stmt(v);
             },
+            Instruction::LoopStmt(v) => {
+                return self.process_loop_stmt(v);
+            },
             Instruction::ReadStaticVariant(v) => {
                 self.read_static_variant(v);
             },
@@ -262,6 +265,7 @@ mod process_if;
 mod memory;
 mod process_while;
 mod process_condition;
+mod process_loop;
 
 #[cfg(test)]
 mod test {
