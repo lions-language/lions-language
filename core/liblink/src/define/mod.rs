@@ -242,6 +242,10 @@ impl LinkDefine {
                 self.process_block_define(value.true_handle_mut().define_mut()
                     , self.define_stream.clone());
             },
+            Instruction::LoopStmt(value) => {
+                self.process_block_define(value.true_handle_mut().define_mut()
+                    , self.define_stream.clone());
+            },
             Instruction::ExecuteBlock(value) => {
                 self.process_block_define(value
                     , self.define_stream.clone());
