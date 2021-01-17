@@ -257,6 +257,7 @@ pub struct WhileStmtContext {
 #[derive(Debug, Clone, Default
     , FieldGet, FieldGetClone)]
 pub struct LoopStmtContext {
+    start_instructure_index: usize,
     block_addr: AddressValue
 }
 
