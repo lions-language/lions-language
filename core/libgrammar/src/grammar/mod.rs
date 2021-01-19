@@ -1034,6 +1034,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
 
 mod expression;
 mod function;
+mod interface;
 mod id;
 mod funccall;
 mod token_extend;
