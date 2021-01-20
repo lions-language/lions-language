@@ -801,6 +801,12 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
             TokenType::Use => {
                 self.use_process();
             },
+            TypeToken::Break => {
+                self.break_process();
+            },
+            TypeToken::Continue => {
+                self.continue_process();
+            },
             _ => {
                 self.expression_process(token, express_context);
             }
@@ -1064,6 +1070,8 @@ mod plus;
 mod angular_brackets;
 mod two_point;
 mod process_loop;
+mod process_break;
+mod process_continue;
 
 #[cfg(test)]
 mod test {
