@@ -105,6 +105,10 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
         self.id_push_keyword_token(TokenType::Break);
     }
 
+    fn id_kw_continue(&mut self) {
+        self.id_push_keyword_token(TokenType::Continue);
+    }
+
     fn id_kw_import(&mut self) {
         /*
          * import
@@ -252,6 +256,9 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
             },
             "break" => {
                 self.id_kw_break();
+            },
+            "continue" => {
+                self.id_kw_continue();
             },
             _ => {
                 self.id(&s);

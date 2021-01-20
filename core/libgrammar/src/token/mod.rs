@@ -80,6 +80,8 @@ pub enum TokenType {
     As,
     // break
     Break,
+    // continue
+    Continue,
     // ->
     RightArrow,
     // (
