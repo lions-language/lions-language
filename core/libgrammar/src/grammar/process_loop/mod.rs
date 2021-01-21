@@ -18,6 +18,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
          * */
         let mut stmt_context = LoopStmtContext::default();
         let mut define_context = BlockDefineContext::default();
+        check_desc_result!(self, self.cb().loop_stmt_start(&mut stmt_context, &mut define_context));
         check_desc_result!(self, self.cb().block_define_start(&mut define_context));
         self.expect_and_take_next_token_unchecked(TokenType::LeftBigParenthese);
         self.parse_block_content();

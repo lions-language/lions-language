@@ -57,7 +57,11 @@ impl FunctionDefine {
 
     pub fn current_index(&self) -> usize {
         let item = self.define_item.get();
-        let len = item.length() - 1;
+        let len = if item.length() > 0 {
+            item.length() - 1
+        } else {
+            0
+        };
         self.define_item.restore(item);
         len
     }
