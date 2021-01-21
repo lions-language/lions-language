@@ -801,10 +801,10 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
             TokenType::Use => {
                 self.use_process();
             },
-            TypeToken::Break => {
+            TokenType::Break => {
                 self.break_process();
             },
-            TypeToken::Continue => {
+            TokenType::Continue => {
                 self.continue_process();
             },
             _ => {
