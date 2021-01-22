@@ -230,6 +230,11 @@ pub struct ReturnStmtContext {
     is_exist_expr: bool
 }
 
+#[derive(Debug, FieldGet, NewWithAll, FieldGetMove
+    , FieldGetClone)]
+pub struct BreakNotagStmtContext {
+}
+
 #[derive(Debug, Clone, Default
     , FieldGet, FieldGetClone)]
 pub struct IfStmtContext {
@@ -517,6 +522,9 @@ pub trait Grammar {
     fn return_stmt(&mut self, _context: ReturnStmtContext) -> DescResult {
         println!("return stmt");
         DescResult::Success
+    }
+    fn break_notag_stmt(&mut self, _context: BreakNotagStmtContext) -> DescResult {
+        unimplemented!();
     }
     fn if_stmt_start(&mut self, _stmt_context: &mut IfStmtContext
         , _define_context: &mut BlockDefineContext) -> DescResult {
