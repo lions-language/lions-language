@@ -6,7 +6,8 @@ use libcommon::address::{FunctionAddrValue};
 use libcommon::consts::{ImportPrefixType};
 use libtype::{Type, TypeAttrubute
     , function::FunctionParamLengthenAttr
-    , structure::StructDefine};
+    , structure::StructDefine
+    , interface::InterfaceDefine};
 use libtype::function::{FindFunctionHandle};
 use libresult::*;
 use libtype::package::PackageStr;
@@ -505,6 +506,9 @@ pub trait Grammar {
         unimplemented!();
     }
     fn struct_init_end(&mut self, _: &mut StructInitContext) -> DescResult {
+        unimplemented!();
+    }
+    fn interface_define_start(&mut self, _: &mut InterfaceDefine) -> DescResult {
         unimplemented!();
     }
     fn var_stmt_start(&mut self) {
