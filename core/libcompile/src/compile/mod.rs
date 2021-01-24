@@ -733,6 +733,7 @@ mod process_first;
 mod imports_mapping;
 mod process_while;
 mod process_loop;
+mod interface;
 
 #[cfg(test)]
 mod test {
