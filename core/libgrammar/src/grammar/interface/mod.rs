@@ -38,6 +38,10 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         let name = extract_token_data!(next_token.token_value().token_data_unchecked(), Id);
         let mut define = InterfaceDefine::new_with_all(name);
         check_desc_result!(self, self.cb().interface_define_start(&mut define));
+        /*
+         * 解析 block
+         * */
+        self.interface_block_process();
     }
 }
 
