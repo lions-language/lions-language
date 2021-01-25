@@ -1,9 +1,12 @@
 use libtype::{TypeAttrubute};
 use libtype::interface::{InterfaceDefine};
+use libresult::{DescResult};
+use libcommon::ptr::{HeapPtr};
+use crate::grammar::{FunctionDefineContext
+    , FunctionDefineParamMutContext, FunctionStatementContext};
 use crate::grammar::{GrammarParser, Grammar, NextToken, ExpressContext};
 use crate::lexical::{CallbackReturnStatus, TokenVecItem, TokenPointer};
 use crate::token::{TokenType, TokenValue, TokenData};
-use libresult::{DescResult};
 
 enum Status {
     Continue,
@@ -63,6 +66,11 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
     }
 
     fn interface_block_function(&mut self) -> Status {
-        unimplemented!();
+        let mut context = FunctionDefineContext::new_with_all(false, HeapPtr::new_null());
+        let mut mut_context = FunctionDefineParamMutContext::default();
+        self.function_parse_param_list(0, &mut context, &mut mut_context);
+        let mut func_statement_context = FunctionStatementContext::new_with_all(false);
+        self.interface_function_parse_return(&mut func_statement_context);
+        Status::Continue
     }
 }

@@ -203,6 +203,12 @@ pub struct BlockDefineContext {
 
 #[derive(Debug, Default, FieldGet, NewWithAll, FieldGetMove
     , FieldGetClone)]
+pub struct FunctionStatementContext {
+    has_lengthen_param: bool
+}
+
+#[derive(Debug, Default, FieldGet, NewWithAll, FieldGetMove
+    , FieldGetClone)]
 pub struct StructDefineContext {
 }
 

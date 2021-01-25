@@ -39,10 +39,11 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         let mut define = InterfaceDefine::new_with_all(name);
         check_desc_result!(self, self.cb().interface_define_start(&mut define));
         /*
-         * 解析 block
+         * 解析 block 中的函数
          * */
         self.interface_block_process();
     }
 }
 
 mod block;
+mod ret;
