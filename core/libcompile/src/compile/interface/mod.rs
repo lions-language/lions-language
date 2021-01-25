@@ -24,7 +24,7 @@ use crate::address::Address;
 
 impl<'a, F: Compile> Compiler<'a, F> {
     pub fn process_interface(&mut self, value: TokenValue
-        , define_context: &mut ) -> DescResult {
+        , define_context: &mut FunctionDefineContext) -> DescResult {
         DescResult::Success
     }
 }
