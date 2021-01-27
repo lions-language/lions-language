@@ -42,7 +42,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         let next = tp.as_ref::<T, CB>();
         match next.context_ref().token_type() {
             TokenType::Id => {
-                self.function_find_params(start_param_no, define_context, mut_context);
+                self.interface_function_find_params(start_param_no, define_context, mut_context);
             },
             TokenType::RightParenthese => {
                 /*
@@ -69,7 +69,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         , mut_context: &mut FunctionDefineParamMutContext) {
         let mut param_no = start_param_no.clone();
         loop {
-            self.function_find_param(param_no, mut_context, define_context);
+            self.interface_function_find_param(param_no, mut_context, define_context);
             param_no += 1;
             let tp = match self.lookup_next_one_ptr() {
                 Some(tp) => {
@@ -151,7 +151,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         }
     }
 
-    fn function_find_param_type(&mut self, tp: Option<TokenPointer>)
+    fn interface_function_find_param_type(&mut self, tp: Option<TokenPointer>)
         -> (TypeAttrubute, FunctionParamLengthenAttr, TypeToken) {
         /*
          * 如果已经获取了next token, 那么直接传入 token
@@ -159,12 +159,12 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
          * */
         match tp {
             Some(tp) => {
-                self.function_find_param_type_with_token(tp)
+                self.interface_function_find_param_type_with_token(tp)
             },
             None => {
                 let tp = self.expect_next_token(|_, _| {
                 }, "type");
-                self.function_find_param_type_with_token(tp.expect("should not happend"))
+                self.interface_function_find_param_type_with_token(tp.expect("should not happend"))
             }
         }
     }
@@ -175,12 +175,12 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         /*
          * 查找 name id
          * */
-        let name_token = self.function_find_param_name();
-        let (typ_attr, lengthen_attr, type_token) = self.function_find_param_type(None);
+        let name_token = self.interface_function_find_param_name();
+        let (typ_attr, lengthen_attr, type_token) = self.interface_function_find_param_type(None);
         if let FunctionParamLengthenAttr::Lengthen = lengthen_attr {
             *define_context.has_lengthen_param_mut() = true;
         };
-        check_desc_result!(self, self.grammar_context().cb.function_define_param(
+        check_desc_result!(self, self.grammar_context().cb.interface_function_define_param(
             FunctionDefineParamContext::new_with_all(
                 name_token.token_value(), FunctionDefineParamContextType::Token(type_token)
                 , typ_attr, lengthen_attr, param_no), mut_context, define_context));

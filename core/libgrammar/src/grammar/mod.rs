@@ -517,6 +517,11 @@ pub trait Grammar {
     fn interface_define_start(&mut self, _: &mut InterfaceDefine) -> DescResult {
         unimplemented!();
     }
+    fn interface_function_define_param(&mut self, context: FunctionDefineParamContext
+        , _mut_context: &mut FunctionDefineParamMutContext
+        , _define_context: &mut FunctionDefineContext) -> DescResult {
+        unimplemented!();
+    }
     fn var_stmt_start(&mut self) {
         println!("var stmt start");
     }
