@@ -56,6 +56,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                 return Status::Continue;
             },
             TokenType::RightBigParenthese => {
+                self.skip_next_one();
                 return Status::End;
             },
             _ => {

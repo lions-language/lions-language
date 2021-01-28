@@ -31,7 +31,9 @@ use libtype::function::{Function, CallFunctionParamAddr
     , FunctionReturn
     , FunctionReturnDataAttr
     , FunctionStatement};
-use libtype::structure::{StructDefine};
+use libtype::{
+    structure::{StructDefine},
+    interface::{InterfaceDefine}};
 use libtype::instruction::{
     Instruction, BlockDefine
     , Jump, RemoveOwnership
@@ -621,6 +623,10 @@ impl<'a, F: Compile> Grammar for Compiler<'a, F> {
 
     fn struct_define_end(&mut self, define: StructDefine) {
         self.process_struct_define_end(define);
+    }
+
+    fn interface_define_start(&mut self, define: &mut InterfaceDefine) -> DescResult {
+        self.process_interface_define_start(define)
     }
 
     fn struct_init_start(&mut self, init_context: &mut GrammarStructInitContext) -> DescResult {

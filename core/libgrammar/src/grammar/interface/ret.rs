@@ -26,9 +26,25 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                 /*
                  * 无返回值
                  * */
+                self.skip_next_one();
+                /*
+                 * 判断有没有到达 interface block 的结尾
+                 * */
+                let tp = self.expect_next_token(|_, _| {
+                }, "`}` / fn");
+                let token = tp.expect("should not happend").as_ref::<T, CB>();
+                let tt = token.context_token_type();
+                match tt {
+                    TokenType::RightBigParenthese => {
+                        self.skip_next_one();
+                        return true;
+                    },
+                    _ => {}
+                }
                 return false;
             },
             TokenType::RightBigParenthese => {
+                self.skip_next_one();
                 return true;
             },
             TokenType::RightArrow => {

@@ -13,6 +13,7 @@ use libtype::function::{AddFunctionContext
 use libtype::{TypeAttrubute, Type
     , AddressKey, AddressValue
     , AddressType};
+use libtype::interface::{InterfaceDefine};
 use libtype::instruction::{JumpType, Jump};
 use libtype::package::{PackageStr};
 use crate::compile::{Compile, Compiler, FunctionNamedStmtContext
@@ -23,8 +24,8 @@ use crate::define::{DefineObject};
 use crate::address::Address;
 
 impl<'a, F: Compile> Compiler<'a, F> {
-    pub fn process_interface(&mut self, value: TokenValue
-        , define_context: &mut FunctionDefineContext) -> DescResult {
+    pub fn process_interface_define_start(&mut self
+        , define: &mut InterfaceDefine) -> DescResult {
         DescResult::Success
     }
 }
