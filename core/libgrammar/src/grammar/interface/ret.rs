@@ -7,24 +7,29 @@ use crate::token::{TokenType};
 
 impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, CB> {
     pub fn interface_function_parse_return(&mut self
-        , define_context: &mut FunctionStatementContext) {
+        , define_context: &mut FunctionStatementContext) -> bool {
         /*
          * 参数解析完成之后, 被调用
          *  参数后:
          *      `{`
          *      `->`
          *      other
+         * 返回值: 如果是true, 表示遇到 interface 结尾的 }, 如果是 false, 表示没有结束, 继续解析
          * */
         let tp = self.expect_next_token(|_, _| {
         }, "new line / `->`");
         let token = tp.expect("should not happend").as_ref::<T, CB>();
         let tt = token.context_token_type();
         match tt {
-            TokenType::NewLine => {
+            TokenType::NewLine
+                | TokenType::Semicolon => {
                 /*
                  * 无返回值
                  * */
-                return;
+                return false;
+            },
+            TokenType::RightBigParenthese => {
+                return true;
             },
             TokenType::RightArrow => {
                 /*
@@ -49,6 +54,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                 FunctionDefineReturnContext::new_with_all(typ_attr, lengthen_attr, type_token)
                 , define_context));
         */
+        false
     }
 }
 

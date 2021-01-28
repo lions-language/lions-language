@@ -812,6 +812,9 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
             TokenType::Structure => {
                 self.structure_process();
             },
+            TokenType::Interface => {
+                self.interface_process();
+            },
             TokenType::Import => {
                 self.import_process();
             },
