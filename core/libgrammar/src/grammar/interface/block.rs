@@ -67,6 +67,35 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
     }
 
     fn interface_block_function(&mut self) -> Status {
+        /*
+         * 跳过 func 关键字
+         * */
+        self.skip_next_one();
+        let tp = match self.skip_white_space_token() {
+            Some(tp) => {
+                tp
+            },
+            None => {
+                /*
+                 * func 后面是 io EOF => 语法错误
+                 * */
+                self.panic("expect id or `(` / `[` after func, but arrive IO EOF");
+                panic!();
+            }
+        };
+        let next_token = tp.as_ref::<T, CB>();
+        match next_token.context_ref().token_type() {
+            TokenType::Id => {
+                /*
+                 * 跳过 id
+                 * */
+                self.skip_next_one();
+            },
+            _ => {
+                self.panic(&format!("expect id after func, but meet: {:?}"
+                        , next_token.context_token_type()));
+            }
+        }
         let mut context = FunctionDefineContext::new_with_all(false, HeapPtr::new_null());
         let mut mut_context = FunctionDefineParamMutContext::default();
         self.interface_function_parse_param_list(0, &mut context, &mut mut_context);
