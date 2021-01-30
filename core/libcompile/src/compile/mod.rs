@@ -629,6 +629,10 @@ impl<'a, F: Compile> Grammar for Compiler<'a, F> {
         self.process_interface_define_start(define)
     }
 
+    fn interface_define_end(&mut self, define: &mut InterfaceDefine) -> DescResult {
+        self.process_interface_define_end(define)
+    }
+
     fn struct_init_start(&mut self, init_context: &mut GrammarStructInitContext) -> DescResult {
         self.process_struct_init_start(init_context)
     }

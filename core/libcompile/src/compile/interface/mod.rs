@@ -28,4 +28,9 @@ impl<'a, F: Compile> Compiler<'a, F> {
         , define: &mut InterfaceDefine) -> DescResult {
         DescResult::Success
     }
+
+    pub fn process_interface_define_end(&mut self
+        , define: &mut InterfaceDefine) -> DescResult {
+        DescResult::Success
+    }
 }
