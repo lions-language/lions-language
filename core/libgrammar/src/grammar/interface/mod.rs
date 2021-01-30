@@ -42,6 +42,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
          * 解析 block 中的函数
          * */
         self.interface_block_process();
+        check_desc_result!(self, self.cb().interface_define_end(&mut define));
     }
 }
 
