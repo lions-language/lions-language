@@ -98,9 +98,11 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         }
         let mut context = FunctionDefineContext::new_with_all(false, HeapPtr::new_null());
         let mut mut_context = FunctionDefineParamMutContext::default();
+        check_desc_result!(self, self.cb().interface_function_statement_start());
         self.interface_function_parse_param_list(0, &mut context, &mut mut_context);
         let mut func_statement_context = FunctionStatementContext::new_with_all(false);
         let is_end = self.interface_function_parse_return(&mut func_statement_context);
+        check_desc_result!(self, self.cb().interface_function_statement_end());
         if is_end {
             Status::End
         } else {

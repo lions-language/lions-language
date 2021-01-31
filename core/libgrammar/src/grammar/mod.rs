@@ -525,6 +525,12 @@ pub trait Grammar {
         , _define_context: &mut FunctionDefineContext) -> DescResult {
         unimplemented!();
     }
+    fn interface_function_statement_start(&mut self) -> DescResult {
+        unimplemented!();
+    }
+    fn interface_function_statement_end(&mut self) -> DescResult {
+        unimplemented!();
+    }
     fn var_stmt_start(&mut self) {
         println!("var stmt start");
     }

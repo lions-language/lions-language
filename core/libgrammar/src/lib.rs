@@ -24,6 +24,7 @@ macro_rules! check_desc_result {
         match $e {
             DescResult::Error(e) => {
                 $this.panic(&e);
+                panic!();
             },
             _ => {}
         }
