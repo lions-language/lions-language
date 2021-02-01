@@ -35,7 +35,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
         DescResult::Success
     }
 
-    pub fn interface_function_statement_start(&mut self) -> DescResult {
+    pub fn interface_function_statement_start(&mut self, context: &mut InterfaceFunctionStatementContext)
+        -> DescResult {
         DescResult::Success
     }
 
