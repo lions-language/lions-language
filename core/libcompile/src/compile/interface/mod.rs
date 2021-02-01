@@ -35,12 +35,13 @@ impl<'a, F: Compile> Compiler<'a, F> {
         DescResult::Success
     }
 
-    pub fn interface_function_statement_start(&mut self, context: &mut InterfaceFunctionStatementContext)
+    pub fn process_interface_function_statement_start(&mut self, context: &mut InterfaceFunctionStatementContext)
         -> DescResult {
         DescResult::Success
     }
 
-    pub fn interface_function_statement_end(&mut self) -> DescResult {
+    pub fn process_interface_function_statement_end(&mut self, context: &mut InterfaceFunctionStatementContext)
+        -> DescResult {
         DescResult::Success
     }
 }

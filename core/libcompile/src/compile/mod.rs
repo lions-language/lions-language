@@ -10,6 +10,7 @@ use libgrammar::grammar::{Grammar, CallFuncScopeContext
     , FunctionDefineParamMutContext
     , FunctionDefineReturnContext
     , FunctionDefineContext
+    , InterfaceFunctionStatementContext
     , BlockDefineContext
     , IfStmtContext, WhileStmtContext
     , LoopStmtContext
@@ -631,6 +632,16 @@ impl<'a, F: Compile> Grammar for Compiler<'a, F> {
 
     fn interface_define_end(&mut self, define: &mut InterfaceDefine) -> DescResult {
         self.process_interface_define_end(define)
+    }
+
+    fn interface_function_statement_start(&mut self, context: &mut InterfaceFunctionStatementContext)
+        -> DescResult {
+        self.process_interface_function_statement_start(context)
+    }
+
+    fn interface_function_statement_end(&mut self, context: &mut InterfaceFunctionStatementContext)
+        -> DescResult {
+        self.process_interface_function_statement_end(context)
     }
 
     fn struct_init_start(&mut self, init_context: &mut GrammarStructInitContext) -> DescResult {
