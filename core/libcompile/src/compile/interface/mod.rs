@@ -5,6 +5,7 @@ use libgrammar::grammar::{FunctionDefineParamContext
     , FunctionDefineParamMutContext
     , FunctionDefineReturnContext
     , FunctionDefineContext
+    , InterfaceFunctionStatementContext
     , TypeToken};
 use libtype::function::{AddFunctionContext
     , FunctionParamDataItem
@@ -31,6 +32,14 @@ impl<'a, F: Compile> Compiler<'a, F> {
 
     pub fn process_interface_define_end(&mut self
         , define: &mut InterfaceDefine) -> DescResult {
+        DescResult::Success
+    }
+
+    pub fn interface_function_statement_start(&mut self) -> DescResult {
+        DescResult::Success
+    }
+
+    pub fn interface_function_statement_end(&mut self) -> DescResult {
         DescResult::Success
     }
 }

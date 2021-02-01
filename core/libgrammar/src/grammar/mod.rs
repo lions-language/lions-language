@@ -209,6 +209,11 @@ pub struct FunctionStatementContext {
 
 #[derive(Debug, Default, FieldGet, NewWithAll, FieldGetMove
     , FieldGetClone)]
+pub struct InterfaceFunctionStatementContext {
+}
+
+#[derive(Debug, Default, FieldGet, NewWithAll, FieldGetMove
+    , FieldGetClone)]
 pub struct StructDefineContext {
 }
 
@@ -525,10 +530,12 @@ pub trait Grammar {
         , _define_context: &mut FunctionDefineContext) -> DescResult {
         unimplemented!();
     }
-    fn interface_function_statement_start(&mut self) -> DescResult {
+    fn interface_function_statement_start(&mut self, _context: &mut InterfaceFunctionStatementContext)
+        -> DescResult {
         unimplemented!();
     }
-    fn interface_function_statement_end(&mut self) -> DescResult {
+    fn interface_function_statement_end(&mut self, _context: &mut InterfaceFunctionStatementContext)
+        -> DescResult {
         unimplemented!();
     }
     fn var_stmt_start(&mut self) {
