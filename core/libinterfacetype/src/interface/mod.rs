@@ -6,7 +6,7 @@ use libcommon::ptr::{HeapPtr, Heap};
  * NOTE NOTE NOTE
  * 这里不能将 InterfaceDefine 存储到 value 中
  * 因为HashMap扩容的原因, 将导致写入 Type 中的地址变为无效的
- * 所以, 当是 Structure 的时候, Type 中存储 HeapPtr 而不是 RefPtr
+ * 所以, 当是 Interface 的时候, Type 中存储 HeapPtr 而不是 RefPtr
  * */
 struct DefineContainer {
     defines: HashMap<String, HeapPtr>
