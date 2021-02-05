@@ -13,6 +13,7 @@ libcommon = { path = "../libcommon" }
 libtype = { path = "../libtype" }
 libtypecontrol = { path = "../libtypecontrol" }
 libstructtype = { path = "../libstructtype" }
+libinterfacetype = { path = "../libinterfacetype" }
 libresult = { path = "../libresult" }
 libmacro = { path = "../libmacro" }
 pathdiff = { version = "0.2.0" }
