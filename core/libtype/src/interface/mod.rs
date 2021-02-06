@@ -2,7 +2,7 @@ use libmacro::{FieldGet, FieldGetClone
     , FieldGetMove, NewWithAll};
 use crate::{Type, TypeAttrubute
     , AddressType};
-use crate::function::{FunctionParan, FunctionReturn};
+use crate::function::{FunctionParam, FunctionReturn};
 use std::collections::{HashMap};
 
 #[derive(Debug, FieldGet
@@ -18,6 +18,6 @@ pub struct InterfaceFunctionStatement {
     , Default)]
 pub struct InterfaceDefine {
     name: String,
-    function_define: Option<Vec<InterfaceFunctionStatement>>
+    function_statement: Option<Vec<InterfaceFunctionStatement>>
 }
 
