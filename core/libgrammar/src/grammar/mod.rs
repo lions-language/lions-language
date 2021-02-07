@@ -525,9 +525,9 @@ pub trait Grammar {
     fn interface_define_end(&mut self, _: &mut InterfaceDefine) -> DescResult {
         unimplemented!();
     }
-    fn interface_function_define_param(&mut self, context: FunctionDefineParamContext
-        , _mut_context: &mut FunctionDefineParamMutContext
-        , _define_context: &mut FunctionDefineContext) -> DescResult {
+    fn interface_function_define_param(&mut self
+        , _define: &mut InterfaceDefine
+        , _context: FunctionDefineParamContext) -> DescResult {
         unimplemented!();
     }
     fn interface_function_statement_start(&mut self, _context: &mut InterfaceFunctionStatementContext)

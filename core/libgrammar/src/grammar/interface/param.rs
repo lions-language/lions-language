@@ -1,6 +1,7 @@
 use libresult::DescResult;
 use libtype::{TypeAttrubute};
 use libtype::function::{FunctionParamLengthenAttr};
+use libtype::interface::{InterfaceDefine};
 use crate::grammar::{GrammarParser, Grammar
     , FunctionDefineParamContext};
 use crate::grammar::{FunctionDefineParamMutContext
@@ -12,7 +13,7 @@ use crate::token::{TokenType};
 impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, CB> {
     pub fn interface_function_parse_param_list(&mut self, start_param_no: usize
         , define_context: &mut FunctionDefineContext
-        , mut_context: &mut FunctionDefineParamMutContext) {
+        , define: &mut InterfaceDefine) {
         /*
          * 查找 (
          * */
@@ -42,7 +43,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         let next = tp.as_ref::<T, CB>();
         match next.context_ref().token_type() {
             TokenType::Id => {
-                self.interface_function_find_params(start_param_no, define_context, mut_context);
+                self.interface_function_find_params(start_param_no, define_context, define);
             },
             TokenType::RightParenthese => {
                 /*
@@ -66,10 +67,10 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
 
     fn interface_function_find_params(&mut self, start_param_no: usize
         , define_context: &mut FunctionDefineContext
-        , mut_context: &mut FunctionDefineParamMutContext) {
+        , define: &mut InterfaceDefine) {
         let mut param_no = start_param_no.clone();
         loop {
-            self.interface_function_find_param(param_no, mut_context, define_context);
+            self.interface_function_find_param(param_no, define, define_context);
             param_no += 1;
             let tp = match self.lookup_next_one_ptr() {
                 Some(tp) => {
@@ -170,20 +171,20 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
     }
 
     fn interface_function_find_param(&mut self, param_no: usize
-        , mut_context: &mut FunctionDefineParamMutContext
-        , define_context: &mut FunctionDefineContext) {
+        , define: &mut InterfaceDefine
+        , context: &mut FunctionDefineContext) {
         /*
          * 查找 name id
          * */
         let name_token = self.interface_function_find_param_name();
         let (typ_attr, lengthen_attr, type_token) = self.interface_function_find_param_type(None);
         if let FunctionParamLengthenAttr::Lengthen = lengthen_attr {
-            *define_context.has_lengthen_param_mut() = true;
+            *context.has_lengthen_param_mut() = true;
         };
         check_desc_result!(self, self.grammar_context().cb.interface_function_define_param(
-            FunctionDefineParamContext::new_with_all(
+            define, FunctionDefineParamContext::new_with_all(
                 name_token.token_value(), FunctionDefineParamContextType::Token(type_token)
-                , typ_attr, lengthen_attr, param_no), mut_context, define_context));
+                , typ_attr, lengthen_attr, param_no)));
     }
 }
 

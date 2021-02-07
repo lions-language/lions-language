@@ -36,8 +36,9 @@ impl<'a, F: Compile> Compiler<'a, F> {
     }
 
     pub fn process_interface_function_define_param(&mut self
-        , context: FunctionDefineParamContext) -> DescResult {
-        DescResult::Suceess
+        , define: &mut InterfaceDefine, context: FunctionDefineParamContext)
+        -> DescResult {
+        DescResult::Success
     }
 
     pub fn process_interface_function_statement_start(&mut self, context: &mut InterfaceFunctionStatementContext)

@@ -634,8 +634,9 @@ impl<'a, F: Compile> Grammar for Compiler<'a, F> {
         self.process_interface_define_end(define)
     }
 
-    fn interface_function_define_param(&mut self, context: FunctionDefineParamContext) -> DescResult {
-        self.process_interface_define_param(context)
+    fn interface_function_define_param(&mut self, define: &mut InterfaceDefine
+        , context: FunctionDefineParamContext) -> DescResult {
+        self.process_interface_function_define_param(define, context)
     }
 
     fn interface_function_statement_start(&mut self, context: &mut InterfaceFunctionStatementContext)
