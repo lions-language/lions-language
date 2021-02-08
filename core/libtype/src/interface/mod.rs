@@ -9,7 +9,7 @@ use std::collections::{HashMap};
     , FieldGetMove, NewWithAll
     , Default)]
 pub struct InterfaceFunctionStatement {
-    func_param: Option<Vec<FunctionParam>>,
+    func_param: Option<FunctionParam>,
     func_return: Option<FunctionReturn>
 }
 

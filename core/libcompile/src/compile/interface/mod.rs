@@ -38,6 +38,12 @@ impl<'a, F: Compile> Compiler<'a, F> {
     pub fn process_interface_function_define_param(&mut self
         , define: &mut InterfaceDefine, context: FunctionDefineParamContext)
         -> DescResult {
+        match define.func_param_mut() {
+            Some(params) => {
+            },
+            None => {
+            }
+        }
         DescResult::Success
     }
 
