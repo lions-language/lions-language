@@ -99,12 +99,17 @@ impl<'a, F: Compile> Compiler<'a, F> {
         DescResult::Success
     }
 
-    pub fn process_interface_function_statement_start(&mut self, context: &mut InterfaceFunctionStatementContext)
+    pub fn process_interface_function_statement_start(&mut self, define: &mut InterfaceDefine
+        , context: &mut InterfaceFunctionStatementContext)
         -> DescResult {
+        /*
+         * 添加一个 statement
+         * */
         DescResult::Success
     }
 
-    pub fn process_interface_function_statement_end(&mut self, context: &mut InterfaceFunctionStatementContext)
+    pub fn process_interface_function_statement_end(&mut self, define: &mut InterfaceDefine
+        , context: &mut InterfaceFunctionStatementContext)
         -> DescResult {
         DescResult::Success
     }

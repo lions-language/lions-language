@@ -530,11 +530,13 @@ pub trait Grammar {
         , _context: FunctionDefineParamContext) -> DescResult {
         unimplemented!();
     }
-    fn interface_function_statement_start(&mut self, _context: &mut InterfaceFunctionStatementContext)
+    fn interface_function_statement_start(&mut self, _define: &mut InterfaceDefine
+        , _context: &mut InterfaceFunctionStatementContext)
         -> DescResult {
         unimplemented!();
     }
-    fn interface_function_statement_end(&mut self, _context: &mut InterfaceFunctionStatementContext)
+    fn interface_function_statement_end(&mut self, _define: &mut InterfaceDefine
+        , _context: &mut InterfaceFunctionStatementContext)
         -> DescResult {
         unimplemented!();
     }

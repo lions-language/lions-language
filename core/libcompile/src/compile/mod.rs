@@ -639,14 +639,16 @@ impl<'a, F: Compile> Grammar for Compiler<'a, F> {
         self.process_interface_function_define_param(define, context)
     }
 
-    fn interface_function_statement_start(&mut self, context: &mut InterfaceFunctionStatementContext)
+    fn interface_function_statement_start(&mut self, define: &mut InterfaceDefine
+        , context: &mut InterfaceFunctionStatementContext)
         -> DescResult {
-        self.process_interface_function_statement_start(context)
+        self.process_interface_function_statement_start(define, context)
     }
 
-    fn interface_function_statement_end(&mut self, context: &mut InterfaceFunctionStatementContext)
+    fn interface_function_statement_end(&mut self, define: &mut InterfaceDefine
+        , context: &mut InterfaceFunctionStatementContext)
         -> DescResult {
-        self.process_interface_function_statement_end(context)
+        self.process_interface_function_statement_end(define, context)
     }
 
     fn struct_init_start(&mut self, init_context: &mut GrammarStructInitContext) -> DescResult {
