@@ -105,6 +105,14 @@ impl<'a, F: Compile> Compiler<'a, F> {
         /*
          * 添加一个 statement
          * */
+        match define.function_statement_mut() {
+            Some(def) => {
+                def.function_statement_mut().push(InterfaceFunctionStatement::default());
+            },
+            None => {
+                *define.function_statement_mut() = Some(vec![InterfaceFunctionStatement::default()]);
+            }
+        }
         DescResult::Success
     }
 
