@@ -15,7 +15,8 @@ use libtype::function::{AddFunctionContext
 use libtype::{TypeAttrubute, Type
     , AddressKey, AddressValue
     , AddressType};
-use libtype::interface::{InterfaceDefine};
+use libtype::interface::{InterfaceDefine
+    , InterfaceFunctionStatement};
 use libtype::instruction::{JumpType, Jump};
 use libtype::package::{PackageStr};
 use crate::compile::{Compile, Compiler, FunctionNamedStmtContext
@@ -107,7 +108,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
          * */
         match define.function_statement_mut() {
             Some(def) => {
-                def.function_statement_mut().push(InterfaceFunctionStatement::default());
+                def.push(InterfaceFunctionStatement::default());
             },
             None => {
                 *define.function_statement_mut() = Some(vec![InterfaceFunctionStatement::default()]);
@@ -119,6 +120,14 @@ impl<'a, F: Compile> Compiler<'a, F> {
     pub fn process_interface_function_statement_end(&mut self, define: &mut InterfaceDefine
         , context: &mut InterfaceFunctionStatementContext)
         -> DescResult {
+        DescResult::Success
+    }
+
+    pub fn process_interface_start(&mut self, define: &mut InterfaceDefine) -> DescResult {
+        DescResult::Success
+    }
+
+    pub fn process_interface_end(&mut self, define: &mut InterfaceDefine) -> DescResult {
         DescResult::Success
     }
 }
