@@ -51,11 +51,11 @@ impl DefineContainer {
 /*
  * 模块 <-> 结构定义
  * */
-pub struct StructControl {
+pub struct InterfaceControl {
     defines: HashMap<String, DefineContainer>
 }
 
-impl StructControl {
+impl InterfaceControl {
     pub fn add_define(&mut self, module_str: String
         , name: String, define: InterfaceDefine) {
         match self.defines.get_mut(&module_str) {

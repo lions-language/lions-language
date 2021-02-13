@@ -51,6 +51,7 @@ use libresult::*;
 use libtype::{AddressKey, AddressValue};
 use libtype::package::{PackageStr};
 use libstructtype::structure::{StructControl};
+use libinterfacetype::interface::{InterfaceControl};
 use libmacro::{FieldGet, FieldGetClone, FieldGetMove, NewWithAll};
 use std::collections::HashMap;
 use crate::address;
@@ -389,6 +390,7 @@ pub struct IoAttribute {
 pub struct Compiler<'a, F: Compile> {
     function_control: &'a mut FunctionControl,
     struct_control: &'a mut StructControl,
+    interface_control: &'a mut InterfaceControl,
     module_stack: &'a mut ModuleStack,
     scope_context: ScopeContext,
     input_context: InputContext,
@@ -705,6 +707,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
         , package_str: &'a str, io_attr: IoAttribute
         , function_control: &'a mut FunctionControl
         , struct_control: &'a mut StructControl
+        , interface_control: &'a mut InterfaceControl
         , package_context: &'a PackageContext
         , module_mapping: &'a mut ModuleMapping) -> Self {
         match module {
@@ -715,6 +718,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
         Self {
             function_control: function_control,
             struct_control: struct_control,
+            interface_control: interface_control,
             module_stack: module_stack,
             scope_context: ScopeContext::new(),
             input_context: input_context,
