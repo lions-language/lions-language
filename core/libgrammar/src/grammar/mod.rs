@@ -522,7 +522,7 @@ pub trait Grammar {
     fn interface_define_start(&mut self, _: &mut InterfaceDefine) -> DescResult {
         unimplemented!();
     }
-    fn interface_define_end(&mut self, _: &mut InterfaceDefine) -> DescResult {
+    fn interface_define_end(&mut self, _: InterfaceDefine) -> DescResult {
         unimplemented!();
     }
     fn interface_function_define_param(&mut self

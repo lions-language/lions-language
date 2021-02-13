@@ -127,7 +127,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
         DescResult::Success
     }
 
-    pub fn process_interface_end(&mut self, define: &mut InterfaceDefine) -> DescResult {
+    pub fn process_interface_end(&mut self, define: InterfaceDefine) -> DescResult {
         self.interface_control.add_define(
             self.module_stack.current().name_clone()
             , define.name_ref().clone()
