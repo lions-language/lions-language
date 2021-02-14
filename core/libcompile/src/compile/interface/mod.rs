@@ -33,7 +33,11 @@ impl<'a, F: Compile> Compiler<'a, F> {
     }
 
     pub fn process_interface_define_end(&mut self
-        , define: &mut InterfaceDefine) -> DescResult {
+        , define: InterfaceDefine) -> DescResult {
+        self.interface_control.add_define(
+            self.module_stack.current().name_clone()
+            , define.name_ref().clone()
+            , define);
         DescResult::Success
     }
 
@@ -120,18 +124,6 @@ impl<'a, F: Compile> Compiler<'a, F> {
     pub fn process_interface_function_statement_end(&mut self, define: &mut InterfaceDefine
         , context: &mut InterfaceFunctionStatementContext)
         -> DescResult {
-        DescResult::Success
-    }
-
-    pub fn process_interface_start(&mut self, define: &mut InterfaceDefine) -> DescResult {
-        DescResult::Success
-    }
-
-    pub fn process_interface_end(&mut self, define: InterfaceDefine) -> DescResult {
-        self.interface_control.add_define(
-            self.module_stack.current().name_clone()
-            , define.name_ref().clone()
-            , define);
         DescResult::Success
     }
 }

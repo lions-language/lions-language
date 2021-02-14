@@ -628,11 +628,11 @@ impl<'a, F: Compile> Grammar for Compiler<'a, F> {
         self.process_struct_define_end(define);
     }
 
-    fn interface_define_start(&mut self, define: InterfaceDefine) -> DescResult {
+    fn interface_define_start(&mut self, define: &mut InterfaceDefine) -> DescResult {
         self.process_interface_define_start(define)
     }
 
-    fn interface_define_end(&mut self, define: &mut InterfaceDefine) -> DescResult {
+    fn interface_define_end(&mut self, define: InterfaceDefine) -> DescResult {
         self.process_interface_define_end(define)
     }
 
@@ -828,6 +828,7 @@ mod test {
         let mut test_compile = TestCompile{};
         let mut function_control = FunctionControl::new();
         let mut struct_control = StructControl::new();
+        let mut interface_control = InterfaceControl::new();
         let package = Package::<String>::new();
         let package_control = PackageControl::new();
         let mut package_context = PackageContext::new(&package, &package_control);
@@ -840,6 +841,7 @@ mod test {
                     , &package_str, io_attr_clone
                     , &mut function_control
                     , &mut struct_control
+                    , &mut interface_control
                     , &package_context
                     , &mut module_mapping)
         };
