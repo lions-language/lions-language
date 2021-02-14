@@ -7,6 +7,7 @@ use libtype::module::Module;
 use libtype::instruction::{Instruction};
 use libtypecontrol::function::FunctionControl;
 use libstructtype::structure::{StructControl};
+use libinterfacetype::interface::{InterfaceControl};
 use libcompile::compile::{FileType, InputAttribute, InputContext, IoAttribute
     , Compiler};
 use libcompile::bytecode::{self, Bytecode};
@@ -116,6 +117,7 @@ impl Control {
         let mut module_stack = ModuleStack::new();
         let mut function_control = FunctionControl::new();
         let mut struct_control = StructControl::new();
+        let mut interface_control = InterfaceControl::new();
         let mut module_mapping = ModuleMapping::new();
         let mut bytecode = Bytecode::new(
                     &mut inner_writer
@@ -130,7 +132,7 @@ impl Control {
                 , &mut static_variant_dispatch
                 , package_str, io_attr_clone
                 , &mut function_control
-                , &mut struct_control
+                , &mut struct_control, &mut interface_control
                 , package_context
                 , &mut module_mapping
             )
