@@ -53,7 +53,10 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                  * 跳过 ->
                  * */
                 self.skip_next_one();
-            }
+            },
+            TokenType::Function => {
+                return false;
+            },
             _ => {
                 /*
                  * 既不是 { 也不是 ->, 交给 类型处理函数
