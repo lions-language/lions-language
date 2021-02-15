@@ -509,6 +509,7 @@ mod comma;
 mod and;
 mod annotate;
 mod boolean;
+mod is_opt;
 
 #[cfg(test)]
 mod test {
