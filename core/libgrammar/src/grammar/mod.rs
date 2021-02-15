@@ -404,6 +404,9 @@ pub trait Grammar {
     fn operator_equal(&mut self, value: TokenValue) -> DescResult {
         unimplemented!();
     }
+    fn operator_is(&mut self, value: TokenValue) -> DescResult {
+        unimplemented!();
+    }
     fn operator_equal_equal(&mut self, context: OperatorEqualEqualContext) -> DescResult {
         unimplemented!();
     }
@@ -1116,6 +1119,7 @@ mod two_point;
 mod process_loop;
 mod process_break;
 mod process_continue;
+mod process_is;
 
 #[cfg(test)]
 mod test {

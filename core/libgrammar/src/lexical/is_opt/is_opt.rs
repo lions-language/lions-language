@@ -7,7 +7,7 @@ pub struct IsOptToken {
 
 lazy_static!{
     static ref is_opt_token_attrubute: TokenAttrubute = TokenAttrubute{
-        bp: &0,
+        bp: &15,
         oper_type: &TokenOperType::Operator
     };
 }
@@ -22,7 +22,7 @@ impl IsOptToken {
     fn led<T: FnMut() -> CallbackReturnStatus, CB: Grammar>(token: &Token<T, CB>
         , grammar: &mut GrammarParser<T, CB>
         , express_context: &mut ExpressContext<T, CB>) -> TokenMethodResult {
-        grammar.equal_process(express_context)
+        grammar.is_process(express_context)
     }
 }
 

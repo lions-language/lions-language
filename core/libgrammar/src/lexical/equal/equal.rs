@@ -7,7 +7,7 @@ pub struct EqualToken {
 
 lazy_static!{
     static ref equal_token_attrubute: TokenAttrubute = TokenAttrubute{
-        bp: &0,
+        bp: &2,
         oper_type: &TokenOperType::Operator
     };
 }
