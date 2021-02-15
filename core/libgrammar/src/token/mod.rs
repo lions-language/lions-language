@@ -121,6 +121,7 @@ pub enum TokenType {
     // 注释
     Annotate,
     Id,
+    Is,
     Const(PrimevalType),
     PrimevalType(PrimevalType)
 }
