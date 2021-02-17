@@ -354,6 +354,12 @@ pub struct UseStmtContext {
     pub content: String
 }
 
+#[derive(Debug, FieldGet
+    , NewWithAll, FieldGetMove
+    , Default)]
+pub struct ImplStmtContext {
+}
+
 impl<'a> ImportStmtContext<'a> {
     pub fn new(prefix: ImportPrefixType, content: &'a str
         , alias: Option<String>) -> Self {
@@ -681,6 +687,9 @@ pub trait Grammar {
     fn use_stmt(&mut self, _context: UseStmtContext) -> DescResult {
         unimplemented!();
     }
+    fn impl_stmt(&mut self, _context: ImplStmtContext) -> DescResult {
+        unimplemented!();
+    }
     fn first_stmt(&mut self, _context: FirstStmtContext) -> DescResult {
         unimplemented!();
     }
@@ -856,6 +865,9 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
             },
             TokenType::Is => {
                 self.is_process(express_context);
+            },
+            TokenType::Impl => {
+                self.impl_process();
             },
             _ => {
                 self.expression_process(token, express_context);
@@ -1123,6 +1135,7 @@ mod process_loop;
 mod process_break;
 mod process_continue;
 mod process_is;
+mod process_impl;
 
 #[cfg(test)]
 mod test {
