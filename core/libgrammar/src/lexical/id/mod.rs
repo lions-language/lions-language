@@ -110,11 +110,15 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
     }
 
     fn id_kw_is(&mut self) {
-        self.id_push_keyword_token(TokenType::Is);
+        /*
+         * 定义于 lexical/is_opt/mod.rs
+         * */
+        self.build_is_opt();
     }
 
     fn id_kw_impl(&mut self) {
-        self.id_push_keyword_token(TokenType::Impl);
+        let context = self.build_token_context_without_data(TokenType::Impl);
+        // self.push_to_token_buffer(is_opt::IsOptToken::new(context));
     }
 
     fn id_kw_import(&mut self) {

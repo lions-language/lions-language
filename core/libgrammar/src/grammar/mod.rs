@@ -863,9 +863,6 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
             TokenType::Continue => {
                 self.continue_process();
             },
-            TokenType::Is => {
-                self.is_process(express_context);
-            },
             TokenType::Impl => {
                 self.impl_process();
             },
