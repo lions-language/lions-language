@@ -25,8 +25,7 @@ impl TrueToken {
         token: &Token<T, CB>, grammar: &mut GrammarParser<T, CB>
         , express_context: &mut ExpressContext<T, CB>) -> TokenMethodResult {
         grammar.true_process(DescContext::new(
-                TypeAttrubute::default()));
-        TokenMethodResult::End
+                TypeAttrubute::default()))
     }
 }
 

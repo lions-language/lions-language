@@ -331,7 +331,6 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                      * 如果到达这里, 说明 led 方法返回的不是 IoEOF, 那么这一次的 lookup next 一定不会是 None
                      * */
                     panic!("should not happend");
-                    return TokenMethodResult::Panic;
                 }
             };
             next_token = next_tp.as_ref::<T, CB>();
