@@ -100,6 +100,9 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
     }
 
     fn id_process_coloncolon(&mut self, desc_ctx: DescContext) {
+        /*
+         * TODO: 多次 :: 操作
+         * */
         let mut t = self.take_next_one();
         let module_prefix = extract_token_data!(
             t.token_value().token_data().expect("should not happend")

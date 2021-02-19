@@ -1130,6 +1130,7 @@ mod process_break;
 mod process_continue;
 mod process_is;
 mod process_impl;
+mod finder;
 
 #[cfg(test)]
 mod test {
