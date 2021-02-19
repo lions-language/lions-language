@@ -384,6 +384,12 @@ pub struct EndContext {
 pub struct FirstStmtContext {
 }
 
+#[derive(Debug, FieldGet
+    , NewWithAll, FieldGetMove
+    , Default)]
+pub struct FindInterfaceContext {
+}
+
 pub trait Grammar {
     // type IdUse;
     
@@ -691,6 +697,12 @@ pub trait Grammar {
         unimplemented!();
     }
     fn first_stmt(&mut self, _context: FirstStmtContext) -> DescResult {
+        unimplemented!();
+    }
+    fn find_interface_mid(&mut self, _context: &mut FindInterfaceContext) -> DescResult {
+        unimplemented!();
+    }
+    fn find_interface_end(&mut self, _context: &mut FindInterfaceContext) -> DescResult {
         unimplemented!();
     }
 }
