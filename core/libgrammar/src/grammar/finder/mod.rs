@@ -1,6 +1,6 @@
 use libresult::DescResult;
 use super::{GrammarParser, Grammar
-    , CallFuncScopeContext, LoadVariantContext
+    , FindInterfaceContext
     , DescContext};
 use crate::lexical::{CallbackReturnStatus, TokenPointer};
 use crate::token::{TokenType, TokenData};
@@ -9,7 +9,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
     /*
      * 查找接口 (包括 其他包中的)
      * */
-    pub fn find_interface(&mut self) {
+    pub fn find_interface(&mut self, context: &mut FindInterfaceContext) {
         /*
          * 判断下一个token是否是 id
          * */
@@ -25,6 +25,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                 /*
                  * 不存在 :: => 调用结束的cb
                  * */
+                check_desc_result!(self, self.cb().find_interface_end(context));
                 return;
             }
         };
@@ -33,11 +34,13 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
             /*
              * 调用 中间 的cb
              * */
-            self.find_interface();
+            self.find_interface(context);
+            check_desc_result!(self, self.cb().find_interface_mid(context));
         } else {
             /*
              * 调用 结束的cb
              * */
+            check_desc_result!(self, self.cb().find_interface_end(context));
             return;
         };
     }
