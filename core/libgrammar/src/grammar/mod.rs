@@ -388,6 +388,8 @@ pub struct FirstStmtContext {
     , NewWithAll, FieldGetMove
     , Default)]
 pub struct FindInterfaceContext {
+    seque: Vec<String>,
+    context: HeapPtr
 }
 
 pub trait Grammar {
