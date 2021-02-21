@@ -701,11 +701,11 @@ impl<'a, F: Compile> Grammar for Compiler<'a, F> {
     }
 
     fn find_interface_mid(&mut self, context: &mut FindInterfaceContext) -> DescResult {
-        self.process_interface_mid(context)
+        self.process_find_interface_mid(context)
     }
 
     fn find_interface_end(&mut self, context: &mut FindInterfaceContext) -> DescResult {
-        self.process_interface_end(context)
+        self.process_find_interface_end(context)
     }
 }
 
@@ -775,6 +775,7 @@ mod imports_mapping;
 mod process_while;
 mod process_loop;
 mod interface;
+mod finder;
 
 #[cfg(test)]
 mod test {
