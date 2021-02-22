@@ -101,7 +101,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
 
     fn id_process_coloncolon(&mut self, desc_ctx: DescContext) {
         /*
-         * TODO: 多次 :: 操作
+         * 宗旨: 最多一层 ::, 因为 import 的时候已经指定了
          * */
         let mut t = self.take_next_one();
         let module_prefix = extract_token_data!(
