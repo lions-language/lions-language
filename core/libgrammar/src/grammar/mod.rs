@@ -389,7 +389,7 @@ pub struct FirstStmtContext {
     , Default)]
 pub struct FindInterfaceContext {
     seque: Vec<String>,
-    context: HeapPtr
+    context: Option<HeapPtr>
 }
 
 pub trait Grammar {
