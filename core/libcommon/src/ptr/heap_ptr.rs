@@ -62,6 +62,14 @@ impl HeapPtr {
         &self.typ
     }
 
+    pub fn is_null(&self) -> bool {
+        if self.ptr == 0 {
+            true
+        } else {
+            false
+        }
+    }
+
     pub fn new_null() -> Self {
         Self {
             ptr: 0,
