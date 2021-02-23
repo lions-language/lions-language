@@ -1,6 +1,8 @@
 use libresult::DescResult;
 use super::{GrammarParser, Grammar
     , FindInterfaceContext
+    , FindInterfacePrefixContext
+    , FindInterfaceEndContext
     , DescContext};
 use crate::lexical::{CallbackReturnStatus, TokenPointer};
 use crate::token::{TokenType, TokenData};
@@ -25,24 +27,35 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                 /*
                  * 不存在 :: => 调用结束的cb
                  * */
-                check_desc_result!(self, self.cb().find_interface_end(context));
+                let end = FindInterfaceEndContext::new_with_all(id_token.token_value());
+                check_desc_result!(self, self.cb().find_interface_end(end, context));
                 return;
             }
         };
         let next = tp.as_ref::<T, CB>();
         if let TokenType::ColonColon = next.context_token_type() {
-            /*
-             * 调用 中间 的cb
-             * */
-            self.find_interface(context);
-            check_desc_result!(self, self.cb().find_interface_mid(context));
+            self.find_interface_after_coloncolon(context);
         } else {
             /*
              * 调用 结束的cb
              * */
-            check_desc_result!(self, self.cb().find_interface_end(context));
+            let end = FindInterfaceEndContext::new_with_all(id_token.token_value());
+            check_desc_result!(self, self.cb().find_interface_end(end, context));
             return;
         };
+    }
+
+    fn find_interface_after_coloncolon(&mut self, context: &mut FindInterfaceContext) {
+        /*
+         * 跳过 ::
+         * */
+        self.skip_next_one();
+        /*
+         * 获取 :: 后的 id
+         * */
+        let id_token = self.expect_and_take_next_token_unchecked(TokenType::Id);
+        let prefix = FindInterfacePrefixContext::new_with_all(id_token.token_value());
+        check_desc_result!(self, self.cb().find_interface_prefix(prefix, context));
     }
 }
 

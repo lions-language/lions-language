@@ -387,9 +387,22 @@ pub struct FirstStmtContext {
 #[derive(Debug, FieldGet
     , NewWithAll, FieldGetMove
     , Default)]
+pub struct FindInterfacePrefixContext {
+    value: TokenValue
+}
+
+#[derive(Debug, FieldGet
+    , NewWithAll, FieldGetMove
+    , Default)]
+pub struct FindInterfaceEndContext {
+    value: TokenValue
+}
+
+#[derive(Debug, FieldGet
+    , NewWithAll, FieldGetMove
+    , Default)]
 pub struct FindInterfaceContext {
-    seque: Vec<String>,
-    context: Option<HeapPtr>
+    context: HeapPtr
 }
 
 pub trait Grammar {
@@ -701,10 +714,12 @@ pub trait Grammar {
     fn first_stmt(&mut self, _context: FirstStmtContext) -> DescResult {
         unimplemented!();
     }
-    fn find_interface_mid(&mut self, _context: &mut FindInterfaceContext) -> DescResult {
+    fn find_interface_prefix(&mut self, _prefix_context: FindInterfacePrefixContext
+                             , _context: &mut FindInterfaceContext) -> DescResult {
         unimplemented!();
     }
-    fn find_interface_end(&mut self, _context: &mut FindInterfaceContext) -> DescResult {
+    fn find_interface_end(&mut self, _end_context: FindInterfaceEndContext
+                          , _context: &mut FindInterfaceContext) -> DescResult {
         unimplemented!();
     }
 }
