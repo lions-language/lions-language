@@ -703,12 +703,12 @@ impl<'a, F: Compile> Grammar for Compiler<'a, F> {
 
     fn find_interface_prefix(&mut self, prefix_context: FindInterfacePrefixContext
                              , context: &mut FindInterfaceContext) -> DescResult {
-        self.process_find_interface_mid(context)
+        self.process_find_interface_prefix(prefix_context, context)
     }
 
     fn find_interface_end(&mut self, end_context: FindInterfaceEndContext
                           , context: &mut FindInterfaceContext) -> DescResult {
-        self.process_find_interface_end(context)
+        self.process_find_interface_end(end_context, context)
     }
 }
 
