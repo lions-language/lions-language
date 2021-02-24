@@ -24,7 +24,8 @@ use libgrammar::grammar::{Grammar, CallFuncScopeContext
     , OperatorTwoPointContext
     , RelmodStmtContext, ModuleStmtContext
     , UseStmtContext, EndContext, FirstStmtContext
-    , FindInterfaceContext};
+    , FindInterfaceContext, FindInterfacePrefixContext
+    , FindInterfaceEndContext};
 use libgrammar::token::{TokenValue};
 use libtype::{Type, Data};
 use libtype::function::{Function, CallFunctionParamAddr
@@ -700,11 +701,13 @@ impl<'a, F: Compile> Grammar for Compiler<'a, F> {
         self.process_first_stmt(context)
     }
 
-    fn find_interface_mid(&mut self, context: &mut FindInterfaceContext) -> DescResult {
+    fn find_interface_prefix(&mut self, prefix_context: FindInterfacePrefixContext
+                             , context: &mut FindInterfaceContext) -> DescResult {
         self.process_find_interface_mid(context)
     }
 
-    fn find_interface_end(&mut self, context: &mut FindInterfaceContext) -> DescResult {
+    fn find_interface_end(&mut self, end_context: FindInterfaceEndContext
+                          , context: &mut FindInterfaceContext) -> DescResult {
         self.process_find_interface_end(context)
     }
 }
