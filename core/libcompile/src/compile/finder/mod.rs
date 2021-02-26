@@ -22,11 +22,20 @@ impl<'a, F: Compile> Compiler<'a, F> {
 
     pub fn process_find_interface_end(&mut self, end_context: FindInterfaceEndContext
                                       , context: &mut FindInterfaceContext) -> DescResult {
+        let name = extract_token_data!(prefix_context.value().token_data_unchecked(), Id);
         if context.context_ref().is_null() {
             /*
              * 无前缀
              * */
             let module_str = self.module_stack.current().name_ref();
+            let obj_ptr = match self.interface_control.find_define(module_str, name) {
+                Some(p) => {
+                    p
+                },
+                None => {
+                    return DescResule::Error(String::from("not found"));
+                }
+            };
         } else {
             /*
              * 存在前缀
@@ -42,6 +51,13 @@ impl<'a, F: Compile> Compiler<'a, F> {
                         format!("{} is not found", module_prefix));
                 }
             };
+            match package_str {
+                PackageStr::ItSelf => {
+                },
+                PackageStr::Third => {
+                    unimplmented!()
+                }
+            }
         }
         DescResult::Success
     }
