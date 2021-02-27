@@ -5,6 +5,7 @@ use libgrammar::grammar::{FindInterfaceContext
 use libgrammar::token::{TokenData};
 use libcommon::consts::{ImportPrefixType};
 use libcommon::ptr::{HeapPtr};
+use libtype::package::{PackageStr};
 use std::path::Path;
 use crate::compile::{Compile, Compiler, FileType};
 
@@ -22,18 +23,18 @@ impl<'a, F: Compile> Compiler<'a, F> {
 
     pub fn process_find_interface_end(&mut self, end_context: FindInterfaceEndContext
                                       , context: &mut FindInterfaceContext) -> DescResult {
-        let name = extract_token_data!(prefix_context.value().token_data_unchecked(), Id);
+        let name = extract_token_data!(end_context.value().token_data_unchecked(), Id);
         if context.context_ref().is_null() {
             /*
              * 无前缀
              * */
             let module_str = self.module_stack.current().name_ref();
-            let obj_ptr = match self.interface_control.find_define(module_str, name) {
+            let obj_ptr = match self.interface_control.find_define(module_str, &name) {
                 Some(p) => {
                     p
                 },
                 None => {
-                    return DescResule::Error(String::from("not found"));
+                    return DescResult::Error(String::from("not found"));
                 }
             };
         } else {
@@ -52,10 +53,13 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 }
             };
             match package_str {
-                PackageStr::ItSelf => {
+                PackageStr::Itself => {
                 },
-                PackageStr::Third => {
-                    unimplmented!()
+                PackageStr::Third(_) => {
+                    unimplemented!();
+                },
+                PackageStr::Empty => {
+                    unimplemented!();
                 }
             }
         }
