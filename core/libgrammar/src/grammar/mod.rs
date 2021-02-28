@@ -15,7 +15,7 @@ use libmacro::{FieldGet, NewWithAll
     , FieldGetMove, FieldGetClone};
 
 #[derive(FieldGet, FieldGetClone
-    , FieldGetMove)]
+    , FieldGetMove, Default)]
 pub struct CallFuncScopeContext {
     module_prefix: Option<String>,
     desc_ctx: DescContext
@@ -761,7 +761,8 @@ pub struct NupContext {
 pub struct ExpressContext<T: FnMut() -> CallbackReturnStatus, CB: Grammar> {
     pub end_f: ExpressEndFunc<T, CB>,
     desc_ctx: DescContext,
-    nup_context: NupContext
+    nup_context: NupContext,
+    scope_context: CallFuncScopeContext
 }
 
 impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> ExpressContext<T, CB> {
@@ -770,17 +771,19 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> ExpressContext<T, CB> {
     }
 
     pub fn new_with_desc_ctx(end_f: ExpressEndFunc<T, CB>
-        , desc_ctx: DescContext) -> Self {
+        , desc_ctx: DescContext, scope_context: CallFuncScopeContext) -> Self {
         Self {
             end_f: end_f,
             desc_ctx: desc_ctx,
-            nup_context: NupContext::default()
+            nup_context: NupContext::default(),
+            scope_context: scope_context,
         }
     }
 
     pub fn new(end_f: ExpressEndFunc<T, CB>) -> Self {
         ExpressContext::<T, CB>::new_with_desc_ctx(end_f
-            , DescContext::new(TypeAttrubute::Move))
+            , DescContext::new(TypeAttrubute::Move)
+            , CallFuncScopeContext::default())
     }
 }
 
