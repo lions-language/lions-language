@@ -15,7 +15,7 @@ use libmacro::{FieldGet, NewWithAll
     , FieldGetMove, FieldGetClone};
 
 #[derive(FieldGet, FieldGetClone
-    , FieldGetMove, Default)]
+    , FieldGetMove, Default, Clone)]
 pub struct CallFuncScopeContext {
     module_prefix: Option<String>,
     desc_ctx: DescContext
@@ -431,7 +431,7 @@ pub trait Grammar {
     fn operator_equal(&mut self, value: TokenValue) -> DescResult {
         unimplemented!();
     }
-    fn operator_is(&mut self, value: TokenValue) -> DescResult {
+    fn operator_is(&mut self, value: TokenValue, _scope_context: CallFuncScopeContext) -> DescResult {
         unimplemented!();
     }
     fn operator_equal_equal(&mut self, context: OperatorEqualEqualContext) -> DescResult {

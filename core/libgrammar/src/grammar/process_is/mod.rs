@@ -26,7 +26,8 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
             }
         };
         let r =  self.expression(t.token_attrubute().bp, express_context, &tp);
-        if let DescResult::Error(err) = self.grammar_context().cb.operator_is(t.token_value()) {
+        if let DescResult::Error(err) = self.grammar_context().cb.operator_is(
+            t.token_value(), express_context.scope_context.clone()) {
             self.panic(&err);
         };
         r
