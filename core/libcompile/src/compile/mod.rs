@@ -444,7 +444,7 @@ impl<'a, F: Compile> Grammar for Compiler<'a, F> {
         self.operator_two_point(context)
     }
 
-    fn operator_is_point(&mut self, context: OperatorIsContext) -> DescResult {
+    fn operator_is(&mut self, context: OperatorIsContext) -> DescResult {
         self.operator_is(context)
     }
 

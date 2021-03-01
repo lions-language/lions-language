@@ -44,6 +44,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
         self.call_function(func_statement, func_define, PackageStr::Empty
             , desc_ctx, param_len)
         */
+        DescResult::Success
     }
 }
 
