@@ -15,7 +15,8 @@ use libmacro::{FieldGet, NewWithAll
     , FieldGetMove, FieldGetClone};
 
 #[derive(FieldGet, FieldGetClone
-    , FieldGetMove, Default, Clone)]
+    , FieldGetMove, Default, Clone
+    , Debug)]
 pub struct CallFuncScopeContext {
     module_prefix: Option<String>,
     desc_ctx: DescContext
@@ -324,6 +325,14 @@ pub struct PrefixPlusPlusContext {
     symbol_count: u8
 }
 
+#[derive(Debug, FieldGet
+    , NewWithAll, FieldGetMove
+    , Default)]
+pub struct OperatorIsContext {
+    value: TokenValue,
+    scope_context: CallFuncScopeContext
+}
+
 #[derive(Debug, Default)]
 pub struct ImportStmtContext<'a> {
     pub prefix: ImportPrefixType,
@@ -431,7 +440,7 @@ pub trait Grammar {
     fn operator_equal(&mut self, value: TokenValue) -> DescResult {
         unimplemented!();
     }
-    fn operator_is(&mut self, value: TokenValue, _scope_context: CallFuncScopeContext) -> DescResult {
+    fn operator_is(&mut self, _context: OperatorIsContext) -> DescResult {
         unimplemented!();
     }
     fn operator_equal_equal(&mut self, context: OperatorEqualEqualContext) -> DescResult {
