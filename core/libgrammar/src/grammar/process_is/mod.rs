@@ -1,6 +1,6 @@
 use libresult::DescResult;
 use super::{GrammarParser, Grammar
-    , ExpressContext};
+    , ExpressContext, OperatorIsContext};
 use crate::lexical::{CallbackReturnStatus};
 use crate::token::{TokenMethodResult};
 
@@ -27,7 +27,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         };
         let r =  self.expression(t.token_attrubute().bp, express_context, &tp);
         if let DescResult::Error(err) = self.grammar_context().cb.operator_is(
-            t.token_value(), express_context.scope_context.clone()) {
+            OperatorIsContext::new_with_all(t.token_value(), express_context.scope_context.clone())) {
             self.panic(&err);
         };
         r

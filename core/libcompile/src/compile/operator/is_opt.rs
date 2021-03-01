@@ -1,13 +1,13 @@
 use libresult::*;
 use libtype::package::PackageStr;
 use libgrammar::token::TokenValue;
-use libgrammar::grammar::{OperatorEqualEqualContext};
+use libgrammar::grammar::{OperatorIsContext};
 use libtype::function::{FunctionDefine
         , FunctionStatement};
 use crate::compile::{Compile, Compiler};
 
 impl<'a, F: Compile> Compiler<'a, F> {
-    pub fn operator_is(&mut self, context: OperatorEqualEqualContext) -> DescResult {
+    pub fn operator_is(&mut self, context: OperatorIsContext) -> DescResult {
         use libtype::function::consts;
         let (_, desc_ctx) = context.fields_move();
         let right = self.scope_context.top_n_with_panic_from_value_buffer(1);
@@ -40,8 +40,10 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 format!("{} is undefine", func_str));
         }
         let param_len = func_statement.as_ref().unwrap().get_func_param_len();
+        /*
         self.call_function(func_statement, func_define, PackageStr::Empty
             , desc_ctx, param_len)
+        */
     }
 }
 
