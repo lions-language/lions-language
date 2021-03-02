@@ -118,21 +118,23 @@ pub struct StructInitContext {
     , Clone)]
 pub struct DescContext {
     typ_attr: TypeAttrubute,
-    star_prefix: bool
+    star_prefix: bool,
+    coloncolon_prefix: bool
 }
 
 impl Default for DescContext {
     fn default() -> Self {
         Self {
             typ_attr: TypeAttrubute::default(),
-            star_prefix: false
+            star_prefix: false,
+            coloncolon_prefix: false
         }
     }
 }
 
 impl DescContext {
     pub fn new(typ_attr: TypeAttrubute) -> Self {
-        DescContext::new_with_all(typ_attr, false)
+        DescContext::new_with_all(typ_attr, false, false)
     }
 }
 

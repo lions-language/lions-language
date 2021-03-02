@@ -99,10 +99,11 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         lengthen_offset
     }
 
-    fn id_process_coloncolon(&mut self, desc_ctx: DescContext) {
+    fn id_process_coloncolon(&mut self, mut desc_ctx: DescContext) {
         /*
          * 宗旨: 最多一层 ::, 因为 import 的时候已经指定了
          * */
+        *desc_ctx.coloncolon_prefix_mut() = true;
         let mut t = self.take_next_one();
         let module_prefix = extract_token_data!(
             t.token_value().token_data().expect("should not happend")
