@@ -112,6 +112,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
          * 跳过 ::
          * */
         self.skip_next_one();
+        // self.cb().enter_colon_colon()
         self.id_process_inner(desc_ctx, Some(module_prefix));
     }
 
