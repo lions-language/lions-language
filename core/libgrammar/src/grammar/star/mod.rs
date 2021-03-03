@@ -25,7 +25,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                 }
             }
         }, "id after `*`");
-        self.id_process(DescContext::new_with_all(TypeAttrubute::default(), true, false));
+        self.id_process(DescContext::new_with_all(TypeAttrubute::default(), true));
     }
 }
 
