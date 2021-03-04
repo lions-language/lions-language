@@ -1,7 +1,6 @@
 use libresult::DescResult;
 use super::{GrammarParser, Grammar
     , CallFuncScopeContext, LoadVariantContext
-    , EnterColonColonContext
     , DescContext};
 use crate::lexical::{CallbackReturnStatus, TokenPointer};
 use crate::token::{TokenType, TokenData};
@@ -100,24 +99,6 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         lengthen_offset
     }
 
-    fn id_process_coloncolon(&mut self, mut desc_ctx: DescContext) {
-        /*
-         * 宗旨: 最多一层 ::, 因为 import 的时候已经指定了
-         * */
-        let mut t = self.take_next_one();
-        let module_prefix = extract_token_data!(
-            t.token_value().token_data().expect("should not happend")
-            , Id);
-        /*
-         * 跳过 ::
-         * */
-        self.skip_next_one();
-        self.cb().enter_colon_colon(EnterColonColonContext::new_with_all(
-                module_prefix.clone()));
-        self.id_process_inner(desc_ctx, Some(module_prefix));
-        self.cb().leave_colon_colon();
-    }
-
     pub fn id_process(&mut self, desc_ctx: DescContext) {
         self.id_process_inner(desc_ctx, None);
     }
@@ -207,4 +188,5 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
 
 mod point_access;
 mod equal;
+mod colon_colon;
 
