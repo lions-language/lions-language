@@ -188,5 +188,5 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
 
 mod point_access;
 mod equal;
-mod colon_colon;
+mod colon_colon_access;
 
