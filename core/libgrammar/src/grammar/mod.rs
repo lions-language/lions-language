@@ -296,7 +296,7 @@ pub struct EnterPointAccessContext {
 #[derive(Debug, FieldGet, FieldGetClone
     , NewWithAll, FieldGetMove
     , Default)]
-pub struct EnterColonColonContext {
+pub struct EnterColonColonAccessContext {
     id: String
 }
 
@@ -712,10 +712,10 @@ pub trait Grammar {
     fn leave_point_access(&mut self) {
         unimplemented!();
     }
-    fn enter_colon_colon(&mut self, _context: EnterColonColonContext) {
+    fn enter_colon_colon_access(&mut self, _context: EnterColonColonAccessContext) {
         unimplemented!();
     }
-    fn leave_colon_colon(&mut self) {
+    fn leave_colon_colon_access(&mut self) {
         unimplemented!();
     }
     fn import_stmt(&mut self, _context: ImportStmtContext) -> DescResult {

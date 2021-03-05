@@ -163,7 +163,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
                     },
                     TokenType::ColonColon => {
                         let bl = self.restore_from_backtrack_point();
-                        self.id_process_coloncolon(desc_ctx);
+                        self.id_process_coloncolon_access(desc_ctx);
                         return;
                     },
                     _ => {
