@@ -25,7 +25,7 @@ use libgrammar::grammar::{Grammar, CallFuncScopeContext
     , RelmodStmtContext, ModuleStmtContext
     , UseStmtContext, EndContext, FirstStmtContext
     , FindInterfaceContext, FindInterfacePrefixContext
-    , FindInterfaceEndContext};
+    , FindInterfaceEndContext, EnterColonColonAccessContext};
 use libgrammar::token::{TokenValue};
 use libtype::{Type, Data};
 use libtype::function::{Function, CallFunctionParamAddr
@@ -771,6 +771,7 @@ mod block;
 mod structure;
 mod structinit;
 mod point_access;
+mod colon_colon_access;
 mod process_if;
 mod boolean;
 mod import;
