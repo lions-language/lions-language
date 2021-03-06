@@ -56,6 +56,13 @@ pub struct PointAccess {
     object_typ_attr: TypeAttrubute
 }
 
+#[derive(Default, FieldGet, NewWithAll
+    , FieldGetClone, FieldGetMove
+    , Clone)]
+pub struct ColonColonAccess {
+    prefix: String
+}
+
 #[derive(FieldGet, FieldGetMove)]
 pub struct Scope {
     scope_typ: ScopeType,
@@ -83,7 +90,11 @@ pub struct Scope {
      * . 操作符
      * */
     point_access: Option<VecDeque<PointAccess>>,
-    point_access_fullname: Option<String>
+    point_access_fullname: Option<String>,
+    /*
+     * :: 操作符
+     * */
+    colon_colon_access: Option<ColonColonAccess>
 }
 
 impl Scope {
@@ -469,6 +480,18 @@ impl Scope {
         &self.point_access_fullname.as_ref().expect("should not happend")
     }
 
+    pub fn enter_colon_colon_access(&mut self, v: ColonColonAccess) {
+        self.colon_colon_access = Some(v);
+    }
+
+    pub fn leave_colon_colon_access(&mut self) {
+        *&mut self.colon_colon_access = None;
+    }
+
+    pub fn colon_coloin_access_current_unchecked(&self) -> &ColonColonAccess {
+        self.colon_colon_access.as_ref().unwrap()
+    }
+
     fn _new(start: usize, define_obj: DefineObject, scope_typ: ScopeType) -> Self {
         Self {
             scope_typ: scope_typ,
@@ -484,7 +507,8 @@ impl Scope {
             structinit_field_stack: None,
             structinit_stack: None,
             point_access: None,
-            point_access_fullname: None
+            point_access_fullname: None,
+            colon_colon_access: None
         }
     }
 
