@@ -485,11 +485,20 @@ impl Scope {
     }
 
     pub fn leave_colon_colon_access(&mut self) {
-        *&mut self.colon_colon_access = None;
+        // *&mut self.colon_colon_access = None;
+        self.colon_colon_access.take();
     }
 
     pub fn colon_coloin_access_current_unchecked(&self) -> &ColonColonAccess {
         self.colon_colon_access.as_ref().unwrap()
+    }
+
+    pub fn colon_colon_access_take_unwrap(&mut self) -> ColonColonAccess {
+        self.colon_colon_access.take().unwrap()
+    }
+
+    pub fn is_colon_colon_access(&self) -> bool {
+        self.colon_colon_access.is_some()
     }
 
     fn _new(start: usize, define_obj: DefineObject, scope_typ: ScopeType) -> Self {

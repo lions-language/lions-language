@@ -14,9 +14,18 @@ impl<'a, F: Compile> Compiler<'a, F> {
     pub fn handle_load_variant(&mut self, context: LoadVariantContext) -> DescResult {
         if self.scope_context.current_unchecked().is_point_access() {
             self.handle_load_variant_with_point_access(context)
+        } else if self.scope_context.current_unchecked().is_colon_colon_access() {
+            self.handle_load_variant_with_colon_colon_access(context)
         } else {
             self.handle_load_variant_no_point_access(context)
         }
+    }
+
+    fn handle_load_variant_with_colon_colon_access(&mut self, context: LoadVariantContext) -> DescResult {
+        let (first, _, typ_attr, lengthen_offset) = context.fields_move();
+        let first_data = first.token_data().expect("should not happend");
+        let first = extract_token_data!(first_data, Id);
+        DescResult::Success
     }
 
     fn handle_load_variant_with_point_access(&mut self, context: LoadVariantContext) -> DescResult {
