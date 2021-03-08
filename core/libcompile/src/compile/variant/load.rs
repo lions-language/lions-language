@@ -25,6 +25,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
         let (first, _, typ_attr, lengthen_offset) = context.fields_move();
         let first_data = first.token_data().expect("should not happend");
         let first = extract_token_data!(first_data, Id);
+        let colon_colon_access = self.scope_context.current_mut_unchecked().colon_colon_access_take_unwrap();
+        let prefix = colon_colon_access.fields_move();
         DescResult::Success
     }
 
