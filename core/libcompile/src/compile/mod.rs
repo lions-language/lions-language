@@ -784,6 +784,7 @@ mod process_while;
 mod process_loop;
 mod interface;
 mod finder;
+mod process_impl;
 
 #[cfg(test)]
 mod test {
