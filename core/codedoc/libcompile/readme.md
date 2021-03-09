@@ -18,3 +18,6 @@
     - 并且是在 两个 id 之间的, 那么必然在 grammar/id/mod.rs 中处理
 - 通过 enter_point_access 和 leave_point_access 告知compile 层, 让 compile层 在 enter/leave 记录需要的上下文信息
 
+
+## impl语句
+
