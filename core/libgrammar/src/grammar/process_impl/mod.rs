@@ -13,8 +13,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         /*
          * 解析后面的 interface
          * */
-        check_desc_result!(self, self.cb().impl_stmt(
-            ImplStmtContext::new_with_all()));
+        self.find_interface();
         TokenMethodResult::End
     }
 }
