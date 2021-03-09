@@ -1,6 +1,7 @@
 use libresult::{DescResult};
-use super::{GrammarParser, Grammar
-    , ImplStmtContext, DescContext};
+use crate::grammar::{GrammarParser, Grammar
+    , ImplStmtContext, DescContext
+    , FindInterfaceContext};
 use crate::token::{TokenData, TokenMethodResult};
 use crate::lexical::{CallbackReturnStatus};
 
@@ -13,7 +14,8 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         /*
          * 解析后面的 interface
          * */
-        self.find_interface();
+        let mut find_interface_context = FindInterfaceContext::default();
+        self.find_interface(&mut find_interface_context);
         TokenMethodResult::End
     }
 }
