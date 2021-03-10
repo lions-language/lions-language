@@ -374,6 +374,7 @@ pub struct UseStmtContext {
     , NewWithAll, FieldGetMove
     , Default)]
 pub struct ImplStmtContext {
+    find_context: FindInterfaceContext
 }
 
 impl<'a> ImportStmtContext<'a> {

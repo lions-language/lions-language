@@ -16,6 +16,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
          * */
         let mut find_interface_context = FindInterfaceContext::default();
         self.find_interface(&mut find_interface_context);
+        check_desc_result!(self, self.cb().impl_stmt(ImplStmtContext::new_with_all(find_interface_context)));
         TokenMethodResult::End
     }
 }
