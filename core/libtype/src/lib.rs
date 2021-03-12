@@ -3,6 +3,7 @@ use libmacro::{FieldGet, FieldGetClone
     , FieldGetMove, NewWithAll};
 use crate::primeval::{PrimevalType, PrimevalData};
 use crate::structure::{StructureData, StructDefine};
+use crate::interface::{InterfaceDefine};
 use std::cmp::{PartialEq, Eq};
 use std::hash::Hash;
 
@@ -257,6 +258,10 @@ pub enum TypeValue {
      * 结构体类型
      * */
     Structure(Structure),
+    /*
+     * 接口类型
+     * */
+    Interface(Interface),
     Any,
     /*
      * 空类型

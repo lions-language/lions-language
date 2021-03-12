@@ -6,6 +6,7 @@ use crate::{Type, TypeValue
     , AddressType
     , StructObject, Structure};
 use crate::structure::{StructDefine};
+use crate::interface::{InterfaceDefine};
 use crate::primeval::{PrimevalType};
 
 impl Type {
@@ -103,6 +104,14 @@ impl Type {
         Type::new_with_addrtyp(TypeValue::Structure(
                 Structure::new(
                     StructObject::new(define)))
+            , addr_typ)
+    }
+
+    pub fn from_interface(define: HeapPtr
+        , addr_typ: TypeAddrType) -> Self {
+        Type::new_with_addrtyp(TypeValue::Interface(
+                Interface::new(
+                    InterfaceObject::new(define)))
             , addr_typ)
     }
 
