@@ -44,6 +44,44 @@ impl Structure {
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct InterfaceObject(HeapPtr);
+
+impl InterfaceObject {
+    pub fn pop(&self) -> Heap<InterfaceDefine> {
+        self.0.pop()
+    }
+    pub fn push(&self, v: Heap<InterfaceDefine>) {
+        self.0.push(v);
+    }
+    pub fn new(p: HeapPtr) -> Self {
+        Self(p)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq
+    , FieldGet, FieldGetClone)]
+pub struct Interface {
+    /*
+     * 因为每一个结构的类型信息在整个系统中只有一份, 所以这里将结构的内存指针存储下来
+     * 之后获取类型 string 的时候, 就只要访问地址中的字符串就可以, 降低内存消耗, 提高效率
+     *
+     * 在构造 结构类型时, 会从 interface_control 中找到 InterfaceObject 指针
+     *  比如: let a = mod1::Test{};
+     *  compile 阶段会通过 mod1 从 interface_control 中找到 InterfaceObject 指针, 然后通过这个指针, 构造
+     *  Type对象, 调用 interface_control 获取方法定义
+     * */
+    interface_obj: InterfaceObject
+}
+
+impl Interface {
+    pub fn new(interface_obj: InterfaceObject) -> Self {
+        Self {
+            interface_obj: interface_obj
+        }
+    }
+}
+
 #[derive(Debug)]
 pub enum BoolType {
     True,
