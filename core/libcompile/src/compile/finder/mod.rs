@@ -54,6 +54,14 @@ impl<'a, F: Compile> Compiler<'a, F> {
             };
             match package_str {
                 PackageStr::Itself => {
+                    let obj_ptr = match self.interface_control.find_define(module_str, &name) {
+                        Some(p) => {
+                            p
+                        },
+                        None => {
+                            return DescResult::Error(String::from("not found"));
+                        }
+                    };
                 },
                 PackageStr::Third(_) => {
                     unimplemented!();
