@@ -4,7 +4,8 @@ use crate::{Type, TypeValue
     , Primeval, TypeAddrType
     , TypeAttrubute
     , AddressType
-    , StructObject, Structure};
+    , StructObject, Structure
+    , InterfaceObject, Interface};
 use crate::structure::{StructDefine};
 use crate::interface::{InterfaceDefine};
 use crate::primeval::{PrimevalType};
@@ -19,6 +20,12 @@ impl Type {
                 let v = sp.struct_obj.pop();
                 let name = v.name_ref().to_string();
                 sp.struct_obj_ref().push(v);
+                name
+            },
+            TypeValue::Interface(ip) => {
+                let v = ip.interface_obj.pop();
+                let name = v.name_ref().to_string();
+                ip.interface_obj_ref().push(v);
                 name
             },
             TypeValue::Any => {
