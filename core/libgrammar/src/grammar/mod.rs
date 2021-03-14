@@ -419,7 +419,8 @@ pub struct FindInterfaceEndContext {
     , NewWithAll, FieldGetMove
     , Default)]
 pub struct FindInterfaceContext {
-    context: HeapPtr
+    context: HeapPtr,
+    define: HeapPtr
 }
 
 pub trait Grammar {

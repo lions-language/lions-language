@@ -37,6 +37,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                     return DescResult::Error(String::from("not found"));
                 }
             };
+            *context.define_mut() = obj_ptr.clone();
         } else {
             /*
              * 存在前缀
@@ -54,7 +55,11 @@ impl<'a, F: Compile> Compiler<'a, F> {
             };
             match package_str {
                 PackageStr::Itself => {
-                    let obj_ptr = match self.interface_control.find_define(module_str, &name) {
+                    let ms = match &module_str {
+                        Some(v) => v,
+                        None => self.module_stack.current().name_ref()
+                    };
+                    let obj_ptr = match self.interface_control.find_define(ms, &name) {
                         Some(p) => {
                             p
                         },
@@ -62,6 +67,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                             return DescResult::Error(String::from("not found"));
                         }
                     };
+                    *context.define_mut() = obj_ptr.clone();
                 },
                 PackageStr::Third(_) => {
                     unimplemented!();
