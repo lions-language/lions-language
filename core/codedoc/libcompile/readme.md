@@ -8,6 +8,9 @@
 ### 文件
 - compile/import_mapping.rs
 
+### import结果 结构
+- 保存了 PackageStr 和 ModuleStr 信息
+
 
 ## 双冒号(::)访问
 - 最多只会有一次 :: 访问, 因为 import语句已经将导入的包解析完毕了
@@ -19,5 +22,8 @@
 - 通过 enter_point_access 和 leave_point_access 告知compile 层, 让 compile层 在 enter/leave 记录需要的上下文信息
 
 
-## impl语句
+## 什么时候确定 PackageStr
+- 定义的时候一定是 Itself, 所以在定义的时候, 没有必要设置
+- 只有在 load 的时候才能辨别是 Itself, 还是 other
+    - 如果有前缀(::操作符), 说明是 other, 此时直接从 imports 中获取 package_str 和 module_str
 
