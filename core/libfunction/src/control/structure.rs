@@ -25,7 +25,7 @@ impl FunctionControlInterface for StructFunctionControl {
                 }
             },
             _ => {
-                unimplemented!();
+                unimplemented!("{:?}", ps);
             }
         }
     }

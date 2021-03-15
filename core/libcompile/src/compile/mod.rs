@@ -25,7 +25,8 @@ use libgrammar::grammar::{Grammar, CallFuncScopeContext
     , RelmodStmtContext, ModuleStmtContext
     , UseStmtContext, EndContext, FirstStmtContext
     , FindInterfaceContext, FindInterfacePrefixContext
-    , FindInterfaceEndContext, EnterColonColonAccessContext};
+    , FindInterfaceEndContext, EnterColonColonAccessContext
+    , ImplStmtContext};
 use libgrammar::token::{TokenValue};
 use libtype::{Type, Data};
 use libtype::function::{Function, CallFunctionParamAddr
@@ -699,6 +700,10 @@ impl<'a, F: Compile> Grammar for Compiler<'a, F> {
 
     fn use_stmt(&mut self, context: UseStmtContext) -> DescResult {
         self.process_use_stmt(context)
+    }
+
+    fn impl_stmt(&mut self, context: ImplStmtContext) -> DescResult {
+        self.process_impl_stmt(context)
     }
 
     fn first_stmt(&mut self, context: FirstStmtContext) -> DescResult {
