@@ -19,6 +19,10 @@ use crate::compile::value_buffer::{ValueBufferItemContext};
 impl<'a, F: Compile> Compiler<'a, F> {
     pub fn process_struct_init_start(&mut self
         , init_context: &mut StructInitContext) -> DescResult {
+        /*
+         * TODO: 判断是否处于 :: 模式
+         * 如果处于 :: 模式, 从 imports 中获取 package_str 和 module_str
+         * */
         let de = match self.struct_control.find_define(
             self.module_stack.current().name_ref(), init_context.struct_name_ref()) {
             Some(define) => {
