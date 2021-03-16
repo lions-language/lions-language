@@ -20,11 +20,37 @@ impl<'a, F: Compile> Compiler<'a, F> {
     pub fn process_struct_init_start(&mut self
         , init_context: &mut StructInitContext) -> DescResult {
         /*
-         * TODO: 判断是否处于 :: 模式
+         * 判断是否处于 :: 模式
          * 如果处于 :: 模式, 从 imports 中获取 package_str 和 module_str
          * */
+        if self.scope_context.current_unchecked().is_colon_colon_access() {
+            let colon_colon_access = self.scope_context.current_mut_unchecked().colon_colon_access_take_unwrap();
+            let prefix = colon_colon_access.fields_move();
+            match self.imports_mapping.get_clone(&prefix) {
+                Some(v) => {
+                    let (module_str, package_str) = v.fields_move();
+                    *init_context.package_str_mut() = package_str;
+                    self.process_struct_init_start_with_module(
+                        Some(module_str), init_context)
+                },
+                None => {
+                    self.process_struct_init_start_with_module(
+                        None, init_context)
+                }
+            }
+        } else {
+            self.process_struct_init_start_with_module(
+                None, init_context)
+        }
+    }
+
+    pub fn process_struct_init_start_with_module(&mut self
+        , module_str: Option<String>, init_context: &mut StructInitContext) -> DescResult {
         let de = match self.struct_control.find_define(
-            self.module_stack.current().name_ref(), init_context.struct_name_ref()) {
+            match &module_str{
+                Some(s) => s,
+                None => self.module_stack.current().name_ref()
+            }, init_context.struct_name_ref()) {
             Some(define) => {
                 define
             },
