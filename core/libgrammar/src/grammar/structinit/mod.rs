@@ -1,6 +1,7 @@
 use libresult::*;
 use libcommon::ptr::HeapPtr;
 use libtype::structure::{StructDefine};
+use libtype::package::PackageStr;
 use super::{Grammar, GrammarParser
     , ExpressContext, CallFuncScopeContext
     , StructInitContext, StructInitFieldContext
@@ -21,7 +22,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         let struct_name = extract_token_data!(name_data, Id);
         let struct_define = StructDefine::default();
         let mut init_context = StructInitContext::new_with_all(
-            struct_name, HeapPtr::new_null(), DescContext::default());
+            struct_name, HeapPtr::new_null(), DescContext::default(), PackageStr::Empty);
         match self.cb().struct_init_start(&mut init_context) {
             DescResult::Error(e) => {
                 self.panic(&e);

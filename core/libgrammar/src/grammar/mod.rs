@@ -110,7 +110,8 @@ impl CallFunctionContext {
 pub struct StructInitContext {
     struct_name: String,
     define: HeapPtr,
-    desc_ctx: DescContext
+    desc_ctx: DescContext,
+    package_str: PackageStr
 }
 
 #[derive(Debug, FieldGet, NewWithAll, FieldGetMove
