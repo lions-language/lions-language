@@ -49,6 +49,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
         let typ = value.typ_ref().clone();
         let typ_attr = value.typ_attr_ref().clone();
         let src_addr = value.addr_ref().addr_clone();
+        let package_str = value.package_str_clone();
         // println!("{:?}", typ_attr);
         /*
         self.scope_context.add_variant(name
@@ -60,7 +61,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
             ValueBufferItemContext::Structure => {
                 self.scope_context.add_variant(name
                     , Variant::new(
-                        Address::new(src_addr), typ, typ_attr));
+                        Address::new(src_addr), typ, typ_attr
+                        , package_str));
                 return DescResult::Success;
             },
             _ => {}
