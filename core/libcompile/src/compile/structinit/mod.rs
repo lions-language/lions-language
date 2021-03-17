@@ -125,10 +125,11 @@ impl<'a, F: Compile> Compiler<'a, F> {
         let context = LoadStackContext::new_with_all(
             addr.addr_clone(), Data::new(DataValue::Structure(StructureData::new())));
         self.cb.load_stack(context);
-        self.scope_context.push_with_addr_context_typattr_to_value_buffer(
+        self.scope_context.push_full_to_value_buffer(
             typ
             , addr, ValueBufferItemContext::Structure
-            , init_context.desc_ctx_ref().typ_attr_clone());
+            , init_context.desc_ctx_ref().typ_attr_clone()
+            , init_context.package_str_clone());
         DescResult::Success
     }
 
