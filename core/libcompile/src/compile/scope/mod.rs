@@ -5,6 +5,7 @@ use libmacro::{FieldGet, FieldGetMove
 use libtype::{AddressType, AddressValue, AddressKey
     , Type, TypeAttrubute};
 use libtype::function::{FunctionReturn};
+use libtype::package::PackageStr;
 use crate::compile::address_dispatch::AddressDispatch;
 use crate::compile::ref_count::RefCounter;
 use crate::compile::value_buffer::{ValueBuffer
@@ -186,6 +187,13 @@ impl Scope {
         , typ_attr: TypeAttrubute) {
         self.value_buffer.push_with_addr_context_typattr(typ
             , addr, context, typ_attr);
+    }
+
+    fn push_full_to_value_buffer(&mut self, typ: Type
+        , addr: Address, context: ValueBufferItemContext
+        , typ_attr: TypeAttrubute, package_str: PackageStr) {
+        self.value_buffer.push_full(typ
+            , addr, context, typ_attr, package_str);
     }
 
     fn push_to_value_buffer(&mut self, typ: Type) {

@@ -105,6 +105,18 @@ impl ValueBuffer {
             context: context
         });
     }
+
+    pub fn push_full(&mut self, typ: Type, addr: Address
+        , context: ValueBufferItemContext, typ_attr: TypeAttrubute
+        , package_str: PackageStr) {
+        self.buffer.push_back(ValueBufferItem {
+            typ: typ,
+            addr: addr,
+            typ_attr: typ_attr,
+            package_str: package_str,
+            context: context
+        });
+    }
     
     pub fn push(&mut self, typ: Type) {
         self.push_with_addr(typ, Address::default());

@@ -2,6 +2,7 @@ use libresult::{DescResult};
 use libtype::{AddressType, AddressValue
     , AddressKey, Type, TypeAttrubute};
 use libtype::function::{FunctionReturn};
+use libtype::package::PackageStr;
 use libcommon::ptr::{RefPtr};
 use super::{Scope, ScopeType, ScopeFuncCall};
 use super::{vars::Variant};
@@ -149,6 +150,15 @@ impl ScopeContext {
         , typ_attr: TypeAttrubute) {
         self.current_mut_unchecked().push_with_addr_context_typattr_to_value_buffer(
             typ, addr, context, typ_attr)
+    }
+
+    pub fn push_full_to_value_buffer(&mut self
+        , typ: Type, addr: Address
+        , context: ValueBufferItemContext
+        , typ_attr: TypeAttrubute
+        , package_str: PackageStr) {
+        self.current_mut_unchecked().push_full_to_value_buffer(
+            typ, addr, context, typ_attr, package_str)
     }
 
     pub fn push_to_value_buffer(&mut self, typ: Type) {
