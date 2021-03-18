@@ -109,7 +109,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
                         , AddressKey::new(param_no as u64)))
                 */
                 addr
-                , typ.clone(), typ_attr.clone()));
+                , typ.clone(), typ_attr.clone()
+                , mut_context.package_str_clone()));
         /*
          * 填充函数声明
          * */
