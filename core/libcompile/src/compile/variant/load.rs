@@ -150,7 +150,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
          * */
         let buf_ctx = ValueBufferItemContext::Variant(
             RefPtr::from_ref(name));
-        let (mut var_addr, var_typ, var_typ_attr, _) = var.fields_move();
+        let (mut var_addr, var_typ, var_typ_attr, _, package_str) = var.fields_move();
         /*
          * 修改 var_addr
          * */

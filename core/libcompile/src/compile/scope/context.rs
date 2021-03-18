@@ -210,7 +210,7 @@ impl ScopeContext {
         *var_addr.addr_mut().addr_mut().scope_mut() += scope;
         // println!("--- {}, {}", var_addr.addr_mut().addr_mut().scope_ref(), scope);
         Some((name, Variant::new(var_addr, var.typ_ref().clone()
-                    , var.typ_attr_ref().clone())))
+                    , var.typ_attr_ref().clone(), var.package_str_ref().clone())))
     }
 
     pub fn find_variant_mut(&mut self, name: &str) -> Option<RefPtr> {

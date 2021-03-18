@@ -5,6 +5,7 @@ use libtype::{AddressType, AddressValue
     , Type, TypeAttrubute};
 use libtype::instruction::{UpdateRefParamAddr
     , DeleteData};
+use libtype::package::PackageStr;
 use libgrammar::grammar::{VarStmtContext, VarUpdateStmtContext
     , ValueUpdateStmtContext};
 use crate::address::Address;
@@ -30,7 +31,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 , Variant::new(
                     Address::new(AddressValue::new_invalid())
                     , Type::new_null()
-                    , TypeAttrubute::default()));
+                    , TypeAttrubute::default()
+                    , PackageStr::default()));
             return DescResult::Success;
         }
         /*
@@ -62,7 +64,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 self.scope_context.add_variant(name
                     , Variant::new(
                         Address::new(src_addr), typ, typ_attr
-                        , package_str));
+                        , package_str.clone()));
                 return DescResult::Success;
             },
             _ => {}
@@ -80,7 +82,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 // println!("var {} define, alloc addr: {:?}", name, addr);
                 self.scope_context.add_variant(name
                     , Variant::new(
-                        Address::new(addr.addr_clone()), typ, typ_attr));
+                        Address::new(addr.addr_clone()), typ, typ_attr
+                        , package_str.clone()));
                 /*
                 self.cb.ownership_move(OwnershipMoveContext::new_with_all(
                     addr.addr().addr(), src_addr.clone()));
@@ -115,7 +118,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
                  * */
                 self.scope_context.add_variant(name
                     , Variant::new(
-                        Address::new(src_addr), typ, typ_attr));
+                        Address::new(src_addr), typ, typ_attr
+                        , package_str));
             },
             TypeAttrubute::Pointer
             | TypeAttrubute::Empty => {
