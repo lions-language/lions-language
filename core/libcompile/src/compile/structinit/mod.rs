@@ -7,6 +7,7 @@ use libtype::{Type, TypeAddrType
     , Data, DataValue};
 use libtype::structure::{StructDefine
     , StructField, StructureData};
+use libtype::package::PackageStr;
 use libresult::{DescResult};
 use crate::compile::{Compile, Compiler
     , OwnershipMoveContext, AddRefParamAddr
@@ -34,11 +35,11 @@ impl<'a, F: Compile> Compiler<'a, F> {
                         Some(module_str), init_context)
                 },
                 None => {
-                    self.process_struct_init_start_with_module(
-                        None, init_context)
+                    DescResult::Error(format!("{:?} is not exist", prefix))
                 }
             }
         } else {
+            *init_context.package_str_mut() = PackageStr::Itself;
             self.process_struct_init_start_with_module(
                 None, init_context)
         }
