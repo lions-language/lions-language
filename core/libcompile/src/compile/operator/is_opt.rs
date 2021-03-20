@@ -27,7 +27,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
         let param_typs = vec![(left_typ.clone(), left_typ_attr.clone())
             , (right_typ.clone(), right_typ_attr.clone())];
         let (exists, func_str) = 
-            match self.function_is_exist(consts::OPERATOR_EQUAL_EQUAL_FUNCTION_NAME
+            match self.function_is_exist(consts::OPERATOR_IS_FUNCTION_NAME
             , Some(&left_typ), left.package_str_clone(), &None
             , param_typs, &mut func_statement, &mut func_define) {
             Ok(r) => r,
