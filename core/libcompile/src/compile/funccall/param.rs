@@ -82,6 +82,9 @@ impl<'a, F: Compile> Compiler<'a, F> {
                         }
                         s.struct_obj_ref().push(so);
                     },
+                    TypeValue::Interface(_) => {
+                        unimplemented!();
+                    },
                     _ => {
                         let src = src_addr.clone_with_scope_plus(1);
                         let dst = addr.addr_ref().clone();
