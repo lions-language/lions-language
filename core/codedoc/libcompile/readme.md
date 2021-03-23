@@ -36,3 +36,7 @@
 - 首先判断 Type 是什么, 再判断怎么处理相应的类型
     - 比如: 判断 typ是 Structure, 那么就处理 结构体; 如果typ是 Interface, 就处理接口
 
+
+## operator/is_opt 处理
+- 判断right的类型是否是 interface, 如果是interface, 需要进行特殊处理
+
