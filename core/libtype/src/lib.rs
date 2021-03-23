@@ -289,13 +289,14 @@ impl TypeValue {
 /*
  * 类型存储在栈上还是堆上
  * */
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum TypeAddrType {
     Stack,
     Heap
 }
 
-#[derive(Debug, Clone, FieldGet, FieldGetClone)]
+#[derive(Debug, Clone, FieldGet, FieldGetClone
+         , PartialEq, Eq)]
 pub struct Type {
     typ: TypeValue,
     attr: TypeAttrubute,

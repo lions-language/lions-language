@@ -59,6 +59,9 @@ impl<'a, F: Compile> Compiler<'a, F> {
     fn is_interface_process(&mut self, define: Interface) -> DescResult {
         let right = self.scope_context.take_top_from_value_buffer();
         let left = self.scope_context.take_top_from_value_buffer();
+        /*
+         * 判断 left 中是否含有 right 的所有方法
+         * */
         DescResult::Success
     }
 }

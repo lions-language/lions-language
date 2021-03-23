@@ -14,18 +14,19 @@ use std::collections::VecDeque;
 /*
  * 函数返回值
  * */
-#[derive(Debug, Default, Clone, FieldGet)]
+#[derive(Debug, Default, Clone, FieldGet
+         , PartialEq, Eq)]
 pub struct FunctionReturn {
     pub data: FunctionReturnData
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum FunctionReturnRefParam {
     Index(usize),
     Addr(AddressValue)
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum FunctionReturnDataAttr {
     /*
      * 元组第一个位置: 参数的位置索引
@@ -50,7 +51,8 @@ impl Default for FunctionReturnDataAttr {
  * 如果返回值是多个值, 将抽象为元组
  * */
 #[derive(Debug, Clone, Default, FieldGet
-    , NewWithAll, FieldGetClone)]
+    , NewWithAll, FieldGetClone
+    , PartialEq, Eq)]
 pub struct FunctionReturnData {
     pub typ: Type,
     pub typ_attr: TypeAttrubute,
@@ -102,12 +104,13 @@ pub struct CallFunctionReturnData {
 /*
  * 函数参数
  * */
-#[derive(Debug, Clone, FieldGet)]
+#[derive(Debug, Clone, FieldGet
+         , PartialEq, Eq)]
 pub struct FunctionParam {
     pub data: FunctionParamData
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum FunctionParamLengthenAttr {
     /*
      * 变长参数
@@ -120,7 +123,7 @@ pub enum FunctionParamLengthenAttr {
 }
 
 #[derive(Debug, Clone, FieldGet, NewWithAll
-    , FieldGetClone)]
+    , FieldGetClone, PartialEq, Eq)]
 pub struct FunctionParamDataItem {
     pub typ: Type,
     pub typ_attr: TypeAttrubute,
@@ -135,7 +138,7 @@ pub struct FunctionParamDataItem {
     pub is_check_func_call_param_typ_attr: bool
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum FunctionParamData {
     /*
      * 其实可以写成一个, 之所以分开, 是因为如果只有一个参数, 没必要构建一个Vec, 提高效率,

@@ -7,7 +7,7 @@ use std::collections::{HashMap};
 
 #[derive(Debug, FieldGet
     , FieldGetMove, NewWithAll
-    , Default)]
+    , Default, PartialEq, Eq)]
 pub struct InterfaceFunctionStatement {
     func_param: Option<FunctionParam>,
     func_return: Option<FunctionReturn>
