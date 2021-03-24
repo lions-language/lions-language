@@ -26,9 +26,6 @@ impl DefineContainer {
     pub fn length(&self) -> usize {
         self.defines.len()
     }
-
-    pub fn iter(&self) {
-    }
     
     pub fn print_defines(&self) {
         for (name, define) in self.defines.iter() {
@@ -60,6 +57,16 @@ impl<'a> std::iter::IntoIterator for &'a DefineContainer {
 }
 
 /*
+impl<'a> std::iter::Iterator for &'a DefineContainer {
+    type Item = (&'a String, &'a HeapPtr);
+
+    fn next(&mut self) -> Option<(&'a String, &'a HeapPtr)> {
+        self.defines.next()
+    }
+}
+*/
+
+/*
  * 模块 <-> 结构定义
  * */
 pub struct InterfaceControl {
@@ -89,8 +96,20 @@ impl InterfaceControl {
         }
     }
 
-    pub fn iter_define<F: FnMut(&InterfaceDefine)>(&self, f: F) {
-        for (k, v) in self.defines.iter() {
+    pub fn iter_define<F: FnMut(&String, &InterfaceDefine) -> bool>(&self
+                , module_str: &str, name: &str, mut f: F) {
+        let c = match self.defines.get(module_str) {
+            Some(c) => c,
+            None => {
+                return;
+            }
+        };
+        for (k, v) in c.into_iter() {
+            let d = v.pop();
+            if f(k, &d) {
+                break;
+            }
+            v.push(d);
         }
     }
 
