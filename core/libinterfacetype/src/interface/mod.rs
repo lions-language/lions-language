@@ -26,6 +26,9 @@ impl DefineContainer {
     pub fn length(&self) -> usize {
         self.defines.len()
     }
+
+    pub fn iter(&self) {
+    }
     
     pub fn print_defines(&self) {
         for (name, define) in self.defines.iter() {
@@ -45,6 +48,14 @@ impl DefineContainer {
         Self {
             defines: HashMap::new()
         }
+    }
+}
+
+impl<'a> std::iter::IntoIterator for &'a DefineContainer {
+    type Item = (&'a String, &'a HeapPtr);
+    type IntoIter = std::collections::hash_map::Iter<'a, String, HeapPtr>;
+    fn into_iter(self) -> Self::IntoIter {
+        self.defines.iter()
     }
 }
 
@@ -75,6 +86,11 @@ impl InterfaceControl {
                 c.add_define(name, define);
                 self.defines.insert(module_str, c);
             }
+        }
+    }
+
+    pub fn iter_define<F: FnMut(&InterfaceDefine)>(&self, f: F) {
+        for (k, v) in self.defines.iter() {
         }
     }
 
