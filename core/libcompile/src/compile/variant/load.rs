@@ -27,6 +27,9 @@ impl<'a, F: Compile> Compiler<'a, F> {
         let first = extract_token_data!(first_data, Id);
         let colon_colon_access = self.scope_context.current_mut_unchecked().colon_colon_access_take_unwrap();
         let prefix = colon_colon_access.fields_move();
+        /*
+         * TODO: 从 imports 中找到 ImportItem, 然后调用 no_point_access
+         * */
         DescResult::Success
     }
 
