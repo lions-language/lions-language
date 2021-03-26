@@ -37,6 +37,9 @@ pub struct ModuleStack {
 
 impl ModuleStack {
     pub fn current(&self) -> &Module {
+        /*
+         * TODO: current 应该是完整的路径(距离 根 的完整path), 而不是最后一个
+         * */
         &self.stack.top_ref_unchecked().module
     }
 

@@ -4,6 +4,7 @@ use libmacro::{FieldGet, FieldGetClone
     , FieldGetMove};
 use libcommon::ptr::RefPtr;
 use crate::address::{Address};
+use crate::compile::imports_mapping::{ImportItem};
 use std::collections::{VecDeque};
 
 #[derive(Debug, Clone)]
@@ -20,7 +21,7 @@ pub struct ValueBufferItem {
     pub typ: Type,
     pub addr: Address,
     pub typ_attr: TypeAttrubute,
-    pub package_str: PackageStr,
+    pub import_item: ImportItem,
     pub context: ValueBufferItemContext
 }
 
