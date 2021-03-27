@@ -18,9 +18,10 @@ impl<'a, F: Compile> Compiler<'a, F> {
         let mut func_define = FunctionDefine::new_invalid_addr();
         let mut func_statement: Option<FunctionStatement> = None;
         let param_typs = vec![(value_typ.clone(), value_typ_attr.clone())];
+        let (value_module_str, value_package_str) = value.import_item_clone().fields_move();
         let (exists, func_str) = 
             match self.function_is_exist(consts::OPERATOR_PREFIX_PLUS_PLUS_FUNCTION_NAME
-            , Some(&value_typ), value.package_str_clone(), &None
+            , Some(&value_typ), value_package_str, &Some(value_module_str)
             , param_typs, &mut func_statement, &mut func_define) {
             Ok(r) => r,
             Err(err) => {

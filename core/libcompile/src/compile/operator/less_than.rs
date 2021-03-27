@@ -26,9 +26,10 @@ impl<'a, F: Compile> Compiler<'a, F> {
         let mut func_statement: Option<FunctionStatement> = None;
         let param_typs = vec![(left_typ.clone(), left_typ_attr.clone())
             , (right_typ.clone(), right_typ_attr.clone())];
+        let (left_module_str, left_package_str) = left.import_item_clone().fields_move();
         let (exists, func_str) = 
             match self.function_is_exist(consts::OPERATOR_LESS_THAN_FUNCTION_NAME
-            , Some(&left_typ), left.package_str_clone(), &None
+            , Some(&left_typ), left_package_str, &Some(left_module_str)
             , param_typs, &mut func_statement, &mut func_define) {
             Ok(r) => r,
             Err(err) => {
