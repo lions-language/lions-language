@@ -5,7 +5,8 @@
     - 一开始会获取依赖的包, 并下载到本地, 需要访问的时候, 将下载的二进制文件读取到内存中, 以后使用这些包的时候, 就会从这些指针对象中获取
 
 ### 对于module
-- 通过 import 的路径, 计算出距离 根的 path, 将这个完整的 path, 写入到 module 中
+- 通过 import 的路径, 计算出距离根路径 的 path, 将这个完整的 path, 写入到 module 中
+    - 并将其写入到 module_stack 中, 然后跳转到文件中import的路径中, 进行编译
 
 
 ## 记录import结果
@@ -43,11 +44,6 @@
 
 ## operator/is_opt 处理
 - 判断right的类型是否是 interface, 如果是interface, 需要进行特殊处理
-
-
-## module_stack
-### 说明
-- 每次进入一个模块的时候, 都会将其推入到 module_stack 中
 
 
 ## 第三方包
