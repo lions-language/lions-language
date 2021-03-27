@@ -69,7 +69,7 @@ impl ValueBuffer {
             typ: typ,
             addr: addr,
             typ_attr: TypeAttrubute::Move,
-            package_str: PackageStr::Empty,
+            import_item: ImportItem::default(),
             context: ValueBufferItemContext::Null
         });
     }
@@ -80,7 +80,7 @@ impl ValueBuffer {
             typ: typ,
             addr: addr,
             typ_attr: typ_attr,
-            package_str: PackageStr::Empty,
+            import_item: ImportItem::default(),
             context: ValueBufferItemContext::Null
         });
     }
@@ -91,7 +91,7 @@ impl ValueBuffer {
             typ: typ,
             addr: addr,
             typ_attr: TypeAttrubute::Move,
-            package_str: PackageStr::Empty,
+            import_item: ImportItem::default(),
             context: context
         });
     }
@@ -102,19 +102,19 @@ impl ValueBuffer {
             typ: typ,
             addr: addr,
             typ_attr: typ_attr,
-            package_str: PackageStr::Empty,
+            import_item: ImportItem::default(),
             context: context
         });
     }
 
     pub fn push_full(&mut self, typ: Type, addr: Address
         , context: ValueBufferItemContext, typ_attr: TypeAttrubute
-        , package_str: PackageStr) {
+        , import_item: ImportItem) {
         self.buffer.push_back(ValueBufferItem {
             typ: typ,
             addr: addr,
             typ_attr: typ_attr,
-            package_str: package_str,
+            import_item: import_item,
             context: context
         });
     }

@@ -2,7 +2,8 @@ use libmacro::{FieldGet, FieldGetMove, NewWithAll};
 use libtype::package::{PackageStr};
 use std::collections::HashMap;
 
-#[derive(FieldGet, FieldGetMove, NewWithAll, Clone)]
+#[derive(FieldGet, FieldGetMove, NewWithAll, Clone
+         , Debug, Default)]
 pub struct ImportItem {
     module_str: String,
     package_str: PackageStr

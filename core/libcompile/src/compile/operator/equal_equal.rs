@@ -16,6 +16,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
         let left = self.scope_context.top_n_with_panic_from_value_buffer(2);
         let left_typ = left.typ_clone();
         let left_typ_attr = left.typ_attr_ref();
+        let (left_module_str, left_package_str) = left.import_item_clone().fields_move();
         /*
         let (right_typ, right_addr, right_typ_attr, right_package_type, right_package_str, right_context)
             = take_value_top!(self, right_expr_value).fields_move();
@@ -28,7 +29,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
             , (right_typ.clone(), right_typ_attr.clone())];
         let (exists, func_str) = 
             match self.function_is_exist(consts::OPERATOR_EQUAL_EQUAL_FUNCTION_NAME
-            , Some(&left_typ), left.package_str_clone(), &None
+            , Some(&left_typ), left_package_str, &Some(left_module_str)
             , param_typs, &mut func_statement, &mut func_define) {
             Ok(r) => r,
             Err(err) => {

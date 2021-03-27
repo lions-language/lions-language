@@ -48,7 +48,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
         let right_addr = right.addr_clone();
         let left_context = left.context_clone();
         let right_context = right.context_clone();
-        let left_package_str = left.package_str_clone();
+        let left_import_item = left.import_item_clone();
         let value_left_typ_attr = left.typ_attr_clone();
         let value_right_typ_attr = right.typ_attr_clone();
         // println!("{:?}, {:?}", value_left_typ_attr, value_right_typ_attr);
@@ -166,7 +166,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
         let func_ptr = match self.function_control.find_function(&FindFunctionContext{
             func_name: consts::OPERATOR_PLUS_FUNCTION_NAME,
             typ: Some(&left_type),
-            package_str: left_package_str,
+            package_str: left_import_item.package_str(),
             func_str: &statement_str,
             module_str: self.module_stack.current().to_str()
         }, &None) {
