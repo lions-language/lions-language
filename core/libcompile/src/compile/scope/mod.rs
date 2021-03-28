@@ -10,6 +10,7 @@ use crate::compile::address_dispatch::AddressDispatch;
 use crate::compile::ref_count::RefCounter;
 use crate::compile::value_buffer::{ValueBuffer
     , ValueBufferItem, ValueBufferItemContext};
+use crate::compile::imports_mapping::{ImportItem};
 use crate::address::{Address};
 use crate::define::{DefineObject};
 use std::cmp::{PartialEq};
@@ -191,9 +192,9 @@ impl Scope {
 
     fn push_full_to_value_buffer(&mut self, typ: Type
         , addr: Address, context: ValueBufferItemContext
-        , typ_attr: TypeAttrubute, package_str: PackageStr) {
+        , typ_attr: TypeAttrubute, import_item: ImportItem) {
         self.value_buffer.push_full(typ
-            , addr, context, typ_attr, package_str);
+            , addr, context, typ_attr, import_item);
     }
 
     fn push_to_value_buffer(&mut self, typ: Type) {

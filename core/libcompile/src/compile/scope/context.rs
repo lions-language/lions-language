@@ -9,6 +9,7 @@ use super::{vars::Variant};
 use crate::address::Address;
 use crate::compile::value_buffer::{
     ValueBufferItem, ValueBufferItemContext};
+use crate::compile::imports_mapping::{ImportItem};
 use crate::define::{DefineObject};
 use std::collections::VecDeque;
 
@@ -156,9 +157,9 @@ impl ScopeContext {
         , typ: Type, addr: Address
         , context: ValueBufferItemContext
         , typ_attr: TypeAttrubute
-        , package_str: PackageStr) {
+        , import_item: ImportItem) {
         self.current_mut_unchecked().push_full_to_value_buffer(
-            typ, addr, context, typ_attr, package_str)
+            typ, addr, context, typ_attr, import_item)
     }
 
     pub fn push_to_value_buffer(&mut self, typ: Type) {

@@ -51,7 +51,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
         let typ = value.typ_ref().clone();
         let typ_attr = value.typ_attr_ref().clone();
         let src_addr = value.addr_ref().addr_clone();
-        let package_str = value.package_str_clone();
+        let import_item = value.import_item_clone();
+        let (module_str, package_str) = import_item.fields_move();
         // println!("{:?}", typ_attr);
         /*
         self.scope_context.add_variant(name
