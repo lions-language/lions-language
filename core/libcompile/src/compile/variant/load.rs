@@ -153,7 +153,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
          * */
         let buf_ctx = ValueBufferItemContext::Variant(
             RefPtr::from_ref(name));
-        let (mut var_addr, var_typ, var_typ_attr, package_str, _) = var.fields_move();
+        let (mut var_addr, var_typ, var_typ_attr, import_item, _) = var.fields_move();
         /*
          * 修改 var_addr
          * */
@@ -174,7 +174,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
         self.scope_context.push_full_to_value_buffer(
             var_typ
             , var_addr, buf_ctx
-            , at, package_str
+            , at, import_item
         );
         DescResult::Success
     }

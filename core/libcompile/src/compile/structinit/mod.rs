@@ -16,6 +16,7 @@ use crate::compile::address::Address;
 use crate::compile::scope::{StructInitField
     , StructInit};
 use crate::compile::value_buffer::{ValueBufferItemContext};
+use crate::compile::imports_mapping::{ImportItem};
 
 impl<'a, F: Compile> Compiler<'a, F> {
     pub fn process_struct_init_start(&mut self
@@ -31,6 +32,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 Some(v) => {
                     let (module_str, package_str) = v.fields_move();
                     *init_context.package_str_mut() = package_str;
+                    *init_context.module_str_mut() = module_str.clone();
                     self.process_struct_init_start_with_module(
                         Some(module_str), init_context)
                 },
@@ -130,7 +132,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
             typ
             , addr, ValueBufferItemContext::Structure
             , init_context.desc_ctx_ref().typ_attr_clone()
-            , init_context.package_str_clone());
+            , ImportItem::new_with_all(init_context.module_str_clone(), init_context.package_str_clone()));
         DescResult::Success
     }
 

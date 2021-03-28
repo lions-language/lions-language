@@ -111,7 +111,8 @@ pub struct StructInitContext {
     struct_name: String,
     define: HeapPtr,
     desc_ctx: DescContext,
-    package_str: PackageStr
+    package_str: PackageStr,
+    module_str: String
 }
 
 #[derive(Debug, FieldGet, NewWithAll, FieldGetMove
