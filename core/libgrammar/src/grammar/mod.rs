@@ -181,7 +181,8 @@ pub struct FunctionDefineParamMutContext {
      * 引用参数序号
      * */
     ref_param_no: usize,
-    package_str: PackageStr
+    package_str: PackageStr,
+    module_str: String
 }
 
 #[derive(Debug, FieldGet, NewWithAll, FieldGetMove)]
