@@ -2,6 +2,7 @@ use libmacro::{FieldGet, FieldGetMove, NewWithAll};
 use libtype::{Type, TypeAttrubute, AddressKey};
 use libtype::package::PackageStr;
 use crate::address::Address;
+use crate::compile::imports_mapping::{ImportItem};
 use std::collections::{HashMap, HashSet};
 
 #[derive(FieldGet, FieldGetMove)]
@@ -9,7 +10,7 @@ pub struct Variant {
     addr: Address,
     typ: Type,
     typ_attr: TypeAttrubute,
-    package_str: PackageStr,
+    import_item: ImportItem,
     /*
      * 连续地址
      * */
@@ -57,7 +58,7 @@ impl Variant {
     }
 
     pub fn new(addr: Address, typ: Type, typ_attr: TypeAttrubute
-               , package_str: PackageStr) -> Self {
+               , import_item: ImportItem) -> Self {
         let length = addr.addr_ref().addr_ref().length_clone();
         let consecutive_addr = if length == 0 {
             None
@@ -72,7 +73,7 @@ impl Variant {
             addr: addr,
             typ: typ,
             typ_attr: typ_attr,
-            package_str: package_str,
+            import_item: import_item,
             consecutive_addr: consecutive_addr
         }
     }
