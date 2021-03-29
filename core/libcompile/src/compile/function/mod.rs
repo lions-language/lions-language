@@ -19,6 +19,7 @@ use crate::compile::{Compile, Compiler, FunctionNamedStmtContext
     , TypeTokenExpand};
 use crate::compile::scope::vars::Variant;
 use crate::compile::scope::ScopeType;
+use crate::compile::imports_mapping::{ImportItem};
 use crate::define::{DefineObject};
 use crate::address::Address;
 
@@ -110,7 +111,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 */
                 addr
                 , typ.clone(), typ_attr.clone()
-                , mut_context.package_str_clone()));
+                , ImportItem::new_with_all(mut_context.module_str_clone()
+                                           , mut_context.package_str_clone())));
         /*
          * 填充函数声明
          * */

@@ -12,6 +12,7 @@ use crate::address::Address;
 use crate::compile::{Compile, Compiler, OwnershipMoveContext};
 use crate::compile::scope::vars::Variant;
 use crate::compile::value_buffer::{ValueBufferItemContext};
+use crate::compile::imports_mapping::{ImportItem};
 
 impl<'a, F: Compile> Compiler<'a, F> {
     pub fn handle_var_stmt_start(&mut self) {
@@ -32,7 +33,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                     Address::new(AddressValue::new_invalid())
                     , Type::new_null()
                     , TypeAttrubute::default()
-                    , PackageStr::default()));
+                    , ImportItem::default()));
             return DescResult::Success;
         }
         /*
@@ -52,7 +53,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
         let typ_attr = value.typ_attr_ref().clone();
         let src_addr = value.addr_ref().addr_clone();
         let import_item = value.import_item_clone();
-        let (module_str, package_str) = import_item.fields_move();
+        // let (module_str, package_str) = import_item.fields_move();
         // println!("{:?}", typ_attr);
         /*
         self.scope_context.add_variant(name
@@ -65,7 +66,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 self.scope_context.add_variant(name
                     , Variant::new(
                         Address::new(src_addr), typ, typ_attr
-                        , package_str.clone()));
+                        , import_item.clone()));
                 return DescResult::Success;
             },
             _ => {}
@@ -84,7 +85,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 self.scope_context.add_variant(name
                     , Variant::new(
                         Address::new(addr.addr_clone()), typ, typ_attr
-                        , package_str.clone()));
+                        , import_item.clone()));
                 /*
                 self.cb.ownership_move(OwnershipMoveContext::new_with_all(
                     addr.addr().addr(), src_addr.clone()));
@@ -120,7 +121,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
                 self.scope_context.add_variant(name
                     , Variant::new(
                         Address::new(src_addr), typ, typ_attr
-                        , package_str));
+                        , import_item));
             },
             TypeAttrubute::Pointer
             | TypeAttrubute::Empty => {
