@@ -5,6 +5,7 @@ use libgrammar::grammar::{OperatorIsContext};
 use libtype::function::{FunctionDefine
         , FunctionStatement};
 use libtype::{TypeValue, Interface};
+use libtype::interface::InterfaceDefine;
 use crate::compile::{Compile, Compiler};
 use crate::compile::value_buffer::{ValueBufferItem};
 
@@ -58,8 +59,28 @@ impl<'a, F: Compile> Compiler<'a, F> {
     }
 
     fn is_interface_process(&mut self, define: Interface) -> DescResult {
-        let right = self.scope_context.take_top_from_value_buffer();
+        let right = match self.scope_context.take_top_from_value_buffer() {
+            Ok(o) => o,
+            Err(err) => {
+                return err;
+            }
+        };
         let left = self.scope_context.take_top_from_value_buffer();
+        let (right_typ, right_addr, right_typ_attr, right_import_item, right_context) = right.fields_move();
+        let (right_module_str, right_package_str) = right_import_item.fields_move();
+        let interface_define = define.interface_obj_ref().pop();
+        match right_package_str {
+            PackageStr::Itself => {
+                self.interface_control.iter_define(&right_module_str, interface_define.name_ref()
+                            , |name: &String, de: &InterfaceDefine| -> bool {
+                                true
+                            });
+            },
+            _ => {
+                unimplemented!();
+            }
+        }
+        define.interface_obj_ref().push(interface_define);
         // self.interface_control.iter_define();
         /*
          * 判断 left 中是否含有 right 的所有方法
