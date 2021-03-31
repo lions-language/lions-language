@@ -96,6 +96,9 @@ impl InterfaceControl {
         }
     }
 
+    /*
+     * 遇到 true 就 break
+     * */
     pub fn iter_define<F: FnMut(&String, &InterfaceDefine) -> bool>(&self
                 , module_str: &str, name: &str, mut f: F) {
         let c = match self.defines.get(module_str) {
