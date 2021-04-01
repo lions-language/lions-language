@@ -71,6 +71,15 @@ impl<'a, F: Compile> Compiler<'a, F> {
         let interface_define = define.interface_obj_ref().pop();
         match right_package_str {
             PackageStr::Itself => {
+                match interface_define.function_statemet_ref() {
+                    Some(s) => s,
+                    None => {
+                        /*
+                         * interface 中没有函数 => 一定满足
+                         * */
+                        unimplemented!();
+                    }
+                }
                 self.interface_control.iter_define(&right_module_str, interface_define.name_ref()
                             , |name: &String, de: &InterfaceDefine| -> bool {
                                 /*
