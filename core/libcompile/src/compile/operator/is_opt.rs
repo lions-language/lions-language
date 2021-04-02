@@ -71,7 +71,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
         let interface_define = define.interface_obj_ref().pop();
         match right_package_str {
             PackageStr::Itself => {
-                match interface_define.function_statemet_ref() {
+                let statement = match interface_define.function_statemet_ref() {
                     Some(s) => s,
                     None => {
                         /*
@@ -79,30 +79,28 @@ impl<'a, F: Compile> Compiler<'a, F> {
                          * */
                         unimplemented!();
                     }
+                };
+                for s in statement {
+                    /*
+                     * TODO: 不应该迭代 InterfaceControl, 应该 先找到 InterfaceDefine,
+                     * 再迭代 InterfaceDefine
+                     * */
+                    let expect_func_str = FunctionSplice::get_function_without_return_string_by_type(
+                        &func_name, &Some(&param), &Some(&input_typ));
+                    // println!("{:?}", expect_func_str);
+                    /*
+                     * 查找方法
+                     * */
+                    let (input_module_str, input_package_str) = input_import_item.fields_move();
+                    let find_func_context = FindFunctionContext {
+                        func_name: &func_name,
+                        typ: Some(&input_typ),
+                        package_str: input_package_str.clone(),
+                        func_str: &expect_func_str,
+                        module_str: self.module_stack.current().name_ref()
+                    };
+                    let (exists, handle) = self.function_control.is_exists(&find_func_context);
                 }
-                self.interface_control.iter_define(&right_module_str, interface_define.name_ref()
-                            , |name: &String, de: &InterfaceDefine| -> bool {
-                                /*
-                                 * TODO: 不应该迭代 InterfaceControl, 应该 先找到 InterfaceDefine,
-                                 * 再迭代 InterfaceDefine
-                                 * */
-                                let expect_func_str = FunctionSplice::get_function_without_return_string_by_type(
-                                    &func_name, &Some(&param), &Some(&input_typ));
-                                // println!("{:?}", expect_func_str);
-                                /*
-                                 * 查找方法
-                                 * */
-                                let (input_module_str, input_package_str) = input_import_item.fields_move();
-                                let find_func_context = FindFunctionContext {
-                                    func_name: &func_name,
-                                    typ: Some(&input_typ),
-                                    package_str: input_package_str.clone(),
-                                    func_str: &expect_func_str,
-                                    module_str: self.module_stack.current().name_ref()
-                                };
-                                let (exists, handle) = self.function_control.is_exists(&find_func_context);
-                                false
-                            });
             },
             _ => {
                 unimplemented!();
