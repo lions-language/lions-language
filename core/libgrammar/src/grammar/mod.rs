@@ -215,6 +215,7 @@ pub struct FunctionStatementContext {
 #[derive(Debug, Default, FieldGet, NewWithAll, FieldGetMove
     , FieldGetClone)]
 pub struct InterfaceFunctionStatementContext {
+    func_name: String
 }
 
 #[derive(Debug, Default, FieldGet, NewWithAll, FieldGetMove
@@ -588,7 +589,7 @@ pub trait Grammar {
         unimplemented!();
     }
     fn interface_function_statement_end(&mut self, _define: &mut InterfaceDefine
-        , _context: &mut InterfaceFunctionStatementContext)
+        , _context: InterfaceFunctionStatementContext)
         -> DescResult {
         unimplemented!();
     }

@@ -85,28 +85,30 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
             }
         };
         let next_token = tp.as_ref::<T, CB>();
-        match next_token.context_ref().token_type() {
+        let func_name = match next_token.context_ref().token_type() {
             TokenType::Id => {
                 /*
-                 * 跳过 id
+                 * 获取函数名称
                  * */
-                self.skip_next_one();
+                let name_token = self.take_next_one().token_value().token_data_unchecked();
+                extract_token_data!(name_token, Id)
             },
             _ => {
                 self.panic(&format!("expect id after func, but meet: {:?}"
                         , next_token.context_token_type()));
+                panic!();
             }
-        }
+        };
         let mut context = FunctionDefineContext::new_with_all(false, HeapPtr::new_null());
         let mut define = InterfaceDefine::default();
-        let mut interface_function_statement_context = InterfaceFunctionStatementContext::new_with_all();
+        let mut interface_function_statement_context = InterfaceFunctionStatementContext::new_with_all(func_name);
         check_desc_result!(self, self.cb().interface_function_statement_start(&mut define
                             , &mut interface_function_statement_context));
         self.interface_function_parse_param_list(0, &mut context, &mut define);
         let mut func_statement_context = FunctionStatementContext::new_with_all(false);
         let is_end = self.interface_function_parse_return(&mut func_statement_context);
         check_desc_result!(self, self.cb().interface_function_statement_end(&mut define
-                            , &mut interface_function_statement_context));
+                            , interface_function_statement_context));
         if is_end {
             Status::End
         } else {
