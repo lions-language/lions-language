@@ -655,7 +655,7 @@ impl<'a, F: Compile> Grammar for Compiler<'a, F> {
     }
 
     fn interface_function_statement_end(&mut self, define: &mut InterfaceDefine
-        , context: &mut InterfaceFunctionStatementContext)
+        , context: InterfaceFunctionStatementContext)
         -> DescResult {
         self.process_interface_function_statement_end(define, context)
     }

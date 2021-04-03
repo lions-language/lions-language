@@ -71,7 +71,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
         let interface_define = define.interface_obj_ref().pop();
         match right_package_str {
             PackageStr::Itself => {
-                let statement = match interface_define.function_statemet_ref() {
+                let statement = match interface_define.function_statement_ref() {
                     Some(s) => s,
                     None => {
                         /*
@@ -81,10 +81,6 @@ impl<'a, F: Compile> Compiler<'a, F> {
                     }
                 };
                 for s in statement {
-                    /*
-                     * TODO: 不应该迭代 InterfaceControl, 应该 先找到 InterfaceDefine,
-                     * 再迭代 InterfaceDefine
-                     * */
                     let expect_func_str = FunctionSplice::get_function_without_return_string_by_type(
                         &func_name, &Some(&param), &Some(&input_typ));
                     // println!("{:?}", expect_func_str);

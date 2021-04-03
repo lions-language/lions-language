@@ -122,8 +122,21 @@ impl<'a, F: Compile> Compiler<'a, F> {
     }
 
     pub fn process_interface_function_statement_end(&mut self, define: &mut InterfaceDefine
-        , context: &mut InterfaceFunctionStatementContext)
+        , context: InterfaceFunctionStatementContext)
         -> DescResult {
+        let func_statement = match define.function_statement_mut() {
+            Some(statements) => {
+                if statements.is_empty() {
+                    unreachable!("function statement is empty");
+                }
+                statements.last_mut().unwrap()
+            },
+            None => {
+                unreachable!("function statement is none");
+            }
+        };
+        let func_name = context.fields_move();
+        *func_statement.func_name_mut() = func_name;
         DescResult::Success
     }
 }
