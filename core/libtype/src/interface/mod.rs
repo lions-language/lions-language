@@ -9,6 +9,7 @@ use std::collections::{HashMap};
     , FieldGetMove, NewWithAll
     , Default, PartialEq, Eq)]
 pub struct InterfaceFunctionStatement {
+    func_name: String,
     func_param: Option<FunctionParam>,
     func_return: Option<FunctionReturn>
 }
