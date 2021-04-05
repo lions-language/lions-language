@@ -3,7 +3,8 @@ use libtype::package::PackageStr;
 use libgrammar::token::TokenValue;
 use libgrammar::grammar::{OperatorIsContext};
 use libtype::function::{FunctionDefine
-        , FunctionStatement};
+    , FunctionStatement, FindFunctionContext
+    , splice::FunctionSplice};
 use libtype::{TypeValue, Interface};
 use libtype::interface::InterfaceDefine;
 use crate::compile::{Compile, Compiler};
@@ -81,19 +82,24 @@ impl<'a, F: Compile> Compiler<'a, F> {
                     }
                 };
                 for s in statement {
+                    let param = match s.func_param_ref() {
+                        Some(p) => Some(p.data_ref()),
+                        None => {
+                            None
+                        }
+                    };
                     let expect_func_str = FunctionSplice::get_function_without_return_string_by_type(
-                        &func_name, &Some(&param), &Some(&input_typ));
+                        s.func_name_ref(), &param, &Some(&right_typ));
                     // println!("{:?}", expect_func_str);
                     /*
                      * 查找方法
                      * */
-                    let (input_module_str, input_package_str) = input_import_item.fields_move();
                     let find_func_context = FindFunctionContext {
-                        func_name: &func_name,
-                        typ: Some(&input_typ),
-                        package_str: input_package_str.clone(),
+                        func_name: s.func_name_ref(),
+                        typ: Some(&right_typ),
+                        package_str: right_package_str.clone(),
                         func_str: &expect_func_str,
-                        module_str: self.module_stack.current().name_ref()
+                        module_str: &right_module_str,
                     };
                     let (exists, handle) = self.function_control.is_exists(&find_func_context);
                 }
