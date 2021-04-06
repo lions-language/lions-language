@@ -70,38 +70,41 @@ impl<'a, F: Compile> Compiler<'a, F> {
         let (right_typ, right_addr, right_typ_attr, right_import_item, right_context) = right.fields_move();
         let (right_module_str, right_package_str) = right_import_item.fields_move();
         let interface_define = define.interface_obj_ref().pop();
+        let mut is = true;
         match right_package_str {
             PackageStr::Itself => {
-                let statement = match interface_define.function_statement_ref() {
-                    Some(s) => s,
-                    None => {
+                if let Some(statement) = interface_define.function_statement_ref() {
+                    for s in statement {
+                        let param = match s.func_param_ref() {
+                            Some(p) => Some(p.data_ref()),
+                            None => {
+                                None
+                            }
+                        };
+                        let expect_func_str = FunctionSplice::get_function_without_return_string_by_type(
+                            s.func_name_ref(), &param, &Some(&right_typ));
+                        // println!("{:?}", expect_func_str);
                         /*
-                         * interface 中没有函数 => 一定满足
+                         * 查找方法
                          * */
-                        unimplemented!();
-                    }
-                };
-                for s in statement {
-                    let param = match s.func_param_ref() {
-                        Some(p) => Some(p.data_ref()),
-                        None => {
-                            None
+                        let find_func_context = FindFunctionContext {
+                            func_name: s.func_name_ref(),
+                            typ: Some(&right_typ),
+                            package_str: right_package_str.clone(),
+                            func_str: &expect_func_str,
+                            module_str: &right_module_str,
+                        };
+                        let (exists, handle) = self.function_control.is_exists(&find_func_context);
+                        if !exists {
+                            is = false;
+                            break;
                         }
-                    };
-                    let expect_func_str = FunctionSplice::get_function_without_return_string_by_type(
-                        s.func_name_ref(), &param, &Some(&right_typ));
-                    // println!("{:?}", expect_func_str);
+                    }
+                } else {
                     /*
-                     * 查找方法
+                     * 因为 interface 中不存在任何的函数, 所以一定，满足
                      * */
-                    let find_func_context = FindFunctionContext {
-                        func_name: s.func_name_ref(),
-                        typ: Some(&right_typ),
-                        package_str: right_package_str.clone(),
-                        func_str: &expect_func_str,
-                        module_str: &right_module_str,
-                    };
-                    let (exists, handle) = self.function_control.is_exists(&find_func_context);
+                    is = true;
                 }
             },
             _ => {
