@@ -23,6 +23,14 @@ impl Boolean {
         }
     }
 
+    pub fn from_std(b: bool) -> Self {
+        if b {
+            Self::new(BooleanValue::True)
+        } else {
+            Self::new(BooleanValue::False)
+        }
+    }
+
     pub fn new(value: BooleanValue) -> Self {
         Self {
             value: value
