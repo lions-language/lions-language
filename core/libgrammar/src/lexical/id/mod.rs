@@ -101,6 +101,10 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
         self.id_push_keyword_token(TokenType::Interface);
     }
 
+    fn id_kw_enum(&mut self) {
+        self.id_push_keyword_token(TokenType::Enum);
+    }
+
     fn id_kw_break(&mut self) {
         self.id_push_keyword_token(TokenType::Break);
     }
@@ -246,6 +250,9 @@ impl<T: FnMut() -> CallbackReturnStatus, CB: Grammar> LexicalParser<T, CB> {
             },
             "interface" => {
                 self.id_kw_interface();
+            },
+            "enum" => {
+                self.id_kw_enum();
             },
             "true" => {
                 self.id_kw_true();
