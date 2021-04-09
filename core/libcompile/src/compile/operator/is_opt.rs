@@ -5,7 +5,10 @@ use libgrammar::grammar::{OperatorIsContext};
 use libtype::function::{FunctionDefine
     , FunctionStatement, FindFunctionContext
     , splice::FunctionSplice};
-use libtype::{TypeValue, Interface};
+use libtype::{TypeValue, Interface, Data
+    , DataValue, TypeAttrubute};
+use libtype::{Primeval, primeval::PrimevalData
+    , primeval::boolean::Boolean};
 use libtype::interface::InterfaceDefine;
 use crate::compile::{Compile, Compiler};
 use crate::compile::value_buffer::{ValueBufferItem};
@@ -112,6 +115,8 @@ impl<'a, F: Compile> Compiler<'a, F> {
             }
         }
         define.interface_obj_ref().push(interface_define);
+        let data = Data::new(DataValue::Primeval(PrimevalData::Boolean(Boolean::from_std(is))));
+        self.const_boolean(data, TypeAttrubute::Move);
         // self.interface_control.iter_define();
         /*
          * 判断 left 中是否含有 right 的所有方法

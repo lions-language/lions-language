@@ -12,7 +12,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
         self.const_boolean(value.to_data(), typ_attr);
     }
 
-    fn const_boolean(&mut self, data: Data, typ_attr: TypeAttrubute) {
+    pub fn const_boolean(&mut self, data: Data, typ_attr: TypeAttrubute) {
         let typ = Type::new(TypeValue::Primeval(Primeval::new(
                     PrimevalType::Boolean)), typ_attr.clone());
         /*
