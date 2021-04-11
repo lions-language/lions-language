@@ -64,6 +64,8 @@ pub enum TokenType {
     Structure,
     // interface
     Interface,
+    // enum
+    Enum,
     // true
     True,
     // false

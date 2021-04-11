@@ -906,6 +906,9 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
             TokenType::Interface => {
                 self.interface_process();
             },
+            TokenType::Enum => {
+                self.enum_process();
+            },
             TokenType::Import => {
                 self.import_process();
             },
@@ -1171,6 +1174,7 @@ mod number;
 mod string;
 mod typ;
 mod structure;
+mod enumerate;
 mod structinit;
 mod process_if;
 mod boolean;
