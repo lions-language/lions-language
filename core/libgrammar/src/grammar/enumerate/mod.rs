@@ -30,8 +30,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         let name = extract_token_data!(next_token.token_value().token_data_unchecked(), Id);
         self.enum_block_process();
     }
-
-    fn enum_block_process(&mut self) {
-    }
 }
+
+mod block;
 
