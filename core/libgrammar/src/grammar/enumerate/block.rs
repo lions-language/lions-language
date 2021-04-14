@@ -32,6 +32,45 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
     }
 
     fn enum_block(&mut self) -> Status {
+        let tp = self.skip_white_space_token();
+        match tp {
+            Some(p) => {
+                return self.enum_block_select(&p);
+            },
+            None => {
+                return Status::End;
+            }
+        }
+    }
+
+    fn enum_block_select(&mut self, tp: &TokenPointer) -> Status {
+        let token = tp.as_ref::<T, CB>();
+        match token.context_token_type() {
+            TokenType::Id => {
+                return self.enum_block_item();
+            },
+            TokenType::Annotate => {
+                return Status::Continue;
+            },
+            TokenType::RightBigParenthese => {
+                self.skip_next_one();
+                return Status::End;
+            },
+            _ => {
+                self.panic(&format!("expect id, but meet {:?}", token.context_token_type()));
+                panic!();
+            }
+        }
+    }
+
+    fn enum_block_item(&mut self) -> Status {
+        /*
+         * 跳过id token
+         * */
+        let item_name = take_next_one();
+        /*
+         * 判断后面是否是 括号
+         * */
     }
 }
 
