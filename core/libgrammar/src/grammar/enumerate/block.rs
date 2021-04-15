@@ -67,10 +67,38 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         /*
          * 跳过id token
          * */
-        let item_name = take_next_one();
+        let item_name_token = self.take_next_one().token_value().token_data_unchecked();
+        let item_name = extract_token_data!(name_token, Id);
         /*
          * 判断后面是否是 括号
          * */
+        let tp = self.skip_white_space_token();
+        let tp = match tp {
+            Some(p) => {
+                p
+            },
+            None => {
+                self.panic("expect id, but arrive EOF");
+                panic!();
+            }
+        };
+        let token = tp.as_ref::<T, CB>();
+        match token.context_token_type() {
+            TokenType::LeftParenthese => {
+                /*
+                 * 直到找到 RightParenthese
+                 * */
+                self.enum_block_item_content();
+            },
+            _ => {
+                self.panic(&format!("expect id, but meet {:?}", token.context_token_type()));
+                panic!();
+            }
+        }
+        Status::Continue
+    }
+
+    fn enum_block_item_content(&mut self) {
     }
 }
 
