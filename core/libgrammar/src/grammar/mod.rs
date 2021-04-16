@@ -1162,6 +1162,7 @@ mod expression;
 mod function;
 mod interface;
 mod id;
+mod id_access;
 mod funccall;
 mod token_extend;
 mod annotate;
