@@ -428,6 +428,14 @@ pub struct FindInterfaceContext {
     define: HeapPtr
 }
 
+#[derive(Debug, FieldGet
+    , NewWithAll, FieldGetMove
+    , Default)]
+pub struct FormatDefine {
+    prefix: Option<String>,
+    name: String
+}
+
 pub trait Grammar {
     // type IdUse;
     
