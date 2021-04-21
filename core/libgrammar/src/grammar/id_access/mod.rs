@@ -9,7 +9,13 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
          * env:
          *  1. 从 math 开始, 不要跳过 math
          * */
-        let tp = self.skip_white_space_token();
+        let tp = match self.skip_white_space_token() {
+            Some(tp) => tp,
+            None => {
+                self.panic("expect id, but arrive EOF");
+                panic!();
+            }
+        };
         let token = tp.as_ref::<T, CB>();
         match token.context_token_type() {
             TokenType::Id => {
@@ -25,17 +31,24 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
     fn format_define_id(&mut self, end_token: TokenType) -> FormatDefine {
         let first = self.take_next_one().token_value().token_data_unchecked();
         let first_name = extract_token_data!(first, Id);
-        let tp = self.skip_white_space_token();
+        let tp = match self.skip_white_space_token() {
+            Some(tp) => tp,
+            None => {
+                self.panic("expect `)` or `::`, but arrive EOF");
+                panic!();
+            }
+        };
         let token = tp.as_ref::<T, CB>();
         match token.context_token_type() {
             TokenType::ColonColon => {
                 self.format_define_colon_colon(first_name)
             },
             _ => {
-                if end_token == token.context_token_type() {
+                if &end_token == token.context_token_type() {
                     self.format_define_end_single(first_name)
                 } else {
                     self.panic(&format!("expect id or {:?}, but meet {:?}", end_token, token.context_token_type()));
+                    panic!();
                 }
             }
         }
@@ -46,7 +59,13 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
          * 跳过 ::
          * */
         self.skip_next_one();
-        let tp = self.skip_white_space_token();
+        let tp = match self.skip_white_space_token() {
+            Some(tp) => tp,
+            None => {
+                self.panic("expect id, but arrive EOF");
+                panic!();
+            }
+        };
         let token = tp.as_ref::<T, CB>();
         match token.context_token_type() {
             TokenType::Id => {
@@ -66,6 +85,6 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
     fn format_define_end_multi(&mut self, first: String) -> FormatDefine {
         let second = self.take_next_one().token_value().token_data_unchecked();
         let second_name = extract_token_data!(second, Id);
-        FormatDefine::new_with_all(Some(first), second)
+        FormatDefine::new_with_all(Some(first), second_name)
     }
 }

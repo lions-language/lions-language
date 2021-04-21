@@ -68,7 +68,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
          * 跳过id token
          * */
         let item_name_token = self.take_next_one().token_value().token_data_unchecked();
-        let item_name = extract_token_data!(name_token, Id);
+        let item_name = extract_token_data!(item_name_token, Id);
         /*
          * 判断后面是否是 括号
          * */
