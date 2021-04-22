@@ -759,6 +759,12 @@ pub trait Grammar {
                           , _context: &mut FindInterfaceContext) -> DescResult {
         unimplemented!();
     }
+    fn enum_define_start(&mut self) -> DescResult {
+    }
+    fn enum_define_item(&mut self) -> DescResult {
+    }
+    fn enum_define_end(&mut self) -> DescResult {
+    }
 }
 
 enum NextToken<T: FnMut() -> CallbackReturnStatus, CB: Grammar> {
