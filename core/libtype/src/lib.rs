@@ -483,4 +483,5 @@ pub mod instruction;
 pub mod package;
 pub mod structure;
 pub mod interface;
+pub mod enumerate;
 
