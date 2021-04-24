@@ -7,7 +7,8 @@ use libcommon::consts::{ImportPrefixType};
 use libtype::{Type, TypeAttrubute
     , function::FunctionParamLengthenAttr
     , structure::StructDefine
-    , interface::InterfaceDefine};
+    , interface::InterfaceDefine
+    , enumerate::EnumerateDefine};
 use libtype::function::{FindFunctionHandle};
 use libresult::*;
 use libtype::package::PackageStr;
@@ -436,6 +437,24 @@ pub struct FormatDefine {
     name: String
 }
 
+#[derive(Debug, FieldGet
+    , NewWithAll, FieldGetMove
+    , Default)]
+pub struct EnumDefineStartContext {
+}
+
+#[derive(Debug, FieldGet
+    , NewWithAll, FieldGetMove
+    , Default)]
+pub struct EnumDefineItemContext {
+}
+
+#[derive(Debug, FieldGet
+    , NewWithAll, FieldGetMove
+    , Default)]
+pub struct EnumDefineEndContext {
+}
+
 pub trait Grammar {
     // type IdUse;
     
@@ -759,11 +778,17 @@ pub trait Grammar {
                           , _context: &mut FindInterfaceContext) -> DescResult {
         unimplemented!();
     }
-    fn enum_define_start(&mut self) -> DescResult {
+    fn enum_define_start(&mut self, _context: EnumDefineStartContext
+                         , _define: &mut EnumerateDefine) -> DescResult {
+        unimplemented!();
     }
-    fn enum_define_item(&mut self) -> DescResult {
+    fn enum_define_item(&mut self, _context: EnumDefineItemContext
+                        , _define: &mut EnumerateDefine) -> DescResult {
+        unimplemented!();
     }
-    fn enum_define_end(&mut self) -> DescResult {
+    fn enum_define_end(&mut self, _context: EnumDefineEndContext
+                       , _define: &mut EnumerateDefine) -> DescResult {
+        unimplemented!();
     }
 }
 
