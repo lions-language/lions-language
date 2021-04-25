@@ -100,6 +100,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
 
     fn enum_block_item_content(&mut self) {
         let format_define = self.format_define(TokenType::RightParenthese);
+        let define = 
     }
 }
 

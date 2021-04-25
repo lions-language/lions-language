@@ -441,12 +441,15 @@ pub struct FormatDefine {
     , NewWithAll, FieldGetMove
     , Default)]
 pub struct EnumDefineStartContext {
+    name: String
 }
 
 #[derive(Debug, FieldGet
     , NewWithAll, FieldGetMove
     , Default)]
 pub struct EnumDefineItemContext {
+    name: String,
+    format: FormatDefine
 }
 
 #[derive(Debug, FieldGet
