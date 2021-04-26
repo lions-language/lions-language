@@ -1,6 +1,8 @@
 use libtype::{TypeAttrubute};
 use libtype::interface::{InterfaceDefine};
-use crate::grammar::{GrammarParser, Grammar, NextToken, ExpressContext};
+use libtype::enumerate::{EnumerateDefine};
+use crate::grammar::{GrammarParser, Grammar, NextToken, ExpressContext
+    , EnumDefineStartContext};
 use crate::lexical::{CallbackReturnStatus, TokenVecItem, TokenPointer};
 use crate::token::{TokenType, TokenValue, TokenData};
 use libresult::{DescResult};
@@ -100,7 +102,6 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
 
     fn enum_block_item_content(&mut self) {
         let format_define = self.format_define(TokenType::RightParenthese);
-        let define = 
     }
 }
 
