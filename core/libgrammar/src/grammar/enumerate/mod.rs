@@ -33,7 +33,7 @@ impl<'a, T: FnMut() -> CallbackReturnStatus, CB: Grammar> GrammarParser<'a, T, C
         let context = EnumDefineStartContext::new_with_all(name);
         let mut define = EnumerateDefine::default();
         check_desc_result!(self, self.cb().enum_define_start(context, &mut define));
-        self.enum_block_process();
+        self.enum_block_process(&mut define);
     }
 }
 

@@ -449,7 +449,7 @@ pub struct EnumDefineStartContext {
     , Default)]
 pub struct EnumDefineItemContext {
     name: String,
-    format: FormatDefine
+    format: Option<FormatDefine>
 }
 
 #[derive(Debug, FieldGet
