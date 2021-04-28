@@ -788,6 +788,7 @@ mod imports_mapping;
 mod process_while;
 mod process_loop;
 mod interface;
+mod enumerate;
 mod finder;
 mod process_impl;
 
