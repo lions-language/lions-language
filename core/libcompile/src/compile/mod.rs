@@ -26,6 +26,8 @@ use libgrammar::grammar::{Grammar, CallFuncScopeContext
     , UseStmtContext, EndContext, FirstStmtContext
     , FindInterfaceContext, FindInterfacePrefixContext
     , FindInterfaceEndContext, EnterColonColonAccessContext
+    , EnumDefineStartContext, EnumDefineItemContext
+    , EnumDefineEndContext
     , ImplStmtContext};
 use libgrammar::token::{TokenValue};
 use libtype::{Type, Data};
@@ -37,7 +39,8 @@ use libtype::function::{Function, CallFunctionParamAddr
     , FunctionStatement};
 use libtype::{
     structure::{StructDefine},
-    interface::{InterfaceDefine}};
+    interface::{InterfaceDefine},
+    enumerate::{EnumerateDefine}};
 use libtype::instruction::{
     Instruction, BlockDefine
     , Jump, RemoveOwnership
@@ -718,6 +721,18 @@ impl<'a, F: Compile> Grammar for Compiler<'a, F> {
     fn find_interface_end(&mut self, end_context: FindInterfaceEndContext
                           , context: &mut FindInterfaceContext) -> DescResult {
         self.process_find_interface_end(end_context, context)
+    }
+
+    fn enum_define_start(&mut self, _: EnumDefineStartContext, _define: &mut EnumerateDefine) -> DescResult {
+        unimplemented!();
+    }
+
+    fn enum_define_item(&mut self, _: EnumDefineItemContext, _define: &mut EnumerateDefine) -> DescResult {
+        unimplemented!();
+    }
+
+    fn enum_define_end(&mut self, _: EnumDefineEndContext, _define: &mut EnumerateDefine) -> DescResult {
+        unimplemented!();
     }
 }
 

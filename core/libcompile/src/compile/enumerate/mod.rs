@@ -9,4 +9,14 @@ impl<'a, F: Compile> Compiler<'a, F> {
         , context: EnumDefineStartContext, define: &mut EnumerateDefine) -> DescResult {
         DescResult::Success
     }
+
+    pub fn process_enum_define_item(&mut self
+        , context: EnumDefineItemContext, define: &mut EnumerateDefine) -> DescResult {
+        DescResult::Success
+    }
+
+    pub fn process_enum_define_end(&mut self
+        , context: EnumDefineEndContext, define: &mut EnumerateDefine) -> DescResult {
+        DescResult::Success
+    }
 }
