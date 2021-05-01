@@ -1,7 +1,7 @@
 use libresult::DescResult;
 use libgrammar::grammar::{EnumDefineStartContext
     , EnumDefineItemContext, EnumDefineEndContext};
-use libtype::enumerate::{EnumerateDefine};
+use libtype::enumerate::{EnumerateDefine, EnumerateItem};
 use crate::compile::{Compile, Compiler};
 
 impl<'a, F: Compile> Compiler<'a, F> {
@@ -16,7 +16,7 @@ impl<'a, F: Compile> Compiler<'a, F> {
         let (name, format_define) = context.fields_move();
         match define.items_mut() {
             Some(item) => {
-                // item.push_back()
+                item.push(EnumerateDefein:new_with_all(name, Type::new_with_all()));
             },
             None => {
             }

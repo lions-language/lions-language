@@ -723,16 +723,16 @@ impl<'a, F: Compile> Grammar for Compiler<'a, F> {
         self.process_find_interface_end(end_context, context)
     }
 
-    fn enum_define_start(&mut self, _: EnumDefineStartContext, _define: &mut EnumerateDefine) -> DescResult {
-        unimplemented!();
+    fn enum_define_start(&mut self, context: EnumDefineStartContext, define: &mut EnumerateDefine) -> DescResult {
+        self.process_enum_define_start(context, define)
     }
 
-    fn enum_define_item(&mut self, _: EnumDefineItemContext, _define: &mut EnumerateDefine) -> DescResult {
-        unimplemented!();
+    fn enum_define_item(&mut self, context: EnumDefineItemContext, define: &mut EnumerateDefine) -> DescResult {
+        self.process_enum_define_item(context, define)
     }
 
     fn enum_define_end(&mut self, _: EnumDefineEndContext, _define: &mut EnumerateDefine) -> DescResult {
-        unimplemented!();
+        self.process_enum_define_end(context, define)
     }
 }
 
