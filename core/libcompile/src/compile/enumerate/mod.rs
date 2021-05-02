@@ -16,7 +16,15 @@ impl<'a, F: Compile> Compiler<'a, F> {
         let (name, format_define) = context.fields_move();
         match define.items_mut() {
             Some(item) => {
-                item.push(EnumerateDefein:new_with_all(name, Type::new_with_all()));
+                let typ = match format_define {
+                    Some(fd) => {
+                        get_typ_from_format_define(format_define)
+                    },
+                    None => {
+                        None
+                    }
+                };
+                item.push(EnumerateItem:new_with_all(name, typ));
             },
             None => {
             }

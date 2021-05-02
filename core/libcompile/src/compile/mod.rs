@@ -806,6 +806,7 @@ mod interface;
 mod enumerate;
 mod finder;
 mod process_impl;
+mod format_define;
 
 #[cfg(test)]
 mod test {
