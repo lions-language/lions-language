@@ -14,19 +14,20 @@ impl<'a, F: Compile> Compiler<'a, F> {
     pub fn process_enum_define_item(&mut self
         , context: EnumDefineItemContext, define: &mut EnumerateDefine) -> DescResult {
         let (name, format_define) = context.fields_move();
-        match define.items_mut() {
-            Some(item) => {
-                let typ = match format_define {
-                    Some(fd) => {
-                        get_typ_from_format_define(format_define)
-                    },
-                    None => {
-                        None
-                    }
-                };
-                item.push(EnumerateItem:new_with_all(name, typ));
+        let typ = match format_define {
+            Some(fd) => {
+                Some(self.get_typ_from_format_define(format_define))
             },
             None => {
+                None
+            }
+        };
+        match define.items_mut() {
+            Some(item) => {
+                item.push(EnumerateItem::new_with_all(name, typ));
+            },
+            None => {
+                *define.items_mut() = Some(vec![EnumerateItem::new_with_all(name, typ)]);
             }
         }
         DescResult::Success

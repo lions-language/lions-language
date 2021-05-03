@@ -731,7 +731,7 @@ impl<'a, F: Compile> Grammar for Compiler<'a, F> {
         self.process_enum_define_item(context, define)
     }
 
-    fn enum_define_end(&mut self, _: EnumDefineEndContext, _define: &mut EnumerateDefine) -> DescResult {
+    fn enum_define_end(&mut self, context: EnumDefineEndContext, define: &mut EnumerateDefine) -> DescResult {
         self.process_enum_define_end(context, define)
     }
 }
